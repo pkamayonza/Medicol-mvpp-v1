@@ -154,8 +154,8 @@
       <span class="org-pill" id="org-label">—</span>
     </div>
     <div class="nav-tabs">
-      <button class="tab-btn active" id="inv-tab" onclick="showPage('inventory')">💊 Inventory</button>
-      <button class="tab-btn" id="pat-tab" onclick="showPage('patients')">👤 Patients</button>
+      <button class="tab-btn active" id="inv-tab" onclick="showPage('inventory')">Inventory</button>
+      <button class="tab-btn" id="pat-tab" onclick="showPage('patients')">Patients</button>
     </div>
     <button class="btn-logout" onclick="doLogout()">Sign Out</button>
   </nav>
@@ -169,7 +169,7 @@
       <div class="stat-card"><div class="num" id="s-exp-dead">—</div><div class="lbl">Expired</div></div>
     </div>
     <div class="card">
-      <h2>➕ Add Drug</h2>
+      <h2>Add Drug</h2>
       <div class="form-grid">
         <div class="form-group" style="grid-column:span 2"><label>Drug Name *</label><input type="text" id="i-name" placeholder="e.g. Amoxicillin 500mg"/></div>
         <div class="form-group"><label>Quantity *</label><input type="number" id="i-qty" placeholder="200" min="0"/></div>
@@ -181,7 +181,7 @@
       <div class="form-actions"><button class="btn btn-primary" onclick="addDrug()">Add Drug</button></div>
     </div>
     <div class="card">
-      <h2>📦 Drug Inventory</h2>
+      <h2>Drug Inventory</h2>
       <div class="search-bar"><input type="text" id="i-search" placeholder="Search drug name or supplier..." oninput="filterInv()"/></div>
       <div class="table-wrap">
         <table>
@@ -199,7 +199,7 @@
       <div class="stat-card"><div class="num" id="s-today">—</div><div class="lbl">Added Today</div></div>
     </div>
     <div class="card">
-      <h2>➕ Register Patient</h2>
+      <h2>Register Patient</h2>
       <div class="form-grid">
         <div class="form-group"><label>Full Name *</label><input type="text" id="p-name" placeholder="e.g. Grace Nakato"/></div>
         <div class="form-group"><label>Age</label><input type="number" id="p-age" placeholder="34" min="0"/></div>
@@ -211,7 +211,7 @@
       <div class="form-actions"><button class="btn btn-primary" onclick="addPatient()">Register Patient</button></div>
     </div>
     <div class="card">
-      <h2>👥 Patient Records</h2>
+      <h2>Patient Records</h2>
       <div class="search-bar"><input type="text" id="p-search" placeholder="Search by name, phone, or condition..." oninput="filterPts()"/></div>
       <div class="table-wrap">
         <table>
@@ -235,7 +235,7 @@
 <!-- EDIT DRUG MODAL -->
 <div class="mo" id="m-drug">
   <div class="mb">
-    <h3>✏️ Update Stock</h3>
+    <h3>Update Stock</h3>
     <input type="hidden" id="e-drug-id"/>
     <div class="form-group" style="margin-bottom:1rem"><label>Drug</label><input type="text" id="e-drug-name" readonly style="background:#f5f5f5"/></div>
     <div class="form-group"><label>New Quantity *</label><input type="number" id="e-drug-qty" min="0"/></div>
@@ -317,7 +317,7 @@ async function doSignup() {
   if (pass.length<6) { showErr('signup-err','Password must be at least 6 characters.'); return; }
   try {
     await authFetch('signup', { email, password:pass, data:{org_name:org, org_type:type} });
-    showOk('signup-ok','✅ Account created! Please check your email to confirm, then sign in.');
+    showOk('signup-ok',' Account created! Please check your email to confirm, then sign in.');
     ['s-org','s-email','s-pass'].forEach(id=>document.getElementById(id).value='');
     document.getElementById('s-type').value='';
   } catch(e) { showErr('signup-err', e.message); }
@@ -408,7 +408,7 @@ async function addDrug() {
   if (!name||isNaN(qty)) { toast('Drug name and quantity required.','err'); return; }
   try {
     await dbFetch('inventory','POST',{drug_name:name,quantity:qty,unit:document.getElementById('i-unit').value,expiry_date:document.getElementById('i-exp').value||null,price:document.getElementById('i-price').value||null,supplier:document.getElementById('i-sup').value.trim()||null,org_id:user.id});
-    toast('✅ Drug added!');
+    toast('Drug added!');
     ['i-name','i-qty','i-exp','i-price','i-sup'].forEach(id=>document.getElementById(id).value='');
     loadDrugs();
   } catch(e) { toast('Error: '+e.message,'err'); }
@@ -425,7 +425,7 @@ async function saveDrugQty() {
   const id=document.getElementById('e-drug-id').value;
   const qty=parseInt(document.getElementById('e-drug-qty').value);
   if (isNaN(qty)) { toast('Enter a valid quantity.','err'); return; }
-  try { await dbFetch(`inventory?id=eq.${id}`,'PATCH',{quantity:qty}); toast('✅ Stock updated!'); cm('m-drug'); loadDrugs(); }
+  try { await dbFetch(`inventory?id=eq.${id}`,'PATCH',{quantity:qty}); toast('Stock updated!'); cm('m-drug'); loadDrugs(); }
   catch(e) { toast('Error: '+e.message,'err'); }
 }
 
@@ -486,7 +486,7 @@ async function addPatient() {
   if (!name) { toast('Patient name required.','err'); return; }
   try {
     await dbFetch('patients','POST',{name,age:document.getElementById('p-age').value||null,gender:document.getElementById('p-gender').value||null,phone:document.getElementById('p-phone').value.trim()||null,condition:document.getElementById('p-cond').value.trim()||null,notes:document.getElementById('p-notes').value.trim()||null,org_id:user.id});
-    toast('✅ Patient registered!');
+    toast('Patient registered!');
     ['p-name','p-age','p-phone','p-cond','p-notes'].forEach(id=>document.getElementById(id).value='');
     document.getElementById('p-gender').value='';
     loadPatients();
