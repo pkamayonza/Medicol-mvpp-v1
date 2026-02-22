@@ -4,193 +4,825 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>Medicol MVP</title>
+
 <style>
-  *{box-sizing:border-box;margin:0;padding:0;}
-  body{font-family:system-ui,sans-serif;background:#f5f5f5;color:#111;}
+  *{
+    box-sizing:border-box;
+    margin:0;padding:0;
+  }
 
-  /* ── AUTH ── */
-  #auth-screen{min-height:100vh;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#0B1F3A 0%,#0D3333 100%);}
-  .auth-box{background:white;border-radius:14px;padding:2.5rem;width:90%;max-width:440px;box-shadow:0 20px 60px rgba(0,0,0,0.3);}
-  .auth-logo{text-align:center;margin-bottom:1.8rem;}
-  .auth-logo h1{font-size:2rem;color:#0B1F3A;}
-  .auth-logo h1 span{color:#0D6E6E;}
-  .auth-logo p{font-size:0.82rem;color:#999;margin-top:0.25rem;}
-  .auth-tabs{display:flex;border:1px solid #e0e0e0;border-radius:8px;margin-bottom:1.6rem;overflow:hidden;}
-  .auth-tab{flex:1;padding:0.65rem;text-align:center;cursor:pointer;font-size:0.9rem;font-weight:600;background:white;border:none;color:#888;transition:all 0.2s;}
-  .auth-tab.active{background:#0D6E6E;color:white;}
-  .af{display:flex;flex-direction:column;gap:0.9rem;}
-  .fg{display:flex;flex-direction:column;gap:0.3rem;}
-  .fg label{font-size:0.75rem;font-weight:600;color:#555;text-transform:uppercase;letter-spacing:0.5px;}
-  .fg input,.fg select{border:1px solid #ddd;border-radius:8px;padding:0.7rem 1rem;font-size:0.93rem;outline:none;transition:border-color 0.2s;font-family:inherit;}
-  .fg input:focus,.fg select:focus{border-color:#0D6E6E;}
-  .btn-auth{background:#0D6E6E;color:white;border:none;padding:0.85rem;border-radius:8px;font-size:0.95rem;font-weight:600;cursor:pointer;margin-top:0.4rem;transition:background 0.2s;width:100%;}
-  .btn-auth:hover{background:#0A5555;}
-  .a-err{background:#fef2f2;border:1px solid #fca5a5;color:#dc2626;padding:0.7rem 1rem;border-radius:8px;font-size:0.83rem;display:none;}
-  .a-ok{background:#f0fdf4;border:1px solid #86efac;color:#16a34a;padding:0.7rem 1rem;border-radius:8px;font-size:0.83rem;display:none;}
+  body{
+    font-family:system-ui,sans-serif;
+    background:#f5f5f5;
+    color:#111;
+  }
 
-  /* ── ROLE PICKER (shown after signup fields, before submit) ── */
-  .role-grid{display:grid;grid-template-columns:1fr 1fr;gap:0.7rem;margin-top:0.2rem;}
-  .role-card{border:2px solid #e0e0e0;border-radius:10px;padding:0.9rem;text-align:center;cursor:pointer;transition:all 0.2s;background:white;}
-  .role-card:hover{border-color:#0D6E6E;background:#f0fdf9;}
-  .role-card.selected{border-color:#0D6E6E;background:#f0fdf9;}
-  .role-card .ri{font-size:1.6rem;display:block;margin-bottom:0.3rem;}
-  .role-card .rn{font-size:0.82rem;font-weight:600;color:#0B1F3A;}
+  /* ── authentication ── */
+  #auth-screen{
+    min-height:100vh;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    background:linear-gradient(135deg,#0B1F3A 0%,#0D3333 100%);
+  }
 
-  /* ── APP ── */
-  #app-screen{display:none;}
-  nav{background:#0B1F3A;color:white;padding:1rem 2rem;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:0.8rem;}
-  .nav-left{display:flex;align-items:center;gap:1rem;}
-  nav h1{font-size:1.2rem;}
-  nav h1 span{color:#0D9E9E;}
-  .org-pill{font-size:0.76rem;color:rgba(255,255,255,0.55);background:rgba(255,255,255,0.09);padding:0.28rem 0.75rem;border-radius:100px;white-space:nowrap;}
-  .role-pill{font-size:0.72rem;font-weight:600;padding:0.28rem 0.75rem;border-radius:100px;}
-  .role-pill.pharmacy{background:rgba(16,185,129,0.2);color:#6ee7b7;}
-  .role-pill.clinic{background:rgba(59,130,246,0.2);color:#93c5fd;}
-  .role-pill.hospital{background:rgba(139,92,246,0.2);color:#c4b5fd;}
-  .role-pill.lab{background:rgba(245,158,11,0.2);color:#fcd34d;}
-  .nav-tabs{display:flex;gap:0.5rem;}
-  .tab-btn{background:transparent;border:1px solid rgba(255,255,255,0.2);color:white;padding:0.5rem 1.1rem;border-radius:6px;cursor:pointer;font-size:0.88rem;transition:background 0.2s;}
-  .tab-btn.active{background:#0D6E6E;border-color:#0D6E6E;}
-  .tab-btn:hover:not(.active){background:rgba(255,255,255,0.1);}
-  .btn-logout{background:transparent;border:1px solid rgba(255,255,255,0.15);color:rgba(255,255,255,0.6);padding:0.38rem 0.9rem;border-radius:6px;cursor:pointer;font-size:0.8rem;transition:all 0.2s;}
-  .btn-logout:hover{background:rgba(220,38,38,0.2);color:#fca5a5;}
+  .auth-box{
+    background:white;
+    border-radius:14px;
+    padding:2.5rem;
+    width:90%;
+    max-width:440px;
+    box-shadow:0 20px 60px rgba(0,0,0,0.3);
+  }
 
-  /* ── ROLE WELCOME BANNER ── */
-  .welcome-banner{margin:1.5rem 0 0;padding:1.2rem 1.5rem;border-radius:12px;display:flex;align-items:center;gap:1rem;}
-  .welcome-banner.pharmacy{background:linear-gradient(135deg,#ecfdf5,#d1fae5);border:1px solid #a7f3d0;}
-  .welcome-banner.clinic{background:linear-gradient(135deg,#eff6ff,#dbeafe);border:1px solid #93c5fd;}
-  .welcome-banner.hospital{background:linear-gradient(135deg,#f5f3ff,#ede9fe);border:1px solid #c4b5fd;}
-  .welcome-banner.lab{background:linear-gradient(135deg,#fffbeb,#fef3c7);border:1px solid #fcd34d;}
-  .wb-icon{font-size:2rem;}
-  .wb-text h3{font-size:1rem;color:#0B1F3A;margin-bottom:0.2rem;}
-  .wb-text p{font-size:0.82rem;color:#555;}
+  .auth-logo{
+    text-align:center;
+    margin-bottom:1.8rem;
+  }
 
-  /* ── ALERT BANNER ── */
-  .alert-bar{margin:1rem 0 0;padding:0.85rem 1.2rem;background:#fef3c7;border:1px solid #fcd34d;border-radius:10px;font-size:0.88rem;color:#92400e;display:none;align-items:center;gap:0.6rem;}
-  .alert-bar.show{display:flex;}
-  .alert-bar a{color:#92400e;font-weight:600;cursor:pointer;text-decoration:underline;margin-left:0.3rem;}
+  .auth-logo h1{
+    font-size:2rem;
+    color:#0B1F3A;
+  }
 
-  /* ── LAYOUT ── */
-  .page{display:none;padding:0 2rem 2rem;max-width:1100px;margin:0 auto;}
-  .page.active{display:block;}
-  .card{background:white;border-radius:10px;border:1px solid #e0e0e0;padding:1.5rem;margin-bottom:1.5rem;}
-  .card h2{font-size:1rem;margin-bottom:1.2rem;color:#0B1F3A;border-bottom:1px solid #eee;padding-bottom:0.8rem;display:flex;align-items:center;gap:0.5rem;}
-  .form-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1rem;}
-  .form-group{display:flex;flex-direction:column;gap:0.3rem;}
-  .form-group label{font-size:0.75rem;font-weight:600;color:#555;text-transform:uppercase;letter-spacing:0.5px;}
-  .form-group input,.form-group select,.form-group textarea{border:1px solid #ddd;border-radius:6px;padding:0.6rem 0.8rem;font-size:0.9rem;font-family:inherit;outline:none;transition:border-color 0.2s;}
-  .form-group input:focus,.form-group select:focus,.form-group textarea:focus{border-color:#0D6E6E;}
-  .form-group textarea{resize:vertical;min-height:70px;}
-  .form-actions{margin-top:1rem;}
-  .btn{padding:0.65rem 1.5rem;border-radius:6px;border:none;cursor:pointer;font-size:0.9rem;font-weight:600;transition:all 0.2s;}
-  .btn-primary{background:#0D6E6E;color:white;}
-  .btn-primary:hover{background:#0A5555;}
-  .btn-danger{background:#dc2626;color:white;font-size:0.8rem;padding:0.38rem 0.85rem;}
-  .btn-danger:hover{background:#b91c1c;}
-  .btn-sm{background:#f3f4f6;color:#111;font-size:0.8rem;padding:0.38rem 0.85rem;border:none;border-radius:6px;cursor:pointer;}
-  .btn-sm:hover{background:#e5e7eb;}
+  .auth-logo h1 span{
+    color:#0D6E6E;
+  }
 
-  /* ── STATS ── */
-  .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:1rem;margin-bottom:1.5rem;}
-  .stat-card{background:white;border:1px solid #e0e0e0;border-radius:10px;padding:1.1rem 1.4rem;}
-  .stat-card .num{font-size:1.9rem;font-weight:700;color:#0B1F3A;}
-  .stat-card .lbl{font-size:0.76rem;color:#888;margin-top:0.2rem;}
-  .stat-card.danger{border-color:#fca5a5;background:#fef2f2;}
-  .stat-card.danger .num{color:#dc2626;}
-  .stat-card.warn{border-color:#fcd34d;background:#fffbeb;}
-  .stat-card.warn .num{color:#d97706;}
+  .auth-logo p{
+    font-size:0.82rem;
+    color:#999;
+    margin-top:0.25rem;
+  }
 
-  /* ── TABLE ── */
-  .search-bar input{width:100%;border:1px solid #ddd;border-radius:6px;padding:0.6rem 0.9rem;font-size:0.9rem;outline:none;margin-bottom:1rem;}
-  .search-bar input:focus{border-color:#0D6E6E;}
-  .loading{text-align:center;padding:2rem;color:#999;font-size:0.9rem;}
-  .table-wrap{overflow-x:auto;}
-  table{width:100%;border-collapse:collapse;font-size:0.87rem;}
-  th{background:#f8f8f8;padding:0.65rem 1rem;text-align:left;font-size:0.73rem;text-transform:uppercase;letter-spacing:0.5px;color:#666;border-bottom:2px solid #eee;}
-  td{padding:0.72rem 1rem;border-bottom:1px solid #f0f0f0;vertical-align:middle;}
-  tr:hover td{background:#fafafa;}
-  .badge{display:inline-block;padding:0.2rem 0.6rem;border-radius:100px;font-size:0.74rem;font-weight:600;}
-  .b-low{background:#fef2f2;color:#dc2626;}
-  .b-ok{background:#f0fdf4;color:#16a34a;}
-  .b-warn{background:#fffbeb;color:#d97706;}
-  .exp-soon{color:#d97706;font-weight:600;}
-  .exp-dead{color:#dc2626;font-weight:600;}
-  .td-actions{display:flex;gap:0.4rem;}
+  .auth-tabs{
+    display:flex;
+    border:1px solid #e0e0e0;
+    border-radius:8px;
+    margin-bottom:1.6rem;
+    overflow:hidden;
+  }
 
-  /* ── TOAST ── */
-  .toast{position:fixed;bottom:2rem;right:2rem;background:#0D6E6E;color:white;padding:0.8rem 1.5rem;border-radius:8px;font-size:0.9rem;display:none;z-index:999;box-shadow:0 4px 16px rgba(0,0,0,0.15);}
-  .toast.err{background:#dc2626;}
-  .toast.on{display:block;animation:su 0.3s ease;}
-  @keyframes su{from{transform:translateY(20px);opacity:0;}to{transform:translateY(0);opacity:1;}}
+  .auth-tab{
+    flex:1;
+    padding:0.65rem;
+    text-align:center;
+    cursor:pointer;
+    font-size:0.9rem;
+    font-weight:600;
+    background:white;
+    border:none;
+    color:#888;
+    transition:all 0.2s;
+  }
 
-  /* ── MODAL ── */
-  .mo{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.4);z-index:500;align-items:center;justify-content:center;}
-  .mo.open{display:flex;}
-  .mb{background:white;border-radius:12px;padding:2rem;width:90%;max-width:500px;max-height:90vh;overflow-y:auto;}
-  .mb h3{margin-bottom:1.2rem;color:#0B1F3A;}
-  .ma{display:flex;gap:0.8rem;margin-top:1.2rem;justify-content:flex-end;}
-  .dr{display:flex;gap:0.5rem;margin-bottom:0.6rem;font-size:0.9rem;}
-  .dr strong{min-width:110px;color:#555;}
+  .auth-tab.active{
+    background:#0D6E6E;
+    color:white;
+  }
 
-  /* ── PRESCRIPTION BADGE ── */
-  .rx-badge{display:inline-flex;align-items:center;gap:0.3rem;background:#eff6ff;color:#1d4ed8;padding:0.2rem 0.6rem;border-radius:100px;font-size:0.74rem;font-weight:600;}
+  .af{
+    display:flex;
+    flex-direction:column;
+    gap:0.9rem;
+  }
+
+  .fg{
+    display:flex;
+    flex-direction:column;
+    gap:0.3rem;
+  }
+
+  .fg label{
+    font-size:0.75rem;
+    font-weight:600;
+    color:#555;
+    text-transform:uppercase;
+    letter-spacing:0.5px;
+  }
+
+  .fg input,.fg select{
+    border:1px solid #ddd;
+    border-radius:8px;
+    padding:0.7rem 1rem;
+    font-size:0.93rem;
+    outline:none;
+    transition:border-color 0.2s;
+    font-family:inherit;
+  }
+
+  .fg input:focus,.fg select:focus{
+    border-color:#0D6E6E;
+  }
+
+  .btn-auth{
+    background:#0D6E6E;
+    color:white;
+    border:none;
+    padding:0.85rem;
+    border-radius:8px;
+    font-size:0.95rem;
+    font-weight:600;
+    cursor:pointer;
+    margin-top:0.4rem;
+    transition:background 0.2s;
+    width:100%;
+  }
+
+  .btn-auth:hover{
+    background:#0A5555;
+  }
+
+  .a-err{
+    background:#fef2f2;
+    border:1px solid #fca5a5;
+    color:#dc2626;
+    padding:0.7rem 1rem;
+    border-radius:8px;
+    font-size:0.83rem;
+    display:none;
+  }
+
+  .a-ok{
+    background:#f0fdf4;
+    border:1px solid #86efac;
+    color:#16a34a;
+    padding:0.7rem 1rem;
+    border-radius:8px;
+    font-size:0.83rem;
+    display:none;
+  }
+
+  /* ── role picker ── */
+  .role-grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:0.7rem;
+    margin-top:0.2rem;
+  }
+
+  .role-card{
+    border:2px solid #e0e0e0;
+    border-radius:10px;
+    padding:0.9rem;
+    text-align:center;
+    cursor:pointer;
+    transition:all 0.2s;
+    background:white;
+  }
+
+  .role-card:hover{
+    border-color:#0D6E6E;
+    background:#f0fdf9;
+  }
+
+  .role-card.selected{
+    border-color:#0D6E6E;
+    background:#f0fdf9;
+  }
+
+  .role-card .ri{
+    font-size:1.6rem;
+    display:block;
+    margin-bottom:0.3rem;
+  }
+
+  .role-card .rn{
+    font-size:0.82rem;
+    font-weight:600;
+    color:#0B1F3A;
+  }
+
+  /* ── app ── */
+  #app-screen{
+    display:none;
+  }
+
+  nav{
+    background:#0B1F3A;
+    color:white;
+    padding:1rem 2rem;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    flex-wrap:wrap;
+    gap:0.8rem;
+  }
+
+  .nav-left{
+    display:flex;
+    align-items:center;
+    gap:1rem;
+  }
+
+  nav h1{
+    font-size:1.2rem;
+  }
+
+  nav h1 span{
+    color:#0D9E9E;
+  }
+
+  .org-pill{
+    font-size:0.76rem;
+    color:rgba(255,255,255,0.55);
+    background:rgba(255,255,255,0.09);
+    padding:0.28rem 0.75rem;
+    border-radius:100px;
+    white-space:nowrap;
+  }
+
+  .role-pill{
+    font-size:0.72rem;
+    font-weight:600;
+    padding:0.28rem 0.75rem;
+    border-radius:100px;
+  }
+
+  .role-pill.pharmacy{
+    background:rgba(16,185,129,0.2);
+    color:#6ee7b7;
+  }
+
+  .role-pill.clinic{
+    background:rgba(59,130,246,0.2);
+    color:#93c5fd;
+  }
+
+  .role-pill.hospital{
+    background:rgba(139,92,246,0.2);
+    color:#c4b5fd;
+  }
+
+  .role-pill.lab{
+    background:rgba(245,158,11,0.2);
+    color:#fcd34d;
+  }
+
+  .nav-tabs{
+    display:flex;
+    gap:0.5rem;
+  }
+
+  .tab-btn{
+    background:transparent;
+    border:1px solid rgba(255,255,255,0.2);
+    color:white;
+    padding:0.5rem 1.1rem;
+    border-radius:6px;
+    cursor:pointer;
+    font-size:0.88rem;
+    transition:background 0.2s;
+  }
+
+  .tab-btn.active{
+    background:#0D6E6E;
+    border-color:#0D6E6E;
+  }
+
+  .tab-btn:hover:not(.active){
+    background:rgba(255,255,255,0.1);
+  }
+
+  .btn-logout{
+    background:transparent;
+    border:1px solid rgba(255,255,255,0.15);
+    color:rgba(255,255,255,0.6);
+    padding:0.38rem 0.9rem;
+    border-radius:6px;
+    cursor:pointer;
+    font-size:0.8rem;
+    transition:all 0.2s;
+  }
+
+  .btn-logout:hover{
+    background:rgba(220,38,38,0.2);
+    color:#fca5a5;
+  }
+
+  /* ── welcome banner ── */
+  .welcome-banner{
+    margin:1.5rem 0 0;
+    padding:1.2rem 1.5rem;
+    border-radius:12px;
+    display:flex;
+    align-items:center;
+    gap:1rem;
+  }
+
+  .welcome-banner.pharmacy{
+    background:linear-gradient(135deg,#ecfdf5,#d1fae5);
+    border:1px solid #a7f3d0;
+  }
+
+  .welcome-banner.clinic{
+    background:linear-gradient(135deg,#eff6ff,#dbeafe);
+    border:1px solid #93c5fd;
+  }
+
+  .welcome-banner.hospital{
+    background:linear-gradient(135deg,#f5f3ff,#ede9fe);
+    border:1px solid #c4b5fd;
+  }
+
+  .welcome-banner.lab{
+    background:linear-gradient(135deg,#fffbeb,#fef3c7);
+    border:1px solid #fcd34d;
+  }
+
+  .wb-icon{
+    font-size:2rem;
+  }
+
+  .wb-text h3{
+    font-size:1rem;
+    color:#0B1F3A;
+    margin-bottom:0.2rem;
+  }
+
+  .wb-text p{
+    font-size:0.82rem;
+    color:#555;
+  }
+
+  /* ── alert banner ── */
+  .alert-bar{
+    margin:1rem 0 0;
+    padding:0.85rem 1.2rem;
+    background:#fef3c7;
+    border:1px solid #fcd34d;
+    border-radius:10px;
+    font-size:0.88rem;
+    color:#92400e;
+    display:none;
+    align-items:center;
+    gap:0.6rem;
+  }
+
+  .alert-bar.show{
+    display:flex;
+  }
+
+  .alert-bar a{
+    color:#92400e;
+    font-weight:600;
+    cursor:pointer;
+    text-decoration:underline;
+    margin-left:0.3rem;
+  }
+
+  /* ── layout ── */
+  .page{
+    display:none;
+    padding:0 2rem 2rem;
+    max-width:1100px;
+    margin:0 auto;
+  }
+
+  .page.active{
+    display:block;
+  }
+
+  .card{
+    background:white;
+    border-radius:10px;
+    border:1px solid #e0e0e0;
+    padding:1.5rem;
+    margin-bottom:1.5rem;
+  }
+
+  .card h2{
+    font-size:1rem;
+    margin-bottom:1.2rem;
+    color:#0B1F3A;
+    border-bottom:1px solid #eee;
+    padding-bottom:0.8rem;
+    display:flex;
+    align-items:center;
+    gap:0.5rem;
+  }
+
+  .form-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
+    gap:1rem;
+  }
+
+  .form-group{
+    display:flex;
+    flex-direction:column;
+    gap:0.3rem;
+  }
+
+  .form-group label{
+    font-size:0.75rem;
+    font-weight:600;
+    color:#555;
+    text-transform:uppercase;
+    letter-spacing:0.5px;
+  }
+
+  .form-group input,.form-group select,.form-group textarea{
+    border:1px solid #ddd;
+    border-radius:6px;
+    padding:0.6rem 0.8rem;
+    font-size:0.9rem;
+    font-family:inherit;
+    outline:none;
+    transition:border-color 0.2s;
+  }
+
+  .form-group input:focus,.form-group select:focus,.form-group textarea:focus{
+    border-color:#0D6E6E;
+  }
+
+  .form-group textarea{
+    resize:vertical;
+    min-height:70px;
+  }
+
+  .form-actions{
+    margin-top:1rem;
+  }
+
+  .btn{
+    padding:0.65rem 1.5rem;
+    border-radius:6px;
+    border:none;
+    cursor:pointer;
+    font-size:0.9rem;
+    font-weight:600;
+    transition:all 0.2s;
+  }
+
+  .btn-primary{
+    background:#0D6E6E;
+    color:white;
+  }
+
+  .btn-primary:hover{
+    background:#0A5555;
+  }
+
+  .btn-danger{
+    background:#dc2626;
+    color:white;
+    font-size:0.8rem;
+    padding:0.38rem 0.85rem;
+  }
+
+  .btn-danger:hover{
+    background:#b91c1c;
+  }
+
+  .btn-sm{
+    background:#f3f4f6;
+    color:#111;
+    font-size:0.8rem;
+    padding:0.38rem 0.85rem;
+    border:none;
+    border-radius:6px;
+    cursor:pointer;
+  }
+
+  .btn-sm:hover{
+    background:#e5e7eb;
+  }
+
+  /* ── stats ── */
+  .stats{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(150px,1fr));
+    gap:1rem;
+    margin-bottom:1.5rem;
+  }
+
+  .stat-card{
+    background:white;
+    border:1px solid #e0e0e0;
+    border-radius:10px;
+    padding:1.1rem 1.4rem;
+  }
+
+  .stat-card .num{
+    font-size:1.9rem;
+    font-weight:700;
+    color:#0B1F3A;
+  }
+
+  .stat-card .lbl{
+    font-size:0.76rem;
+    color:#888;
+    margin-top:0.2rem;
+  }
+
+  .stat-card.danger{
+    border-color:#fca5a5;
+    background:#fef2f2;
+  }
+
+  .stat-card.danger .num{
+    color:#dc2626;
+  }
+
+  .stat-card.warn{
+    border-color:#fcd34d;
+    background:#fffbeb;
+  }
+
+  .stat-card.warn .num{
+    color:#d97706;
+  }
+
+  /* ── table ── */
+  .search-bar input{
+    width:100%;
+    border:1px solid #ddd;
+    border-radius:6px;
+    padding:0.6rem 0.9rem;
+    font-size:0.9rem;
+    outline:none;
+    margin-bottom:1rem;
+  }
+
+  .search-bar input:focus{
+    border-color:#0D6E6E;
+  }
+
+  .loading{
+    text-align:center;
+    padding:2rem;
+    color:#999;
+    font-size:0.9rem;
+  }
+
+  .table-wrap{
+    overflow-x:auto;
+  }
+
+  table{
+    width:100%;
+    border-collapse:collapse;
+    font-size:0.87rem;
+  }
+
+  th{
+    background:#f8f8f8;
+    padding:0.65rem 1rem;
+    text-align:left;
+    font-size:0.73rem;
+    text-transform:uppercase;
+    letter-spacing:0.5px;
+    color:#666;
+    border-bottom:2px solid #eee;
+  }
+
+  td{
+    padding:0.72rem 1rem;
+    border-bottom:1px solid #f0f0f0;
+    vertical-align:middle;
+  }
+
+  tr:hover td{
+    background:#fafafa;
+  }
+
+  .badge{
+    display:inline-block;
+    padding:0.2rem 0.6rem;
+    border-radius:100px;
+    font-size:0.74rem;
+    font-weight:600;
+  }
+
+  .b-low{
+    background:#fef2f2;
+    color:#dc2626;
+  }
+
+  .b-ok{
+    background:#f0fdf4;
+    color:#16a34a;
+  }
+
+  .b-warn{
+    background:#fffbeb;
+    color:#d97706;
+  }
+
+  .exp-soon{
+    color:#d97706;
+    font-weight:600;
+  }
+
+  .exp-dead{
+    color:#dc2626;
+    font-weight:600;
+  }
+
+  .td-actions{
+    display:flex;
+    gap:0.4rem;
+  }
+
+  /* ── toast ── */
+  .toast{
+    position:fixed;
+    bottom:2rem;
+    right:2rem;
+    background:#0D6E6E;
+    color:white;
+    padding:0.8rem 1.5rem;
+    border-radius:8px;
+    font-size:0.9rem;
+    display:none;
+    z-index:999;
+    box-shadow:0 4px 16px rgba(0,0,0,0.15);
+  }
+
+  .toast.err{
+    background:#dc2626;
+  }
+
+  .toast.on{
+    display:block;
+    animation:su 0.3s ease;
+  }
+
+  @keyframes su{
+    from{transform:translateY(20px);
+      opacity:0;
+    }to{transform:translateY(0);
+      opacity:1;}
+    }
+
+  /* ── modal ── */
+  .mo{
+    display:none;
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,0.4);
+    z-index:500;
+    align-items:center;
+    justify-content:center;
+  }
+
+  .mo.open{
+    display:flex;
+  }
+
+  .mb{
+    background:white;
+    border-radius:12px;
+    padding:2rem;
+    width:90%;
+    max-width:500px;
+    max-height:90vh;
+    overflow-y:auto;
+  }
+
+  .mb h3{
+    margin-bottom:1.2rem;
+    color:#0B1F3A;
+  }
+
+  .ma{
+    display:flex;
+    gap:0.8rem;
+    margin-top:1.2rem;
+    justify-content:flex-end;
+  }
+
+  .dr{
+    display:flex;
+    gap:0.5rem;
+    margin-bottom:0.6rem;
+    font-size:0.9rem;
+  }
+
+  .dr strong{
+    min-width:110px;
+    color:#555;
+  }
+
+  /* ── prescription badge ── */
+  .rx-badge{
+    display:inline-flex;
+    align-items:center;
+    gap:0.3rem;
+    background:#eff6ff;
+    color:#1d4ed8;
+    padding:0.2rem 0.6rem;
+    border-radius:100px;
+    font-size:0.74rem;
+    font-weight:600;
+  }
 
   @media(max-width:640px){
     nav{padding:1rem;}
     .page{padding:0 1rem 1rem;}
     .role-grid{grid-template-columns:1fr 1fr;}
   }
+
 </style>
+
 </head>
+
 <body>
 
-<!-- ════════════════ AUTH ════════════════ -->
+<!-- AUTHENTICATION -->
 <div id="auth-screen">
   <div class="auth-box">
+
     <div class="auth-logo">
       <h1>Medi<span>col</span></h1>
       <p>Health infrastructure for Africa</p>
     </div>
+
     <div class="auth-tabs">
       <button class="auth-tab active" id="tab-login-btn" onclick="switchTab('login')">Sign In</button>
       <button class="auth-tab" id="tab-signup-btn" onclick="switchTab('signup')">Register</button>
     </div>
 
-    <!-- LOGIN -->
+    <!-- login -->
     <div id="pane-login">
       <div class="af">
         <div class="a-err" id="login-err"></div>
-        <div class="fg"><label>Email</label><input type="email" id="l-email" placeholder="you@pharmacy.com"/></div>
-        <div class="fg"><label>Password</label><input type="password" id="l-pass" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()"/></div>
+
+        <div class="fg">
+          <label>Email</label>
+          <input type="email" id="l-email" placeholder="you@pharmacy.com"/>
+        </div>
+
+        <div class="fg">
+          <label>Password</label>
+          <input type="password" id="l-pass" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()"/>
+        </div>
+
         <button class="btn-auth" onclick="doLogin()">Sign In →</button>
       </div>
     </div>
 
-    <!-- SIGNUP -->
+    <!-- signup -->
     <div id="pane-signup" style="display:none">
       <div class="af">
+
         <div class="a-err" id="signup-err"></div>
+
         <div class="a-ok" id="signup-ok"></div>
-        <div class="fg"><label>Organisation Name</label><input type="text" id="s-org" placeholder="e.g. Nakato Pharmacy"/></div>
-        <div class="fg"><label>Email</label><input type="email" id="s-email" placeholder="you@org.com"/></div>
-        <div class="fg"><label>Password</label><input type="password" id="s-pass" placeholder="Min. 6 characters"/></div>
+
+        <div class="fg">
+          <label>Organisation Name</label>
+          <input type="text" id="s-org" placeholder="e.g. Nakato Pharmacy"/>
+        </div>
+        
+        <div class="fg">
+          <label>Email</label>
+          <input type="email" id="s-email" placeholder="you@org.com"/>
+        </div>
+
+        <div class="fg">
+          <label>Password</label>
+          <input type="password" id="s-pass" placeholder="Min. 6 characters"/>
+        </div>
+
         <div class="fg">
           <label>What type of organisation are you?</label>
           <div class="role-grid">
-            <div class="role-card" onclick="selectRole('Pharmacy',this)"><span class="ri">💊</span><span class="rn">Pharmacy</span></div>
-            <div class="role-card" onclick="selectRole('Clinic',this)"><span class="ri">🏥</span><span class="rn">Clinic</span></div>
-            <div class="role-card" onclick="selectRole('Hospital',this)"><span class="ri">🏨</span><span class="rn">Hospital</span></div>
-            <div class="role-card" onclick="selectRole('Diagnostic Lab',this)"><span class="ri">🧪</span><span class="rn">Diagnostic Lab</span></div>
+
+            <div class="role-card" onclick="selectRole('Pharmacy',this)">
+              <span class="ri">💊</span>
+              <span class="rn">Pharmacy</span>
+            </div>
+
+            <div class="role-card" onclick="selectRole('Clinic',this)">
+              <span class="ri">🏥</span>
+              <span class="rn">Clinic</span>
+            </div>
+
+            <div class="role-card" onclick="selectRole('Hospital',this)">
+              <span class="ri">🏨</span>
+              <span class="rn">Hospital</span>
+            </div>
+
+            <div class="role-card" onclick="selectRole('Diagnostic Lab',this)">
+              <span class="ri">🧪</span>
+              <span class="rn">Diagnostic Lab</span>
+            </div>
+
           </div>
+
           <input type="hidden" id="s-role" value=""/>
         </div>
+
         <button class="btn-auth" onclick="doSignup()">Create Account →</button>
+
       </div>
     </div>
   </div>
 </div>
 
-<!-- ════════════════ APP ════════════════ -->
+<!-- APP -->
 <div id="app-screen">
   <nav>
     <div class="nav-left">
@@ -202,175 +834,453 @@
     <button class="btn-logout" onclick="doLogout()">Sign Out</button>
   </nav>
 
-  <!-- ── PHARMACY DASHBOARD ── -->
+  <!-- Pharmacy Dashboard -->
   <div class="page" id="page-pharmacy">
     <div class="welcome-banner pharmacy" id="wb-pharmacy">
       <div class="wb-icon">💊</div>
+
       <div class="wb-text">
         <h3 id="wb-pharmacy-title">Welcome</h3>
-        <p>Manage your drug inventory, track stock levels, and record patient visits.</p>
+        <p>Manage your drug inventory, track stock levels, and record customer purchases.</p>
       </div>
+
     </div>
+
     <div class="alert-bar" id="low-stock-alert">
-      ⚠️ <span id="low-stock-msg"></span><a onclick="showPage('ph-inventory')">View inventory →</a>
+      ⚠️ <span id="low-stock-msg"></span>
+      <a onclick="showPage('ph-inventory')">View inventory →</a>
     </div>
+
     <div style="margin-top:1.5rem">
+
       <div class="stats">
-        <div class="stat-card"><div class="num" id="ph-total">—</div><div class="lbl">Total Drugs</div></div>
-        <div class="stat-card danger"><div class="num" id="ph-low">—</div><div class="lbl">Low Stock</div></div>
-        <div class="stat-card warn"><div class="num" id="ph-exp-soon">—</div><div class="lbl">Expiring (30d)</div></div>
-        <div class="stat-card danger"><div class="num" id="ph-expired">—</div><div class="lbl">Expired</div></div>
-        <div class="stat-card"><div class="num" id="ph-pts">—</div><div class="lbl">Dispensed Today</div></div>
+
+        <div class="stat-card">
+          <div class="num" id="ph-total">—</div>
+          <div class="lbl">Total Drugs</div>
+        </div>
+
+        <div class="stat-card danger">
+          <div class="num" id="ph-low">—</div>
+          <div class="lbl">Low Stock</div>
+        </div>
+
+        <div class="stat-card warn">
+          <div class="num" id="ph-exp-soon">—</div>
+          <div class="lbl">Expiring (30d)</div>
+        </div>
+
+        <div class="stat-card danger">
+          <div class="num" id="ph-expired">—</div>
+          <div class="lbl">Expired</div>
+        </div>
+
+        <div class="stat-card">
+          <div class="num" id="ph-pts">—</div>
+          <div class="lbl">Dispensed Today</div>
+        </div>
+
       </div>
     </div>
   </div>
 
-  <!-- ── PHARMACY: INVENTORY ── -->
+  <!-- pharmacy: inventory -->
   <div class="page" id="page-ph-inventory">
     <div style="margin-top:1.5rem">
+
     <div class="card">
-      <h2>➕ Add Drug</h2>
+      <h2>Add Drug</h2>
       <div class="form-grid">
-        <div class="form-group" style="grid-column:span 2"><label>Drug Name *</label><input type="text" id="i-name" placeholder="e.g. Amoxicillin 500mg"/></div>
-        <div class="form-group"><label>Quantity *</label><input type="number" id="i-qty" placeholder="200" min="0"/></div>
-        <div class="form-group"><label>Unit</label><select id="i-unit"><option>Tablets</option><option>Capsules</option><option>Bottles</option><option>Vials</option><option>Sachets</option><option>Strips</option><option>Other</option></select></div>
-        <div class="form-group"><label>Expiry Date</label><input type="date" id="i-exp"/></div>
-        <div class="form-group"><label>Price (UGX)</label><input type="number" id="i-price" placeholder="5000" min="0"/></div>
-        <div class="form-group" style="grid-column:span 2"><label>Supplier</label><input type="text" id="i-sup" placeholder="e.g. National Medical Stores"/></div>
+        <div class="form-group" style="grid-column:span 2">
+          <label>Drug Name *</label>
+          <input type="text" id="i-name" placeholder="e.g. Amoxicillin 500mg"/>
+        </div>
+        
+        <div class="form-group">
+          <label>Quantity *</label>
+          <input type="number" id="i-qty" placeholder="200" min="0"/>
+        </div>
+        <div class="form-group">
+          <label>Unit</label>
+            <select id="i-unit">
+              <option>Tablets</option>
+              <option>Capsules</option>
+              <option>Bottles</option>
+              <option>Vials</option>
+              <option>Sachets</option>
+              <option>Strips</option>
+              <option>Other</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+          <label>Expiry Date</label>
+            <input type="date" id="i-exp"/>
+        </div>
+
+        <div class="form-group">
+          <label>Price (UGX)</label>
+          <input type="number" id="i-price" placeholder="5000" min="0"/>
+        </div>
+
+        <div class="form-group" style="grid-column:span 2">
+          <label>Supplier</label>
+          <input type="text" id="i-sup" placeholder="e.g. National Medical Stores"/>
+        </div>
+
       </div>
-      <div class="form-actions"><button class="btn btn-primary" onclick="addDrug()">Add Drug</button></div>
+
+      <div class="form-actions">
+        <button class="btn btn-primary" onclick="addDrug()">Add Drug</button>
+      </div>
+
     </div>
+
     <div class="card">
+
       <h2>📦 Drug Inventory</h2>
-      <div class="search-bar"><input type="text" id="i-search" placeholder="Search drug or supplier..." oninput="filterInv()"/></div>
+      <div class="search-bar">
+        <input type="text" id="i-search" placeholder="Search drug or supplier..." oninput="filterInv()"/>
+      </div>
+
       <div class="table-wrap">
         <table>
-          <thead><tr><th>Drug Name</th><th>Qty</th><th>Unit</th><th>Expiry</th><th>Price (UGX)</th><th>Supplier</th><th>Status</th><th>Actions</th></tr></thead>
+          <thead>
+            <tr>
+              <th>Drug Name</th>
+              <th>Qty</th>
+              <th>Unit</th>
+              <th>Expiry</th>
+              <th>Price (UGX)</th>
+              <th>Supplier</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
           <tbody id="i-body"><tr><td colspan="8" class="loading">Loading...</td></tr></tbody>
         </table>
+
       </div>
     </div>
     </div>
   </div>
 
-  <!-- ── PHARMACY: DISPENSING LOG ── -->
+  <!-- pharmacy: dispensary log -->
   <div class="page" id="page-ph-patients">
     <div style="margin-top:1.5rem">
     <div class="card">
-      <h2>➕ Record Dispensing</h2>
+
+      <h2>Record Dispensing</h2>
       <div class="form-grid">
-        <div class="form-group"><label>Drug Dispensed *</label><input type="text" id="dl-drug" placeholder="e.g. Coartem 20/120mg"/></div>
-        <div class="form-group"><label>Qty Dispensed *</label><input type="number" id="dl-qty" placeholder="6" min="1"/></div>
-        <div class="form-group"><label>Unit</label><select id="dl-unit"><option>Tablets</option><option>Capsules</option><option>Bottles</option><option>Vials</option><option>Sachets</option><option>Strips</option><option>Other</option></select></div>
-        <div class="form-group"><label>Amount Paid (UGX)</label><input type="number" id="dl-paid" placeholder="15000" min="0"/></div>
-        <div class="form-group"><label>Payment Method</label><select id="dl-payment"><option>Cash</option><option>Mobile Money</option><option>Insurance</option><option>Credit</option></select></div>
-        <div class="form-group"><label>Customer Name (optional)</label><input type="text" id="dl-customer" placeholder="e.g. Grace Nakato"/></div>
-        <div class="form-group" style="grid-column:span 2"><label>Notes (optional)</label><input type="text" id="dl-notes" placeholder="e.g. Repeat customer, follow-up in 3 days"/></div>
+        <div class="form-group">
+          <label>Drug Dispensed *</label>
+          <input type="text" id="dl-drug" placeholder="e.g. Coartem 20/120mg"/>
+        </div>
+
+        <div class="form-group">
+          <label>Qty Dispensed *</label>
+          <input type="number" id="dl-qty" placeholder="6" min="1"/>
+        </div>
+
+        <div class="form-group">
+          <label>Unit</label>
+          <select id="dl-unit">
+            <option>Tablets</option>
+            <option>Capsules</option>
+            <option>Bottles</option>
+            <option>Vials</option>
+            <option>Sachets</option>
+            <option>Strips</option>
+            <option>Other</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Amount Paid (UGX)</label>
+          <input type="number" id="dl-paid" placeholder="15000" min="0"/>
+        </div>
+
+        <div class="form-group">
+          <label>Payment Method</label>
+          <select id="dl-payment">
+            <option>Cash</option>
+            <option>Mobile Money</option>
+            <option>Insurance</option>
+            <option>Credit</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Customer Name (optional)</label>
+          <input type="text" id="dl-customer" placeholder="e.g. Grace Nakato"/>
+        </div>
+
+        <div class="form-group" style="grid-column:span 2">
+          <label>Notes (optional)</label>
+          <input type="text" id="dl-notes" placeholder="e.g. Repeat customer, follow-up in 3 days"/>
+        </div>
+
       </div>
-      <div class="form-actions"><button class="btn btn-primary" onclick="addDispensing()">Save Record</button></div>
+
+      <div class="form-actions">
+        <button class="btn btn-primary" onclick="addDispensing()">Save Record</button>
+      </div>
+
     </div>
+
     <div class="card">
       <h2>📋 Dispensing Log</h2>
       <div style="display:flex;gap:1rem;align-items:center;margin-bottom:1rem;flex-wrap:wrap;">
-        <div class="search-bar" style="flex:1;margin:0"><input type="text" id="dl-search" placeholder="Search drug or customer..." oninput="filterDl()" style="margin:0"/></div>
-        <div style="font-size:0.82rem;color:#888">Today's revenue: <strong id="dl-today-rev" style="color:#0D6E6E">UGX 0</strong></div>
+
+        <div class="search-bar" style="flex:1;margin:0">
+          <input type="text" id="dl-search" placeholder="Search drug or customer..." oninput="filterDl()" style="margin:0"/>
+        </div>
+
+        <div style="font-size:0.82rem;color:#888">Today's revenue: 
+          <strong id="dl-today-rev" style="color:#0D6E6E">UGX 0</strong>
+        </div>
+
       </div>
+
       <div class="table-wrap">
         <table>
-          <thead><tr><th>Drug</th><th>Qty</th><th>Unit</th><th>Amount (UGX)</th><th>Payment</th><th>Customer</th><th>Time</th><th>Actions</th></tr></thead>
+          <thead>
+            <tr>
+              <th>Drug</th>
+              <th>Qty</th>
+              <th>Unit</th>
+              <th>Amount (UGX)</th>
+              <th>Payment</th>
+              <th>Customer</th>
+              <th>Time</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
           <tbody id="dl-body"><tr><td colspan="8" class="loading">Loading...</td></tr></tbody>
         </table>
+
       </div>
     </div>
     </div>
   </div>
 
-  <!-- ── CLINIC DASHBOARD ── -->
+  <!-- Clinic Dashboard -->
   <div class="page" id="page-clinic">
     <div class="welcome-banner clinic" id="wb-clinic">
+
       <div class="wb-icon">🏥</div>
+
       <div class="wb-text">
         <h3 id="wb-clinic-title">Welcome</h3>
         <p>Register patients, manage records, write prescriptions, and track visits.</p>
       </div>
+
     </div>
+
     <div style="margin-top:1.5rem">
+
       <div class="stats">
-        <div class="stat-card"><div class="num" id="cl-pts">—</div><div class="lbl">Total Patients</div></div>
-        <div class="stat-card"><div class="num" id="cl-today">—</div><div class="lbl">Seen Today</div></div>
-        <div class="stat-card"><div class="num" id="cl-rx">—</div><div class="lbl">Prescriptions</div></div>
+        <div class="stat-card">
+          <div class="num" id="cl-pts">—</div>
+          <div class="lbl">Total Patients</div>
+        </div>
+
+        <div class="stat-card">
+          <div class="num" id="cl-today">—</div>
+          <div class="lbl">Seen Today</div>
+        </div>
+
+        <div class="stat-card">
+          <div class="num" id="cl-rx">—</div>
+          <div class="lbl">Prescriptions</div>
+        </div>
+
       </div>
     </div>
   </div>
 
-  <!-- ── CLINIC: PATIENTS ── -->
+  <!-- clinic: patients-->
   <div class="page" id="page-cl-patients">
+
     <div style="margin-top:1.5rem">
+
     <div class="card">
       <h2>➕ Register Patient</h2>
       <div class="form-grid">
-        <div class="form-group"><label>Full Name *</label><input type="text" id="cp-name" placeholder="e.g. Grace Nakato"/></div>
-        <div class="form-group"><label>Age</label><input type="number" id="cp-age" placeholder="34" min="0"/></div>
-        <div class="form-group"><label>Gender</label><select id="cp-gender"><option value="">Select</option><option>Female</option><option>Male</option><option>Other</option></select></div>
-        <div class="form-group"><label>Phone</label><input type="tel" id="cp-phone" placeholder="0701234567"/></div>
-        <div class="form-group" style="grid-column:span 2"><label>Condition / Diagnosis</label><input type="text" id="cp-cond" placeholder="e.g. Malaria, Hypertension, Diabetes"/></div>
-        <div class="form-group" style="grid-column:span 2"><label>Prescription / Treatment Notes</label><textarea id="cp-notes" placeholder="e.g. Coartem 20/120mg — 3 tablets twice daily for 3 days. Review in 7 days if no improvement."></textarea></div>
+        <div class="form-group">
+          <label>Full Name *</label>
+          <input type="text" id="cp-name" placeholder="e.g. Grace Nakato"/>
+        </div>
+
+        <div class="form-group">
+          <label>Age</label>
+          <input type="number" id="cp-age" placeholder="34" min="0"/>
+        </div>
+
+        <div class="form-group">
+          <label>Gender</label>
+          <select id="cp-gender">
+            <option value="">Select</option>
+            <option>Female</option>
+            <option>Male</option>
+            <option>Other</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Phone</label>
+          <input type="tel" id="cp-phone" placeholder="0701234567"/>
+        </div>
+
+        <div class="form-group" style="grid-column:span 2">
+          <label>Condition / Diagnosis</label>
+          <input type="text" id="cp-cond" placeholder="e.g. Malaria, Hypertension, Diabetes"/>
+        </div>
+
+        <div class="form-group" style="grid-column:span 2">
+          <label>Prescription / Treatment Notes</label>
+          <textarea id="cp-notes" placeholder="e.g. Coartem 20/120mg — 3 tablets twice daily for 3 days. Review in 7 days if no improvement.">
+          </textarea>
+        </div>
+
       </div>
-      <div class="form-actions"><button class="btn btn-primary" onclick="addClinicPatient()">Register Patient</button></div>
+
+      <div class="form-actions">
+        <button class="btn btn-primary" onclick="addClinicPatient()">Register Patient</button>
+      </div>
+
     </div>
+
     <div class="card">
       <h2>👥 Patient Records</h2>
       <div class="search-bar"><input type="text" id="cp-search" placeholder="Search by name, phone, or condition..." oninput="filterClPts()"/></div>
+
       <div class="table-wrap">
         <table>
-          <thead><tr><th>Name</th><th>Age</th><th>Gender</th><th>Phone</th><th>Condition</th><th>Date</th><th>Actions</th></tr></thead>
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Age</th>
+              <th>Gender</th>
+              <th>Phone</th>
+              <th>Condition</th>
+              <th>Date</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
           <tbody id="cp-body"><tr><td colspan="7" class="loading">Loading...</td></tr></tbody>
         </table>
+
       </div>
     </div>
     </div>
   </div>
 
-  <!-- ── HOSPITAL/LAB: same as clinic but labelled differently ── -->
+  <!-- Hospital/Lab: same as clinic but labelled differently -->
   <div class="page" id="page-hospital">
     <div class="welcome-banner hospital">
+
       <div class="wb-icon">🏨</div>
+
       <div class="wb-text">
         <h3 id="wb-hosp-title">Welcome</h3>
         <p>Manage patient admissions, records, prescriptions, and inventory.</p>
       </div>
     </div>
+
     <div style="margin-top:1.5rem">
       <div class="stats">
-        <div class="stat-card"><div class="num" id="ho-pts">—</div><div class="lbl">Total Patients</div></div>
-        <div class="stat-card"><div class="num" id="ho-today">—</div><div class="lbl">Admitted Today</div></div>
-        <div class="stat-card danger"><div class="num" id="ho-low">—</div><div class="lbl">Low Stock Drugs</div></div>
+        <div class="stat-card">
+          <div class="num" id="ho-pts">—</div>
+          <div class="lbl">Total Patients</div>
+        </div>
+
+        <div class="stat-card">
+          <div class="num" id="ho-today">—</div>
+          <div class="lbl">Admitted Today</div>
+        </div>
+
+        <div class="stat-card danger">
+          <div class="num" id="ho-low">—</div>
+          <div class="lbl">Low Stock Drugs</div>
+        </div>
+
       </div>
     </div>
   </div>
 
   <div class="page" id="page-ho-patients">
     <div style="margin-top:1.5rem">
+
     <div class="card">
-      <h2>➕ Admit / Register Patient</h2>
+      <h2>Admit / Register Patient</h2>
       <div class="form-grid">
-        <div class="form-group"><label>Full Name *</label><input type="text" id="hp-name" placeholder="e.g. John Okello"/></div>
-        <div class="form-group"><label>Age</label><input type="number" id="hp-age" placeholder="45" min="0"/></div>
-        <div class="form-group"><label>Gender</label><select id="hp-gender"><option value="">Select</option><option>Female</option><option>Male</option><option>Other</option></select></div>
-        <div class="form-group"><label>Phone</label><input type="tel" id="hp-phone" placeholder="0701234567"/></div>
-        <div class="form-group" style="grid-column:span 2"><label>Diagnosis</label><input type="text" id="hp-cond" placeholder="e.g. Severe malaria, Type 2 Diabetes"/></div>
-        <div class="form-group" style="grid-column:span 2"><label>Treatment Notes</label><textarea id="hp-notes" placeholder="Ward, treatment plan, attending doctor..."></textarea></div>
+        <div class="form-group">
+          <label>Full Name *</label>
+          <input type="text" id="hp-name" placeholder="e.g. John Okello"/>
+        </div>
+
+        <div class="form-group">
+          <label>Age</label>
+          <input type="number" id="hp-age" placeholder="45" min="0"/>
+        </div>
+
+        <div class="form-group">
+          <label>Gender</label>
+          <select id="hp-gender">
+            <option value="">Select</option>
+            <option>Female</option>
+            <option>Male</option>
+            <option>Other</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Phone</label>
+          <input type="tel" id="hp-phone" placeholder="0701234567"/>
+        </div>
+
+        <div class="form-group" style="grid-column:span 2">
+          <label>Diagnosis</label>
+          <input type="text" id="hp-cond" placeholder="e.g. Severe malaria, Type 2 Diabetes"/>
+        </div>
+
+        <div class="form-group" style="grid-column:span 2">
+          <label>Treatment Notes</label>
+          <textarea id="hp-notes" placeholder="Ward, treatment plan, attending doctor...">
+          </textarea>
+        </div>
+
       </div>
-      <div class="form-actions"><button class="btn btn-primary" onclick="addHospPatient()">Register Patient</button></div>
+
+      <div class="form-actions">
+        <button class="btn btn-primary" onclick="addHospPatient()">Register Patient</button>
+      </div>
+
     </div>
+
     <div class="card">
-      <h2>👥 Patient Records</h2>
-      <div class="search-bar"><input type="text" id="hp-search" placeholder="Search patients..." oninput="filterHoPts()"/></div>
+      <h2>Patient Records</h2>
+      <div class="search-bar">
+        <input type="text" id="hp-search" placeholder="Search patients..." oninput="filterHoPts()"/>
+      </div>
+
       <div class="table-wrap">
         <table>
-          <thead><tr><th>Name</th><th>Age</th><th>Gender</th><th>Phone</th><th>Diagnosis</th><th>Date</th><th>Actions</th></tr></thead>
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Age</th>
+              <th>Gender</th>
+              <th>Phone</th>
+              <th>Diagnosis</th>
+              <th>Date</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
           <tbody id="hp-body"><tr><td colspan="7" class="loading">Loading...</td></tr></tbody>
         </table>
+
       </div>
     </div>
     </div>
@@ -378,25 +1288,72 @@
 
   <div class="page" id="page-ho-inventory">
     <div style="margin-top:1.5rem">
+
     <div class="card">
-      <h2>➕ Add Drug / Medical Supply</h2>
+      <h2>Add Drug / Medical Supply</h2>
       <div class="form-grid">
-        <div class="form-group" style="grid-column:span 2"><label>Item Name *</label><input type="text" id="hi-name" placeholder="e.g. Quinine IV 600mg"/></div>
-        <div class="form-group"><label>Quantity *</label><input type="number" id="hi-qty" min="0" placeholder="100"/></div>
-        <div class="form-group"><label>Unit</label><select id="hi-unit"><option>Vials</option><option>Tablets</option><option>Bottles</option><option>Sachets</option><option>Units</option><option>Other</option></select></div>
-        <div class="form-group"><label>Expiry Date</label><input type="date" id="hi-exp"/></div>
-        <div class="form-group"><label>Supplier</label><input type="text" id="hi-sup" placeholder="e.g. NMS"/></div>
+        <div class="form-group" style="grid-column:span 2">
+          <label>Item Name *</label>
+          <input type="text" id="hi-name" placeholder="e.g. Quinine IV 600mg"/>
+        </div>
+
+        <div class="form-group">
+          <label>Quantity *</label>
+          <input type="number" id="hi-qty" min="0" placeholder="100"/>
+        </div>
+
+        <div class="form-group">
+          <label>Unit</label>
+          <select id="hi-unit">
+            <option>Vials</option>
+            <option>Tablets</option>
+            <option>Bottles</option>
+            <option>Sachets</option>
+            <option>Units</option>
+            <option>Other</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Expiry Date</label>
+          <input type="date" id="hi-exp"/>
+        </div>
+
+        <div class="form-group">
+          <label>Supplier</label>
+          <input type="text" id="hi-sup" placeholder="e.g. NMS"/>
+        </div>
+
       </div>
-      <div class="form-actions"><button class="btn btn-primary" onclick="addHospDrug()">Add Item</button></div>
+
+      <div class="form-actions">
+        <button class="btn btn-primary" onclick="addHospDrug()">Add Item</button>
+      </div>
+
     </div>
+
     <div class="card">
-      <h2>📦 Drug & Supply Inventory</h2>
-      <div class="search-bar"><input type="text" id="hi-search" placeholder="Search items..." oninput="filterHoInv()"/></div>
+      <h2>Drug & Supply Inventory</h2>
+      <div class="search-bar">
+        <input type="text" id="hi-search" placeholder="Search items..." oninput="filterHoInv()"/>
+      </div>
+
       <div class="table-wrap">
         <table>
-          <thead><tr><th>Item</th><th>Qty</th><th>Unit</th><th>Expiry</th><th>Supplier</th><th>Status</th><th>Actions</th></tr></thead>
+          <thead>
+            <tr>
+              <th>Item</th>
+              <th>Qty</th>
+              <th>Unit</th>
+              <th>Expiry</th>
+              <th>Supplier</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
           <tbody id="hi-body"><tr><td colspan="7" class="loading">Loading...</td></tr></tbody>
         </table>
+
       </div>
     </div>
     </div>
@@ -404,25 +1361,41 @@
 
 </div><!-- /app-screen -->
 
-<!-- MODALS -->
+<!-- Modals -->
 <div class="mo" id="m-patient">
+
   <div class="mb">
+
     <h3>👤 Patient Record</h3>
     <div id="m-patient-body"></div>
-    <div class="ma"><button class="btn btn-sm" onclick="cm('m-patient')">Close</button></div>
+    <div class="ma">
+      <button class="btn btn-sm" onclick="cm('m-patient')">Close</button>
+    </div>
+
   </div>
 </div>
+
 <div class="mo" id="m-drug-edit">
   <div class="mb">
     <h3>✏️ Update Stock</h3>
     <input type="hidden" id="e-id"/>
     <input type="hidden" id="e-table"/>
-    <div class="form-group" style="margin-bottom:1rem"><label>Item</label><input type="text" id="e-name" readonly style="background:#f5f5f5"/></div>
-    <div class="form-group"><label>New Quantity *</label><input type="number" id="e-qty" min="0"/></div>
+
+    <div class="form-group" style="margin-bottom:1rem">
+      <label>Item</label>
+      <input type="text" id="e-name" readonly style="background:#f5f5f5"/>
+    </div>
+
+    <div class="form-group">
+      <label>New Quantity *</label>
+      <input type="number" id="e-qty" min="0"/>
+    </div>
+
     <div class="ma">
       <button class="btn btn-sm" onclick="cm('m-drug-edit')">Cancel</button>
       <button class="btn btn-primary" onclick="saveQty()">Update</button>
     </div>
+
   </div>
 </div>
 
@@ -435,10 +1408,22 @@ const SKEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI
 let session=null,user=null,orgRole=null;
 let drugs=[],patients=[];
 
-// ── HELPERS ──
-function toast(msg,type='ok'){const t=document.getElementById('toast');t.textContent=msg;t.className=`toast ${type==='err'?'err':''} on`;setTimeout(()=>t.classList.remove('on'),3500);}
-function cm(id){document.getElementById(id).classList.remove('open');}
-function showEl(id,msg,cls){const e=document.getElementById(id);e.textContent=msg;e.style.display='block';if(!cls)setTimeout(()=>e.style.display='none',5000);}
+// ── Helpers ──
+function toast(msg,type='ok')
+{const t=document.getElementById('toast');
+t.textContent=msg;
+t.className=`toast ${type==='err'?'err':''} on`;setTimeout(()=>t.classList.remove('on'),3500);
+}
+
+function cm(id)
+{document.getElementById(id).classList.remove('open');}
+
+function showEl(id,msg,cls)
+{const e=document.getElementById(id);
+  e.textContent=msg;
+  e.style.display='block';if(!cls)setTimeout(()=>e.style.display='none',5000);
+  }
+  
 
 async function db(path,method='GET',body=null){
   const h={'Content-Type':'application/json','apikey':SKEY,'Prefer':'return=representation'};
@@ -460,7 +1445,7 @@ async function authPost(path,body){
   return d;
 }
 
-// ── AUTH UI ──
+// ── auth ui ──
 function switchTab(tab){
   document.getElementById('pane-login').style.display=tab==='login'?'block':'none';
   document.getElementById('pane-signup').style.display=tab==='signup'?'block':'none';
@@ -513,7 +1498,7 @@ async function doLogout(){
   document.getElementById('auth-screen').style.display='flex';
 }
 
-// ── LAUNCH ──
+// ── launch ──
 function launchApp(){
   document.getElementById('auth-screen').style.display='none';
   document.getElementById('app-screen').style.display='block';
@@ -527,7 +1512,7 @@ function launchApp(){
   routeHome();
 }
 
-// ── ROLE-BASED NAV ──
+// ── role based navigation ──
 const NAV_CONFIG={
   pharmacy:[
     {id:'pharmacy',label:'🏠 Home'},
@@ -581,7 +1566,7 @@ function routeHome(){
   else showPage('clinic');
 }
 
-// ── SHARED UTILS ──
+// ── shared utils ──
 function expDisplay(ds){
   if(!ds)return'<span style="color:#aaa">—</span>';
   const e=new Date(ds),diff=Math.ceil((e-new Date())/864e5);
@@ -610,9 +1595,7 @@ function viewPatientModal(p){
   document.getElementById('m-patient').classList.add('open');
 }
 
-// ══════════════════════════════════════
 // PHARMACY
-// ══════════════════════════════════════
 async function loadPharmacyHome(){
   const m=user?.user_metadata||{};
   document.getElementById('wb-pharmacy-title').textContent=`Welcome, ${m.org_name||''}`;
@@ -675,7 +1658,7 @@ async function addDrug(){
   }catch(e){toast('Error: '+e.message,'err');}
 }
 
-// ── DISPENSING LOG ──
+// ── dispensing log ──
 let dispLog=[];
 
 async function loadDispensing(){
@@ -733,9 +1716,8 @@ async function addDispensing(){
   }catch(e){toast('Error: '+e.message,'err');}
 }
 
-// ══════════════════════════════════════
+
 // CLINIC
-// ══════════════════════════════════════
 async function loadClinicHome(){
   const m=user?.user_metadata||{};
   document.getElementById('wb-clinic-title').textContent=`Welcome, ${m.org_name||''}`;
@@ -780,9 +1762,8 @@ async function addClinicPatient(){
   }catch(e){toast('Error: '+e.message,'err');}
 }
 
-// ══════════════════════════════════════
+
 // HOSPITAL
-// ══════════════════════════════════════
 async function loadHospHome(){
   const m=user?.user_metadata||{};
   document.getElementById('wb-hosp-title').textContent=`Welcome, ${m.org_name||''}`;
@@ -861,7 +1842,7 @@ async function addHospDrug(){
   }catch(e){toast('Error: '+e.message,'err');}
 }
 
-// ── SHARED CRUD ──
+// ── shared crud ──
 function viewPtById(id,table){
   const p=patients.find(x=>x.id===id);
   if(p)viewPatientModal(p);
@@ -893,7 +1874,7 @@ async function delItem(table,id,reloadFn){
   catch(e){toast('Error: '+e.message,'err');}
 }
 
-// ── RESTORE SESSION ──
+// ── restore session ──
 (async()=>{
   const stored=localStorage.getItem('mc_s');
   if(!stored)return;
@@ -905,5 +1886,6 @@ async function delItem(table,id,reloadFn){
   localStorage.removeItem('mc_s');
 })();
 </script>
+
 </body>
 </html>
