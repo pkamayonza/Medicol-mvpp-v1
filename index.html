@@ -220,7 +220,7 @@
         <div class="stat-card danger"><div class="num" id="ph-low">—</div><div class="lbl">Low Stock</div></div>
         <div class="stat-card warn"><div class="num" id="ph-exp-soon">—</div><div class="lbl">Expiring (30d)</div></div>
         <div class="stat-card danger"><div class="num" id="ph-expired">—</div><div class="lbl">Expired</div></div>
-        <div class="stat-card"><div class="num" id="ph-pts">—</div><div class="lbl">Patients Served</div></div>
+        <div class="stat-card"><div class="num" id="ph-pts">—</div><div class="lbl">Dispensed Today</div></div>
       </div>
     </div>
   </div>
@@ -229,20 +229,11 @@
   <div class="page" id="page-ph-inventory">
     <div style="margin-top:1.5rem">
     <div class="card">
-      <h2>Add Drug</h2>
+      <h2>➕ Add Drug</h2>
       <div class="form-grid">
         <div class="form-group" style="grid-column:span 2"><label>Drug Name *</label><input type="text" id="i-name" placeholder="e.g. Amoxicillin 500mg"/></div>
         <div class="form-group"><label>Quantity *</label><input type="number" id="i-qty" placeholder="200" min="0"/></div>
-        <div class="form-group"><label>Unit</label><select id="i-unit">
-                                                  <option>Tablets</option>
-                                                  <option>Capsules</option>
-                                                  <option>Bottles</option>
-                                                  <option>Vials</option>
-                                                  <option>Sachets</option>
-                                                  <option>Strips</option>
-                                                  <option>Other</option>
-                                                  </select></div>
-
+        <div class="form-group"><label>Unit</label><select id="i-unit"><option>Tablets</option><option>Capsules</option><option>Bottles</option><option>Vials</option><option>Sachets</option><option>Strips</option><option>Other</option></select></div>
         <div class="form-group"><label>Expiry Date</label><input type="date" id="i-exp"/></div>
         <div class="form-group"><label>Price (UGX)</label><input type="number" id="i-price" placeholder="5000" min="0"/></div>
         <div class="form-group" style="grid-column:span 2"><label>Supplier</label><input type="text" id="i-sup" placeholder="e.g. National Medical Stores"/></div>
@@ -250,7 +241,7 @@
       <div class="form-actions"><button class="btn btn-primary" onclick="addDrug()">Add Drug</button></div>
     </div>
     <div class="card">
-      <h2>Drug Inventory</h2>
+      <h2>📦 Drug Inventory</h2>
       <div class="search-bar"><input type="text" id="i-search" placeholder="Search drug or supplier..." oninput="filterInv()"/></div>
       <div class="table-wrap">
         <table>
@@ -262,35 +253,32 @@
     </div>
   </div>
 
-  <!-- ── PHARMACY: DISPENSARY LOG ── -->
+  <!-- ── PHARMACY: DISPENSING LOG ── -->
   <div class="page" id="page-ph-patients">
     <div style="margin-top:1.5rem">
     <div class="card">
-      <h2>Dispensing Log</h2>
+      <h2>➕ Record Dispensing</h2>
       <div class="form-grid">
-        <div class="form-group" style="grid-column:span 2"><label>Drugs Dispensed</label><input type="text" id="pp-drugs" placeholder="e.g. Coartem 6 tabs, Paracetamol 10 tabs" required/></div>
-        <div class="form-group"><label>Unit</label><select id="i-unit">
-                                                  <option>Tablets</option>
-                                                  <option>Capsules</option>
-                                                  <option>Bottles</option>
-                                                  <option>Vials</option>
-                                                  <option>Sachets</option>
-                                                  <option>Strips</option>
-                                                  <option>Other</option>
-                                                  </select></div>
-        <div class="form-group"><label>Price (UGX)</label><input type="number" id="i-price" placeholder="5000" min="0"/></div>
-        
-        <div class="form-group" style="grid-column:span 2"><label>Notes</label><textarea id="pp-notes" placeholder="Any additional notes..."></textarea></div>
+        <div class="form-group"><label>Drug Dispensed *</label><input type="text" id="dl-drug" placeholder="e.g. Coartem 20/120mg"/></div>
+        <div class="form-group"><label>Qty Dispensed *</label><input type="number" id="dl-qty" placeholder="6" min="1"/></div>
+        <div class="form-group"><label>Unit</label><select id="dl-unit"><option>Tablets</option><option>Capsules</option><option>Bottles</option><option>Vials</option><option>Sachets</option><option>Strips</option><option>Other</option></select></div>
+        <div class="form-group"><label>Amount Paid (UGX)</label><input type="number" id="dl-paid" placeholder="15000" min="0"/></div>
+        <div class="form-group"><label>Payment Method</label><select id="dl-payment"><option>Cash</option><option>Mobile Money</option><option>Insurance</option><option>Credit</option></select></div>
+        <div class="form-group"><label>Customer Name (optional)</label><input type="text" id="dl-customer" placeholder="e.g. Grace Nakato"/></div>
+        <div class="form-group" style="grid-column:span 2"><label>Notes (optional)</label><input type="text" id="dl-notes" placeholder="e.g. Repeat customer, follow-up in 3 days"/></div>
       </div>
-      <div class="form-actions"><button class="btn btn-primary" onclick="addPhPatient()">Save Visit</button></div>
+      <div class="form-actions"><button class="btn btn-primary" onclick="addDispensing()">Save Record</button></div>
     </div>
     <div class="card">
-      <h2>Patient Visits</h2>
-      <div class="search-bar"><input type="text" id="pp-search" placeholder="Search by name or phone..." oninput="filterPhPts()"/></div>
+      <h2>📋 Dispensing Log</h2>
+      <div style="display:flex;gap:1rem;align-items:center;margin-bottom:1rem;flex-wrap:wrap;">
+        <div class="search-bar" style="flex:1;margin:0"><input type="text" id="dl-search" placeholder="Search drug or customer..." oninput="filterDl()" style="margin:0"/></div>
+        <div style="font-size:0.82rem;color:#888">Today's revenue: <strong id="dl-today-rev" style="color:#0D6E6E">UGX 0</strong></div>
+      </div>
       <div class="table-wrap">
         <table>
-          <thead><tr><th>Name</th><th>Age</th><th>Phone</th><th>Drugs Dispensed</th><th>Date</th><th>Actions</th></tr></thead>
-          <tbody id="pp-body"><tr><td colspan="6" class="loading">Loading...</td></tr></tbody>
+          <thead><tr><th>Drug</th><th>Qty</th><th>Unit</th><th>Amount (UGX)</th><th>Payment</th><th>Customer</th><th>Time</th><th>Actions</th></tr></thead>
+          <tbody id="dl-body"><tr><td colspan="8" class="loading">Loading...</td></tr></tbody>
         </table>
       </div>
     </div>
@@ -544,7 +532,7 @@ const NAV_CONFIG={
   pharmacy:[
     {id:'pharmacy',label:'🏠 Home'},
     {id:'ph-inventory',label:'💊 Inventory'},
-    {id:'ph-patients',label:'👥 Patients'}
+    {id:'ph-patients',label:'📋 Dispensing Log'}
   ],
   clinic:[
     {id:'clinic',label:'🏠 Home'},
@@ -577,7 +565,7 @@ function showPage(name){
   if(btn)btn.classList.add('active');
   if(name==='pharmacy')loadPharmacyHome();
   if(name==='ph-inventory')loadDrugs();
-  if(name==='ph-patients')loadPhPts();
+  if(name==='ph-patients')loadDispensing();
   if(name==='clinic')loadClinicHome();
   if(name==='cl-patients')loadClPts();
   if(name==='hospital')loadHospHome();
@@ -647,10 +635,10 @@ async function loadPharmacyHome(){
     } else {bar.classList.remove('show');}
   }catch(e){}
   try{
-    const p=await db('patients?order=created_at.desc');
-    patients=p;
+    const dl=await db('dispensing_log?order=created_at.desc');
     const tod=new Date().toDateString();
-    document.getElementById('ph-pts').textContent=p.length;
+    const todayLogs=dl.filter(x=>new Date(x.created_at).toDateString()===tod);
+    document.getElementById('ph-pts').textContent=todayLogs.length;
   }catch(e){}
 }
 
@@ -687,34 +675,61 @@ async function addDrug(){
   }catch(e){toast('Error: '+e.message,'err');}
 }
 
-async function loadPhPts(){
-  try{
-    patients=await db('patients?order=created_at.desc');
-    renderPhPts(patients);
-  }catch(e){document.getElementById('pp-body').innerHTML=`<tr><td colspan="6" class="loading">Error: ${e.message}</td></tr>`;}
-}
-function renderPhPts(arr){
-  const b=document.getElementById('pp-body');
-  if(!arr.length){b.innerHTML=`<tr><td colspan="6" class="loading">No visits yet.</td></tr>`;return;}
-  b.innerHTML=arr.map(p=>`<tr>
-    <td><strong>${p.name}</strong></td><td>${p.age||'—'}</td><td>${p.phone||'—'}</td>
-    <td>${p.condition||'—'}</td><td>${fmtDate(p.created_at)}</td>
-    <td class="td-actions">
-      <button class="btn btn-sm" onclick="viewPtById('${p.id}','patients')">View</button>
-      <button class="btn btn-danger" onclick="delItem('patients','${p.id}',loadPhPts)">Del</button>
-    </td></tr>`).join('');
-}
-function filterPhPts(){const q=document.getElementById('pp-search').value.toLowerCase();renderPhPts(patients.filter(p=>p.name.toLowerCase().includes(q)||(p.phone||'').includes(q)));}
+// ── DISPENSING LOG ──
+let dispLog=[];
 
-async function addPhPatient(){
-  const name=document.getElementById('pp-name').value.trim();
-  if(!name){toast('Patient name required.','err');return;}
+async function loadDispensing(){
   try{
-    await db('patients','POST',{name,age:document.getElementById('pp-age').value||null,gender:document.getElementById('pp-gender').value||null,phone:document.getElementById('pp-phone').value.trim()||null,condition:document.getElementById('pp-drugs').value.trim()||null,notes:document.getElementById('pp-notes').value.trim()||null,org_id:user.id});
-    toast('✅ Visit saved!');
-    ['pp-name','pp-age','pp-phone','pp-drugs','pp-notes'].forEach(id=>document.getElementById(id).value='');
-    document.getElementById('pp-gender').value='';
-    loadPhPts();
+    dispLog=await db('dispensing_log?order=created_at.desc');
+    renderDl(dispLog);
+    dlTodayRevenue(dispLog);
+  }catch(e){document.getElementById('dl-body').innerHTML=`<tr><td colspan="8" class="loading">Error: ${e.message}</td></tr>`;}
+}
+
+function dlTodayRevenue(arr){
+  const tod=new Date().toDateString();
+  const rev=arr.filter(x=>new Date(x.created_at).toDateString()===tod).reduce((s,x)=>s+(Number(x.amount_paid)||0),0);
+  document.getElementById('dl-today-rev').textContent='UGX '+rev.toLocaleString();
+}
+
+function renderDl(arr){
+  const b=document.getElementById('dl-body');
+  if(!arr.length){b.innerHTML=`<tr><td colspan="8" class="loading">No dispensing records yet.</td></tr>`;return;}
+  b.innerHTML=arr.map(d=>`<tr>
+    <td><strong>${d.drug_name}</strong></td>
+    <td>${d.quantity_dispensed}</td>
+    <td>${d.unit||'—'}</td>
+    <td>${d.amount_paid?Number(d.amount_paid).toLocaleString():'—'}</td>
+    <td><span class="badge b-ok">${d.payment_method||'Cash'}</span></td>
+    <td>${d.customer_name||'<span style="color:#aaa">Anonymous</span>'}</td>
+    <td style="font-size:0.8rem;color:#888">${new Date(d.created_at).toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'})} · ${new Date(d.created_at).toLocaleDateString('en-GB',{day:'2-digit',month:'short'})}</td>
+    <td><button class="btn btn-danger" onclick="delItem('dispensing_log','${d.id}',loadDispensing)">Del</button></td>
+  </tr>`).join('');
+}
+
+function filterDl(){
+  const q=document.getElementById('dl-search').value.toLowerCase();
+  renderDl(dispLog.filter(d=>d.drug_name.toLowerCase().includes(q)||(d.customer_name||'').toLowerCase().includes(q)));
+}
+
+async function addDispensing(){
+  const drug=document.getElementById('dl-drug').value.trim();
+  const qty=parseInt(document.getElementById('dl-qty').value);
+  if(!drug||isNaN(qty)||qty<1){toast('Drug name and quantity required.','err');return;}
+  try{
+    await db('dispensing_log','POST',{
+      drug_name:drug,
+      quantity_dispensed:qty,
+      unit:document.getElementById('dl-unit').value,
+      amount_paid:document.getElementById('dl-paid').value||null,
+      payment_method:document.getElementById('dl-payment').value,
+      customer_name:document.getElementById('dl-customer').value.trim()||null,
+      notes:document.getElementById('dl-notes').value.trim()||null,
+      org_id:user.id
+    });
+    toast('✅ Dispensing recorded!');
+    ['dl-drug','dl-qty','dl-paid','dl-customer','dl-notes'].forEach(id=>document.getElementById(id).value='');
+    loadDispensing();
   }catch(e){toast('Error: '+e.message,'err');}
 }
 
