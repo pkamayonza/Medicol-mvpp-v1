@@ -726,6 +726,27 @@
 
 </style>
 
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-CC0S9R0K9N"></script>
+
+<script>
+  // ── google  analytics ──
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-CC0S9R0K9N');
+</script>
+
+<script>
+  // ── posthog setup ──
+  !function(t,e){var o,n,p,r;e.__SV||(window.posthog=e,e._i=[],e.init=function(i,s,a){function g(t,e){var o=e.split(".");2==o.length&&(t=t[o[0]],e=o[1]),t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}}(p=t.createElement("script")).type="text/javascript",p.async=!0,p.src=s.api_host+"/static/array.js",(r=t.getElementsByTagName("script")[0]).parentNode.insertBefore(p,r);var u=e;for(void 0!==a?u=e[a]=[]:a="posthog",u.people=u.people||[],u.toString=function(t){var e="posthog";return"posthog"!==a&&(e+="."+a),t||(e+=" (stub)"),e},u.people.toString=function(){return u.toString(1)+" (stub)"},o="capture identify alias people.set people.set_once set_config register register_once unregister opt_out_capturing has_opted_out_capturing opt_in_capturing reset isFeatureEnabled onFeatureFlags getFeatureFlag getFeatureFlagPayload reloadFeatureFlags group updateEarlyAccessFeatureEnrollment getEarlyAccessFeatures getActiveMatchingSurveys getSurveys".split(" "),n=0;n<o.length;n++)g(u,o[n]);e._i.push([i,s,a])},e.__SV=1)}(document,window.posthog||[]);
+
+  posthog.init('phc_DKtyCRLBj5o1IRUpUw6mgQl7vEYR6B0ATQwDlZ7J76t', {
+    api_host: 'https://app.posthog.com',
+    autocapture: true,        
+    capture_pageview: true,   
+    persistence: 'localStorage'
+  });
+</script>
 </head>
 
 <body>
@@ -1139,8 +1160,7 @@
 
         <div class="form-group" style="grid-column:span 2">
           <label>Prescription / Treatment Notes</label>
-          <textarea id="cp-notes" placeholder="e.g. Coartem 20/120mg — 3 tablets twice daily for 3 days. Review in 7 days if no improvement.">
-          </textarea>
+          <textarea id="cp-notes" placeholder="e.g. Coartem 20/120mg — 3 tablets twice daily for 3 days. Review in 7 days if no improvement."></textarea>
         </div>
 
       </div>
@@ -1247,8 +1267,7 @@
 
         <div class="form-group" style="grid-column:span 2">
           <label>Treatment Notes</label>
-          <textarea id="hp-notes" placeholder="Ward, treatment plan, attending doctor...">
-          </textarea>
+          <textarea id="hp-notes" placeholder="Ward, treatment plan, attending doctor..."></textarea>
         </div>
 
       </div>
@@ -1402,6 +1421,11 @@
 <div class="toast" id="toast"></div>
 
 <script>
+  
+function track(event, props={}) {
+  if (window.posthog) posthog.capture(event, props);
+}
+
 const SURL='https://qflqwmfdwalvmndaojzl.supabase.co';
 const SKEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFmbHF3bWZkd2Fsdm1uZGFvanpsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE2MjcxMTcsImV4cCI6MjA4NzIwMzExN30.Ewpo8PoGq6PGcHnN85aYCUdPtSv7RXoGh9qthBJHezA';
 
@@ -1470,6 +1494,17 @@ async function doLogin(){
     session=d;user=d.user;
     localStorage.setItem('mc_s',JSON.stringify(d));
     launchApp();
+
+    posthog.identify(user.email, {
+    email:        user.email,
+    orgType:      user.user_metadata?.org_type  || 'unknown',
+    facilityName: user.user_metadata?.org_name  || 'unknown',
+  });
+    posthog.capture('user_logged_in', {
+    org_type: user.user_metadata?.org_type || 'unknown',
+    facility: user.user_metadata?.org_name || 'unknown',
+  });
+
   }catch(e){showEl('login-err',e.message);}
 }
 
@@ -1487,6 +1522,12 @@ async function doSignup(){
     ['s-org','s-email','s-pass'].forEach(id=>document.getElementById(id).value='');
     document.getElementById('s-role').value='';
     document.querySelectorAll('.role-card').forEach(c=>c.classList.remove('selected'));
+
+    posthog.capture('user_signed_up', {
+    org_type: role,
+    facility: org,
+  });
+
   }catch(e){showEl('signup-err',e.message);}
 }
 
@@ -1494,6 +1535,8 @@ async function doLogout(){
   try{await fetch(`${SURL}/auth/v1/logout`,{method:'POST',headers:{'apikey':SKEY,'Authorization':`Bearer ${session?.access_token}`}});}catch(e){}
   session=null;user=null;orgRole=null;
   localStorage.removeItem('mc_s');
+  posthog.capture('user_logged_out');
+  posthog.reset();
   document.getElementById('app-screen').style.display='none';
   document.getElementById('auth-screen').style.display='flex';
 }
@@ -1712,6 +1755,13 @@ async function addDispensing(){
     });
     toast('✅ Dispensing recorded!');
     ['dl-drug','dl-qty','dl-paid','dl-customer','dl-notes'].forEach(id=>document.getElementById(id).value='');
+    posthog.capture('drug_dispensed', {
+    org_type: 'pharmacy',
+    facility: user?.user_metadata?.org_name || 'unknown',
+    drug_name: drug,
+    quantity: qty,
+    payment_method: document.getElementById('dl-payment').value,
+  });
     loadDispensing();
   }catch(e){toast('Error: '+e.message,'err');}
 }
@@ -1758,10 +1808,13 @@ async function addClinicPatient(){
     toast('✅ Patient registered!');
     ['cp-name','cp-age','cp-phone','cp-cond','cp-notes'].forEach(id=>document.getElementById(id).value='');
     document.getElementById('cp-gender').value='';
+    posthog.capture('patient_logged', {
+    org_type: orgRole,
+    facility: user?.user_metadata?.org_name || 'unknown',
+  });
     loadClPts();
   }catch(e){toast('Error: '+e.message,'err');}
 }
-
 
 // HOSPITAL
 async function loadHospHome(){
@@ -1881,7 +1934,11 @@ async function delItem(table,id,reloadFn){
   try{
     const s=JSON.parse(stored);
     const res=await fetch(`${SURL}/auth/v1/token?grant_type=refresh_token`,{method:'POST',headers:{'Content-Type':'application/json','apikey':SKEY},body:JSON.stringify({refresh_token:s.refresh_token})});
-    if(res.ok){const d=await res.json();session=d;user=d.user;localStorage.setItem('mc_s',JSON.stringify(d));launchApp();return;}
+    if(res.ok){const d=await res.json();
+      session=d;
+      user=d.user;
+      localStorage.setItem('mc_s',JSON.stringify(d));
+      launchApp();return;}
   }catch(e){}
   localStorage.removeItem('mc_s');
 })();
