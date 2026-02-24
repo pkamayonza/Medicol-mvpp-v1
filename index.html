@@ -489,6 +489,11 @@
     background:#e5e7eb;
   }
 
+  button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
   /* ── stats ── */
   .stats{
     display:grid;
@@ -956,7 +961,7 @@
   <div class="form-actions">
     <button class="btn btn-primary" onclick="addDrug()">Add Drug</button>
   </div>
-  
+
 </div>
 
     <div class="card">
@@ -991,65 +996,98 @@
   <!-- pharmacy: dispensary log -->
   <div class="page" id="page-ph-patients">
     <div style="margin-top:1.5rem">
+      
     <div class="card">
+  <h2>Record Dispensing</h2>
+  <div class="form-grid">
 
-      <h2>Record Dispensing</h2>
-      <div class="form-grid">
-        <div class="form-group">
-          <label>Drug Dispensed *</label>
-          <input type="text" id="dl-drug" placeholder="e.g. Coartem 20/120mg"/>
-        </div>
-
-        <div class="form-group">
-          <label>Qty Dispensed *</label>
-          <input type="number" id="dl-qty" placeholder="6" min="1"/>
-        </div>
-
-        <div class="form-group">
-          <label>Unit</label>
-          <select id="dl-unit">
-            <option>Tablets</option>
-            <option>Capsules</option>
-            <option>Bottles</option>
-            <option>Vials</option>
-            <option>Sachets</option>
-            <option>Strips</option>
-            <option>Other</option>
-          </select>
-        </div>
-
-        <div class="form-group">
-          <label>Amount Paid (UGX)</label>
-          <input type="number" id="dl-paid" placeholder="15000" min="0"/>
-        </div>
-
-        <div class="form-group">
-          <label>Payment Method</label>
-          <select id="dl-payment">
-            <option>Cash</option>
-            <option>Mobile Money</option>
-            <option>Insurance</option>
-            <option>Credit</option>
-          </select>
-        </div>
-
-        <div class="form-group">
-          <label>Customer Name (optional)</label>
-          <input type="text" id="dl-customer" placeholder="e.g. Grace Nakato"/>
-        </div>
-
-        <div class="form-group" style="grid-column:span 2">
-          <label>Notes (optional)</label>
-          <input type="text" id="dl-notes" placeholder="e.g. Repeat customer, follow-up in 3 days"/>
-        </div>
-
+    <div class="form-group" style="grid-column:span 2">
+      <label>Drug Dispensed *</label>
+      <input type="text" id="dl-drug" placeholder="e.g. Coartem 20/120mg"
+             oninput="onDrugInput()" autocomplete="off"/>
+      <!-- autocomplete dropdown -->
+      <div id="dl-drug-suggestions" style="
+        position:relative;z-index:100;background:white;
+        border:1px solid #ddd;border-radius:6px;
+        display:none;max-height:180px;overflow-y:auto;
+        box-shadow:0 4px 12px rgba(0,0,0,0.1);margin-top:2px;">
       </div>
-
-      <div class="form-actions">
-        <button class="btn btn-primary" onclick="addDispensing()">Save Record</button>
-      </div>
-
     </div>
+
+    <div class="form-group">
+      <label>Qty Dispensed *</label>
+      <input type="number" id="dl-qty" placeholder="6" min="1"
+             oninput="calcTotal()"/>
+    </div>
+
+    <div class="form-group">
+      <label>Unit</label>
+      <select id="dl-unit">
+        <option>Tablets</option>
+        <option>Capsules</option>
+        <option>Bottles</option>
+        <option>Vials</option>
+        <option>Sachets</option>
+        <option>Strips</option>
+        <option>Other</option>
+      </select>
+    </div>
+
+    <!-- READ-ONLY: unit price fetched from inventory -->
+    <div class="form-group">
+      <label>Unit Price (UGX)</label>
+      <input type="text" id="dl-unit-price" readonly
+             placeholder="Select drug first"
+             style="background:#f5f5f5;color:#555;cursor:not-allowed;"/>
+      <span id="dl-price-status" style="font-size:0.75rem;margin-top:0.2rem;"></span>
+    </div>
+
+    <!-- READ-ONLY: auto-calculated total -->
+    <div class="form-group">
+      <label>Total Cost (UGX)</label>
+      <input type="text" id="dl-total" readonly
+             placeholder="—"
+             style="background:#f0fdf4;color:#16a34a;font-weight:700;
+                    font-size:1rem;cursor:not-allowed;"/>
+    </div>
+
+    <!-- NO PRICE WARNING -->
+    <div id="dl-no-price-warning" style="
+      grid-column:span 2;display:none;
+      background:#fffbeb;border:1px solid #fcd34d;
+      border-radius:8px;padding:0.7rem 1rem;
+      font-size:0.83rem;color:#92400e;">
+      ⚠️ No price set for this drug. Please update the inventory first before dispensing.
+    </div>
+
+    <div class="form-group">
+      <label>Payment Method</label>
+      <select id="dl-payment">
+        <option>Cash</option>
+        <option>Mobile Money</option>
+        <option>Insurance</option>
+        <option>Credit</option>
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label>Customer Name (optional)</label>
+      <input type="text" id="dl-customer" placeholder="e.g. Grace Nakato"/>
+    </div>
+
+    <div class="form-group" style="grid-column:span 2">
+      <label>Notes (optional)</label>
+      <input type="text" id="dl-notes"
+             placeholder="e.g. Repeat customer, follow-up in 3 days"/>
+    </div>
+
+  </div>
+  <div class="form-actions">
+    <button class="btn btn-primary" id="dl-submit-btn" onclick="addDispensing()">
+      Save Record
+    </button>
+  </div>
+</div>
 
     <div class="card">
       <h2>📋 Dispensing Log</h2>
@@ -1704,68 +1742,196 @@ async function addDrug(){
 }
 
 // ── dispensing log ──
-let dispLog=[];
+let dispLog = [];
+let currentUnitPrice = 0;
+let priceLoading = false;
 
-async function loadDispensing(){
-  try{
-    dispLog=await db('dispensing_log?order=created_at.desc');
+// Drug name autocomplete + price fetch trigger
+function onDrugInput() {
+  const val = document.getElementById('dl-drug').value.trim().toLowerCase();
+  const sugg = document.getElementById('dl-drug-suggestions');
+
+  // reset price state
+  currentUnitPrice = 0;
+  document.getElementById('dl-unit-price').value = '';
+  document.getElementById('dl-total').value = '';
+  document.getElementById('dl-no-price-warning').style.display = 'none';
+  document.getElementById('dl-price-status').textContent = '';
+  document.getElementById('dl-submit-btn').disabled = false;
+
+  if (!val) { sugg.style.display = 'none'; return; }
+
+  // filter from already-loaded drugs array
+  const matches = drugs.filter(d => d.drug_name.toLowerCase().includes(val));
+  if (!matches.length) { sugg.style.display = 'none'; return; }
+
+  sugg.innerHTML = matches.map(d => `
+    <div onclick="selectDrug('${d.drug_name.replace(/'/g,"\\'")}',${d.unit_price||0})"
+         style="padding:0.6rem 1rem;cursor:pointer;font-size:0.88rem;
+                border-bottom:1px solid #f0f0f0;"
+         onmouseover="this.style.background='#f0fdf9'"
+         onmouseout="this.style.background='white'">
+      <strong>${d.drug_name}</strong>
+      <span style="float:right;color:#888;font-size:0.8rem;">
+        ${d.unit_price ? 'UGX ' + Number(d.unit_price).toLocaleString() : 'No price'}
+      </span>
+    </div>`).join('');
+  sugg.style.display = 'block';
+}
+
+function selectDrug(name, price) {
+  document.getElementById('dl-drug').value = name;
+  document.getElementById('dl-drug-suggestions').style.display = 'none';
+  applyDrugPrice(name, price);
+}
+
+async function applyDrugPrice(drugName, cachedPrice) {
+  const statusEl = document.getElementById('dl-price-status');
+  const unitPriceEl = document.getElementById('dl-unit-price');
+  const warningEl = document.getElementById('dl-no-price-warning');
+  const submitBtn = document.getElementById('dl-submit-btn');
+
+  // show loading state
+  statusEl.textContent = '⏳ Fetching price...';
+  statusEl.style.color = '#888';
+  unitPriceEl.value = '';
+  currentUnitPrice = 0;
+
+  try {
+    // fresh fetch from Supabase for accuracy
+    const result = await db(
+      `inventory?drug_name=eq.${encodeURIComponent(drugName)}&select=unit_price&limit=1`
+    );
+    const price = result?.[0]?.unit_price;
+
+    if (!price || price === 0) {
+      currentUnitPrice = 0;
+      unitPriceEl.value = 'Not set';
+      statusEl.textContent = '';
+      warningEl.style.display = 'block';
+      submitBtn.disabled = true;
+      document.getElementById('dl-total').value = '';
+    } else {
+      currentUnitPrice = price;
+      unitPriceEl.value = 'UGX ' + Number(price).toLocaleString();
+      statusEl.textContent = '✓ Price loaded';
+      statusEl.style.color = '#16a34a';
+      warningEl.style.display = 'none';
+      submitBtn.disabled = false;
+      calcTotal();
+    }
+  } catch(e) {
+    statusEl.textContent = 'Could not fetch price';
+    statusEl.style.color = '#dc2626';
+  }
+}
+
+function calcTotal() {
+  const qty = parseInt(document.getElementById('dl-qty').value);
+  const totalEl = document.getElementById('dl-total');
+  if (!currentUnitPrice || isNaN(qty) || qty < 1) {
+    totalEl.value = '';
+    return;
+  }
+  const total = currentUnitPrice * qty;
+  totalEl.value = 'UGX ' + total.toLocaleString();
+}
+
+async function loadDispensing() {
+  try {
+    dispLog = await db('dispensing_log?order=created_at.desc');
     renderDl(dispLog);
     dlTodayRevenue(dispLog);
-  }catch(e){document.getElementById('dl-body').innerHTML=`<tr><td colspan="8" class="loading">Error: ${e.message}</td></tr>`;}
+  } catch(e) {
+    document.getElementById('dl-body').innerHTML =
+      `<tr><td colspan="8" class="loading">Error: ${e.message}</td></tr>`;
+  }
 }
 
-function dlTodayRevenue(arr){
-  const tod=new Date().toDateString();
-  const rev=arr.filter(x=>new Date(x.created_at).toDateString()===tod).reduce((s,x)=>s+(Number(x.amount_paid)||0),0);
-  document.getElementById('dl-today-rev').textContent='UGX '+rev.toLocaleString();
+function dlTodayRevenue(arr) {
+  const tod = new Date().toDateString();
+  const rev = arr
+    .filter(x => new Date(x.created_at).toDateString() === tod)
+    .reduce((s, x) => s + (Number(x.total_cost) || 0), 0);
+  document.getElementById('dl-today-rev').textContent = 'UGX ' + rev.toLocaleString();
 }
 
-function renderDl(arr){
-  const b=document.getElementById('dl-body');
-  if(!arr.length){b.innerHTML=`<tr><td colspan="8" class="loading">No dispensing records yet.</td></tr>`;return;}
-  b.innerHTML=arr.map(d=>`<tr>
+function renderDl(arr) {
+  const b = document.getElementById('dl-body');
+  if (!arr.length) {
+    b.innerHTML = `<tr><td colspan="8" class="loading">No dispensing records yet.</td></tr>`;
+    return;
+  }
+  b.innerHTML = arr.map(d => `<tr>
     <td><strong>${d.drug_name}</strong></td>
     <td>${d.quantity_dispensed}</td>
     <td>${d.unit||'—'}</td>
-    <td>${d.amount_paid?Number(d.amount_paid).toLocaleString():'—'}</td>
+    <td>${d.total_cost ? 'UGX ' + Number(d.total_cost).toLocaleString() : '—'}</td>
     <td><span class="badge b-ok">${d.payment_method||'Cash'}</span></td>
     <td>${d.customer_name||'<span style="color:#aaa">Anonymous</span>'}</td>
-    <td style="font-size:0.8rem;color:#888">${new Date(d.created_at).toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'})} · ${new Date(d.created_at).toLocaleDateString('en-GB',{day:'2-digit',month:'short'})}</td>
-    <td><button class="btn btn-danger" onclick="delItem('dispensing_log','${d.id}',loadDispensing)">Del</button></td>
+    <td style="font-size:0.8rem;color:#888">
+      ${new Date(d.created_at).toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'})}
+      · ${new Date(d.created_at).toLocaleDateString('en-GB',{day:'2-digit',month:'short'})}
+    </td>
+    <td><button class="btn btn-danger"
+      onclick="delItem('dispensing_log','${d.id}',loadDispensing)">Del</button></td>
   </tr>`).join('');
 }
 
-function filterDl(){
-  const q=document.getElementById('dl-search').value.toLowerCase();
-  renderDl(dispLog.filter(d=>d.drug_name.toLowerCase().includes(q)||(d.customer_name||'').toLowerCase().includes(q)));
+function filterDl() {
+  const q = document.getElementById('dl-search').value.toLowerCase();
+  renderDl(dispLog.filter(d =>
+    d.drug_name.toLowerCase().includes(q) ||
+    (d.customer_name||'').toLowerCase().includes(q)
+  ));
 }
 
-async function addDispensing(){
-  const drug=document.getElementById('dl-drug').value.trim();
-  const qty=parseInt(document.getElementById('dl-qty').value);
-  if(!drug||isNaN(qty)||qty<1){toast('Drug name and quantity required.','err');return;}
-  try{
-    await db('dispensing_log','POST',{
-      drug_name:drug,
-      quantity_dispensed:qty,
-      unit:document.getElementById('dl-unit').value,
-      amount_paid:document.getElementById('dl-paid').value||null,
-      payment_method:document.getElementById('dl-payment').value,
-      customer_name:document.getElementById('dl-customer').value.trim()||null,
-      notes:document.getElementById('dl-notes').value.trim()||null,
-      org_id:user.id
+async function addDispensing() {
+  const drug = document.getElementById('dl-drug').value.trim();
+  const qty = parseInt(document.getElementById('dl-qty').value);
+  if (!drug || isNaN(qty) || qty < 1) {
+    toast('Drug name and quantity required.', 'err'); return;
+  }
+  if (!currentUnitPrice) {
+    toast('Cannot dispense — no price set for this drug.', 'err'); return;
+  }
+  const total = currentUnitPrice * qty;
+  try {
+    await db('dispensing_log', 'POST', {
+      drug_name: drug,
+      quantity_dispensed: qty,
+      unit: document.getElementById('dl-unit').value,
+      unit_price_at_time_of_dispensing: currentUnitPrice,
+      total_cost: total,
+      amount_paid: total,  // pre-fill amount_paid with total
+      payment_method: document.getElementById('dl-payment').value,
+      customer_name: document.getElementById('dl-customer').value.trim() || null,
+      notes: document.getElementById('dl-notes').value.trim() || null,
+      org_id: user.id
     });
     toast('✅ Dispensing recorded!');
-    ['dl-drug','dl-qty','dl-paid','dl-customer','dl-notes'].forEach(id=>document.getElementById(id).value='');
-    posthog.capture('drug_dispensed', {
-    org_type: 'pharmacy',
-    facility: user?.user_metadata?.org_name || 'unknown',
-    drug_name: drug,
-    quantity: qty,
-    payment_method: document.getElementById('dl-payment').value,
-  });
+
+    // reset form
+    ['dl-drug','dl-qty','dl-paid','dl-customer','dl-notes'].forEach(
+      id => { const el = document.getElementById(id); if(el) el.value=''; }
+    );
+    document.getElementById('dl-unit-price').value = '';
+    document.getElementById('dl-total').value = '';
+    document.getElementById('dl-price-status').textContent = '';
+    document.getElementById('dl-no-price-warning').style.display = 'none';
+    document.getElementById('dl-submit-btn').disabled = false;
+    currentUnitPrice = 0;
+
+    track('drug_dispensed', {
+      org_type: 'pharmacy',
+      facility: user?.user_metadata?.org_name || 'unknown',
+      drug_name: drug,
+      quantity: qty,
+      total_cost: total,
+      payment_method: document.getElementById('dl-payment').value,
+    });
     loadDispensing();
-  }catch(e){toast('Error: '+e.message,'err');}
+  } catch(e) { toast('Error: ' + e.message, 'err'); }
 }
 
 
