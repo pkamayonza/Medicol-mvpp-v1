@@ -903,7 +903,7 @@
 
         <div class="stat-card">
           <div class="num" id="ph-pts">—</div>
-          <div class="lbl">Dispensed Today</div>
+          <div class="lbl">Dispensed (24h)</div>
         </div>
 
       </div>
@@ -1097,7 +1097,7 @@
           <input type="text" id="dl-search" placeholder="Search drug or customer..." oninput="filterDl()" style="margin:0"/>
         </div>
 
-        <div style="font-size:0.82rem;color:#888">Today's revenue: 
+        <div style="font-size:0.82rem;color:#888">Revenue (24h): 
           <strong id="dl-today-rev" style="color:#0D6E6E">UGX 0</strong>
         </div>
 
@@ -1702,9 +1702,9 @@ async function loadPharmacyHome(){
   }catch(e){}
   try{
     const dl=await db('dispensing_log?order=created_at.desc');
-    const tod=new Date().toDateString();
-    const todayLogs=dl.filter(x=>new Date(x.created_at).toDateString()===tod);
-    document.getElementById('ph-pts').textContent=todayLogs.length;
+    const since = new Date(Date.now() - 24 * 60 * 60 * 1000);
+    const todayLogs = dl.filter(x => new Date(x.created_at) >= since);
+    document.getElementById('ph-pts').textContent = todayLogs.length;
   }catch(e){}
 }
 
@@ -1800,9 +1800,9 @@ async function applyDrugPrice(drugName, cachedPrice) {
   try {
     // fresh fetch from Supabase for accuracy
     const result = await db(
-      `inventory?drug_name=eq.${encodeURIComponent(drugName)}&select=unit_price&limit=1`
+      `inventory?drug_name=eq.${encodeURIComponent(drugName)}&select=price&limit=1`
     );
-    const price = result?.[0]?.unit_price;
+    const price = result?.[0]?.price;
 
     if (!price || price === 0) {
       currentUnitPrice = 0;
@@ -1839,7 +1839,7 @@ function calcTotal() {
 
 async function loadDispensing() {
   try {
-    dispLog = await db('dispensing_log?order=created_at.desc');
+    dispLog = await db('dispensing_log?select=*&order=created_at.desc');
     renderDl(dispLog);
     dlTodayRevenue(dispLog);
   } catch(e) {
@@ -1849,9 +1849,9 @@ async function loadDispensing() {
 }
 
 function dlTodayRevenue(arr) {
-  const tod = new Date().toDateString();
+  const since = new Date(Date.now() - 24 * 60 * 60 * 1000);
   const rev = arr
-    .filter(x => new Date(x.created_at).toDateString() === tod)
+    .filter(x => new Date(x.created_at) >= since)
     .reduce((s, x) => s + (Number(x.total_cost) || 0), 0);
   document.getElementById('dl-today-rev').textContent = 'UGX ' + rev.toLocaleString();
 }
@@ -1901,7 +1901,7 @@ async function addDispensing() {
       drug_name: drug,
       quantity_dispensed: qty,
       unit: document.getElementById('dl-unit').value,
-      unit_price_at_time_of_dispensing: currentUnitPrice,
+      price_at_time_of_dispensing: currentUnitPrice,
       total_cost: total,
       amount_paid: total,  // pre-fill amount_paid with total
       payment_method: document.getElementById('dl-payment').value,
