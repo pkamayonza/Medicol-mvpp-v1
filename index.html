@@ -722,9 +722,16 @@
     font-size:0.74rem;
     font-weight:600;
   }
-  
+
 @media(max-width:768px) {
   #page-ph-patients .page > div > div:first-child {
+    grid-template-columns: 1fr !important;
+  }
+
+}
+
+@media(max-width:640px) {
+  #velocity-section > div {
     grid-template-columns: 1fr !important;
   }
 }
@@ -907,6 +914,72 @@
         </div>
 
       </div>
+
+      <!-- product velocity — sits inside the stats area -->
+      <div id="velocity-section" style="display:none;">
+        <div class="stats">
+
+          <div class="stat-card" onclick="toggleVelocityList('fast')"
+               style="cursor:pointer;border-color:#a7f3d0;background:#f0fdf4;"
+               onmouseover="this.style.boxShadow='0 4px 16px rgba(5,150,105,0.15)'"
+               onmouseout="this.style.boxShadow='none'">
+
+            <div style="display:flex;justify-content:space-between;align-items:flex-start;">
+
+              <div>
+                <div class="num" id="velocity-fast-count" style="color:#059669;">—</div>
+                <div class="lbl">Fast Moving</div>
+              </div>
+
+              <span style="font-size:1.1rem;">🚀</span>
+            </div>
+
+            <div style="font-size:0.72rem;color:#059669;margin-top:0.4rem;font-weight:600;">
+              Click to view →
+            </div>
+
+          </div>
+
+          <div class="stat-card" onclick="toggleVelocityList('slow')"
+               style="cursor:pointer;border-color:#fcd34d;background:#fffbeb;"
+               onmouseover="this.style.boxShadow='0 4px 16px rgba(217,119,6,0.15)'"
+               onmouseout="this.style.boxShadow='none'">
+
+            <div style="display:flex;justify-content:space-between;align-items:flex-start;">
+
+              <div>
+                <div class="num" id="velocity-slow-count" style="color:#d97706;">—</div>
+                <div class="lbl">Slow Moving</div>
+              </div>
+
+              <span style="font-size:1.1rem;">🐢</span>
+            </div>
+
+            <div style="font-size:0.72rem;color:#d97706;margin-top:0.4rem;font-weight:600;">
+              Click to view →
+            </div>
+            
+          </div>
+
+        </div>
+
+        <!-- expandable panel -->
+        <div id="velocity-list-panel" style="display:none;margin-top:1rem;">
+          <div class="card" style="margin-bottom:0;">
+            <div style="display:flex;justify-content:space-between;align-items:center;
+                        margin-bottom:1.2rem;">
+              <h2 id="velocity-list-title" style="margin:0;border:none;padding:0;
+                                                   font-size:1rem;"></h2>
+              <button onclick="toggleVelocityList(null)"
+                      style="background:none;border:none;color:#888;cursor:pointer;
+                             font-size:0.85rem;font-weight:600;">✕ Close</button>
+            </div>
+            <div id="velocity-list-body"></div>
+          </div>
+        </div>
+
+      </div>
+ 
     </div>
   </div>
 
@@ -1732,40 +1805,127 @@ function viewPatientModal(p){
 }
 
 // PHARMACY
-async function loadPharmacyHome(){
-  const m=user?.user_metadata||{};
-  document.getElementById('wb-pharmacy-title').textContent=`Welcome, ${m.org_name||''}`;
-  try{
-    const d=await db('inventory?order=drug_name.asc');
-    drugs=d;
-    const now=new Date(),in30=new Date();in30.setDate(now.getDate()+30);
-    const low=d.filter(x=>x.quantity<=10).length;
-    const expSoon=d.filter(x=>x.expiry_date&&new Date(x.expiry_date)>now&&new Date(x.expiry_date)<=in30).length;
-    const expired=d.filter(x=>x.expiry_date&&new Date(x.expiry_date)<now).length;
-    document.getElementById('ph-total').textContent=d.length;
-    document.getElementById('ph-low').textContent=low;
-    document.getElementById('ph-exp-soon').textContent=expSoon;
-    document.getElementById('ph-expired').textContent=expired;
-    // Low stock alert
-    const bar=document.getElementById('low-stock-alert');
-    if(low>0){
-      document.getElementById('low-stock-msg').textContent=`${low} drug${low>1?'s are':' is'} running low or out of stock.`;
+async function loadPharmacyHome() {
+  const m = user?.user_metadata || {};
+  document.getElementById('wb-pharmacy-title').textContent = `Welcome, ${m.org_name || ''}`;
+
+  // inventory stats
+  try {
+    const d = await db('inventory?order=drug_name.asc');
+    drugs = d;
+    const now = new Date(), in30 = new Date();
+    in30.setDate(now.getDate() + 30);
+    const low = d.filter(x => x.quantity <= 10).length;
+    const expSoon = d.filter(x => x.expiry_date && new Date(x.expiry_date) > now && new Date(x.expiry_date) <= in30).length;
+    const expired = d.filter(x => x.expiry_date && new Date(x.expiry_date) < now).length;
+    document.getElementById('ph-total').textContent = d.length;
+    document.getElementById('ph-low').textContent = low;
+    document.getElementById('ph-exp-soon').textContent = expSoon;
+    document.getElementById('ph-expired').textContent = expired;
+    const bar = document.getElementById('low-stock-alert');
+    if (low > 0) {
+      document.getElementById('low-stock-msg').textContent =
+        `${low} drug${low > 1 ? 's are' : ' is'} running low or out of stock.`;
       bar.classList.add('show');
-    } else {bar.classList.remove('show');}
-  }catch(e){}
-  try{
-    const dl=await db('dispensing_log?order=created_at.desc');
+    } else { bar.classList.remove('show'); }
+  } catch(e) {}
+
+  // dispensing stats + product velocity
+  try {
     const since = new Date(Date.now() - 24 * 60 * 60 * 1000);
+    const dl = await db('dispensing_log?select=*&order=created_at.desc');
     const todayLogs = dl.filter(x => new Date(x.created_at) >= since);
     document.getElementById('ph-pts').textContent = todayLogs.length;
-  }catch(e){}
+    renderProductVelocity(dl);
+  } catch(e) {}
 }
 
-async function loadDrugs(){
-  try{
-    drugs=await db('inventory?order=drug_name.asc');
-    renderDrugs(drugs);
-  }catch(e){document.getElementById('i-body').innerHTML=`<tr><td colspan="8" class="loading">Error: ${e.message}</td></tr>`;}
+let velocityData = { fast: [], slow: [] };
+let velocityOpen = null;
+
+function renderProductVelocity(dl) {
+  const tally = {};
+  dl.forEach(row => {
+    if (!row.drug_name) return;
+    if (!tally[row.drug_name]) tally[row.drug_name] = { qty: 0, revenue: 0 };
+    tally[row.drug_name].qty += Number(row.quantity_dispensed) || 0;
+    tally[row.drug_name].revenue += Number(row.total_cost) || 0;
+  });
+
+  const sorted = Object.entries(tally).sort((a, b) => b[1].qty - a[1].qty);
+
+  if (!sorted.length) {
+    document.getElementById('velocity-section').style.display = 'none';
+    return;
+  }
+
+  document.getElementById('velocity-section').style.display = 'block';
+
+  velocityData.fast = sorted.slice(0, 5);
+  velocityData.slow = [...sorted].slice(-5).reverse();
+
+  document.getElementById('velocity-fast-count').textContent = velocityData.fast.length;
+  document.getElementById('velocity-slow-count').textContent = velocityData.slow.length;
+}
+
+function toggleVelocityList(type) {
+  const panel = document.getElementById('velocity-list-panel');
+  const title = document.getElementById('velocity-list-title');
+  const body = document.getElementById('velocity-list-body');
+
+  // clicking same card again closes it
+  if (velocityOpen === type || type === null) {
+    panel.style.display = 'none';
+    velocityOpen = null;
+    return;
+  }
+
+  velocityOpen = type;
+  panel.style.display = 'block';
+
+  const isFast = type === 'fast';
+  const items = velocityData[type];
+  const maxQty = velocityData.fast[0]?.[1].qty || 1;
+  const color = isFast ? '#059669' : '#d97706';
+  const bgColor = isFast ? '#f0fdf4' : '#fffbeb';
+
+  title.innerHTML = isFast
+    ? '🚀 <span style="color:#059669">Fast Moving Drugs</span> — Top sellers'
+    : '🐢 <span style="color:#d97706">Slow Moving Drugs</span> — Least sold';
+
+  body.innerHTML = items.map(([name, data], i) => {
+    const pct = Math.max(3, Math.round((data.qty / maxQty) * 100));
+    return `
+      <div style="display:flex;align-items:center;gap:1rem;
+                  padding:0.8rem 1rem;border-radius:8px;margin-bottom:0.5rem;
+                  background:${i % 2 === 0 ? bgColor : 'white'};
+                  border:1px solid ${isFast ? '#d1fae5' : '#fef3c7'};">
+        <div style="width:28px;height:28px;border-radius:50%;
+                    background:${color};color:white;font-size:0.78rem;
+                    font-weight:700;display:flex;align-items:center;
+                    justify-content:center;flex-shrink:0;">${i + 1}</div>
+        <div style="flex:1;min-width:0;">
+          <div style="font-weight:600;font-size:0.9rem;color:#0B1F3A;
+                      margin-bottom:0.3rem;">${name}</div>
+          <div style="background:#e5e7eb;border-radius:100px;
+                      height:5px;overflow:hidden;">
+            <div style="width:${pct}%;height:100%;border-radius:100px;
+                        background:${color};"></div>
+          </div>
+        </div>
+        <div style="text-align:right;flex-shrink:0;">
+          <div style="font-size:0.88rem;font-weight:700;color:${color};">
+            ${data.qty.toLocaleString()} units
+          </div>
+          <div style="font-size:0.75rem;color:#999;">
+            UGX ${data.revenue.toLocaleString()}
+          </div>
+        </div>
+      </div>`;
+  }).join('');
+
+  // smooth scroll to panel
+  panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 }
 
 function renderDrugs(arr){
