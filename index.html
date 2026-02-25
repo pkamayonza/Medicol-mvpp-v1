@@ -722,12 +722,12 @@
     font-size:0.74rem;
     font-weight:600;
   }
-
-  @media(max-width:640px){
-    nav{padding:1rem;}
-    .page{padding:0 1rem 1rem;}
-    .role-grid{grid-template-columns:1fr 1fr;}
+  
+@media(max-width:768px) {
+  #page-ph-patients .page > div > div:first-child {
+    grid-template-columns: 1fr !important;
   }
+}
 
 </style>
 
@@ -997,172 +997,178 @@
 <div class="page" id="page-ph-patients">
   <div style="margin-top:1.5rem">
 
-    <!-- ADD DRUGS TO BASKET -->
-    <div class="card">
-      <h2>💊 New Prescription</h2>
-      <div class="form-grid">
+    <!-- TWO COLUMN LAYOUT: form left, basket right -->
+    <div style="display:grid;grid-template-columns:1fr 380px;gap:1.5rem;align-items:start;">
 
-        <div class="form-group" style="grid-column:span 2">
-          <label>Drug *</label>
-          <input type="text" id="dl-drug" placeholder="Start typing drug name..."
-                 oninput="onDrugInput()" autocomplete="off"/>
-          <div id="dl-drug-suggestions" style="position:relative;
-                                              z-index:100;
-                                              background:white;
-                                              border:1px solid #ddd;
-                                              border-radius:6px;
-                                              display:none;
-                                              max-height:180px;
-                                              overflow-y:auto;
-                                              box-shadow:0 4px 12px rgba(0,0,0,0.1);
-                                              margin-top:2px;"
-              </div>
+      <!-- LEFT: drug entry form -->
+      <div class="card" style="margin-bottom:0;">
+        <h2>💊 New Prescription</h2>
+        <div class="form-grid">
+
+          <div class="form-group" style="grid-column:span 2">
+            <label>Drug *</label>
+            <input type="text" id="dl-drug" placeholder="Start typing drug name..."
+                   oninput="onDrugInput()" autocomplete="off"/>
+            <div id="dl-drug-suggestions" style="
+              position:relative;z-index:100;background:white;
+              border:1px solid #ddd;border-radius:6px;display:none;
+              max-height:180px;overflow-y:auto;
+              box-shadow:0 4px 12px rgba(0,0,0,0.1);margin-top:2px;">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Qty *</label>
+            <input type="number" id="dl-qty" placeholder="e.g. 6" min="1" oninput="calcTotal()"/>
+          </div>
+
+          <div class="form-group">
+            <label>Unit</label>
+            <select id="dl-unit">
+              <option>Tablets</option>
+              <option>Capsules</option>
+              <option>Bottles</option>
+              <option>Vials</option>
+              <option>Sachets</option>
+              <option>Strips</option>
+              <option>Other</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label>Unit Price (UGX)</label>
+            <input type="text" id="dl-unit-price" readonly placeholder="Select drug first"
+                   style="background:#f5f5f5;color:#555;cursor:not-allowed;"/>
+            <span id="dl-price-status" style="font-size:0.75rem;margin-top:0.2rem;"></span>
+          </div>
+
+          <div class="form-group">
+            <label>Line Total (UGX)</label>
+            <input type="text" id="dl-total" readonly placeholder="—"
+                   style="background:#f0fdf4;color:#16a34a;font-weight:700;
+                          font-size:1rem;cursor:not-allowed;"/>
+          </div>
+
+          <div id="dl-no-price-warning" style="
+            grid-column:span 2;display:none;
+            background:#fffbeb;border:1px solid #fcd34d;
+            border-radius:8px;padding:0.7rem 1rem;
+            font-size:0.83rem;color:#92400e;">
+            ⚠️ No price set for this drug. Please update the inventory first.
+          </div>
+
         </div>
 
-        <div class="form-group">
-          <label>Qty *</label>
-          <input type="number" id="dl-qty" placeholder="e.g. 6" min="1" oninput="calcTotal()"/>
-        </div>
-
-        <div class="form-group">
-          <label>Unit</label>
-          <select id="dl-unit">
-            <option>Tablets</option>
-            <option>Capsules</option>
-            <option>Bottles</option>
-            <option>Vials</option>
-            <option>Sachets</option>
-            <option>Strips</option>
-            <option>Other</option>
-          </select>
-        </div>
-
-        <div class="form-group">
-          <label>Unit Price (UGX)</label>
-          <input type="text" id="dl-unit-price" readonly placeholder="Select drug first"
-                 style="background:#f5f5f5;color:#555;cursor:not-allowed;"/>
-          <span id="dl-price-status" style="font-size:0.75rem;margin-top:0.2rem;"></span>
-        </div>
-
-        <div class="form-group">
-          <label>Line Total (UGX)</label>
-          <input type="text" id="dl-total" readonly placeholder="—"
-                 style="background:#f0fdf4;color:#16a34a;font-weight:700;
-                        font-size:1rem;cursor:not-allowed;"/>
-        </div>
-
-        <div id="dl-no-price-warning" style="grid-column:span 2;
-                                            display:none;
-                                            background:#fffbeb;
-                                            border:1px solid #fcd34d;
-                                            border-radius:8px;
-                                            padding:0.7rem 1rem;
-                                            font-size:0.83rem;
-                                            color:#92400e;">
-          ⚠️ No price set for this drug. Please update the inventory first.
-        </div>
-
-      </div>
-
-      <div class="form-actions">
-        <button class="btn btn-primary" id="dl-add-btn" onclick="addToBasket()">
-          + Add to Prescription
-        </button>
-      </div>
-    </div>
-
-    <!-- BASKET -->
-    <div class="card" id="basket-card" style="display:none;">
-      <h2>🧾 Prescription Basket</h2>
-
-      <div class="table-wrap" style="margin-bottom:1rem;">
-        <table>
-          <thead>
-            <tr>
-              <th>Drug</th>
-              <th>Qty</th>
-              <th>Unit</th>
-              <th>Unit Price</th>
-              <th>Line Total</th>
-              <th></th>
-            </tr>
-          </thead>
-          <tbody id="basket-body"></tbody>
-        </table>
-      </div>
-
-      <!-- basket total -->
-      <div style="display:flex;justify-content:flex-end;margin-bottom:1.2rem;">
-        <div style="background:#f0fdf4;border:1px solid #a7f3d0;border-radius:10px;
-                    padding:0.8rem 1.5rem;text-align:right;">
-          <div style="font-size:0.75rem;color:#888;text-transform:uppercase;
-                      letter-spacing:0.5px;">Prescription Total</div>
-          <div id="basket-total" style="font-size:1.6rem;font-weight:700;
-                                        color:#16a34a;">UGX 0</div>
+        <div class="form-actions">
+          <button class="btn btn-primary" id="dl-add-btn" onclick="addToBasket()">
+            + Add to Prescription
+          </button>
         </div>
       </div>
 
-      <!-- patient + payment details -->
-      <div class="form-grid">
+      <!-- RIGHT: basket sidebar -->
+      <div id="basket-card" style="
+        background:white;border-radius:10px;border:1px solid #e0e0e0;
+        padding:1.5rem;position:sticky;top:1rem;">
 
-        <div class="form-group">
-          <label>Customer Name (optional)</label>
-          <input type="text" id="dl-customer" placeholder="e.g. Grace Nakato"/>
+        <!-- empty state -->
+        <div id="basket-empty" style="text-align:center;padding:2rem 1rem;">
+          <div style="font-size:2.5rem;margin-bottom:0.8rem;">🧾</div>
+          <div style="font-size:0.88rem;color:#999;line-height:1.6;">
+            No drugs added yet.<br/>Select a drug and click<br/>"+ Add to Prescription"
+          </div>
         </div>
 
-        <div class="form-group">
-          <label>Payment Method</label>
-          <select id="dl-payment">
-            <option>Cash</option>
-            <option>Mobile Money</option>
-            <option>Insurance</option>
-            <option>Credit</option>
-          </select>
+        <!-- filled state -->
+        <div id="basket-filled" style="display:none;">
+          <div style="display:flex;align-items:center;justify-content:space-between;
+                      margin-bottom:1rem;border-bottom:1px solid #eee;padding-bottom:0.8rem;">
+            <h2 style="margin:0;border:none;padding:0;font-size:1rem;">🧾 Prescription</h2>
+            <button onclick="clearBasket()"
+                    style="background:none;border:none;color:#dc2626;font-size:0.8rem;
+                           cursor:pointer;font-weight:600;">✕ Clear</button>
+          </div>
+
+          <!-- basket items -->
+          <div id="basket-items" style="display:flex;flex-direction:column;gap:0.6rem;
+                                         margin-bottom:1rem;"></div>
+
+          <!-- grand total -->
+          <div style="background:#f0fdf4;border:1px solid #a7f3d0;border-radius:10px;
+                      padding:0.8rem 1rem;display:flex;justify-content:space-between;
+                      align-items:center;margin-bottom:1.2rem;">
+            <span style="font-size:0.82rem;color:#555;font-weight:600;">TOTAL</span>
+            <span id="basket-total" style="font-size:1.3rem;font-weight:700;
+                                            color:#16a34a;">UGX 0</span>
+          </div>
+
+          <!-- patient + payment -->
+          <div style="display:flex;flex-direction:column;gap:0.8rem;margin-bottom:1rem;">
+
+            <div class="form-group">
+              <label>Customer Name (optional)</label>
+              <input type="text" id="dl-customer" placeholder="e.g. Grace Nakato"/>
+            </div>
+
+            <div class="form-group">
+              <label>Payment Method</label>
+              <select id="dl-payment">
+                <option>Cash</option>
+                <option>Mobile Money</option>
+                <option>Insurance</option>
+                <option>Credit</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label>Notes (optional)</label>
+              <input type="text" id="dl-notes"
+                     placeholder="e.g. Take after meals"/>
+            </div>
+          </div>
+
+          <button class="btn btn-primary" id="dl-submit-btn" onclick="saveBasket()"
+                  style="width:100%;">
+            ✅ Save Prescription
+          </button>
         </div>
-
-        <div class="form-group" style="grid-column:span 2">
-          <label>Notes (optional)</label>
-          <input type="text" id="dl-notes"
-                 placeholder="e.g. Follow-up in 3 days, take after meals"/>
-        </div>
-      </div>
-
-      <div class="form-actions" style="display:flex;gap:0.8rem;margin-top:1rem;">
-        <button class="btn btn-primary" id="dl-submit-btn" onclick="saveBasket()">
-          ✅ Save Prescription
-        </button>
-
-        <button class="btn btn-sm" onclick="clearBasket()" style="color:#dc2626;">
-          🗑 Clear All
-        </button>
 
       </div>
     </div>
 
-    <!-- DISPENSING LOG TABLE -->
-    <div class="card">
+    <!-- DISPENSING LOG TABLE (full width below) -->
+    <div class="card" style="margin-top:1.5rem;">
       <h2>📋 Dispensing Log</h2>
       <div style="display:flex;gap:1rem;align-items:center;margin-bottom:1rem;flex-wrap:wrap;">
+
         <div class="search-bar" style="flex:1;margin:0">
           <input type="text" id="dl-search" placeholder="Search drug or customer..."
                  oninput="filterDl()" style="margin:0"/>
         </div>
+
         <div style="font-size:0.82rem;color:#888;">
           Last 24h revenue:
           <strong id="dl-today-rev" style="color:#0D6E6E;">UGX 0</strong>
         </div>
+
       </div>
 
       <div class="table-wrap">
         <table>
           <thead>
             <tr>
-              <th>Drug</th><th>Qty</th><th>Unit</th>
-              <th>Amount (UGX)</th><th>Payment</th>
-              <th>Customer</th><th>Time</th><th>Actions</th>
+              <th>Drug</th>
+              <th>Qty</th>
+              <th>Unit</th>
+              <th>Amount (UGX)</th>
+              <th>Payment</th>
+              <th>Customer</th>
+              <th>Time</th>
+              <th>Actions</th>
             </tr>
           </thead>
           <tbody id="dl-body">
+
             <tr><td colspan="8" class="loading">Loading...</td></tr>
           </tbody>
         </table>
@@ -1922,26 +1928,39 @@ function removeFromBasket(index) {
 }
 
 function renderBasket() {
-  const card = document.getElementById('basket-card');
-  const tbody = document.getElementById('basket-body');
+  const emptyEl = document.getElementById('basket-empty');
+  const filledEl = document.getElementById('basket-filled');
+  const itemsEl = document.getElementById('basket-items');
   const totalEl = document.getElementById('basket-total');
 
-  if (!basket.length) { card.style.display = 'none'; return; }
-  card.style.display = 'block';
+  if (!basket.length) {
+    emptyEl.style.display = 'block';
+    filledEl.style.display = 'none';
+    return;
+  }
 
-  tbody.innerHTML = basket.map((item, i) => `
-    <tr>
-      <td><strong>${item.drug_name}</strong></td>
-      <td>${item.qty}</td>
-      <td>${item.unit}</td>
-      <td>UGX ${Number(item.unit_price).toLocaleString()}</td>
-      <td style="color:#16a34a;font-weight:600;">
+  emptyEl.style.display = 'none';
+  filledEl.style.display = 'block';
+
+  itemsEl.innerHTML = basket.map((item, i) => `
+    <div style="background:#f8f8f8;border-radius:8px;padding:0.7rem 0.9rem;
+                display:flex;justify-content:space-between;align-items:center;gap:0.5rem;">
+      <div style="flex:1;min-width:0;">
+        <div style="font-weight:600;font-size:0.88rem;
+                    white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
+          ${item.drug_name}
+        </div>
+        <div style="font-size:0.76rem;color:#888;margin-top:0.15rem;">
+          ${item.qty} ${item.unit} × UGX ${Number(item.unit_price).toLocaleString()}
+        </div>
+      </div>
+      <div style="font-weight:700;color:#0D6E6E;font-size:0.9rem;white-space:nowrap;">
         UGX ${Number(item.line_total).toLocaleString()}
-      </td>
-      <td>
-        <button class="btn btn-danger" onclick="removeFromBasket(${i})">Remove</button>
-      </td>
-    </tr>`).join('');
+      </div>
+      <button onclick="removeFromBasket(${i})"
+              style="background:none;border:none;color:#dc2626;cursor:pointer;
+                     font-size:1rem;padding:0 0.2rem;line-height:1;">✕</button>
+    </div>`).join('');
 
   const grandTotal = basket.reduce((s, b) => s + b.line_total, 0);
   totalEl.textContent = 'UGX ' + grandTotal.toLocaleString();
