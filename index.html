@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Medicol MVP</title>
+<title>Minza Health</title>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700&display=swap" rel="stylesheet"/>
 
 <style>
@@ -512,6 +512,112 @@
     .stats-5{ grid-template-columns:1fr 1fr; }
     .stats-3{ grid-template-columns:1fr 1fr; }
   }
+
+  /* ══════════════════════════════════
+     MOBILE RESPONSIVE — portrait fix
+  ══════════════════════════════════ */
+
+  @media(max-width:480px){
+
+    /* nav */
+    nav{
+      padding:0.5rem 0.85rem;
+      height:auto; min-height:52px;
+      flex-wrap:wrap; gap:0.4rem;
+    }
+    .nav-left{ gap:0.4rem; flex-wrap:wrap; }
+    .org-pill{ display:none; }
+    .nav-tabs{
+      order:3; width:100%;
+      overflow-x:auto; -webkit-overflow-scrolling:touch;
+      padding-bottom:0.35rem; scrollbar-width:none; gap:0.2rem;
+    }
+    .nav-tabs::-webkit-scrollbar{ display:none; }
+    .tab-btn{ padding:0.4rem 0.75rem; font-size:0.72rem; white-space:nowrap; flex-shrink:0; }
+    .btn-logout{ padding:0.3rem 0.6rem; font-size:0.68rem; }
+
+    /* page */
+    .page{ padding:1rem 0.85rem 4rem; }
+
+    /* dashboard header */
+    .dash-header{ flex-direction:column; gap:0.4rem; }
+    .dash-greeting{ font-size:1.2rem; }
+
+    /* stat cards */
+    .stats-5{ grid-template-columns:1fr 1fr !important; gap:0.65rem; }
+    .stats-3{ grid-template-columns:1fr 1fr !important; gap:0.65rem; }
+    .stat-card{ padding:0.85rem; }
+    .stat-num{ font-size:1.5rem; }
+    .stat-icon{ width:28px; height:28px; font-size:0.85rem; }
+
+    /* velocity */
+    .velocity-grid{ grid-template-columns:1fr !important; }
+
+    /* cards */
+    .card{ padding:1rem; margin-bottom:1rem; }
+
+    /* tables */
+    .table-wrap{
+      overflow-x:auto; -webkit-overflow-scrolling:touch;
+      margin:0 -0.85rem; padding:0 0.85rem;
+    }
+    table{ min-width:540px; font-size:0.78rem; }
+    th,td{ padding:0.45rem 0.6rem; }
+    .td-actions{ display:flex; gap:0.3rem; flex-wrap:wrap; }
+    .btn-sm{ padding:0.25rem 0.5rem; font-size:0.68rem; }
+    .btn-danger{ padding:0.25rem 0.5rem; font-size:0.68rem; }
+    .badge{ font-size:0.63rem; padding:0.15rem 0.45rem; }
+
+    /* forms */
+    .form-grid{ grid-template-columns:1fr !important; gap:0.75rem; }
+    .form-group input, .form-group select, .form-group textarea{
+      font-size:0.875rem; padding:0.65rem 0.85rem;
+    }
+    .form-actions{ flex-direction:column; }
+    .form-actions .btn-primary{ width:100%; text-align:center; }
+
+    /* search rows */
+    .search-bar{ margin-bottom:0.75rem; }
+
+    /* modals — slide up from bottom */
+    .mo{ padding:0.5rem; align-items:flex-end; }
+    .mb{
+      width:100% !important; max-width:100% !important;
+      border-radius:16px 16px 0 0;
+      padding:1.25rem 1rem 1.75rem;
+      max-height:90vh; overflow-y:auto;
+    }
+    .ma{ flex-direction:column-reverse; }
+    .ma .btn-primary, .ma .btn-sm{ width:100%; text-align:center; justify-content:center; }
+
+    /* auth */
+    .auth-box{ padding:1.5rem 1.1rem; }
+    .role-grid{ grid-template-columns:1fr 1fr; gap:0.5rem; }
+    .role-card{ padding:0.65rem; }
+    .role-card .ri{ font-size:1.1rem; }
+    .role-card .rn{ font-size:0.7rem; }
+
+    /* detail rows in modals */
+    .dr{ flex-direction:column; gap:0.1rem; }
+    .dr strong{ min-width:unset !important; }
+
+    /* lab test picker */
+    #lr-tests-picker button{ font-size:0.68rem; padding:0.2rem 0.5rem; }
+
+    /* filter rows with inline flex */
+    .filter-row{ flex-direction:column !important; gap:0.5rem !important; }
+    .filter-row select{ width:100%; }
+
+  }
+
+  @media(min-width:481px) and (max-width:768px){
+    .nav-tabs{ overflow-x:auto; -webkit-overflow-scrolling:touch; }
+    .tab-btn{ white-space:nowrap; }
+    .page{ padding:1.25rem 1.25rem 3rem; }
+    .table-wrap{ overflow-x:auto; }
+    .mb{ max-width:90% !important; }
+  }
+
 </style>
 
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-CC0S9R0K9N"></script>
@@ -534,7 +640,7 @@
 <div id="auth-screen">
   <div class="auth-box">
     <div class="auth-logo">
-      <h1>Medi<span>col</span></h1>
+      <h1>Min<span>za</span></h1>
       <p>Health infrastructure for Africa</p>
     </div>
 
@@ -1103,7 +1209,7 @@
         <h2>Patient Records</h2>
 
         <!-- filter bar: search + status filter -->
-        <div style="display:flex;gap:0.75rem;margin-bottom:1rem;flex-wrap:wrap;">
+        <div class="filter-row" style="display:flex;gap:0.75rem;margin-bottom:1rem;flex-wrap:wrap;">
           <div class="search-bar" style="flex:1;margin:0;">
             <input type="text" id="cp-search" placeholder="Search name, phone, or condition..."
                    oninput="filterClPts()" style="margin:0;"/>
@@ -1295,7 +1401,7 @@
       <!-- full worklist table -->
       <div class="card">
         <h2>Active Worklist</h2>
-        <div style="display:flex;gap:0.75rem;margin-bottom:1rem;flex-wrap:wrap;">
+        <div class="filter-row" style="display:flex;gap:0.75rem;margin-bottom:1rem;flex-wrap:wrap;">
           <div class="search-bar" style="flex:1;margin:0;">
             <input type="text" id="lr-search" placeholder="Search patient or test..."
                    oninput="filterWorklist()" style="margin:0;"/>
@@ -1336,7 +1442,7 @@
 
       <div class="card">
         <h2>Results Log</h2>
-        <div style="display:flex;gap:0.75rem;margin-bottom:1rem;flex-wrap:wrap;">
+        <div class="filter-row" style="display:flex;gap:0.75rem;margin-bottom:1rem;flex-wrap:wrap;">
           <div class="search-bar" style="flex:1;margin:0;">
             <input type="text" id="res-search" placeholder="Search patient or test..."
                    oninput="filterResults()" style="margin:0;"/>
