@@ -4804,7 +4804,7 @@ async function loadPharmacyHome(){
                   .reduce((s,x)=>s+(Number(x.quantity)||0)*(Number(x.price)||0),0);
     document.getElementById('ph-stock-val').textContent='UGX '+totalVal.toLocaleString();
     const expEl=document.getElementById('ph-stock-val-exp');
-    
+
 if(expiredVal>0){
   expEl.textContent='UGX '+expiredVal.toLocaleString()+' expired';
 }else{
@@ -4918,7 +4918,9 @@ function renderDrugs(arr){
     <td><strong>${d.drug_name}</strong></td><td>${d.quantity}</td><td class="hide-mobile">${d.unit||'—'}</td>
     <td class="hide-mobile">${expDisplay(d.expiry_date)}</td>
     <td class="hide-mobile">${d.price?'UGX '+Number(d.price).toLocaleString():'<span style="color:#ccc">—</span>'}</td>
-    <td class="hide-mobile">${d.supplier||'—'}</td><td>${stockBadge(d.quantity)}</td>
+    <td class="hide-mobile">${d.supplier||'—'}</td>
+    <td style="${d.expiry_date&&new Date(d.expiry_date)<new Date()?'color:#f59e0b;font-weight:600;':''}">${d.price&&d.quantity?(Number(d.quantity)*Number(d.price)).toLocaleString():'—'}</td>
+    <td>${stockBadge(d.quantity)}</td>
     <td class="td-actions">
       <button class="btn btn-sm" onclick="openEdit('${d.id}','inventory','${d.drug_name.replace(/'/g,"\\'")}',${d.quantity})">Edit</button>
       <button class="btn btn-danger" onclick="delItem('inventory','${d.id}',loadDrugs)">Del</button>
