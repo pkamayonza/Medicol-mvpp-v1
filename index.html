@@ -2016,6 +2016,18 @@ async function loadDrugs(){
 
 function renderDrugs(arr){
   const b=document.getElementById('i-body');
+  // stock valuation
+  const now=new Date();
+  const totalVal=arr.reduce((s,x)=>s+(Number(x.quantity)||0)*(Number(x.price)||0),0);
+  const expiredVal=arr.filter(x=>x.expiry_date&&new Date(x.expiry_date)<now)
+                      .reduce((s,x)=>s+(Number(x.quantity)||0)*(Number(x.price)||0),0);
+  const sellableVal=totalVal-expiredVal;
+  document.getElementById('ph-stock-val').textContent='UGX '+totalVal.toLocaleString();
+  document.getElementById('ph-stock-sellable').textContent='UGX '+sellableVal.toLocaleString();
+  const expEl=document.getElementById('ph-stock-val-exp');
+  expEl.textContent=expiredVal>0?'UGX '+expiredVal.toLocaleString():'None';
+  expEl.style.color=expiredVal>0?'#f59e0b':'#16a34a';
+  // render rows
   if(!arr.length){b.innerHTML=`<tr><td colspan="9" class="loading">No drugs yet. Add one above.</td></tr>`;return;}
   b.innerHTML=arr.map(d=>`<tr>
     <td><strong>${d.drug_name}</strong></td><td>${d.quantity}</td><td class="hide-mobile">${d.unit||'—'}</td>
