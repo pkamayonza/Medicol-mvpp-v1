@@ -4913,7 +4913,7 @@ async function loadDrugs(){
 
 function renderDrugs(arr){
   const b=document.getElementById('i-body');
-  if(!arr.length){b.innerHTML=`<tr><td colspan="8" class="loading">No drugs yet. Add one above.</td></tr>`;return;}
+  if(!arr.length){b.innerHTML=`<tr><td colspan="9" class="loading">No drugs yet. Add one above.</td></tr>`;return;}
   b.innerHTML=arr.map(d=>`<tr>
     <td><strong>${d.drug_name}</strong></td><td>${d.quantity}</td><td class="hide-mobile">${d.unit||'—'}</td>
     <td class="hide-mobile">${expDisplay(d.expiry_date)}</td>
