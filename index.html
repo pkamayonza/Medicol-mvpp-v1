@@ -4797,6 +4797,20 @@ async function loadPharmacyHome(){
     document.getElementById('ph-exp-soon').textContent=expSoon;
     document.getElementById('ph-expired').textContent=expired;
 
+// stock valuation
+const now2=new Date();
+const totalVal=d.reduce((s,x)=>s+(Number(x.quantity)||0)*(Number(x.price)||0),0);
+const expiredVal=d.filter(x=>x.expiry_date&&new Date(x.expiry_date)<now2)
+                  .reduce((s,x)=>s+(Number(x.quantity)||0)*(Number(x.price)||0),0);
+document.getElementById('ph-stock-val').textContent='UGX '+totalVal.toLocaleString();
+const expEl=document.getElementById('ph-stock-val-exp');
+if(expiredVal>0){
+  expEl.textContent='UGX '+expiredVal.toLocaleString()+' expired';
+}else{
+  expEl.textContent='all sellable';
+  expEl.style.color='#16a34a';
+}
+
     // ONLY apply colour classes when there is actually a problem
     const scLow=document.getElementById('sc-low');
     const scExpSoon=document.getElementById('sc-exp-soon');
