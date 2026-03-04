@@ -141,6 +141,10 @@
   .role-pill.clinic{ background:rgba(59,130,246,0.15); color:#93c5fd; }
   .role-pill.hospital{ background:rgba(139,92,246,0.15); color:#c4b5fd; }
   .role-pill.lab{ background:rgba(245,158,11,0.15); color:#fcd34d; }
+  .role-pill.doctor{ background:rgba(16,185,129,0.15); color:#6ee7b7; }
+  .role-pill.reception{ background:rgba(99,102,241,0.15); color:#c7d2fe; }
+  .role-pill.dept-pharmacy{ background:rgba(16,185,129,0.15); color:#6ee7b7; }
+  .role-pill.admin{ background:rgba(245,158,11,0.15); color:#fcd34d; }
 
   .nav-tabs{ display:flex; gap:0.3rem; }
 
@@ -700,6 +704,15 @@
             </div>
           </div>
           <input type="hidden" id="s-role" value=""/>
+        <div class="fg" id="dept-selector" style="display:none;">
+          <label>Your Department</label>
+          <select id="s-dept" style="border:1px solid #E0DFDB;border-radius:8px;padding:0.7rem 1rem;font-size:0.9rem;font-family:'Syne',sans-serif;color:#0B1F3A;outline:none;">
+            <option value="">Select department</option>
+            <option value="reception">Reception</option>
+            <option value="doctor">Doctor / Clinician</option>
+            <option value="pharmacy">Clinic Pharmacy</option>
+          </select>
+        </div>
         </div>
         <button class="btn-auth" onclick="doSignup()">Create Account →</button>
       </div>
@@ -711,7 +724,7 @@
 <div id="app-screen">
   <nav>
     <div class="nav-left">
-      <h1>Medi<span>col</span></h1>
+      <h1>Min<span>za</span></h1>
       <span class="org-pill" id="org-label">—</span>
       <span class="role-pill" id="role-label">—</span>
     </div>
@@ -1670,6 +1683,270 @@
     </div>
   </div>
 
+
+
+  <!-- ══════════════════════════════════
+       CLINIC: RECEPTION DASHBOARD
+  ══════════════════════════════════ -->
+  <div class="page" id="page-reception">
+    <div class="dash-header">
+      <div>
+        <div class="dash-greeting">Good <em id="rec-greeting">morning</em>, <span id="rec-facility-name">Reception</span></div>
+        <div class="dash-date" id="rec-date-str"></div>
+      </div>
+    </div>
+
+    <div class="stats-5" style="grid-template-columns:repeat(3,1fr);">
+      <div class="stat-card">
+        <div class="stat-card-top"><span class="stat-label">Registered Today</span><div class="stat-icon" style="background:#eff6ff;">📋</div></div>
+        <div class="stat-num" id="rec-today">—</div>
+        <div class="stat-sub">patients today</div>
+      </div>
+      <div class="stat-card" id="sc-rec-queue">
+        <div class="stat-card-top"><span class="stat-label">In Queue</span><div class="stat-icon" style="background:#fffbeb;">⏳</div></div>
+        <div class="stat-num" id="rec-queue">—</div>
+        <div class="stat-sub">waiting to see doctor</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-card-top"><span class="stat-label">Seen Today</span><div class="stat-icon" style="background:#f0fdf4;">✅</div></div>
+        <div class="stat-num" id="rec-seen">—</div>
+        <div class="stat-sub">consultations done</div>
+      </div>
+    </div>
+
+    <!-- Register patient form -->
+    <div class="card">
+      <h2>Register Patient</h2>
+      <div class="form-grid">
+        <div class="form-group"><label>Full Name *</label><input type="text" id="rec-name" placeholder="e.g. Grace Nakato"/></div>
+        <div class="form-group"><label>Age</label><input type="number" id="rec-age" placeholder="34" min="0"/></div>
+        <div class="form-group"><label>Gender</label>
+          <select id="rec-gender"><option value="">Select</option><option>Female</option><option>Male</option><option>Other</option></select>
+        </div>
+        <div class="form-group"><label>Phone</label><input type="tel" id="rec-phone" placeholder="0701234567"/></div>
+        <div class="form-group" style="grid-column:span 2"><label>Chief Complaint / Reason for Visit *</label>
+          <input type="text" id="rec-complaint" placeholder="e.g. Fever, headache for 3 days"/>
+        </div>
+        <div class="form-group"><label>Priority</label>
+          <select id="rec-priority">
+            <option value="Normal">Normal</option>
+            <option value="Urgent">Urgent</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-actions">
+        <button class="btn btn-primary" onclick="registerAndQueue()">Register & Add to Queue</button>
+      </div>
+    </div>
+
+    <!-- Today's queue -->
+    <div class="card">
+      <h2>Today's Queue</h2>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>#</th><th>Name</th><th class="hide-mobile">Age</th><th class="hide-mobile">Gender</th><th>Complaint</th><th>Priority</th><th>Status</th><th>Actions</th></tr></thead>
+          <tbody id="rec-queue-body"><tr><td colspan="8" class="loading">Loading...</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════
+       CLINIC: DOCTOR QUEUE
+  ══════════════════════════════════ -->
+  <div class="page" id="page-doctor">
+    <div class="dash-header">
+      <div>
+        <div class="dash-greeting">Good <em id="doc-greeting">morning</em>, Doctor</div>
+        <div class="dash-date" id="doc-date-str"></div>
+      </div>
+      <div style="font-size:0.8rem;color:#9AA3AE;" id="doc-quick-note"></div>
+    </div>
+
+    <div class="stats-5" style="grid-template-columns:repeat(3,1fr);">
+      <div class="stat-card" id="sc-doc-waiting">
+        <div class="stat-card-top"><span class="stat-label">Waiting</span><div class="stat-icon" style="background:#fffbeb;">⏳</div></div>
+        <div class="stat-num" id="doc-waiting">—</div>
+        <div class="stat-sub">patients in queue</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-card-top"><span class="stat-label">Seen Today</span><div class="stat-icon" style="background:#f0fdf4;">✅</div></div>
+        <div class="stat-num" id="doc-seen">—</div>
+        <div class="stat-sub">consultations done</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-card-top"><span class="stat-label">Prescriptions</span><div class="stat-icon" style="background:#eff6ff;">💊</div></div>
+        <div class="stat-num" id="doc-rx-count">—</div>
+        <div class="stat-sub">written today</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Patient Queue — Today</h2>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>#</th><th>Name</th><th class="hide-mobile">Age</th><th>Complaint</th><th>Priority</th><th>Status</th><th>Actions</th></tr></thead>
+          <tbody id="doc-queue-body"><tr><td colspan="7" class="loading">Loading...</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════
+       CLINIC: DOCTOR CONSULTATION
+  ══════════════════════════════════ -->
+  <div class="page" id="page-doctor-consult">
+    <div id="consult-patient-banner" style="
+      background:linear-gradient(135deg,#eff6ff,#dbeafe);
+      border:1px solid #93c5fd; border-radius:12px;
+      padding:1rem 1.4rem; margin-bottom:1.5rem;
+      display:flex; align-items:center; gap:1rem; flex-wrap:wrap;
+    ">
+      <div style="font-size:1.6rem;">🧑‍⚕️</div>
+      <div>
+        <div style="font-weight:700;font-size:1rem;" id="consult-patient-name">—</div>
+        <div style="font-size:0.82rem;color:#555;" id="consult-patient-meta">—</div>
+      </div>
+      <div style="margin-left:auto;">
+        <button class="btn btn-sm" onclick="showPage('doctor')">← Back to Queue</button>
+      </div>
+    </div>
+
+    <!-- Vitals -->
+    <div class="card">
+      <h2>Vitals</h2>
+      <div class="form-grid">
+        <div class="form-group"><label>Blood Pressure</label><input type="text" id="cons-bp" placeholder="e.g. 120/80 mmHg"/></div>
+        <div class="form-group"><label>Temperature (°C)</label><input type="number" id="cons-temp" placeholder="37.5" step="0.1"/></div>
+        <div class="form-group"><label>Weight (kg)</label><input type="number" id="cons-weight" placeholder="68" step="0.1"/></div>
+        <div class="form-group"><label>Pulse (bpm)</label><input type="number" id="cons-pulse" placeholder="72"/></div>
+      </div>
+    </div>
+
+    <!-- Diagnosis & Notes -->
+    <div class="card">
+      <h2>Diagnosis & Treatment</h2>
+      <div class="form-grid">
+        <div class="form-group" style="grid-column:span 2">
+          <label>Diagnosis *</label>
+          <input type="text" id="cons-diagnosis" placeholder="e.g. Malaria, Hypertension"/>
+        </div>
+        <div class="form-group" style="grid-column:span 2">
+          <label>Clinical Notes</label>
+          <textarea id="cons-notes" placeholder="History, examination findings, management plan..."></textarea>
+        </div>
+        <div class="form-group"><label>Patient Status</label>
+          <select id="cons-status">
+            <option value="Active">Active</option>
+            <option value="Follow-up">Follow-up Required</option>
+            <option value="Discharged">Discharged</option>
+            <option value="Referred">Referred</option>
+          </select>
+        </div>
+        <div class="form-group" id="cons-referral-group" style="display:none;">
+          <label>Referred To</label>
+          <input type="text" id="cons-referral" placeholder="e.g. Mulago Referral Hospital"/>
+        </div>
+      </div>
+    </div>
+
+    <!-- Prescription Builder -->
+    <div class="card">
+      <h2>💊 Write Prescription</h2>
+      <div id="rx-items" style="display:flex;flex-direction:column;gap:0.75rem;margin-bottom:1rem;"></div>
+      <div style="background:#F0EFEB;border-radius:10px;padding:1rem;border:1px solid #E8E6E1;">
+        <div class="form-grid">
+          <div class="form-group" style="grid-column:span 2">
+            <label>Drug Name *</label>
+            <input type="text" id="rx-drug" placeholder="e.g. Coartem 20/120mg"/>
+          </div>
+          <div class="form-group"><label>Dose</label><input type="text" id="rx-dose" placeholder="e.g. 3 tablets"/></div>
+          <div class="form-group"><label>Frequency</label>
+            <select id="rx-freq">
+              <option>Once daily</option><option>Twice daily</option><option>Three times daily</option>
+              <option>Four times daily</option><option>At night</option><option>As needed</option>
+            </select>
+          </div>
+          <div class="form-group"><label>Duration</label><input type="text" id="rx-duration" placeholder="e.g. 3 days, 1 week"/></div>
+          <div class="form-group"><label>Instructions</label><input type="text" id="rx-instructions" placeholder="e.g. Take after meals"/></div>
+        </div>
+        <button class="btn btn-sm" onclick="addRxItem()" style="margin-top:0.5rem;">+ Add Drug</button>
+      </div>
+    </div>
+
+    <div class="form-actions" style="display:flex;gap:0.75rem;flex-wrap:wrap;">
+      <button class="btn btn-primary" id="cons-save-btn" onclick="saveConsultation()">✅ Save Consultation & Send Prescription</button>
+      <button class="btn btn-sm" onclick="showPage('doctor')">Cancel</button>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════
+       CLINIC: DEPT PHARMACY
+  ══════════════════════════════════ -->
+  <div class="page" id="page-dept-pharmacy">
+    <div class="dash-header">
+      <div>
+        <div class="dash-greeting">Good <em id="dph-greeting">morning</em>, <span id="dph-facility-name">Pharmacy</span></div>
+        <div class="dash-date" id="dph-date-str"></div>
+      </div>
+    </div>
+
+    <div class="stats-5" style="grid-template-columns:repeat(3,1fr);">
+      <div class="stat-card" id="sc-dph-pending">
+        <div class="stat-card-top"><span class="stat-label">Pending</span><div class="stat-icon" style="background:#fffbeb;">⏳</div></div>
+        <div class="stat-num" id="dph-pending">—</div>
+        <div class="stat-sub">prescriptions to fill</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-card-top"><span class="stat-label">Dispensed Today</span><div class="stat-icon" style="background:#f0fdf4;">✅</div></div>
+        <div class="stat-num" id="dph-dispensed">—</div>
+        <div class="stat-sub">prescriptions filled</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-card-top"><span class="stat-label">Total Today</span><div class="stat-icon" style="background:#eff6ff;">📋</div></div>
+        <div class="stat-num" id="dph-total">—</div>
+        <div class="stat-sub">prescriptions received</div>
+      </div>
+    </div>
+
+    <!-- Prescription queue -->
+    <div class="card">
+      <h2>Prescription Queue</h2>
+      <div style="display:flex;gap:0.75rem;margin-bottom:1rem;flex-wrap:wrap;">
+        <div class="search-bar" style="flex:1;margin:0;">
+          <input type="text" id="dph-search" placeholder="Search patient or drug..." oninput="filterRxQueue()" style="margin:0;"/>
+        </div>
+        <select id="dph-status-filter" onchange="filterRxQueue()"
+                style="border:1px solid #E0DFDB;border-radius:8px;padding:0.6rem 0.9rem;
+                       font-size:0.85rem;font-family:'Syne',sans-serif;color:#0B1F3A;
+                       background:#F0EFEB;outline:none;cursor:pointer;min-width:160px;">
+          <option value="">All</option>
+          <option value="Pending">Pending</option>
+          <option value="Dispensed">Dispensed</option>
+          <option value="Cancelled">Cancelled</option>
+        </select>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Patient</th><th>Drugs</th><th class="hide-mobile">Doctor</th><th class="hide-mobile">Time</th><th>Status</th><th>Actions</th></tr></thead>
+          <tbody id="dph-rx-body"><tr><td colspan="6" class="loading">Loading...</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Prescription Detail Modal -->
+  <div class="mo" id="m-rx-detail">
+    <div class="mb" style="max-width:540px;">
+      <h3>Prescription</h3>
+      <div id="rx-detail-body"></div>
+      <div class="ma">
+        <button class="btn btn-sm" onclick="cm('m-rx-detail')">Close</button>
+        <button class="btn btn-primary" id="rx-dispense-btn" onclick="dispenseRx()">✅ Mark as Dispensed</button>
+      </div>
+    </div>
+  </div>
+
 </div><!-- /app-screen -->
 
 <!-- MODALS -->
@@ -1784,7 +2061,9 @@ async function doSignup(){
   if(!org||!email||!pass||!role){showEl('signup-err','All fields required. Please select an organisation type.');return;}
   if(pass.length<6){showEl('signup-err','Password must be at least 6 characters.');return;}
   try{
-    await authPost('signup',{email,password:pass,data:{org_name:org,org_type:role}});
+    const dept = document.getElementById('s-dept')?.value || null;
+    if(role==='Staff' && !dept){showEl('signup-err','Please select your department.');return;}
+    await authPost('signup',{email,password:pass,data:{org_name:org,org_type:role,department:dept}});
     showEl('signup-ok','✅ Account created! Check your email to confirm, then sign in.',true);
     document.getElementById('signup-ok').style.display='block';
     ['s-org','s-email','s-pass'].forEach(id=>document.getElementById(id).value='');
@@ -1809,6 +2088,10 @@ function launchApp(){
   document.getElementById('app-screen').style.display='block';
   const m=user?.user_metadata||{};
   orgRole=(m.org_type||'Pharmacy').toLowerCase().replace(' ','');
+  // if staff account, override orgRole with their department
+  if(orgRole==='staff' && m.department){
+    orgRole=m.department==='pharmacy'?'dept-pharmacy':m.department;
+  }
   document.getElementById('org-label').textContent=m.org_name||user?.email;
   const rl=document.getElementById('role-label');
   rl.textContent=m.org_type||'Pharmacy';
@@ -2950,6 +3233,415 @@ async function delItem(table,id,reloadFn){
   if(!confirm('Delete this record?'))return;
   try{await db(`${table}?id=eq.${id}`,'DELETE');toast('Deleted.');reloadFn();}
   catch(e){toast('Error: '+e.message,'err');}
+}
+
+
+
+// ══════════════════════════════════════════════════════
+// CLINIC DEPARTMENTS — Phase 1: Reception + Doctor + Rx
+// ══════════════════════════════════════════════════════
+
+let queuePatients = [];  // today's patient queue
+let rxQueue = [];        // prescriptions from doctors
+let currentConsultId = null; // patient being consulted
+let rxItems = [];        // drugs in current prescription
+
+// ── RECEPTION ────────────────────────────────────────
+
+async function loadReception(){
+  const m = user?.user_metadata || {};
+  const now = new Date(), hr = now.getHours();
+  const el = document.getElementById('rec-greeting');
+  if(el) el.textContent = hr<12?'morning':hr<17?'afternoon':'evening';
+  const ne = document.getElementById('rec-facility-name');
+  if(ne) ne.textContent = m.org_name || '';
+  const de = document.getElementById('rec-date-str');
+  if(de) de.textContent = now.toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+
+  try {
+    const todayStr = now.toDateString();
+    const q = await db('queue_patients?order=created_at.asc');
+    queuePatients = q;
+    const todayQ = q.filter(x => new Date(x.created_at).toDateString() === todayStr);
+    const inQueue = todayQ.filter(x => x.status === 'Waiting').length;
+    const seen    = todayQ.filter(x => x.status === 'Seen').length;
+
+    document.getElementById('rec-today').textContent = todayQ.length;
+    document.getElementById('rec-queue').textContent = inQueue;
+    document.getElementById('rec-seen').textContent  = seen;
+
+    const scQ = document.getElementById('sc-rec-queue');
+    if(scQ) scQ.classList.toggle('is-warn', inQueue > 5);
+
+    renderQueueTable(todayQ, 'rec-queue-body', 'reception');
+  } catch(e) { console.error(e); }
+}
+
+async function registerAndQueue(){
+  const name = document.getElementById('rec-name').value.trim();
+  const complaint = document.getElementById('rec-complaint').value.trim();
+  if(!name){ toast('Patient name required.','err'); return; }
+  if(!complaint){ toast('Chief complaint required.','err'); return; }
+  try {
+    await db('queue_patients','POST',{
+      name,
+      age:       document.getElementById('rec-age').value || null,
+      gender:    document.getElementById('rec-gender').value || null,
+      phone:     document.getElementById('rec-phone').value.trim() || null,
+      complaint,
+      priority:  document.getElementById('rec-priority').value,
+      status:    'Waiting',
+      org_id:    user.id
+    });
+    toast('✅ Patient registered and added to queue!');
+    ['rec-name','rec-age','rec-phone','rec-complaint'].forEach(id => {
+      const el = document.getElementById(id); if(el) el.value='';
+    });
+    document.getElementById('rec-gender').value = '';
+    document.getElementById('rec-priority').value = 'Normal';
+    loadReception();
+  } catch(e){ toast('Error: '+e.message,'err'); }
+}
+
+function renderQueueTable(arr, bodyId, view){
+  const b = document.getElementById(bodyId);
+  if(!b) return;
+  if(!arr.length){ b.innerHTML=`<tr><td colspan="8" class="loading">No patients in queue yet.</td></tr>`; return; }
+  b.innerHTML = arr.map((p,i) => `<tr>
+    <td style="color:#9AA3AE;font-size:0.8rem;">${i+1}</td>
+    <td><strong>${p.name}</strong></td>
+    <td class="hide-mobile">${p.age||'—'}</td>
+    <td class="hide-mobile">${p.gender||'—'}</td>
+    <td style="font-size:0.83rem;">${p.complaint||'—'}</td>
+    <td>${p.priority==='Urgent'?'<span class="badge b-low">Urgent</span>':'<span class="badge" style="background:#F0EFEB;color:#4A5568;">Normal</span>'}</td>
+    <td>${queueStatusBadge(p.status)}</td>
+    <td class="td-actions">
+      ${view==='doctor' && p.status==='Waiting' ?
+        `<button class="btn btn-primary" style="font-size:0.75rem;padding:0.35rem 0.8rem;" onclick="startConsult('${p.id}')">Consult</button>` :
+        `<button class="btn btn-sm" onclick="markQueueStatus('${p.id}','${p.status==='Waiting'?'Seen':'Waiting'}')">${p.status==='Waiting'?'Mark Seen':'Reset'}</button>`
+      }
+    </td>
+  </tr>`).join('');
+}
+
+function queueStatusBadge(s){
+  const map = {
+    'Waiting':    'background:#fffbeb;color:#d97706;',
+    'In Consult': 'background:#eff6ff;color:#1d4ed8;',
+    'Seen':       'background:#f0fdf4;color:#059669;',
+  };
+  return `<span class="badge" style="${map[s]||map['Waiting']}">${s||'Waiting'}</span>`;
+}
+
+async function markQueueStatus(id, newStatus){
+  try {
+    await db(`queue_patients?id=eq.${id}`,'PATCH',{status:newStatus});
+    loadReception();
+  } catch(e){ toast('Error: '+e.message,'err'); }
+}
+
+// ── DOCTOR QUEUE ─────────────────────────────────────
+
+async function loadDoctorQueue(){
+  const now = new Date(), hr = now.getHours();
+  const el = document.getElementById('doc-greeting');
+  if(el) el.textContent = hr<12?'morning':hr<17?'afternoon':'evening';
+  const de = document.getElementById('doc-date-str');
+  if(de) de.textContent = now.toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+
+  try {
+    const todayStr = now.toDateString();
+    const q = await db('queue_patients?order=created_at.asc');
+    queuePatients = q;
+    const todayQ = q.filter(x => new Date(x.created_at).toDateString() === todayStr);
+    const waiting = todayQ.filter(x => x.status === 'Waiting').length;
+    const seen    = todayQ.filter(x => x.status === 'Seen').length;
+
+    document.getElementById('doc-waiting').textContent = waiting;
+    document.getElementById('doc-seen').textContent    = seen;
+
+    const scW = document.getElementById('sc-doc-waiting');
+    if(scW) scW.classList.toggle('is-warn', waiting > 0);
+
+    const note = document.getElementById('doc-quick-note');
+    if(note) note.textContent = waiting > 0 ? `${waiting} patient${waiting>1?'s':''} waiting` : 'Queue is clear';
+
+    // rx count today
+    try {
+      const rxToday = await db(`prescriptions?order=created_at.desc`);
+      const todayRx = rxToday.filter(x => new Date(x.created_at).toDateString() === todayStr);
+      document.getElementById('doc-rx-count').textContent = todayRx.length;
+    } catch(e){}
+
+    renderQueueTable(todayQ, 'doc-queue-body', 'doctor');
+  } catch(e){ console.error(e); }
+}
+
+async function loadDoctorConsult(){
+  // placeholder — startConsult() sets the active patient and calls this
+}
+
+function startConsult(patientId){
+  const p = queuePatients.find(x => x.id === patientId);
+  if(!p) return;
+  currentConsultId = patientId;
+  rxItems = [];
+  renderRxItems();
+
+  // populate banner
+  document.getElementById('consult-patient-name').textContent = p.name;
+  document.getElementById('consult-patient-meta').textContent =
+    [p.age ? p.age+'y' : null, p.gender, 'Complaint: '+p.complaint].filter(Boolean).join(' · ');
+
+  // clear form
+  ['cons-bp','cons-temp','cons-weight','cons-pulse','cons-diagnosis','cons-notes','cons-referral',
+   'rx-drug','rx-dose','rx-duration','rx-instructions'].forEach(id => {
+    const el = document.getElementById(id); if(el) el.value='';
+  });
+  document.getElementById('cons-status').value = 'Active';
+  const rg = document.getElementById('cons-referral-group');
+  if(rg) rg.style.display='none';
+
+  // mark patient as In Consult
+  db(`queue_patients?id=eq.${patientId}`,'PATCH',{status:'In Consult'}).catch(()=>{});
+
+  showPage('doctor-consult');
+}
+
+// listen for status change on consult form
+document.addEventListener('DOMContentLoaded', () => {
+  const s = document.getElementById('cons-status');
+  if(s) s.addEventListener('change', () => {
+    const rg = document.getElementById('cons-referral-group');
+    if(rg) rg.style.display = s.value==='Referred' ? '' : 'none';
+  });
+});
+
+// ── PRESCRIPTION BUILDER ──────────────────────────────
+
+function addRxItem(){
+  const drug = document.getElementById('rx-drug').value.trim();
+  if(!drug){ toast('Drug name required.','err'); return; }
+  rxItems.push({
+    drug,
+    dose:         document.getElementById('rx-dose').value.trim(),
+    frequency:    document.getElementById('rx-freq').value,
+    duration:     document.getElementById('rx-duration').value.trim(),
+    instructions: document.getElementById('rx-instructions').value.trim(),
+  });
+  ['rx-drug','rx-dose','rx-duration','rx-instructions'].forEach(id => {
+    document.getElementById(id).value='';
+  });
+  renderRxItems();
+  toast(`✅ ${drug} added to prescription.`);
+}
+
+function removeRxItem(i){
+  rxItems.splice(i,1);
+  renderRxItems();
+}
+
+function renderRxItems(){
+  const el = document.getElementById('rx-items');
+  if(!el) return;
+  if(!rxItems.length){ el.innerHTML='<div style="color:#9AA3AE;font-size:0.83rem;padding:0.5rem 0;">No drugs added yet.</div>'; return; }
+  el.innerHTML = rxItems.map((item,i) => `
+    <div style="background:#f0fdf9;border:1px solid #a7f3d0;border-radius:10px;
+                padding:0.75rem 1rem;display:flex;align-items:flex-start;gap:0.75rem;">
+      <div style="flex:1;">
+        <div style="font-weight:700;color:#0B1F3A;">${item.drug}</div>
+        <div style="font-size:0.8rem;color:#555;margin-top:0.2rem;">
+          ${[item.dose, item.frequency, item.duration, item.instructions].filter(Boolean).join(' · ')}
+        </div>
+      </div>
+      <button onclick="removeRxItem(${i})"
+              style="background:none;border:none;color:#dc2626;cursor:pointer;font-size:0.9rem;">✕</button>
+    </div>`).join('');
+}
+
+async function saveConsultation(){
+  if(!currentConsultId){ toast('No patient selected.','err'); return; }
+  const diagnosis = document.getElementById('cons-diagnosis').value.trim();
+  if(!diagnosis){ toast('Diagnosis required.','err'); return; }
+
+  const patient = queuePatients.find(x => x.id === currentConsultId);
+  const status  = document.getElementById('cons-status').value;
+  const referral = status==='Referred' ? document.getElementById('cons-referral').value.trim()||null : null;
+
+  try {
+    // 1. Save to patients table (full record)
+    await db('patients','POST',{
+      name:           patient?.name,
+      age:            patient?.age || null,
+      gender:         patient?.gender || null,
+      phone:          patient?.phone || null,
+      condition:      diagnosis,
+      notes:          document.getElementById('cons-notes').value.trim() || null,
+      status,
+      referral_to:    referral,
+      blood_pressure: document.getElementById('cons-bp').value.trim() || null,
+      temperature:    document.getElementById('cons-temp').value || null,
+      weight:         document.getElementById('cons-weight').value || null,
+      pulse:          document.getElementById('cons-pulse').value || null,
+      org_id:         user.id
+    });
+
+    // 2. Save prescription if drugs were added
+    if(rxItems.length){
+      await db('prescriptions','POST',{
+        patient_name:  patient?.name,
+        patient_age:   patient?.age || null,
+        doctor_name:   user?.email,
+        drugs:         JSON.stringify(rxItems),
+        notes:         document.getElementById('cons-notes').value.trim() || null,
+        status:        'Pending',
+        org_id:        user.id
+      });
+    }
+
+    // 3. Mark queue patient as Seen
+    await db(`queue_patients?id=eq.${currentConsultId}`,'PATCH',{status:'Seen'});
+
+    toast('✅ Consultation saved!' + (rxItems.length ? ' Prescription sent to pharmacy.' : ''));
+    currentConsultId = null;
+    rxItems = [];
+    showPage('doctor');
+
+  } catch(e){ toast('Error: '+e.message,'err'); }
+}
+
+// ── DEPT PHARMACY ─────────────────────────────────────
+
+async function loadDeptPharmacy(){
+  const m = user?.user_metadata || {};
+  const now = new Date(), hr = now.getHours();
+  const el = document.getElementById('dph-greeting');
+  if(el) el.textContent = hr<12?'morning':hr<17?'afternoon':'evening';
+  const ne = document.getElementById('dph-facility-name');
+  if(ne) ne.textContent = m.org_name || '';
+  const de = document.getElementById('dph-date-str');
+  if(de) de.textContent = now.toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+
+  try {
+    const rxData = await db('prescriptions?order=created_at.desc');
+    rxQueue = rxData;
+    const todayStr = now.toDateString();
+    const todayRx  = rxData.filter(x => new Date(x.created_at).toDateString() === todayStr);
+    const pending   = todayRx.filter(x => x.status === 'Pending').length;
+    const dispensed = todayRx.filter(x => x.status === 'Dispensed').length;
+
+    document.getElementById('dph-pending').textContent   = pending;
+    document.getElementById('dph-dispensed').textContent = dispensed;
+    document.getElementById('dph-total').textContent     = todayRx.length;
+
+    const scP = document.getElementById('sc-dph-pending');
+    if(scP) scP.classList.toggle('is-warn', pending > 0);
+
+    renderRxQueue(rxData);
+  } catch(e){ console.error(e); }
+}
+
+function renderRxQueue(arr){
+  const b = document.getElementById('dph-rx-body');
+  if(!b) return;
+  if(!arr.length){ b.innerHTML=`<tr><td colspan="6" class="loading">No prescriptions yet.</td></tr>`; return; }
+  b.innerHTML = arr.map(rx => {
+    const drugs = parseDrugs(rx.drugs);
+    const drugList = drugs.map(d=>d.drug).join(', ');
+    return `<tr>
+      <td><strong>${rx.patient_name||'—'}</strong></td>
+      <td style="font-size:0.82rem;max-width:200px;">${drugList||'—'}</td>
+      <td class="hide-mobile" style="font-size:0.8rem;color:#9AA3AE;">${rx.doctor_name||'—'}</td>
+      <td class="hide-mobile" style="font-size:0.78rem;color:#9AA3AE;">
+        ${new Date(rx.created_at).toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'})}
+        · ${new Date(rx.created_at).toLocaleDateString('en-GB',{day:'2-digit',month:'short'})}
+      </td>
+      <td>${rxStatusBadge(rx.status)}</td>
+      <td class="td-actions">
+        <button class="btn btn-sm" onclick="openRxDetail('${rx.id}')">View</button>
+        ${rx.status==='Pending' ? `<button class="btn btn-primary" style="font-size:0.75rem;padding:0.35rem 0.8rem;" onclick="quickDispense('${rx.id}')">Dispense</button>` : ''}
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+function filterRxQueue(){
+  const q  = document.getElementById('dph-search').value.toLowerCase();
+  const st = document.getElementById('dph-status-filter').value;
+  renderRxQueue(rxQueue.filter(rx =>
+    (!q || (rx.patient_name||'').toLowerCase().includes(q) || (rx.drugs||'').toLowerCase().includes(q)) &&
+    (!st || rx.status === st)
+  ));
+}
+
+function rxStatusBadge(s){
+  const map = {
+    'Pending':   'background:#fffbeb;color:#d97706;',
+    'Dispensed': 'background:#f0fdf4;color:#059669;',
+    'Cancelled': 'background:#fef2f2;color:#dc2626;',
+  };
+  return `<span class="badge" style="${map[s]||map['Pending']}">${s||'Pending'}</span>`;
+}
+
+function parseDrugs(raw){
+  if(!raw) return [];
+  try{ return JSON.parse(raw); }catch(e){ return []; }
+}
+
+let currentRxId = null;
+
+function openRxDetail(id){
+  const rx = rxQueue.find(x => x.id === id);
+  if(!rx) return;
+  currentRxId = id;
+  const drugs = parseDrugs(rx.drugs);
+  document.getElementById('rx-detail-body').innerHTML = `
+    <div class="dr"><strong>Patient:</strong>${rx.patient_name||'—'}</div>
+    <div class="dr"><strong>Doctor:</strong>${rx.doctor_name||'—'}</div>
+    <div class="dr"><strong>Status:</strong>${rxStatusBadge(rx.status)}</div>
+    ${rx.notes ? `<div style="margin:0.8rem 0;padding:0.75rem 1rem;background:#F0EFEB;border-radius:8px;font-size:0.85rem;border:1px solid #E0DFDB;">${rx.notes}</div>` : ''}
+    <div style="margin-top:1rem;">
+      <div style="font-size:0.65rem;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;color:#9AA3AE;margin-bottom:0.6rem;">Prescribed Drugs</div>
+      ${drugs.map(d => `
+        <div style="background:#F0EFEB;border-radius:8px;padding:0.65rem 0.9rem;margin-bottom:0.5rem;">
+          <div style="font-weight:700;">${d.drug}</div>
+          <div style="font-size:0.8rem;color:#555;margin-top:0.15rem;">
+            ${[d.dose, d.frequency, d.duration].filter(Boolean).join(' · ')}
+          </div>
+          ${d.instructions ? `<div style="font-size:0.78rem;color:#9AA3AE;margin-top:0.1rem;">${d.instructions}</div>` : ''}
+        </div>`).join('')}
+    </div>`;
+
+  const btn = document.getElementById('rx-dispense-btn');
+  if(btn) btn.style.display = rx.status==='Pending' ? 'inline-flex' : 'none';
+  document.getElementById('m-rx-detail').classList.add('open');
+}
+
+async function dispenseRx(){
+  if(!currentRxId) return;
+  try {
+    await db(`prescriptions?id=eq.${currentRxId}`,'PATCH',{
+      status:'Dispensed',
+      dispensed_by: user?.email,
+      dispensed_at: new Date().toISOString()
+    });
+    toast('✅ Prescription dispensed!');
+    cm('m-rx-detail');
+    loadDeptPharmacy();
+  } catch(e){ toast('Error: '+e.message,'err'); }
+}
+
+async function quickDispense(id){
+  if(!confirm('Mark this prescription as dispensed?')) return;
+  try {
+    await db(`prescriptions?id=eq.${id}`,'PATCH',{
+      status:'Dispensed',
+      dispensed_by: user?.email,
+      dispensed_at: new Date().toISOString()
+    });
+    toast('✅ Dispensed!');
+    loadDeptPharmacy();
+  } catch(e){ toast('Error: '+e.message,'err'); }
 }
 
 // restore session
