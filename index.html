@@ -626,8 +626,224 @@
   }
 
 
+
   /* ══════════════════════════════════
-     INVENTORY v2
+     POS / DISPENSING v2
+  ══════════════════════════════════ */
+  .pos-stat-bar{
+    display:flex; align-items:center; flex-wrap:wrap;
+    background:white; border:1px solid #E8E6E1;
+    border-radius:12px; padding:0.9rem 1.4rem;
+    margin-bottom:1rem; gap:0;
+  }
+  .pos-stat{ display:flex; flex-direction:column; gap:0.2rem; padding:0 1.25rem; }
+  .pos-stat:first-child{ padding-left:0; }
+  .pos-stat-lbl{ font-size:0.6rem; font-weight:700; text-transform:uppercase; letter-spacing:0.9px; color:#9AA3AE; white-space:nowrap; }
+  .pos-stat-val{ font-size:1.05rem; font-weight:700; color:#0B1F3A; white-space:nowrap; }
+
+  /* layout */
+  .pos-layout{
+    display:grid; grid-template-columns:1fr 340px;
+    gap:1rem; align-items:start;
+  }
+
+  /* left panel */
+  .pos-left{
+    background:white; border:1px solid #E8E6E1;
+    border-radius:12px; overflow:hidden;
+  }
+  .pos-left-header{
+    display:flex; align-items:baseline; justify-content:space-between;
+    padding:1rem 1.25rem 0.75rem; border-bottom:1px solid #F0EFEB;
+  }
+  .pos-left-title{ font-size:0.88rem; font-weight:700; color:#0B1F3A; }
+  .pos-left-hint{ font-size:0.72rem; color:#9AA3AE; }
+
+  /* drug search */
+  .pos-drug-search-wrap{ padding:0.85rem 1.25rem; border-bottom:1px solid #F5F4F0; position:relative; }
+  .pos-drug-search{
+    display:flex; align-items:center; gap:0.5rem;
+    border:2px solid #E0DFDB; border-radius:10px;
+    padding:0.65rem 1rem; transition:border-color 0.2s;
+    background:white;
+  }
+  .pos-drug-search:focus-within{ border-color:#0D6E6E; }
+  .pos-drug-search input{
+    flex:1; border:none; outline:none; font-size:0.92rem;
+    font-family:'Syne',sans-serif; color:#0B1F3A; background:transparent;
+  }
+  .pos-drug-search input::placeholder{ color:#C0BDB8; }
+  .pos-kbd{
+    font-size:0.62rem; background:#F0EFEB; border:1px solid #E0DFDB;
+    border-radius:4px; padding:0.1rem 0.4rem; color:#9AA3AE;
+    white-space:nowrap; font-family:'Syne',sans-serif;
+  }
+
+  .pos-suggestions{
+    position:absolute; left:1.25rem; right:1.25rem; top:calc(100% - 0.85rem);
+    background:white; border:1px solid #E0DFDB; border-radius:10px;
+    box-shadow:0 8px 24px rgba(11,31,58,0.12); z-index:200;
+    max-height:220px; overflow-y:auto; display:none;
+  }
+  .pos-suggestions.open{ display:block; }
+  .pos-sugg-item{
+    padding:0.65rem 1rem; cursor:pointer; border-bottom:1px solid #F5F4F0;
+    transition:background 0.1s; display:flex; align-items:center; justify-content:space-between;
+  }
+  .pos-sugg-item:last-child{ border-bottom:none; }
+  .pos-sugg-item:hover,.pos-sugg-item.focused{ background:#f0fdf9; }
+  .pos-sugg-name{ font-size:0.88rem; font-weight:700; color:#0B1F3A; }
+  .pos-sugg-meta{ font-size:0.73rem; color:#9AA3AE; margin-top:0.1rem; }
+  .pos-sugg-price{ font-size:0.82rem; font-weight:700; color:#0D6E6E; white-space:nowrap; }
+  .pos-sugg-stock{ font-size:0.7rem; color:#9AA3AE; }
+  .pos-sugg-stock.low{ color:#d97706; }
+  .pos-sugg-stock.out{ color:#dc2626; }
+
+  /* selected drug row */
+  .pos-selected-row{
+    display:flex; align-items:center; gap:0.75rem; flex-wrap:wrap;
+    padding:0.85rem 1.25rem; border-bottom:1px solid #F5F4F0;
+    background:#f8fff8;
+  }
+  .pos-selected-info{ flex:1; min-width:120px; }
+  .pos-selected-name{ font-size:0.9rem; font-weight:700; color:#0B1F3A; }
+  .pos-selected-meta{ font-size:0.72rem; color:#9AA3AE; margin-top:0.15rem; }
+
+  .pos-qty-controls{ display:flex; align-items:center; gap:0; border:1px solid #E0DFDB; border-radius:8px; overflow:hidden; }
+  .pos-qty-btn{
+    width:32px; height:34px; border:none; background:#F0EFEB;
+    cursor:pointer; font-size:1rem; font-weight:700; color:#0B1F3A;
+    transition:background 0.1s; font-family:'Syne',sans-serif;
+    display:flex; align-items:center; justify-content:center;
+  }
+  .pos-qty-btn:hover{ background:#E5E4DF; }
+  .pos-qty-controls input{
+    width:52px; height:34px; border:none; outline:none;
+    text-align:center; font-size:0.9rem; font-weight:700;
+    font-family:'Syne',sans-serif; color:#0B1F3A;
+    border-left:1px solid #E0DFDB; border-right:1px solid #E0DFDB;
+  }
+  .pos-line-total{ font-size:1rem; font-weight:700; color:#0D6E6E; min-width:110px; text-align:right; }
+  .pos-add-btn{
+    background:#0B1F3A; color:white; border:none;
+    padding:0.5rem 1.1rem; border-radius:8px;
+    font-size:0.83rem; font-weight:700; font-family:'Syne',sans-serif;
+    cursor:pointer; transition:background 0.15s; white-space:nowrap;
+  }
+  .pos-add-btn:hover{ background:#0D6E6E; }
+
+  .pos-warn{
+    margin:0 1.25rem 0; padding:0.65rem 1rem; border-radius:8px;
+    font-size:0.82rem; font-weight:500;
+    background:#fffbeb; border:1px solid #fcd34d; color:#92400e;
+  }
+  .pos-warn-red{ background:#fef2f2; border-color:#fca5a5; color:#dc2626; }
+
+  /* log section */
+  .pos-log-section{ padding:1.25rem; border-top:1px solid #F0EFEB; }
+  .pos-log-header{ display:flex; align-items:center; justify-content:space-between; margin-bottom:1rem; flex-wrap:wrap; gap:0.5rem; }
+  .pos-log-title{ font-size:0.83rem; font-weight:700; color:#0B1F3A; }
+  .pos-log-filters{ display:flex; gap:0.5rem; align-items:center; }
+  .pos-date-filter{
+    border:1px solid #E0DFDB; background:white; border-radius:8px;
+    padding:0.42rem 0.75rem; font-size:0.78rem; font-family:'Syne',sans-serif;
+    color:#0B1F3A; outline:none; cursor:pointer;
+  }
+
+  /* basket */
+  .pos-basket{
+    background:white; border:1px solid #E8E6E1; border-radius:12px;
+    position:sticky; top:1rem; min-height:500px;
+    display:flex; flex-direction:column;
+  }
+  .pos-basket-empty{ display:flex; flex-direction:column; align-items:center; justify-content:center; flex:1; padding:3rem 1.5rem; text-align:center; }
+  .pos-basket-header{
+    display:flex; align-items:center; justify-content:space-between;
+    padding:1rem 1.25rem 0.75rem; border-bottom:1px solid #F0EFEB;
+    font-size:0.88rem; font-weight:700; color:#0B1F3A;
+  }
+  .pos-clear-btn{ background:none; border:none; color:#dc2626; font-size:0.75rem; font-weight:700; cursor:pointer; font-family:'Syne',sans-serif; }
+
+  .pos-basket-items{ flex:1; overflow-y:auto; padding:0.75rem 1.25rem; display:flex; flex-direction:column; gap:0.45rem; max-height:280px; }
+  .pos-basket-item{
+    display:flex; align-items:center; gap:0.5rem;
+    background:#F8F7F3; border-radius:8px; padding:0.55rem 0.75rem;
+  }
+  .pos-basket-item-name{ flex:1; font-size:0.83rem; font-weight:700; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .pos-basket-item-meta{ font-size:0.7rem; color:#9AA3AE; }
+  .pos-basket-item-price{ font-size:0.85rem; font-weight:700; color:#0D6E6E; white-space:nowrap; }
+  .pos-basket-item-del{ background:none; border:none; color:#9AA3AE; cursor:pointer; font-size:0.85rem; padding:0; transition:color 0.1s; }
+  .pos-basket-item-del:hover{ color:#dc2626; }
+
+  .pos-subtotal-row,.pos-total-row,.pos-discount-row,.pos-tender-row,.pos-change-row{
+    display:flex; align-items:center; justify-content:space-between;
+    padding:0.5rem 1.25rem; font-size:0.83rem;
+  }
+  .pos-subtotal-row{ color:#9AA3AE; border-top:1px solid #F0EFEB; }
+  .pos-discount-row{ border-bottom:1px solid #F0EFEB; }
+  .pos-discount-inputs{ display:flex; gap:0.35rem; align-items:center; }
+  .pos-discount-inputs input{
+    border:1px solid #E0DFDB; border-radius:6px;
+    padding:0.35rem 0.5rem; font-size:0.82rem;
+    font-family:'Syne',sans-serif; outline:none;
+    transition:border-color 0.15s;
+  }
+  .pos-discount-inputs input:focus{ border-color:#0D6E6E; }
+  .pos-discount-inputs select{
+    border:1px solid #E0DFDB; border-radius:6px;
+    padding:0.35rem 0.5rem; font-size:0.82rem;
+    font-family:'Syne',sans-serif; outline:none; cursor:pointer;
+  }
+  .pos-total-row{
+    font-size:1rem; font-weight:700; color:#0B1F3A;
+    border-top:2px solid #0B1F3A; border-bottom:1px solid #F0EFEB;
+    padding-top:0.65rem; padding-bottom:0.65rem;
+  }
+  .pos-tender-row input{
+    width:140px; border:1px solid #E0DFDB; border-radius:6px;
+    padding:0.38rem 0.6rem; font-size:0.85rem;
+    font-family:'Syne',sans-serif; outline:none; text-align:right;
+  }
+  .pos-change-row{ font-size:0.88rem; background:#f0fdf4; border-top:1px solid #a7f3d0; }
+
+  .pos-basket-meta{ padding:0.5rem 1.25rem; display:flex; flex-direction:column; gap:0.5rem; }
+  .pos-basket-meta .form-group label{ font-size:0.6rem; }
+  .pos-basket-meta .form-group input,
+  .pos-basket-meta .form-group select{ font-size:0.82rem; padding:0.45rem 0.7rem; }
+
+  .pos-save-btn{
+    margin:0.75rem 1.25rem 1.25rem;
+    background:#0D6E6E; color:white; border:none;
+    padding:0.8rem; border-radius:10px;
+    font-size:0.9rem; font-weight:700; font-family:'Syne',sans-serif;
+    cursor:pointer; transition:background 0.15s; width:calc(100% - 2.5rem);
+  }
+  .pos-save-btn:hover{ background:#0e8080; }
+
+  /* receipt */
+  .receipt{
+    font-family:'Syne',sans-serif; text-align:center;
+    border:1px dashed #E0DFDB; border-radius:8px; padding:1.5rem;
+  }
+  .receipt-header{ margin-bottom:1rem; }
+  .receipt-org{ font-size:1rem; font-weight:700; color:#0B1F3A; }
+  .receipt-sub{ font-size:0.75rem; color:#9AA3AE; margin-top:0.2rem; }
+  .receipt-divider{ border:none; border-top:1px dashed #E0DFDB; margin:0.85rem 0; }
+  .receipt-item{ display:flex; justify-content:space-between; font-size:0.82rem; margin-bottom:0.4rem; text-align:left; }
+  .receipt-total{ display:flex; justify-content:space-between; font-size:1rem; font-weight:700; margin-top:0.5rem; }
+  .receipt-footer{ font-size:0.72rem; color:#9AA3AE; margin-top:1rem; line-height:1.6; }
+
+  @media(max-width:900px){
+    .pos-layout{ grid-template-columns:1fr; }
+    .pos-basket{ position:relative; top:0; min-height:auto; }
+  }
+  @media(max-width:640px){
+    .pos-stat-bar{ display:grid; grid-template-columns:1fr 1fr; gap:1rem; padding:1rem; }
+    .pos-stat{ padding:0; }
+    .inv-intel-sep{ display:none; }
+    .pos-selected-row{ flex-direction:column; align-items:flex-start; }
+    .pos-line-total{ text-align:left; }
+  }
   ══════════════════════════════════ */
 
   /* Intel bar */
@@ -1201,141 +1417,225 @@
   </div>
 
   <!-- ══════════════════════════════════
-       PHARMACY: DISPENSING LOG
+       PHARMACY: POS / DISPENSING v2
   ══════════════════════════════════ -->
   <div class="page" id="page-ph-patients">
-    <div style="margin-top:0.5rem">
 
-      <div style="display:grid;grid-template-columns:1fr 380px;gap:1.5rem;align-items:start;">
+    <!-- TOP STAT BAR -->
+    <div class="pos-stat-bar">
+      <div class="pos-stat">
+        <div class="pos-stat-lbl">Today's Revenue</div>
+        <div class="pos-stat-val" id="pos-today-rev">UGX 0</div>
+      </div>
+      <div class="inv-intel-sep"></div>
+      <div class="pos-stat">
+        <div class="pos-stat-lbl">Transactions Today</div>
+        <div class="pos-stat-val" id="pos-today-txns">0</div>
+      </div>
+      <div class="inv-intel-sep"></div>
+      <div class="pos-stat">
+        <div class="pos-stat-lbl">Avg. Transaction</div>
+        <div class="pos-stat-val" id="pos-avg-txn">—</div>
+      </div>
+      <div class="inv-intel-sep"></div>
+      <div class="pos-stat">
+        <div class="pos-stat-lbl">Top Drug Today</div>
+        <div class="pos-stat-val" id="pos-top-drug">—</div>
+      </div>
+    </div>
 
-        <!-- LEFT: drug entry -->
-        <div class="card" style="margin-bottom:0;">
-          <h2>New Prescription</h2>
-          <div class="form-grid">
-            <div class="form-group" style="grid-column:span 2">
-              <label>Drug *</label>
-              <input type="text" id="dl-drug" placeholder="Start typing drug name..."
-                     oninput="onDrugInput()" autocomplete="off"/>
-              <div id="dl-drug-suggestions" style="
-                position:relative;z-index:100;background:white;
-                border:1px solid #E0DFDB;border-radius:8px;display:none;
-                max-height:180px;overflow-y:auto;
-                box-shadow:0 8px 24px rgba(11,31,58,0.1);margin-top:2px;">
+    <!-- POS LAYOUT: left = drug entry, right = basket -->
+    <div class="pos-layout">
+
+      <!-- LEFT: Drug search + add -->
+      <div class="pos-left">
+        <div class="pos-left-header">
+          <span class="pos-left-title">New Sale</span>
+          <span class="pos-left-hint">Type a drug name to search</span>
+        </div>
+
+        <!-- Drug search -->
+        <div class="pos-drug-search-wrap">
+          <div class="pos-drug-search">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#9AA3AE" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            <input type="text" id="pos-drug-input"
+              placeholder="Search drug name…"
+              oninput="onPosSearch()"
+              onkeydown="onPosKeydown(event)"
+              autocomplete="off"/>
+            <kbd class="pos-kbd">↵ to add</kbd>
+          </div>
+          <div class="pos-suggestions" id="pos-suggestions"></div>
+        </div>
+
+        <!-- Selected drug row -->
+        <div class="pos-selected-row" id="pos-selected-row" style="display:none;">
+          <div class="pos-selected-info">
+            <div class="pos-selected-name" id="pos-sel-name">—</div>
+            <div class="pos-selected-meta" id="pos-sel-meta">—</div>
+          </div>
+          <div class="pos-qty-controls">
+            <button class="pos-qty-btn" onclick="posAdjQty(-1)">−</button>
+            <input type="number" id="pos-qty" value="1" min="1" oninput="posCalcLine()"/>
+            <button class="pos-qty-btn" onclick="posAdjQty(1)">+</button>
+          </div>
+          <div class="pos-line-total" id="pos-line-total">—</div>
+          <button class="pos-add-btn" onclick="addToBasket()" id="pos-add-btn">Add →</button>
+        </div>
+
+        <!-- No price warning -->
+        <div class="pos-warn" id="pos-no-price-warn" style="display:none;">
+          ⚠️ This drug has no selling price set. <a onclick="showPage('ph-inventory')" style="color:#0D6E6E;cursor:pointer;font-weight:700;">Update inventory →</a>
+        </div>
+
+        <!-- Out of stock warning -->
+        <div class="pos-warn pos-warn-red" id="pos-no-stock-warn" style="display:none;">
+          ❌ This drug is out of stock.
+        </div>
+
+        <!-- Dispensing log below the POS -->
+        <div class="pos-log-section">
+          <div class="pos-log-header">
+            <span class="pos-log-title">Transaction History</span>
+            <div class="pos-log-filters">
+              <div class="inv-search" style="max-width:200px;padding:0.42rem 0.75rem;">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#9AA3AE" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                <input type="text" id="dl-search" placeholder="Search…" oninput="filterDl()" style="font-size:0.8rem;"/>
               </div>
+              <select class="pos-date-filter" id="dl-date-filter" onchange="filterDl()">
+                <option value="today">Today</option>
+                <option value="week">This week</option>
+                <option value="month">This month</option>
+                <option value="all">All time</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="inv-table-wrap" style="margin-top:0;">
+            <table class="inv-table">
+              <thead>
+                <tr>
+                  <th>Time</th>
+                  <th>Customer</th>
+                  <th>Items</th>
+                  <th>Payment</th>
+                  <th>Total</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="dl-body">
+                <tr><td colspan="6" class="loading">Loading…</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- RIGHT: Basket -->
+      <div class="pos-basket" id="pos-basket">
+
+        <!-- Empty state -->
+        <div class="pos-basket-empty" id="basket-empty">
+          <div style="font-size:2.5rem;opacity:0.2;margin-bottom:0.75rem;">🧾</div>
+          <div style="font-size:0.85rem;color:#9AA3AE;line-height:1.7;">Search for a drug on the left<br/>to start a new sale</div>
+        </div>
+
+        <!-- Filled state -->
+        <div id="basket-filled" style="display:none;height:100%;display:none;flex-direction:column;">
+
+          <div class="pos-basket-header">
+            <span>Current Sale</span>
+            <button onclick="clearBasket()" class="pos-clear-btn">✕ Clear</button>
+          </div>
+
+          <!-- Items -->
+          <div class="pos-basket-items" id="basket-items"></div>
+
+          <!-- Subtotal -->
+          <div class="pos-subtotal-row">
+            <span>Subtotal</span>
+            <span id="basket-subtotal">UGX 0</span>
+          </div>
+
+          <!-- Discount -->
+          <div class="pos-discount-row">
+            <label>Discount</label>
+            <div class="pos-discount-inputs">
+              <input type="number" id="pos-discount-amt" placeholder="0" min="0" oninput="recalcBasket()" style="width:90px;"/>
+              <select id="pos-discount-type" onchange="recalcBasket()">
+                <option value="ugx">UGX</option>
+                <option value="pct">%</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Total -->
+          <div class="pos-total-row">
+            <span>Total</span>
+            <span id="basket-total">UGX 0</span>
+          </div>
+
+          <!-- Amount tendered (cash) -->
+          <div class="pos-tender-row" id="pos-tender-row">
+            <label>Amount Tendered</label>
+            <input type="number" id="pos-tendered" placeholder="Enter amount paid" min="0" oninput="calcChange()"/>
+          </div>
+          <div class="pos-change-row" id="pos-change-row" style="display:none;">
+            <span>Change</span>
+            <span id="pos-change" style="color:#059669;font-weight:700;">UGX 0</span>
+          </div>
+
+          <!-- Customer + payment -->
+          <div class="pos-basket-meta">
+            <div class="form-group">
+              <label>Customer Name</label>
+              <input type="text" id="dl-customer" placeholder="Optional"/>
             </div>
             <div class="form-group">
-              <label>Qty *</label>
-              <input type="number" id="dl-qty" placeholder="e.g. 6" min="1" oninput="calcTotal()"/>
-            </div>
-            <div class="form-group">
-              <label>Unit</label>
-              <select id="dl-unit">
-                <option>Tablets</option><option>Capsules</option><option>Bottles</option>
-                <option>Vials</option><option>Sachets</option><option>Strips</option><option>Other</option>
+              <label>Payment Method</label>
+              <select id="dl-payment" onchange="toggleTender()">
+                <option value="Cash">Cash</option>
+                <option value="Mobile Money">Mobile Money</option>
+                <option value="Insurance">Insurance</option>
+                <option value="Credit">Credit</option>
               </select>
             </div>
             <div class="form-group">
-              <label>Unit Price (UGX)</label>
-              <input type="text" id="dl-unit-price" readonly placeholder="Select drug first"
-                     style="background:#F0EFEB;color:#555;cursor:not-allowed;"/>
-              <span id="dl-price-status" style="font-size:0.72rem;margin-top:0.2rem;"></span>
-            </div>
-            <div class="form-group">
-              <label>Line Total (UGX)</label>
-              <input type="text" id="dl-total" readonly placeholder="—"
-                     style="background:#f0fdf4;color:#16a34a;font-weight:700;font-size:1rem;cursor:not-allowed;"/>
-            </div>
-            <div id="dl-no-price-warning" style="
-              grid-column:span 2;display:none;
-              background:#fffbeb;border:1px solid #fcd34d;
-              border-radius:8px;padding:0.7rem 1rem;font-size:0.83rem;color:#92400e;">
-              ⚠️ No price set for this drug. Please update the inventory first.
-            </div>
-          </div>
-          <div class="form-actions">
-            <button class="btn btn-primary" id="dl-add-btn" onclick="addToBasket()">+ Add to Prescription</button>
-          </div>
-        </div>
-
-        <!-- RIGHT: basket -->
-        <div id="basket-card" style="background:white;border-radius:12px;border:1px solid #E8E6E1;padding:1.5rem;position:sticky;top:1rem;">
-
-          <div id="basket-empty" style="text-align:center;padding:2rem 1rem;">
-            <div style="font-size:2.5rem;margin-bottom:0.8rem;opacity:0.3;">🧾</div>
-            <div style="font-size:0.85rem;color:#9AA3AE;line-height:1.7;">
-              No drugs added yet.<br/>Select a drug and click<br/>"+ Add to Prescription"
+              <label>Notes</label>
+              <input type="text" id="dl-notes" placeholder="e.g. Take after meals"/>
             </div>
           </div>
 
-          <div id="basket-filled" style="display:none;">
-            <div style="display:flex;align-items:center;justify-content:space-between;
-                        margin-bottom:1rem;border-bottom:1px solid #F0EFEB;padding-bottom:0.8rem;">
-              <span style="font-size:0.85rem;font-weight:700;">Prescription</span>
-              <button onclick="clearBasket()"
-                      style="background:none;border:none;color:#dc2626;font-size:0.78rem;
-                             cursor:pointer;font-weight:700;font-family:'Syne',sans-serif;">✕ Clear</button>
-            </div>
-
-            <div id="basket-items" style="display:flex;flex-direction:column;gap:0.5rem;margin-bottom:1rem;"></div>
-
-            <div style="background:#f0fdf4;border:1px solid #a7f3d0;border-radius:10px;
-                        padding:0.8rem 1rem;display:flex;justify-content:space-between;
-                        align-items:center;margin-bottom:1.2rem;">
-              <span style="font-size:0.7rem;color:#555;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;">Total</span>
-              <span id="basket-total" style="font-size:1.3rem;font-weight:700;color:#16a34a;">UGX 0</span>
-            </div>
-
-            <div style="display:flex;flex-direction:column;gap:0.8rem;margin-bottom:1rem;">
-              <div class="form-group">
-                <label>Customer Name (optional)</label>
-                <input type="text" id="dl-customer" placeholder="e.g. Grace Nakato"/>
-              </div>
-              <div class="form-group">
-                <label>Payment Method</label>
-                <select id="dl-payment">
-                  <option>Cash</option><option>Mobile Money</option>
-                  <option>Insurance</option><option>Credit</option>
-                </select>
-              </div>
-              <div class="form-group">
-                <label>Notes (optional)</label>
-                <input type="text" id="dl-notes" placeholder="e.g. Take after meals"/>
-              </div>
-            </div>
-
-            <button class="btn btn-primary" id="dl-submit-btn" onclick="saveBasket()" style="width:100%;">
-              ✅ Save Prescription
-            </button>
-          </div>
+          <button class="pos-save-btn" onclick="saveBasket()">
+            Complete Sale →
+          </button>
 
         </div>
       </div>
+    </div>
 
-      <!-- dispensing log table -->
-      <div class="card" style="margin-top:1.5rem;">
-        <h2>Dispensing Log</h2>
-        <div style="display:flex;gap:1rem;align-items:center;margin-bottom:1rem;flex-wrap:wrap;">
-          <div class="search-bar" style="flex:1;margin:0;">
-            <input type="text" id="dl-search" placeholder="Search drug or customer..."
-                   oninput="filterDl()" style="margin:0;"/>
-          </div>
-          <div style="font-size:0.8rem;color:#9AA3AE;">
-            24h revenue: <strong id="dl-today-rev" style="color:#0D6E6E;">UGX 0</strong>
-          </div>
-        </div>
-        <div class="table-wrap">
-          <table>
-            <thead>
-              <tr>
-                <th>Drug</th><th>Qty</th><th class="hide-mobile">Unit</th><th class="hide-mobile">Amount (UGX)</th>
-                <th class="hide-mobile">Payment</th><th class="hide-mobile">Customer</th><th class="hide-mobile">Time</th><th>Actions</th>
-              </tr>
-            </thead>
-            <tbody id="dl-body"><tr><td colspan="8" class="loading">Loading...</td></tr></tbody>
-          </table>
-        </div>
+  </div>
+
+  <!-- RECEIPT MODAL -->
+  <div class="mo" id="m-receipt">
+    <div class="mb" style="max-width:400px;">
+      <div id="receipt-body"></div>
+      <div class="ma" style="justify-content:center;gap:0.75rem;">
+        <button class="btn btn-sm" onclick="cm('m-receipt')">Close</button>
+        <button class="btn btn-primary" onclick="printReceipt()">🖨 Print Receipt</button>
       </div>
+    </div>
+  </div>
 
+  <!-- TRANSACTION DETAIL MODAL -->
+  <div class="mo" id="m-txn-detail">
+    <div class="mb" style="max-width:420px;">
+      <h3 style="margin-bottom:1.2rem;">Transaction Details</h3>
+      <div id="txn-detail-body"></div>
+      <div class="ma">
+        <button class="btn btn-sm" onclick="cm('m-txn-detail')">Close</button>
+        <button class="btn btn-primary" onclick="reprintTxn()">🖨 Reprint</button>
+      </div>
     </div>
   </div>
 
@@ -2829,107 +3129,212 @@ function openDrugDetail(id){
   document.getElementById('m-drug-detail').classList.add('open');
 }
 
-// ── DISPENSING ──
-let dispLog=[],currentUnitPrice=0,basket=[];
+// ── POS / DISPENSING v2 ──
+let dispLog=[], basket=[], posSuggFocus=-1, currentPosItem=null, lastReceipt=null;
 
-function onDrugInput(){
-  const val=document.getElementById('dl-drug').value.trim().toLowerCase();
-  const sugg=document.getElementById('dl-drug-suggestions');
-  resetPriceFields();
-  if(!val){sugg.style.display='none';return;}
-  const matches=drugs.filter(d=>d.drug_name.toLowerCase().includes(val));
-  if(!matches.length){sugg.style.display='none';return;}
-  sugg.innerHTML=matches.map(d=>`
-    <div onclick="selectDrug('${d.drug_name.replace(/'/g,"\\'")}',${d.price||0})"
-         style="padding:0.6rem 1rem;cursor:pointer;font-size:0.88rem;border-bottom:1px solid #F0EFEB;"
-         onmouseover="this.style.background='#f0fdf9'" onmouseout="this.style.background='white'">
-      <strong>${d.drug_name}</strong>
-      <span style="float:right;color:#9AA3AE;font-size:0.8rem;">${d.price?'UGX '+Number(d.price).toLocaleString():'No price'}</span>
-    </div>`).join('');
-  sugg.style.display='block';
-}
-
-function selectDrug(name,price){
-  document.getElementById('dl-drug').value=name;
-  document.getElementById('dl-drug-suggestions').style.display='none';
-  applyDrugPrice(name,price);
-}
-
-function resetPriceFields(){
-  currentUnitPrice=0;
-  document.getElementById('dl-unit-price').value='';
-  document.getElementById('dl-total').value='';
-  document.getElementById('dl-no-price-warning').style.display='none';
-  document.getElementById('dl-price-status').textContent='';
-  document.getElementById('dl-add-btn').disabled=false;
-}
-
-async function applyDrugPrice(drugName,cachedPrice){
-  const statusEl=document.getElementById('dl-price-status');
-  const unitPriceEl=document.getElementById('dl-unit-price');
-  const warningEl=document.getElementById('dl-no-price-warning');
-  const addBtn=document.getElementById('dl-add-btn');
-  statusEl.textContent='⏳ Fetching price...';statusEl.style.color='#9AA3AE';
-  unitPriceEl.value='';currentUnitPrice=0;
+async function loadDispensing(){
+  // ensure drugs loaded for search
+  if(!drugs.length){ try{ drugs=await db('inventory?order=drug_name.asc'); }catch(e){} }
   try{
-    const result=await db(`inventory?drug_name=eq.${encodeURIComponent(drugName)}&select=price&limit=1`);
-    const price=result?.[0]?.price;
-    if(!price||price===0){
-      currentUnitPrice=0;unitPriceEl.value='Not set';statusEl.textContent='';
-      warningEl.style.display='block';addBtn.disabled=true;document.getElementById('dl-total').value='';
-    }else{
-      currentUnitPrice=price;unitPriceEl.value='UGX '+Number(price).toLocaleString();
-      statusEl.textContent='✓ Price loaded';statusEl.style.color='#16a34a';
-      warningEl.style.display='none';addBtn.disabled=false;calcTotal();
-    }
-  }catch(e){statusEl.textContent='Could not fetch price';statusEl.style.color='#dc2626';}
+    dispLog=await db('dispensing_log?select=*&order=created_at.desc');
+    renderPosStats(dispLog);
+    renderDl(dispLog);
+  }catch(e){
+    document.getElementById('dl-body').innerHTML=`<tr><td colspan="6" class="loading">Error: ${e.message}</td></tr>`;
+  }
 }
 
-function calcTotal(){
-  const qty=parseInt(document.getElementById('dl-qty').value);
-  const totalEl=document.getElementById('dl-total');
-  if(!currentUnitPrice||isNaN(qty)||qty<1){totalEl.value='';return;}
-  totalEl.value='UGX '+(currentUnitPrice*qty).toLocaleString();
+function renderPosStats(arr){
+  const todayStr=new Date().toDateString();
+  const todayItems=arr.filter(x=>new Date(x.created_at).toDateString()===todayStr);
+  // group by session_id for transaction count
+  const sessions=new Set(todayItems.map(x=>x.session_id).filter(Boolean));
+  const todayRev=todayItems.reduce((s,x)=>s+(Number(x.total_cost)||0),0);
+  const avgTxn=sessions.size>0?Math.round(todayRev/sessions.size):0;
+  // top drug today
+  const drugCounts={};
+  todayItems.forEach(x=>{ drugCounts[x.drug_name]=(drugCounts[x.drug_name]||0)+(Number(x.quantity_dispensed)||0); });
+  const topDrug=Object.entries(drugCounts).sort((a,b)=>b[1]-a[1])[0]?.[0]||'—';
+  document.getElementById('pos-today-rev').textContent='UGX '+todayRev.toLocaleString();
+  document.getElementById('pos-today-txns').textContent=sessions.size;
+  document.getElementById('pos-avg-txn').textContent=avgTxn?'UGX '+avgTxn.toLocaleString():'—';
+  document.getElementById('pos-top-drug').textContent=topDrug;
 }
 
+// ── SEARCH ──
+function onPosSearch(){
+  const val=document.getElementById('pos-drug-input').value.trim().toLowerCase();
+  const box=document.getElementById('pos-suggestions');
+  posSuggFocus=-1;
+  if(!val){ box.classList.remove('open'); return; }
+  const matches=drugs.filter(d=>d.drug_name.toLowerCase().includes(val)).slice(0,8);
+  if(!matches.length){ box.classList.remove('open'); return; }
+  box.innerHTML=matches.map((d,i)=>{
+    const isOut=Number(d.quantity)<=0;
+    const isLow=Number(d.quantity)>0&&Number(d.quantity)<=(d.reorder_level||10);
+    return `<div class="pos-sugg-item" data-idx="${i}" onclick="selectPosItem('${d.id}')">
+      <div>
+        <div class="pos-sugg-name">${d.drug_name}</div>
+        <div class="pos-sugg-meta">${d.category||''} ${d.unit?'· '+d.unit:''}</div>
+      </div>
+      <div style="text-align:right;">
+        <div class="pos-sugg-price">${d.price?'UGX '+Number(d.price).toLocaleString():'No price'}</div>
+        <div class="pos-sugg-stock ${isOut?'out':isLow?'low':''}">${isOut?'Out of stock':isLow?'Low: '+d.quantity:d.quantity+' in stock'}</div>
+      </div>
+    </div>`;
+  }).join('');
+  box._items=matches;
+  box.classList.add('open');
+}
+
+function onPosKeydown(e){
+  const box=document.getElementById('pos-suggestions');
+  const items=box.querySelectorAll('.pos-sugg-item');
+  if(e.key==='ArrowDown'){ e.preventDefault(); posSuggFocus=Math.min(posSuggFocus+1,items.length-1); highlightSugg(items); }
+  else if(e.key==='ArrowUp'){ e.preventDefault(); posSuggFocus=Math.max(posSuggFocus-1,0); highlightSugg(items); }
+  else if(e.key==='Enter'){
+    e.preventDefault();
+    if(posSuggFocus>=0&&box._items){ selectPosItem(box._items[posSuggFocus].id); }
+    else if(box._items?.[0]){ selectPosItem(box._items[0].id); }
+    else if(currentPosItem){ addToBasket(); }
+  }
+  else if(e.key==='Escape'){ box.classList.remove('open'); document.getElementById('pos-drug-input').blur(); }
+}
+
+function highlightSugg(items){
+  items.forEach((el,i)=>el.classList.toggle('focused',i===posSuggFocus));
+  if(items[posSuggFocus]) items[posSuggFocus].scrollIntoView({block:'nearest'});
+}
+
+function selectPosItem(id){
+  const d=drugs.find(x=>x.id===id); if(!d)return;
+  currentPosItem=d;
+  document.getElementById('pos-drug-input').value=d.drug_name;
+  document.getElementById('pos-suggestions').classList.remove('open');
+  document.getElementById('pos-qty').value=1;
+
+  const selRow=document.getElementById('pos-selected-row');
+  const warnPrice=document.getElementById('pos-no-price-warn');
+  const warnStock=document.getElementById('pos-no-stock-warn');
+  warnPrice.style.display='none'; warnStock.style.display='none';
+
+  if(Number(d.quantity)<=0){
+    warnStock.style.display='block'; selRow.style.display='none'; return;
+  }
+  if(!d.price){
+    warnPrice.style.display='block'; selRow.style.display='none'; return;
+  }
+
+  document.getElementById('pos-sel-name').textContent=d.drug_name;
+  document.getElementById('pos-sel-meta').textContent=`${d.category||''} · ${d.unit||''} · UGX ${Number(d.price).toLocaleString()} each · ${d.quantity} in stock`;
+  posCalcLine();
+  selRow.style.display='flex';
+  setTimeout(()=>document.getElementById('pos-qty').focus(),50);
+}
+
+function posAdjQty(delta){
+  const el=document.getElementById('pos-qty');
+  el.value=Math.max(1,(parseInt(el.value)||1)+delta);
+  posCalcLine();
+}
+
+function posCalcLine(){
+  if(!currentPosItem?.price)return;
+  const qty=parseInt(document.getElementById('pos-qty').value)||1;
+  const total=Number(currentPosItem.price)*qty;
+  document.getElementById('pos-line-total').textContent='UGX '+total.toLocaleString();
+}
+
+document.addEventListener('click',e=>{
+  if(!e.target.closest('.pos-drug-search-wrap'))
+    document.getElementById('pos-suggestions')?.classList.remove('open');
+});
+
+// ── BASKET ──
 function addToBasket(){
-  const drug=document.getElementById('dl-drug').value.trim();
-  const qty=parseInt(document.getElementById('dl-qty').value);
-  const unit=document.getElementById('dl-unit').value;
-  if(!drug||isNaN(qty)||qty<1){toast('Drug name and quantity required.','err');return;}
-  if(!currentUnitPrice){toast('Cannot add — no price set for this drug.','err');return;}
-  const existing=basket.find(b=>b.drug_name===drug);
-  if(existing){existing.qty+=qty;existing.line_total=existing.unit_price*existing.qty;toast(`Updated ${drug} quantity.`);}
-  else{basket.push({drug_name:drug,qty,unit,unit_price:currentUnitPrice,line_total:currentUnitPrice*qty});toast(`✅ ${drug} added.`);}
+  if(!currentPosItem)return;
+  const qty=parseInt(document.getElementById('pos-qty').value)||1;
+  const d=currentPosItem;
+  const existing=basket.find(b=>b.id===d.id);
+  if(existing){ existing.qty+=qty; existing.line_total=existing.unit_price*existing.qty; }
+  else{ basket.push({id:d.id,drug_name:d.drug_name,qty,unit:d.unit||'',unit_price:Number(d.price),line_total:Number(d.price)*qty}); }
   renderBasket();
-  document.getElementById('dl-drug').value='';document.getElementById('dl-qty').value='';resetPriceFields();
+  // reset search
+  document.getElementById('pos-drug-input').value='';
+  document.getElementById('pos-selected-row').style.display='none';
+  document.getElementById('pos-no-price-warn').style.display='none';
+  document.getElementById('pos-no-stock-warn').style.display='none';
+  currentPosItem=null;
+  document.getElementById('pos-drug-input').focus();
+  toast('✅ Added to sale');
 }
 
-function removeFromBasket(index){basket.splice(index,1);renderBasket();}
+function removeFromBasket(idx){ basket.splice(idx,1); renderBasket(); }
 
 function renderBasket(){
-  const emptyEl=document.getElementById('basket-empty');
-  const filledEl=document.getElementById('basket-filled');
-  if(!basket.length){emptyEl.style.display='block';filledEl.style.display='none';return;}
-  emptyEl.style.display='none';filledEl.style.display='block';
+  const empty=document.getElementById('basket-empty');
+  const filled=document.getElementById('basket-filled');
+  if(!basket.length){
+    empty.style.display='flex'; filled.style.display='none'; return;
+  }
+  empty.style.display='none'; filled.style.display='flex';
   document.getElementById('basket-items').innerHTML=basket.map((item,i)=>`
-    <div style="background:#F0EFEB;border-radius:8px;padding:0.65rem 0.9rem;
-                display:flex;justify-content:space-between;align-items:center;gap:0.5rem;">
+    <div class="pos-basket-item">
       <div style="flex:1;min-width:0;">
-        <div style="font-weight:700;font-size:0.85rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${item.drug_name}</div>
-        <div style="font-size:0.74rem;color:#9AA3AE;margin-top:0.1rem;">${item.qty} ${item.unit} × UGX ${Number(item.unit_price).toLocaleString()}</div>
+        <div class="pos-basket-item-name">${item.drug_name}</div>
+        <div class="pos-basket-item-meta">${item.qty} ${item.unit} × UGX ${Number(item.unit_price).toLocaleString()}</div>
       </div>
-      <div style="font-weight:700;color:#0D6E6E;font-size:0.88rem;white-space:nowrap;">UGX ${Number(item.line_total).toLocaleString()}</div>
-      <button onclick="removeFromBasket(${i})" style="background:none;border:none;color:#dc2626;cursor:pointer;font-size:0.9rem;padding:0 0.2rem;">✕</button>
+      <div class="pos-basket-item-price">UGX ${Number(item.line_total).toLocaleString()}</div>
+      <button class="pos-basket-item-del" onclick="removeFromBasket(${i})">✕</button>
     </div>`).join('');
-  const grandTotal=basket.reduce((s,b)=>s+b.line_total,0);
-  document.getElementById('basket-total').textContent='UGX '+grandTotal.toLocaleString();
+  recalcBasket();
+}
+
+function recalcBasket(){
+  const subtotal=basket.reduce((s,b)=>s+b.line_total,0);
+  document.getElementById('basket-subtotal').textContent='UGX '+subtotal.toLocaleString();
+  // discount
+  let discAmt=0;
+  const discVal=parseFloat(document.getElementById('pos-discount-amt').value)||0;
+  const discType=document.getElementById('pos-discount-type').value;
+  if(discType==='pct') discAmt=Math.round(subtotal*(discVal/100));
+  else discAmt=discVal;
+  discAmt=Math.min(discAmt,subtotal);
+  const total=subtotal-discAmt;
+  document.getElementById('basket-total').textContent='UGX '+total.toLocaleString();
+  calcChange();
+}
+
+function calcChange(){
+  const totalStr=document.getElementById('basket-total').textContent.replace('UGX ','').replace(/,/g,'');
+  const total=parseFloat(totalStr)||0;
+  const tendered=parseFloat(document.getElementById('pos-tendered').value)||0;
+  const changeRow=document.getElementById('pos-change-row');
+  if(tendered>0){
+    const change=tendered-total;
+    document.getElementById('pos-change').textContent='UGX '+(change<0?0:change).toLocaleString();
+    document.getElementById('pos-change').style.color=change<0?'#dc2626':'#059669';
+    changeRow.style.display='flex';
+  } else changeRow.style.display='none';
+}
+
+function toggleTender(){
+  const isCash=document.getElementById('dl-payment').value==='Cash';
+  document.getElementById('pos-tender-row').style.display=isCash?'flex':'none';
+  document.getElementById('pos-change-row').style.display='none';
 }
 
 function clearBasket(){
-  if(!confirm('Clear all items from this prescription?'))return;
-  basket=[];renderBasket();
-  ['dl-customer','dl-notes'].forEach(id=>document.getElementById(id).value='');
+  if(basket.length&&!confirm('Clear this sale?'))return;
+  basket=[];
+  document.getElementById('basket-filled').style.display='none';
+  document.getElementById('basket-empty').style.display='flex';
+  document.getElementById('pos-discount-amt').value='';
+  document.getElementById('pos-tendered').value='';
+  document.getElementById('dl-customer').value='';
+  document.getElementById('dl-notes').value='';
+  document.getElementById('dl-payment').value='Cash';
+  document.getElementById('pos-change-row').style.display='none';
 }
 
 async function saveBasket(){
@@ -2938,51 +3343,149 @@ async function saveBasket(){
   const customer=document.getElementById('dl-customer').value.trim()||null;
   const payment=document.getElementById('dl-payment').value;
   const notes=document.getElementById('dl-notes').value.trim()||null;
-  const grandTotal=basket.reduce((s,b)=>s+b.line_total,0);
+  const subtotal=basket.reduce((s,b)=>s+b.line_total,0);
+  const discVal=parseFloat(document.getElementById('pos-discount-amt').value)||0;
+  const discType=document.getElementById('pos-discount-type').value;
+  let discAmt=discType==='pct'?Math.round(subtotal*(discVal/100)):discVal;
+  discAmt=Math.min(discAmt,subtotal);
+  const grandTotal=subtotal-discAmt;
   try{
     for(const item of basket){
-      await db('dispensing_log','POST',{drug_name:item.drug_name,quantity_dispensed:item.qty,unit:item.unit,price_at_time_of_dispensing:item.unit_price,total_cost:item.line_total,amount_paid:item.line_total,payment_method:payment,customer_name:customer,notes,session_id:sessionId,org_id:user.id});
+      await db('dispensing_log','POST',{
+        drug_name:item.drug_name,quantity_dispensed:item.qty,unit:item.unit,
+        price_at_time_of_dispensing:item.unit_price,total_cost:item.line_total,
+        amount_paid:grandTotal,payment_method:payment,
+        customer_name:customer,notes,session_id:sessionId,org_id:user.id
+      });
     }
-    toast(`✅ Prescription saved — UGX ${grandTotal.toLocaleString()}`);
-    track('prescription_saved',{org_type:'pharmacy',facility:user?.user_metadata?.org_name||'unknown',drug_count:basket.length,grand_total:grandTotal,payment_method:payment});
-    basket=[];renderBasket();
-    ['dl-customer','dl-notes'].forEach(id=>document.getElementById(id).value='');
+    track('sale_saved',{drug_count:basket.length,grand_total:grandTotal,payment_method:payment});
+    toast(`✅ Sale saved — UGX ${grandTotal.toLocaleString()}`);
+    lastReceipt={sessionId,basket:[...basket],customer,payment,notes,subtotal,discAmt,grandTotal,time:new Date()};
+    showReceipt(lastReceipt);
+    clearBasket();
     loadDispensing();
   }catch(e){toast('Error: '+e.message,'err');}
 }
 
-async function loadDispensing(){
-  try{
-    dispLog=await db('dispensing_log?select=*&order=created_at.desc');
-    renderDl(dispLog);dlTodayRevenue(dispLog);
-  }catch(e){document.getElementById('dl-body').innerHTML=`<tr><td colspan="8" class="loading">Error: ${e.message}</td></tr>`;}
+// ── RECEIPT ──
+function showReceipt(r){
+  const org=user?.user_metadata?.org_name||'Minza Pharmacy';
+  document.getElementById('receipt-body').innerHTML=`
+    <div class="receipt">
+      <div class="receipt-header">
+        <div class="receipt-org">${org}</div>
+        <div class="receipt-sub">${r.time.toLocaleString('en-GB',{day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'})}</div>
+        ${r.customer?`<div class="receipt-sub">Customer: ${r.customer}</div>`:''}
+      </div>
+      <hr class="receipt-divider"/>
+      ${r.basket.map(item=>`
+        <div class="receipt-item">
+          <span>${item.drug_name}<br/><small style="color:#9AA3AE;">${item.qty} ${item.unit} × UGX ${Number(item.unit_price).toLocaleString()}</small></span>
+          <span style="font-weight:700;">UGX ${Number(item.line_total).toLocaleString()}</span>
+        </div>`).join('')}
+      <hr class="receipt-divider"/>
+      ${r.discAmt>0?`<div class="receipt-item"><span>Discount</span><span style="color:#dc2626;">− UGX ${r.discAmt.toLocaleString()}</span></div>`:''}
+      <div class="receipt-total"><span>Total</span><span>UGX ${r.grandTotal.toLocaleString()}</span></div>
+      <div class="receipt-item" style="margin-top:0.35rem;"><span>Payment</span><span>${r.payment}</span></div>
+      <hr class="receipt-divider"/>
+      <div class="receipt-footer">Thank you for your visit.<br/>Powered by Minza Health</div>
+    </div>`;
+  document.getElementById('m-receipt').classList.add('open');
 }
 
-function dlTodayRevenue(arr){
-  const since=new Date(Date.now()-24*60*60*1000);
-  const rev=arr.filter(x=>new Date(x.created_at)>=since).reduce((s,x)=>s+(Number(x.total_cost)||0),0);
-  document.getElementById('dl-today-rev').textContent='UGX '+rev.toLocaleString();
+function printReceipt(){
+  const content=document.getElementById('receipt-body').innerHTML;
+  const w=window.open('','_blank','width=380,height=600');
+  w.document.write(`<html><head><title>Receipt</title>
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700&display=swap" rel="stylesheet"/>
+    <style>body{font-family:'Syne',sans-serif;padding:1.5rem;max-width:340px;margin:0 auto;}
+    .receipt{border:none;padding:0;} @media print{body{margin:0;padding:0.5rem;}}</style>
+    </head><body>${content}<script>window.onload=()=>window.print()</script></body></html>`);
+  w.document.close();
+}
+
+function reprintTxn(){ showReceipt(lastReceipt); cm('m-txn-detail'); }
+
+// ── LOG ──
+function filterDl(){
+  const q=(document.getElementById('dl-search').value||'').toLowerCase();
+  const period=document.getElementById('dl-date-filter').value;
+  const now=new Date();
+  let arr=dispLog.filter(x=>{
+    const matchQ=!q||x.drug_name.toLowerCase().includes(q)||(x.customer_name||'').toLowerCase().includes(q);
+    if(!matchQ)return false;
+    const d=new Date(x.created_at);
+    if(period==='today') return d.toDateString()===now.toDateString();
+    if(period==='week'){const w=new Date(now);w.setDate(now.getDate()-7);return d>=w;}
+    if(period==='month'){const m=new Date(now);m.setDate(now.getDate()-30);return d>=m;}
+    return true;
+  });
+  renderDl(arr);
 }
 
 function renderDl(arr){
   const b=document.getElementById('dl-body');
-  if(!arr.length){b.innerHTML=`<tr><td colspan="8" class="loading">No dispensing records yet.</td></tr>`;return;}
-  b.innerHTML=arr.map(d=>`<tr>
-    <td><strong>${d.drug_name}</strong></td><td>${d.quantity_dispensed}</td><td class="hide-mobile">${d.unit||'—'}</td>
-    <td class="hide-mobile">${d.total_cost?'UGX '+Number(d.total_cost).toLocaleString():'—'}</td>
-    <td class="hide-mobile"><span class="badge b-ok">${d.payment_method||'Cash'}</span></td>
-    <td>${d.customer_name||'<span style="color:#ccc">—</span>'}</td>
+  if(!arr.length){b.innerHTML=`<tr><td colspan="6" class="loading">No transactions found.</td></tr>`;return;}
+  // group by session_id
+  const sessions={};
+  arr.forEach(x=>{
+    const sid=x.session_id||x.id;
+    if(!sessions[sid]) sessions[sid]={items:[],customer:x.customer_name,payment:x.payment_method,time:x.created_at,total:0,id:x.id};
+    sessions[sid].items.push(x);
+    sessions[sid].total+=Number(x.total_cost)||0;
+  });
+  b.innerHTML=Object.values(sessions).map(s=>`<tr style="cursor:pointer;" onclick="viewTxn('${s.items[0]?.session_id||s.id}')">
     <td style="font-size:0.78rem;color:#9AA3AE;">
-      ${new Date(d.created_at).toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'})}
-      · ${new Date(d.created_at).toLocaleDateString('en-GB',{day:'2-digit',month:'short'})}
+      ${new Date(s.time).toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'})}
+      <br/><span style="font-size:0.7rem;">${new Date(s.time).toLocaleDateString('en-GB',{day:'2-digit',month:'short'})}</span>
     </td>
-    <td><button class="btn btn-danger" onclick="delItem('dispensing_log','${d.id}',loadDispensing)">Del</button></td>
+    <td style="font-weight:600;">${s.customer||'<span style="color:#ccc">Walk-in</span>'}</td>
+    <td>
+      <div style="font-size:0.82rem;">${s.items.map(x=>x.drug_name).join(', ')}</div>
+      <div style="font-size:0.7rem;color:#9AA3AE;">${s.items.length} item${s.items.length!==1?'s':''}</div>
+    </td>
+    <td><span class="badge b-ok" style="font-size:0.7rem;">${s.payment||'Cash'}</span></td>
+    <td style="font-weight:700;color:#0D6E6E;">UGX ${s.total.toLocaleString()}</td>
+    <td class="td-actions">
+      <button class="btn btn-sm" onclick="event.stopPropagation();viewTxn('${s.items[0]?.session_id||s.id}')">View</button>
+      <button class="btn btn-danger" onclick="event.stopPropagation();delTxnSession('${s.items[0]?.session_id||s.id}')">Del</button>
+    </td>
   </tr>`).join('');
 }
 
-function filterDl(){
-  const q=document.getElementById('dl-search').value.toLowerCase();
-  renderDl(dispLog.filter(d=>d.drug_name.toLowerCase().includes(q)||(d.customer_name||'').toLowerCase().includes(q)));
+function viewTxn(sessionId){
+  const items=dispLog.filter(x=>(x.session_id||x.id)===sessionId);
+  if(!items.length)return;
+  const total=items.reduce((s,x)=>s+(Number(x.total_cost)||0),0);
+  const r={sessionId,basket:items.map(x=>({drug_name:x.drug_name,qty:x.quantity_dispensed,unit:x.unit||'',unit_price:x.price_at_time_of_dispensing||0,line_total:x.total_cost||0})),
+    customer:items[0].customer_name,payment:items[0].payment_method,notes:items[0].notes,
+    subtotal:total,discAmt:0,grandTotal:total,time:new Date(items[0].created_at)};
+  lastReceipt=r;
+  document.getElementById('txn-detail-body').innerHTML=`
+    <div style="display:flex;flex-direction:column;gap:0.5rem;margin-bottom:1rem;">
+      ${items.map(x=>`<div class="pos-basket-item" style="background:#F8F7F3;border-radius:8px;padding:0.55rem 0.75rem;display:flex;justify-content:space-between;">
+        <div><div style="font-size:0.85rem;font-weight:700;">${x.drug_name}</div>
+        <div style="font-size:0.72rem;color:#9AA3AE;">${x.quantity_dispensed} ${x.unit||''} × UGX ${Number(x.price_at_time_of_dispensing||0).toLocaleString()}</div></div>
+        <div style="font-weight:700;color:#0D6E6E;">UGX ${Number(x.total_cost||0).toLocaleString()}</div>
+      </div>`).join('')}
+    </div>
+    <div style="display:flex;justify-content:space-between;padding:0.65rem 0;border-top:2px solid #0B1F3A;font-weight:700;font-size:1rem;">
+      <span>Total</span><span>UGX ${total.toLocaleString()}</span>
+    </div>
+    <div style="display:flex;gap:1.5rem;margin-top:0.75rem;font-size:0.82rem;color:#555;">
+      <span>Payment: <strong>${items[0].payment_method||'Cash'}</strong></span>
+      ${items[0].customer_name?`<span>Customer: <strong>${items[0].customer_name}</strong></span>`:''}
+    </div>`;
+  document.getElementById('m-txn-detail').classList.add('open');
+}
+
+async function delTxnSession(sessionId){
+  if(!confirm('Delete this entire transaction?'))return;
+  const items=dispLog.filter(x=>(x.session_id||x.id)===sessionId);
+  try{
+    for(const x of items) await db(`dispensing_log?id=eq.${x.id}`,'DELETE');
+    toast('Deleted.'); loadDispensing();
+  }catch(e){toast('Error: '+e.message,'err');}
 }
 
 // ── CLINIC ──
