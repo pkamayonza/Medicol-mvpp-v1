@@ -4,892 +4,715 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>Minza Health — Health Infrastructure for Africa</title>
-<meta name="description" content="Minza connects clinics, pharmacies, labs and hospitals across Africa on one platform. Built for Uganda, scaling across the continent."/>
+<meta name="description" content="Minza connects clinics, pharmacies, labs and hospitals across Africa. Built in Uganda, scaling across the continent."/>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet"/>
-
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
 <style>
-:root {
-  --navy:   #0B1F3A;
-  --teal:   #0D6E6E;
-  --teal-lt:#4ECDB4;
-  --cream:  #F0EFEB;
-  --mid:    #E8E6E1;
-  --muted:  #9AA3AE;
-  --white:  #FFFFFF;
-  --danger: #dc2626;
-}
-
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
 html { scroll-behavior: smooth; }
+
+:root {
+  --navy:    #0B1F3A;
+  --navy-dk: #070F1C;
+  --teal:    #0D6E6E;
+  --teal-lt: #3DBFB0;
+  --muted:   #8A929E;
+  --white:   #FFFFFF;
+  --border:  rgba(255,255,255,0.08);
+}
 
 body {
   font-family: 'DM Sans', system-ui, sans-serif;
   background: var(--navy);
   color: var(--white);
   overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
 }
 
-/* ── GRAIN OVERLAY ── */
-body::before {
+body::after {
   content: '';
-  position: fixed; inset: 0; z-index: 0;
-  pointer-events: none;
-  opacity: 0.035;
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
-  background-size: 200px;
+  position: fixed; inset: 0; z-index: 0; pointer-events: none;
+  background-image:
+    linear-gradient(rgba(255,255,255,0.013) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.013) 1px, transparent 1px);
+  background-size: 80px 80px;
 }
 
-/* ── NAV ── */
+/* NAV */
 nav {
-  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
-  padding: 1.25rem 3rem;
+  position: fixed; top: 0; left: 0; right: 0; z-index: 200;
+  height: 64px; padding: 0 3rem;
   display: flex; align-items: center; justify-content: space-between;
-  background: rgba(11,31,58,0.85);
-  backdrop-filter: blur(20px);
-  border-bottom: 1px solid rgba(255,255,255,0.06);
-  transition: all 0.3s;
+  background: rgba(7,15,28,0.92);
+  backdrop-filter: blur(24px);
+  border-bottom: 1px solid var(--border);
 }
 
-.nav-logo {
-  font-family: 'Syne', sans-serif;
-  font-size: 1.4rem; font-weight: 800;
-  letter-spacing: -0.5px; color: var(--white);
-  text-decoration: none;
+.logo {
+  font-family: 'DM Sans', sans-serif; font-weight: 600; font-size: 1.1rem;
+  color: var(--white); text-decoration: none; letter-spacing: -0.3px;
+  display: flex; align-items: center; gap: 0.45rem;
 }
 
-.nav-logo span { color: var(--teal-lt); }
-
-.nav-links {
-  display: flex; align-items: center; gap: 2.5rem;
-  list-style: none;
+.logo-dot {
+  width: 8px; height: 8px; border-radius: 50%;
+  background: var(--teal-lt);
+  animation: blink 3s ease infinite;
 }
 
-.nav-links a {
-  font-size: 0.85rem; font-weight: 500;
-  color: rgba(255,255,255,0.55);
-  text-decoration: none;
-  transition: color 0.2s;
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+.nav-mid {
+  position: absolute; left: 50%; transform: translateX(-50%);
+  display: flex; gap: 2.5rem;
 }
 
-.nav-links a:hover { color: var(--white); }
-
-.nav-cta {
-  display: flex; gap: 0.75rem; align-items: center;
+.nav-mid a {
+  font-size: 0.82rem; font-weight: 500;
+  color: var(--muted); text-decoration: none;
+  transition: color 0.15s;
 }
+.nav-mid a:hover { color: var(--white); }
+
+.nav-right { display: flex; gap: 0.6rem; }
 
 .btn {
-  font-family: 'Syne', sans-serif;
-  font-weight: 700; font-size: 0.85rem;
-  padding: 0.6rem 1.4rem; border-radius: 8px;
-  cursor: pointer; border: none;
-  text-decoration: none; display: inline-flex;
-  align-items: center; gap: 0.4rem;
-  transition: all 0.2s;
+  font-family: 'DM Sans', sans-serif; font-weight: 600;
+  font-size: 0.82rem; padding: 0.5rem 1.1rem; border-radius: 6px;
+  cursor: pointer; border: none; text-decoration: none;
+  display: inline-flex; align-items: center; transition: all 0.15s;
 }
+.btn-ghost { background: transparent; color: var(--muted); border: 1px solid rgba(255,255,255,0.1); }
+.btn-ghost:hover { color: var(--white); border-color: rgba(255,255,255,0.22); }
+.btn-teal { background: var(--teal); color: var(--white); }
+.btn-teal:hover { background: #0e8080; }
 
-.btn-ghost {
-  background: transparent;
-  color: rgba(255,255,255,0.6);
-  border: 1px solid rgba(255,255,255,0.12);
-}
-
-.btn-ghost:hover {
-  background: rgba(255,255,255,0.07);
-  color: var(--white);
-  border-color: rgba(255,255,255,0.2);
-}
-
-.btn-teal {
-  background: var(--teal);
-  color: var(--white);
-}
-
-.btn-teal:hover { background: #0D8080; transform: translateY(-1px); }
-
-.btn-lg {
-  padding: 0.85rem 2rem;
-  font-size: 0.95rem;
-}
-
-.btn-xl {
-  padding: 1rem 2.4rem;
-  font-size: 1rem;
-  border-radius: 10px;
-}
-
-/* ── SECTIONS ── */
-section { position: relative; z-index: 1; }
-
-/* ── HERO ── */
-.hero {
-  min-height: 100vh;
-  display: flex; flex-direction: column;
-  align-items: center; justify-content: center;
-  text-align: center;
-  padding: 8rem 2rem 6rem;
-  position: relative;
-  overflow: hidden;
-}
-
-/* hero radial glow */
-.hero::after {
-  content: '';
-  position: absolute;
-  top: 20%; left: 50%; transform: translateX(-50%);
-  width: 700px; height: 500px;
-  background: radial-gradient(ellipse, rgba(13,110,110,0.18) 0%, transparent 70%);
-  pointer-events: none;
-}
-
-.hero-eyebrow {
-  display: inline-flex; align-items: center; gap: 0.5rem;
-  background: rgba(78,205,180,0.1);
-  border: 1px solid rgba(78,205,180,0.2);
-  border-radius: 100px; padding: 0.35rem 1rem;
-  font-size: 0.78rem; font-weight: 600;
-  color: var(--teal-lt); letter-spacing: 0.5px;
-  margin-bottom: 2rem;
-  opacity: 0; animation: fadeUp 0.6s ease 0.2s forwards;
-}
-
-.hero-eyebrow::before {
-  content: '';
-  width: 6px; height: 6px; border-radius: 50%;
-  background: var(--teal-lt);
-  animation: pulse 2s infinite;
-}
-
-@keyframes pulse {
-  0%, 100% { opacity: 1; transform: scale(1); }
-  50% { opacity: 0.5; transform: scale(0.8); }
-}
-
-.hero h1 {
-  font-family: 'Syne', sans-serif;
-  font-size: clamp(3rem, 5vw, 4rem);
-  font-weight: 800;
-  line-height: 1.05;
-  letter-spacing: -2px;
-  max-width: 900px;
-  margin: 0 auto 1.5rem;
-  opacity: 0; animation: fadeUp 0.7s ease 0.35s forwards;
-}
-
-.hero h1 em {
-  font-style: normal;
-  color: var(--teal-lt);
-}
-
-.hero-sub {
-  font-size: clamp(1rem, 2vw, 1.2rem);
-  font-weight: 300;
-  color: rgba(255,255,255,0.55);
-  max-width: 560px; margin: 0 auto 3rem;
-  line-height: 1.7;
-  opacity: 0; animation: fadeUp 0.7s ease 0.5s forwards;
-}
-
-.hero-actions {
-  display: flex; gap: 1rem; flex-wrap: wrap;
-  justify-content: center;
-  opacity: 0; animation: fadeUp 0.7s ease 0.65s forwards;
-}
-
-.hero-proof {
-  margin-top: 5rem;
-  display: flex; align-items: center; gap: 2rem;
-  flex-wrap: wrap; justify-content: center;
-  opacity: 0; animation: fadeUp 0.7s ease 0.8s forwards;
-}
-
-.proof-item {
-  display: flex; flex-direction: column; align-items: center;
-  gap: 0.25rem;
-}
-
-.proof-num {
-  font-family: 'Syne', sans-serif;
-  font-size: 2rem; font-weight: 800;
-  color: var(--white); line-height: 1;
-}
-
-.proof-num span { color: var(--teal-lt); }
-
-.proof-label {
-  font-size: 0.75rem; color: var(--muted);
-  font-weight: 400; text-align: center;
-}
-
-.proof-divider {
-  width: 1px; height: 40px;
-  background: rgba(255,255,255,0.1);
-}
-
-/* scroll indicator */
-.scroll-hint {
-  position: absolute; bottom: 2.5rem; left: 50%;
-  transform: translateX(-50%);
-  display: flex; flex-direction: column; align-items: center; gap: 0.5rem;
-  color: rgba(255,255,255,0.2); font-size: 0.7rem; font-weight: 500;
-  letter-spacing: 1px; text-transform: uppercase;
-  animation: bounce 2s infinite;
-}
-
-.scroll-hint svg { opacity: 0.3; }
-
-@keyframes bounce {
-  0%, 100% { transform: translateX(-50%) translateY(0); }
-  50% { transform: translateX(-50%) translateY(6px); }
-}
-
-@keyframes fadeUp {
-  from { opacity: 0; transform: translateY(24px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-/* ── PROBLEM ── */
-.problem {
-  background: #070F1C;
-  padding: 7rem 2rem;
-  border-top: 1px solid rgba(255,255,255,0.05);
-  border-bottom: 1px solid rgba(255,255,255,0.05);
-}
-
-.problem-inner {
-  max-width: 1100px; margin: 0 auto;
+/* HERO */
+.hero-wrap {
+  position: relative; z-index: 1;
+  max-width: 1280px; margin: 0 auto;
+  min-height: 100vh; padding: 64px 3rem 0;
   display: grid; grid-template-columns: 1fr 1fr;
-  gap: 5rem; align-items: center;
+  gap: 4rem; align-items: center;
 }
 
-.section-label {
-  font-size: 0.68rem; font-weight: 700;
-  letter-spacing: 2px; text-transform: uppercase;
-  color: var(--teal-lt); margin-bottom: 1.2rem;
+.hero-left { padding: 4.5rem 0; }
+
+.eyebrow {
+  font-family: 'DM Mono', monospace; font-size: 0.65rem;
+  font-weight: 500; color: var(--teal-lt);
+  letter-spacing: 1.5px; text-transform: uppercase;
+  display: flex; align-items: center; gap: 0.6rem;
+  margin-bottom: 1.75rem;
+  opacity: 0; animation: fromLeft 0.55s ease 0.1s forwards;
+}
+.eyebrow::before { content: ''; width: 22px; height: 1px; background: var(--teal-lt); }
+
+h1 {
+  font-family: 'Instrument Serif', Georgia, serif;
+  font-size: clamp(2.8rem, 4.5vw, 4.2rem);
+  font-weight: 400; line-height: 1.08; letter-spacing: -1.5px;
+  margin-bottom: 1.6rem;
+  opacity: 0; animation: fromLeft 0.6s ease 0.25s forwards;
+}
+h1 em { font-style: italic; color: var(--teal-lt); }
+
+.hero-desc {
+  font-size: 0.98rem; font-weight: 300;
+  color: rgba(255,255,255,0.48); line-height: 1.8;
+  max-width: 420px; margin-bottom: 2.25rem;
+  opacity: 0; animation: fromLeft 0.6s ease 0.4s forwards;
 }
 
-.problem h2 {
-  font-family: 'Syne', sans-serif;
-  font-size: clamp(2rem, 4vw, 3rem);
-  font-weight: 800; line-height: 1.1;
-  letter-spacing: -1px; margin-bottom: 1.5rem;
+.hero-btns {
+  display: flex; align-items: center; gap: 1.5rem;
+  opacity: 0; animation: fromLeft 0.6s ease 0.55s forwards;
 }
 
-.problem p {
-  color: rgba(255,255,255,0.55);
-  font-size: 1.05rem; line-height: 1.8;
-  font-weight: 300; margin-bottom: 1.2rem;
+.btn-hero { padding: 0.75rem 1.6rem; font-size: 0.88rem; border-radius: 8px; }
+
+.link-btn {
+  font-size: 0.83rem; font-weight: 500;
+  color: rgba(255,255,255,0.38); text-decoration: none;
+  display: inline-flex; align-items: center; gap: 0.35rem;
+  transition: color 0.15s;
+}
+.link-btn:hover { color: rgba(255,255,255,0.75); }
+.link-btn::after { content: '→'; transition: transform 0.15s; }
+.link-btn:hover::after { transform: translateX(3px); }
+
+.hero-stats {
+  display: flex; align-items: center; gap: 2rem;
+  margin-top: 3.25rem; padding-top: 2.25rem;
+  border-top: 1px solid var(--border);
+  opacity: 0; animation: fromLeft 0.6s ease 0.7s forwards;
 }
 
-.problem-cards {
-  display: flex; flex-direction: column; gap: 1rem;
+.hs { display: flex; flex-direction: column; gap: 0.2rem; }
+.hs-n {
+  font-family: 'Instrument Serif', Georgia, serif;
+  font-size: 1.8rem; line-height: 1; color: var(--white);
+}
+.hs-n em { font-style: normal; color: var(--teal-lt); font-size: 1.15rem; }
+.hs-l { font-size: 0.7rem; color: var(--muted); }
+.hs-sep { width: 1px; height: 30px; background: var(--border); }
+
+/* SLIDESHOW */
+.hero-right {
+  opacity: 0; animation: fadeUp 0.8s ease 0.6s forwards;
 }
 
-.problem-card {
+.sf { /* slideshow frame */
   background: rgba(255,255,255,0.03);
-  border: 1px solid rgba(255,255,255,0.07);
-  border-radius: 12px; padding: 1.25rem 1.4rem;
-  display: flex; align-items: flex-start; gap: 1rem;
-  transition: all 0.3s;
+  border: 1px solid rgba(255,255,255,0.09);
+  border-radius: 14px; overflow: hidden;
+  aspect-ratio: 16/10;
+  box-shadow: 0 40px 80px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.04), 0 0 100px rgba(13,110,110,0.07);
 }
 
-.problem-card:hover {
-  background: rgba(255,255,255,0.05);
-  border-color: rgba(78,205,180,0.15);
-  transform: translateX(4px);
+.sf-chrome {
+  height: 34px; background: rgba(255,255,255,0.04);
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+  display: flex; align-items: center; padding: 0 1rem; gap: 0.4rem;
+}
+.cd { width: 9px; height: 9px; border-radius: 50%; }
+.cd:nth-child(1){ background:rgba(255,95,86,0.45); }
+.cd:nth-child(2){ background:rgba(255,189,46,0.45); }
+.cd:nth-child(3){ background:rgba(39,201,63,0.45); }
+.sf-url {
+  margin-left: 0.65rem; height: 18px; flex: 1; max-width: 220px;
+  background: rgba(255,255,255,0.05); border-radius: 3px;
+  display: flex; align-items: center; padding: 0 0.5rem;
+  font-family: 'DM Mono', monospace; font-size: 0.6rem; color: rgba(255,255,255,0.22);
 }
 
-.pc-icon {
-  font-size: 1.4rem; flex-shrink: 0;
-  width: 42px; height: 42px;
-  background: rgba(13,110,110,0.15);
-  border-radius: 10px; display: flex;
-  align-items: center; justify-content: center;
-}
+.sf-body { position: relative; height: calc(100% - 34px); overflow: hidden; }
 
-.pc-text strong {
-  display: block; font-family: 'Syne', sans-serif;
-  font-size: 0.9rem; font-weight: 700;
-  margin-bottom: 0.3rem; color: var(--white);
+.slide {
+  position: absolute; inset: 0; padding: 1.25rem;
+  background: var(--navy-dk); opacity: 0;
+  transition: opacity 0.55s ease; display: flex; flex-direction: column;
 }
+.slide.active { opacity: 1; }
 
-.pc-text span {
-  font-size: 0.82rem; color: rgba(255,255,255,0.45);
-  line-height: 1.6;
-}
-
-/* ── FEATURES ── */
-.features {
-  padding: 7rem 2rem;
-  background: var(--navy);
-}
-
-.features-inner {
-  max-width: 1100px; margin: 0 auto;
-}
-
-.section-header {
-  text-align: center; margin-bottom: 4rem;
-}
-
-.section-header h2 {
-  font-family: 'Syne', sans-serif;
-  font-size: clamp(2rem, 4vw, 2.8rem);
-  font-weight: 800; letter-spacing: -1px;
+.sl-top {
+  display: flex; justify-content: space-between; align-items: center;
   margin-bottom: 1rem;
 }
-
-.section-header p {
-  color: rgba(255,255,255,0.45);
-  font-size: 1rem; font-weight: 300;
-  max-width: 500px; margin: 0 auto; line-height: 1.7;
+.sl-title { font-size: 0.75rem; font-weight: 600; color: rgba(255,255,255,0.65); }
+.sl-badge {
+  font-size: 0.6rem; font-weight: 600; padding: 0.18rem 0.5rem;
+  border-radius: 100px; background: rgba(61,191,176,0.1);
+  color: var(--teal-lt); border: 1px solid rgba(61,191,176,0.18);
 }
 
-.features-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 1.25rem;
+.sl-cards {
+  display: grid; grid-template-columns: repeat(3,1fr); gap: 0.6rem;
+  margin-bottom: 1rem;
+}
+.slc {
+  background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 7px; padding: 0.65rem 0.7rem;
+}
+.slc-l { font-size: 0.55rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 0.3rem; }
+.slc-n { font-family: 'Instrument Serif', serif; font-size: 1.2rem; color: var(--white); line-height: 1; }
+.slc-s { font-size: 0.55rem; color: var(--teal-lt); margin-top: 0.15rem; }
+
+.sl-rows { display: flex; flex-direction: column; gap: 0.35rem; flex: 1; }
+.slr {
+  display: flex; align-items: center; gap: 0.6rem;
+  padding: 0.42rem 0.65rem;
+  background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05); border-radius: 5px;
+}
+.slr-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+.slr-name { font-size: 0.67rem; font-weight: 500; color: rgba(255,255,255,0.7); flex: 1; }
+.slr-val  { font-size: 0.6rem; color: var(--muted); font-family: 'DM Mono', monospace; }
+.tag {
+  font-size: 0.55rem; font-weight: 600; padding: 0.12rem 0.45rem;
+  border-radius: 100px;
+}
+.t-ok   { background:rgba(16,185,129,0.1); color:#6ee7b7; border:1px solid rgba(16,185,129,0.15); }
+.t-warn { background:rgba(245,158,11,0.1); color:#fcd34d; border:1px solid rgba(245,158,11,0.15); }
+.t-info { background:rgba(99,102,241,0.1); color:#c7d2fe; border:1px solid rgba(99,102,241,0.15); }
+.t-danger{ background:rgba(239,68,68,0.1); color:#fca5a5; border:1px solid rgba(239,68,68,0.15); }
+
+.sf-footer {
+  margin-top: 1.25rem;
+  display: flex; align-items: center; justify-content: space-between;
+}
+.sf-dots { display: flex; gap: 0.35rem; }
+.sd {
+  width: 5px; height: 5px; border-radius: 50%;
+  background: rgba(255,255,255,0.15); border: none; cursor: pointer;
+  transition: all 0.2s; padding: 0;
+}
+.sd.active { width: 16px; border-radius: 3px; background: var(--teal-lt); }
+.sf-lbl {
+  font-family: 'DM Mono', monospace; font-size: 0.65rem;
+  color: rgba(255,255,255,0.18);
 }
 
-.feature-card {
-  background: rgba(255,255,255,0.03);
-  border: 1px solid rgba(255,255,255,0.07);
-  border-radius: 14px; padding: 1.75rem;
-  transition: all 0.3s; position: relative;
-  overflow: hidden;
+/* TRUST BAR */
+.trust {
+  position: relative; z-index: 1;
+  background: var(--navy-dk);
+  border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);
+}
+.trust-in {
+  max-width: 1280px; margin: 0 auto;
+  padding: 1.75rem 3rem;
+  display: flex; align-items: center; gap: 2.5rem; flex-wrap: wrap;
+}
+.trust-label {
+  font-size: 0.65rem; font-weight: 600; letter-spacing: 1px;
+  text-transform: uppercase; color: rgba(255,255,255,0.18); white-space: nowrap;
+}
+.trust-items { display: flex; gap: 2rem; flex-wrap: wrap; }
+.trust-item { font-size: 0.78rem; color: rgba(255,255,255,0.18); }
+
+/* SHARED SECTION STYLES */
+section { position: relative; z-index: 1; }
+
+.section-in { max-width: 1280px; margin: 0 auto; }
+
+.sec-ey {
+  font-family: 'DM Mono', monospace; font-size: 0.65rem;
+  font-weight: 500; color: var(--teal-lt);
+  letter-spacing: 1.5px; text-transform: uppercase;
+  display: flex; align-items: center; gap: 0.6rem; margin-bottom: 1.5rem;
+}
+.sec-ey::before { content: ''; width: 22px; height: 1px; background: var(--teal-lt); }
+
+h2 {
+  font-family: 'Instrument Serif', Georgia, serif;
+  font-size: clamp(1.8rem, 3vw, 2.7rem);
+  font-weight: 400; line-height: 1.12; letter-spacing: -0.8px;
+}
+h2 em { font-style: italic; color: var(--teal-lt); }
+
+/* PROBLEM */
+.problem { padding: 7rem 3rem; background: var(--navy-dk); border-bottom: 1px solid var(--border); }
+.problem .section-in { display: grid; grid-template-columns: 5fr 7fr; gap: 6rem; align-items: start; }
+
+.prob-body p {
+  font-size: 0.93rem; font-weight: 300;
+  color: rgba(255,255,255,0.45); line-height: 1.85; margin-bottom: 1rem;
+}
+.prob-body p strong { color: rgba(255,255,255,0.75); font-weight: 500; }
+
+.pc-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.7rem; margin-top: 2rem; }
+
+.pc {
+  padding: 1.2rem; border-radius: 10px;
+  border: 1px solid var(--border); background: rgba(255,255,255,0.02);
+  transition: all 0.2s;
+}
+.pc:hover { border-color: rgba(61,191,176,0.18); background: rgba(255,255,255,0.04); }
+.pc-top { display: flex; align-items: center; gap: 0.55rem; margin-bottom: 0.5rem; }
+.pc-icon { font-size: 0.95rem; }
+.pc-ttl { font-size: 0.8rem; font-weight: 600; color: rgba(255,255,255,0.7); }
+.pc-txt { font-size: 0.76rem; color: rgba(255,255,255,0.32); line-height: 1.65; font-weight: 300; }
+
+/* FEATURES */
+.features { padding: 7rem 3rem; border-bottom: 1px solid var(--border); }
+
+.feat-hdr {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 4rem;
+  align-items: end; margin-bottom: 3.5rem;
+}
+.feat-hdr p { font-size: 0.9rem; font-weight: 300; color: rgba(255,255,255,0.38); line-height: 1.8; }
+
+.feat-grid {
+  display: grid; grid-template-columns: repeat(3,1fr);
+  border: 1px solid var(--border); border-radius: 12px; overflow: hidden;
 }
 
-.feature-card::before {
-  content: '';
-  position: absolute; top: 0; left: 0; right: 0;
-  height: 2px;
-  background: linear-gradient(90deg, transparent, var(--teal), transparent);
-  opacity: 0; transition: opacity 0.3s;
+.fc {
+  padding: 1.75rem; background: rgba(255,255,255,0.02);
+  border-right: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+  transition: background 0.2s;
+}
+.fc:hover { background: rgba(255,255,255,0.04); }
+.fc:nth-child(3n) { border-right: none; }
+.fc:nth-last-child(-n+3) { border-bottom: none; }
+
+.fc-num { font-family: 'DM Mono', monospace; font-size: 0.6rem; color: rgba(255,255,255,0.13); margin-bottom: 1.1rem; letter-spacing: 1px; }
+.fc-ic  { font-size: 1.2rem; margin-bottom: 0.9rem; }
+.fc h3  { font-size: 0.88rem; font-weight: 600; color: rgba(255,255,255,0.82); margin-bottom: 0.55rem; letter-spacing: -0.2px; }
+.fc p   { font-size: 0.78rem; font-weight: 300; color: rgba(255,255,255,0.36); line-height: 1.7; }
+.fc-tag {
+  display: inline-flex; margin-top: 0.9rem;
+  font-family: 'DM Mono', monospace; font-size: 0.58rem; letter-spacing: 0.5px;
+  color: var(--teal-lt); background: rgba(61,191,176,0.07);
+  border: 1px solid rgba(61,191,176,0.14); padding: 0.18rem 0.5rem; border-radius: 4px;
 }
 
-.feature-card:hover {
-  background: rgba(255,255,255,0.05);
-  border-color: rgba(78,205,180,0.2);
-  transform: translateY(-4px);
-  box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+/* PRICING */
+.pricing { padding: 7rem 3rem; background: var(--navy-dk); border-bottom: 1px solid var(--border); }
+
+.price-hdr { display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; align-items: end; margin-bottom: 3.5rem; }
+.price-hdr p { font-size: 0.9rem; font-weight: 300; color: rgba(255,255,255,0.38); line-height: 1.8; }
+
+.price-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 1rem; }
+
+.pcard {
+  border: 1px solid var(--border); border-radius: 12px;
+  padding: 1.85rem; background: rgba(255,255,255,0.02);
+  display: flex; flex-direction: column; position: relative;
+  transition: all 0.2s;
 }
+.pcard:hover { border-color: rgba(255,255,255,0.14); }
+.pcard.feat { border-color: rgba(61,191,176,0.28); background: rgba(13,110,110,0.07); }
+.pcard.feat:hover { border-color: rgba(61,191,176,0.4); }
 
-.feature-card:hover::before { opacity: 1; }
-
-.fc-icon {
-  font-size: 1.6rem; margin-bottom: 1.2rem;
-  width: 48px; height: 48px;
-  background: rgba(13,110,110,0.15);
-  border-radius: 12px; display: flex;
-  align-items: center; justify-content: center;
-}
-
-.feature-card h3 {
-  font-family: 'Syne', sans-serif;
-  font-size: 1rem; font-weight: 700;
-  margin-bottom: 0.6rem; color: var(--white);
-}
-
-.feature-card p {
-  font-size: 0.85rem; color: rgba(255,255,255,0.45);
-  line-height: 1.7; font-weight: 300;
-}
-
-.feature-tag {
-  display: inline-block; margin-top: 1rem;
-  font-size: 0.68rem; font-weight: 700;
-  letter-spacing: 0.5px; text-transform: uppercase;
-  color: var(--teal-lt);
-  background: rgba(78,205,180,0.08);
-  border-radius: 100px; padding: 0.2rem 0.6rem;
-}
-
-/* ── PRICING ── */
-.pricing {
-  padding: 7rem 2rem;
-  background: #070F1C;
-  border-top: 1px solid rgba(255,255,255,0.05);
-}
-
-.pricing-inner { max-width: 900px; margin: 0 auto; }
-
-.pricing-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 1.25rem; margin-top: 3rem;
-}
-
-.pricing-card {
-  background: rgba(255,255,255,0.03);
-  border: 1px solid rgba(255,255,255,0.08);
-  border-radius: 14px; padding: 2rem;
-  transition: all 0.3s; position: relative;
-}
-
-.pricing-card.featured {
-  background: rgba(13,110,110,0.12);
-  border-color: rgba(78,205,180,0.3);
-}
-
-.pricing-card.featured::after {
-  content: 'Most Popular';
-  position: absolute; top: -12px; left: 50%; transform: translateX(-50%);
+.pc-pill {
+  position: absolute; top: -11px; left: 1.5rem;
+  font-family: 'DM Mono', monospace; font-size: 0.58rem;
+  letter-spacing: 0.8px; text-transform: uppercase;
   background: var(--teal); color: white;
-  font-size: 0.68rem; font-weight: 700;
-  letter-spacing: 0.5px; text-transform: uppercase;
-  padding: 0.25rem 0.85rem; border-radius: 100px;
-  font-family: 'Syne', sans-serif;
+  padding: 0.18rem 0.6rem; border-radius: 100px;
 }
 
-.pricing-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+.p-tier { font-family: 'DM Mono', monospace; font-size: 0.63rem; letter-spacing: 1.5px; text-transform: uppercase; color: var(--muted); margin-bottom: 1.2rem; }
+.p-amt  { font-family: 'Instrument Serif', serif; font-size: 2.3rem; line-height: 1; color: var(--white); margin-bottom: 0.2rem; }
+.p-amt span { font-family: 'DM Sans', sans-serif; font-size: 0.82rem; color: var(--muted); font-weight: 400; }
+.p-per  { font-size: 0.73rem; color: var(--muted); margin-bottom: 1.6rem; font-weight: 300; }
+.p-div  { height: 1px; background: var(--border); margin-bottom: 1.4rem; }
+
+.p-feats { list-style: none; display: flex; flex-direction: column; gap: 0.55rem; flex: 1; }
+.p-feats li { font-size: 0.78rem; color: rgba(255,255,255,0.48); display: flex; align-items: flex-start; gap: 0.45rem; font-weight: 300; line-height: 1.4; }
+.p-feats li::before { content: '✓'; color: var(--teal-lt); font-weight: 600; flex-shrink: 0; font-size: 0.72rem; margin-top: 0.05rem; }
+
+.p-cta {
+  margin-top: 1.6rem; display: block; text-align: center;
+  text-decoration: none; padding: 0.68rem 1rem; border-radius: 7px;
+  font-size: 0.8rem; font-weight: 600; transition: all 0.15s;
+}
+.p-outline { border: 1px solid rgba(255,255,255,0.1); color: rgba(255,255,255,0.45); background: transparent; }
+.p-outline:hover { border-color: rgba(255,255,255,0.22); color: var(--white); }
+.p-filled { background: var(--teal); color: white; border: 1px solid transparent; }
+.p-filled:hover { background: #0e8080; }
+
+.p-note { margin-top: 2.25rem; padding-top: 1.75rem; border-top: 1px solid var(--border); font-size: 0.76rem; color: rgba(255,255,255,0.22); line-height: 1.7; }
+.p-note a { color: var(--teal-lt); text-decoration: none; }
+
+/* TESTIMONIALS */
+.testimonials { padding: 7rem 3rem; border-bottom: 1px solid var(--border); }
+
+.t-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 1rem; margin-top: 3rem; }
+
+.tc {
+  padding: 1.65rem; border: 1px solid var(--border); border-radius: 10px;
+  background: rgba(255,255,255,0.02); transition: all 0.2s;
+}
+.tc:hover { border-color: rgba(255,255,255,0.1); background: rgba(255,255,255,0.04); }
+
+.tc-q {
+  font-family: 'Instrument Serif', Georgia, serif;
+  font-size: 0.96rem; font-style: italic;
+  color: rgba(255,255,255,0.58); line-height: 1.75; margin-bottom: 1.4rem;
 }
 
-.pricing-card h3 {
-  font-family: 'Syne', sans-serif;
-  font-size: 0.85rem; font-weight: 700;
-  text-transform: uppercase; letter-spacing: 1px;
-  color: var(--muted); margin-bottom: 1rem;
+.tc-src { display: flex; align-items: center; gap: 0.7rem; padding-top: 1rem; border-top: 1px solid var(--border); }
+.tc-av {
+  width: 32px; height: 32px; border-radius: 50%;
+  background: rgba(13,110,110,0.18);
+  border: 1px solid rgba(61,191,176,0.14);
+  display: flex; align-items: center; justify-content: center; font-size: 0.8rem; flex-shrink: 0;
+}
+.tc-nm { font-size: 0.78rem; font-weight: 600; color: rgba(255,255,255,0.65); }
+.tc-rl { font-size: 0.7rem; color: var(--muted); margin-top: 0.1rem; }
+
+/* ABOUT */
+.about { padding: 7rem 3rem; background: var(--navy-dk); border-bottom: 1px solid var(--border); }
+.about .section-in { display: grid; grid-template-columns: 5fr 7fr; gap: 6rem; align-items: start; }
+
+.about-r p { font-size: 0.93rem; font-weight: 300; color: rgba(255,255,255,0.43); line-height: 1.88; margin-bottom: 1.1rem; }
+.about-r p strong { color: rgba(255,255,255,0.72); font-weight: 500; }
+
+.founder {
+  margin-top: 2.25rem; padding: 1.2rem;
+  border: 1px solid var(--border); border-radius: 10px;
+  background: rgba(255,255,255,0.02);
+  display: flex; align-items: center; gap: 1rem;
+}
+.founder-av {
+  width: 42px; height: 42px; border-radius: 50%; flex-shrink: 0;
+  background: linear-gradient(135deg, var(--teal), rgba(11,31,58,0.6));
+  border: 1px solid rgba(61,191,176,0.2);
+  display: flex; align-items: center; justify-content: center; font-size: 1.1rem;
+}
+.founder-nm { font-size: 0.85rem; font-weight: 600; color: rgba(255,255,255,0.78); }
+.founder-rl { font-size: 0.73rem; color: var(--muted); margin-top: 0.15rem; }
+
+/* JOIN */
+.join-sec { padding: 7rem 3rem; }
+.join-sec .section-in { display: grid; grid-template-columns: 5fr 7fr; gap: 6rem; align-items: start; }
+
+.join-l h2 { margin-bottom: 1rem; }
+.join-l p { font-size: 0.9rem; font-weight: 300; color: rgba(255,255,255,0.38); line-height: 1.8; }
+
+.jform {
+  background: rgba(255,255,255,0.02);
+  border: 1px solid var(--border); border-radius: 12px; padding: 1.85rem;
 }
 
-.pricing-amount {
-  font-family: 'Syne', sans-serif;
-  font-size: 2.2rem; font-weight: 800;
-  color: var(--white); line-height: 1;
-  margin-bottom: 0.3rem;
+.jtabs { display: flex; border: 1px solid var(--border); border-radius: 7px; overflow: hidden; margin-bottom: 1.6rem; }
+.jtab {
+  flex: 1; padding: 0.58rem; text-align: center; cursor: pointer;
+  font-size: 0.78rem; font-weight: 600; background: transparent; border: none;
+  color: rgba(255,255,255,0.28); transition: all 0.15s; font-family: 'DM Sans', sans-serif;
 }
+.jtab.active { background: var(--teal); color: white; }
 
-.pricing-amount sub {
-  font-size: 0.9rem; font-weight: 500;
-  color: var(--muted); vertical-align: baseline;
+.jpanel { display: none; flex-direction: column; gap: 0.7rem; }
+.jpanel.active { display: flex; }
+
+.ji {
+  background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 7px; padding: 0.68rem 0.9rem;
+  font-size: 0.84rem; color: var(--white); font-family: 'DM Sans', sans-serif;
+  outline: none; transition: border-color 0.15s; width: 100%;
 }
+.ji::placeholder { color: rgba(255,255,255,0.2); }
+.ji:focus { border-color: rgba(61,191,176,0.4); }
 
-.pricing-period {
-  font-size: 0.78rem; color: var(--muted);
-  margin-bottom: 1.5rem;
+.ji-row { display: flex; gap: 0.7rem; }
+.ji-row .ji { flex: 1; }
+
+select.ji {
+  cursor: pointer; appearance: none;
+  background-color: rgba(255,255,255,0.04);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24' fill='none' stroke='%238A929E' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  background-repeat: no-repeat; background-position: right 0.9rem center; padding-right: 2rem;
 }
+select.ji option { background: var(--navy-dk); }
 
-.pricing-features {
-  list-style: none; display: flex;
-  flex-direction: column; gap: 0.65rem;
-  margin-bottom: 1.75rem;
+.jsub {
+  width: 100%; padding: 0.75rem; background: var(--teal); color: white;
+  border: none; border-radius: 7px; cursor: pointer;
+  font-family: 'DM Sans', sans-serif; font-size: 0.83rem; font-weight: 600;
+  transition: background 0.15s; margin-top: 0.15rem;
 }
+.jsub:hover { background: #0e8080; }
 
-.pricing-features li {
-  font-size: 0.83rem; color: rgba(255,255,255,0.6);
-  display: flex; align-items: flex-start; gap: 0.5rem;
-  line-height: 1.5;
-}
+.jmsg { font-size: 0.76rem; padding: 0.55rem 0.8rem; border-radius: 6px; display: none; }
+.jmsg.ok  { background: rgba(16,185,129,0.1); color: #6ee7b7; border: 1px solid rgba(16,185,129,0.2); }
+.jmsg.err { background: rgba(220,38,38,0.08); color: #fca5a5; border: 1px solid rgba(220,38,38,0.15); }
 
-.pricing-features li::before {
-  content: '✓';
-  color: var(--teal-lt); font-weight: 700;
-  flex-shrink: 0; margin-top: 0.05rem;
-}
+.jfootnote { font-size: 0.7rem; color: rgba(255,255,255,0.2); text-align: center; margin-top: 0.6rem; }
+.jfootnote a { color: var(--teal-lt); text-decoration: none; }
 
-.pricing-note {
-  text-align: center; margin-top: 2.5rem;
-  font-size: 0.83rem; color: rgba(255,255,255,0.3);
-  line-height: 1.7;
-}
-
-.pricing-note strong { color: var(--teal-lt); }
-
-/* ── TESTIMONIALS ── */
-.testimonials {
-  padding: 7rem 2rem;
-  background: var(--navy);
-}
-
-.testimonials-inner {
-  max-width: 1100px; margin: 0 auto;
-}
-
-.testimonials-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 1.25rem; margin-top: 3rem;
-}
-
-.testimonial-card {
-  background: rgba(255,255,255,0.03);
-  border: 1px solid rgba(255,255,255,0.07);
-  border-radius: 14px; padding: 1.75rem;
-  transition: all 0.3s;
-}
-
-.testimonial-card:hover {
-  background: rgba(255,255,255,0.05);
-  border-color: rgba(78,205,180,0.15);
-  transform: translateY(-3px);
-}
-
-.testimonial-quote {
-  font-size: 0.92rem; color: rgba(255,255,255,0.65);
-  line-height: 1.8; font-weight: 300;
-  font-style: italic; margin-bottom: 1.5rem;
-}
-
-.testimonial-quote::before {
-  content: '"';
-  font-family: 'Syne', sans-serif;
-  font-size: 2.5rem; color: var(--teal);
-  line-height: 0; vertical-align: -0.7rem;
-  margin-right: 0.15rem;
-}
-
-.testimonial-author {
-  display: flex; align-items: center; gap: 0.75rem;
-}
-
-.author-avatar {
-  width: 38px; height: 38px; border-radius: 50%;
-  background: rgba(13,110,110,0.2);
-  border: 1px solid rgba(78,205,180,0.2);
-  display: flex; align-items: center; justify-content: center;
-  font-size: 1rem; flex-shrink: 0;
-}
-
-.author-name {
-  font-family: 'Syne', sans-serif;
-  font-size: 0.85rem; font-weight: 700;
-  color: var(--white);
-}
-
-.author-role {
-  font-size: 0.75rem; color: var(--muted);
-}
-
-/* ── ABOUT ── */
-.about {
-  padding: 7rem 2rem;
-  background: #070F1C;
-  border-top: 1px solid rgba(255,255,255,0.05);
-}
-
-.about-inner {
-  max-width: 780px; margin: 0 auto; text-align: center;
-}
-
-.about h2 {
-  font-family: 'Syne', sans-serif;
-  font-size: clamp(1.8rem, 3.5vw, 2.5rem);
-  font-weight: 800; letter-spacing: -1px;
-  margin-bottom: 1.5rem; line-height: 1.15;
-}
-
-.about p {
-  color: rgba(255,255,255,0.5);
-  font-size: 1rem; line-height: 1.9;
-  font-weight: 300; margin-bottom: 1.2rem;
-}
-
-.about p strong {
-  color: var(--white); font-weight: 500;
-}
-
-.founder-block {
-  margin-top: 3rem; padding-top: 2.5rem;
-  border-top: 1px solid rgba(255,255,255,0.07);
-  display: flex; align-items: center; gap: 1.5rem;
-  text-align: left;
-}
-
-.founder-avatar {
-  width: 60px; height: 60px; border-radius: 50%;
-  background: linear-gradient(135deg, var(--teal), var(--navy));
-  border: 2px solid rgba(78,205,180,0.3);
-  display: flex; align-items: center; justify-content: center;
-  font-size: 1.5rem; flex-shrink: 0;
-}
-
-.founder-name {
-  font-family: 'Syne', sans-serif;
-  font-size: 1rem; font-weight: 700; color: var(--white);
-}
-
-.founder-title {
-  font-size: 0.82rem; color: var(--muted);
-  margin-top: 0.2rem; line-height: 1.5;
-}
-
-/* ── CTA / WAITLIST ── */
-.cta-section {
-  padding: 8rem 2rem;
-  background: var(--navy);
-  position: relative; overflow: hidden;
-}
-
-.cta-section::before {
-  content: '';
-  position: absolute; top: 50%; left: 50%;
-  transform: translate(-50%, -50%);
-  width: 800px; height: 600px;
-  background: radial-gradient(ellipse, rgba(13,110,110,0.12) 0%, transparent 70%);
-  pointer-events: none;
-}
-
-.cta-inner {
-  max-width: 640px; margin: 0 auto;
-  text-align: center; position: relative; z-index: 1;
-}
-
-.cta-inner h2 {
-  font-family: 'Syne', sans-serif;
-  font-size: clamp(2rem, 4vw, 3rem);
-  font-weight: 800; letter-spacing: -1px;
-  margin-bottom: 1rem; line-height: 1.1;
-}
-
-.cta-inner p {
-  color: rgba(255,255,255,0.45);
-  font-size: 1rem; line-height: 1.7;
-  font-weight: 300; margin-bottom: 2.5rem;
-}
-
-/* Tabs */
-.cta-tabs {
-  display: flex; background: rgba(255,255,255,0.05);
-  border-radius: 10px; padding: 0.3rem; gap: 0.25rem;
-  margin-bottom: 2rem;
-}
-
-.cta-tab {
-  flex: 1; padding: 0.6rem;
-  text-align: center; cursor: pointer;
-  font-size: 0.85rem; font-weight: 700;
-  background: transparent; border: none;
-  color: rgba(255,255,255,0.4); border-radius: 7px;
-  transition: all 0.2s; font-family: 'Syne', sans-serif;
-}
-
-.cta-tab.active {
-  background: var(--teal); color: white;
-}
-
-/* Waitlist form */
-.waitlist-form {
-  display: flex; flex-direction: column; gap: 0.85rem;
-}
-
-.wf-row { display: flex; gap: 0.75rem; }
-
-.wf-input {
-  flex: 1; background: rgba(255,255,255,0.06);
-  border: 1px solid rgba(255,255,255,0.1);
-  border-radius: 10px; padding: 0.85rem 1.1rem;
-  font-size: 0.9rem; color: var(--white);
-  font-family: 'DM Sans', sans-serif;
-  outline: none; transition: border-color 0.2s;
-}
-
-.wf-input::placeholder { color: rgba(255,255,255,0.25); }
-.wf-input:focus { border-color: var(--teal); }
-
-.wf-select {
-  background: rgba(255,255,255,0.06);
-  border: 1px solid rgba(255,255,255,0.1);
-  border-radius: 10px; padding: 0.85rem 1.1rem;
-  font-size: 0.9rem; color: var(--white);
-  font-family: 'DM Sans', sans-serif;
-  outline: none; cursor: pointer;
-  transition: border-color 0.2s;
-  appearance: none;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%239AA3AE' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
-  background-repeat: no-repeat;
-  background-position: right 1rem center;
-  padding-right: 2.5rem;
-}
-
-.wf-select:focus { border-color: var(--teal); }
-.wf-select option { background: var(--navy); }
-
-.form-msg {
-  padding: 0.75rem 1rem; border-radius: 8px;
-  font-size: 0.83rem; display: none;
-}
-
-.form-msg.ok {
-  background: rgba(16,185,129,0.1);
-  border: 1px solid rgba(16,185,129,0.2);
-  color: #6ee7b7;
-}
-
-.form-msg.err {
-  background: rgba(220,38,38,0.1);
-  border: 1px solid rgba(220,38,38,0.2);
-  color: #fca5a5;
-}
-
-/* Signup form (direct) */
-.signup-form { display: none; flex-direction: column; gap: 0.85rem; }
-.signup-form.active { display: flex; }
-.waitlist-form.active { display: flex; }
-.waitlist-form { display: none; }
-
-/* ── FOOTER ── */
+/* FOOTER */
 footer {
-  padding: 3rem 3rem 2.5rem;
-  border-top: 1px solid rgba(255,255,255,0.06);
-  display: flex; align-items: center;
-  justify-content: space-between; flex-wrap: wrap; gap: 1.5rem;
+  position: relative; z-index: 1;
+  padding: 2.25rem 3rem;
+  border-top: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1.5rem;
+}
+.footer-l { display: flex; align-items: center; gap: 2.5rem; }
+.flogo { font-family: 'DM Sans', sans-serif; font-weight: 600; font-size: 1rem; color: rgba(255,255,255,0.45); text-decoration: none; display: flex; align-items: center; gap: 0.4rem; }
+.flogo .logo-dot { width: 6px; height: 6px; }
+.flinks { display: flex; gap: 1.75rem; list-style: none; }
+.flinks a { font-size: 0.76rem; color: rgba(255,255,255,0.22); text-decoration: none; transition: color 0.15s; }
+.flinks a:hover { color: rgba(255,255,255,0.55); }
+.fcopy { font-size: 0.7rem; color: rgba(255,255,255,0.15); }
+
+/* REVEAL */
+.reveal { opacity: 0; transform: translateY(18px); transition: opacity 0.6s ease, transform 0.6s ease; }
+.reveal.visible { opacity: 1; transform: translateY(0); }
+.rd1{transition-delay:.1s} .rd2{transition-delay:.2s} .rd3{transition-delay:.3s}
+.rd4{transition-delay:.4s} .rd5{transition-delay:.5s}
+
+@keyframes fromLeft { from{opacity:0;transform:translateX(-14px)} to{opacity:1;transform:translateX(0)} }
+@keyframes fadeUp   { from{opacity:0;transform:translateY(16px)}   to{opacity:1;transform:translateY(0)} }
+
+/* RESPONSIVE */
+@media(max-width:1024px){
+  nav{padding:0 1.5rem}
+  .nav-mid{display:none}
+  .hero-wrap{grid-template-columns:1fr;padding:5rem 2rem 3rem;min-height:auto;gap:3rem}
+  .hero-right{max-width:560px}
+  .problem .section-in,.about .section-in,.join-sec .section-in{grid-template-columns:1fr;gap:3rem}
+  .feat-hdr,.price-hdr{grid-template-columns:1fr;gap:1.5rem}
+  .feat-grid{grid-template-columns:1fr 1fr}
+  .fc:nth-child(3n){border-right:1px solid var(--border)}
+  .fc:nth-child(2n){border-right:none}
+  .problem,.features,.pricing,.testimonials,.about,.join-sec{padding:5rem 2rem}
+  .trust-in{padding:1.5rem 2rem}
 }
 
-.footer-logo {
-  font-family: 'Syne', sans-serif;
-  font-size: 1.1rem; font-weight: 800;
-  color: var(--white); text-decoration: none;
-}
-
-.footer-logo span { color: var(--teal-lt); }
-
-.footer-links {
-  display: flex; gap: 2rem; list-style: none;
-}
-
-.footer-links a {
-  font-size: 0.8rem; color: rgba(255,255,255,0.35);
-  text-decoration: none; transition: color 0.2s;
-}
-
-.footer-links a:hover { color: rgba(255,255,255,0.7); }
-
-.footer-copy {
-  font-size: 0.78rem; color: rgba(255,255,255,0.2);
-}
-
-/* ── SCROLL REVEAL ── */
-.reveal {
-  opacity: 0; transform: translateY(32px);
-  transition: opacity 0.7s ease, transform 0.7s ease;
-}
-
-.reveal.visible {
-  opacity: 1; transform: translateY(0);
-}
-
-.reveal-delay-1 { transition-delay: 0.1s; }
-.reveal-delay-2 { transition-delay: 0.2s; }
-.reveal-delay-3 { transition-delay: 0.3s; }
-.reveal-delay-4 { transition-delay: 0.4s; }
-.reveal-delay-5 { transition-delay: 0.5s; }
-
-/* ── RESPONSIVE ── */
-@media (max-width: 900px) {
-  nav { padding: 1rem 1.5rem; }
-  .nav-links { display: none; }
-  .problem-inner { grid-template-columns: 1fr; gap: 3rem; }
-  .features-grid { grid-template-columns: 1fr 1fr; }
-  .pricing-grid { grid-template-columns: 1fr; max-width: 400px; margin: 3rem auto 0; }
-  .testimonials-grid { grid-template-columns: 1fr; max-width: 480px; margin: 3rem auto 0; }
-  footer { flex-direction: column; text-align: center; padding: 2rem 1.5rem; }
-  .footer-links { flex-wrap: wrap; justify-content: center; }
-}
-
-@media (max-width: 640px) {
-  nav { padding: 1rem; }
-  .hero { padding: 7rem 1.25rem 5rem; }
-  .features-grid { grid-template-columns: 1fr; }
-  .wf-row { flex-direction: column; }
-  .hero-proof { gap: 1.25rem; }
-  .proof-divider { display: none; }
-  .about-inner, .cta-inner { padding: 0 0.5rem; }
-  .founder-block { flex-direction: column; text-align: center; }
+@media(max-width:640px){
+  h1{font-size:2.5rem;letter-spacing:-1px}
+  .price-grid,.t-grid{grid-template-columns:1fr}
+  .feat-grid{grid-template-columns:1fr}
+  .fc:nth-child(n){border-right:none}
+  footer{flex-direction:column;align-items:flex-start;padding:2rem 1.5rem}
+  .footer-l{flex-direction:column;align-items:flex-start;gap:1rem}
+  .ji-row{flex-direction:column}
+  .hero-stats{flex-wrap:wrap;gap:1rem}
+  .hs-sep{display:none}
 }
 </style>
 </head>
 <body>
 
 <!-- NAV -->
-<nav id="main-nav">
-  <a class="nav-logo" href="#">Min<span>za</span></a>
-  <ul class="nav-links">
-    <li><a href="#problem">Problem</a></li>
-    <li><a href="#features">Features</a></li>
-    <li><a href="#pricing">Pricing</a></li>
-    <li><a href="#about">About</a></li>
-  </ul>
-  <div class="nav-cta">
-    <a href="index.html" class="btn btn-ghost">Sign In</a>
+<nav>
+  <a class="logo" href="#"><span class="logo-dot"></span>Minza</a>
+  <div class="nav-mid">
+    <a href="#problem">Problem</a>
+    <a href="#features">Features</a>
+    <a href="#pricing">Pricing</a>
+    <a href="#about">About</a>
+  </div>
+  <div class="nav-right">
+    <a href="app.html" class="btn btn-ghost">Sign In</a>
     <a href="#join" class="btn btn-teal">Get Started</a>
   </div>
 </nav>
 
 <!-- HERO -->
-<section class="hero">
-  <div class="hero-eyebrow">Now live in Kampala</div>
-  <h1>Health Infrastructure for <em>Africa</em></h1>
-  <p class="hero-sub">The connected layer that Epic built for the US, Minza is building for Africa. One platform linking every facility, every record, every patient — continent-wide.</p>
-    <a href="#join" class="btn btn-teal btn-xl">Get Started Free →</a>
-    <a href="#features" class="btn btn-ghost btn-xl">See how it works</a>
-  </div>
-  <div class="hero-proof">
-    <div class="proof-item">
-      <div class="proof-num">4<span>+</span></div>
-      <div class="proof-label">Active facilities</div>
+<section style="position:relative;z-index:1;background:var(--navy);">
+  <div class="hero-wrap">
+    <div class="hero-left">
+      <div class="eyebrow">Now live in Kampala, Uganda</div>
+      <h1>Healthcare<br/><em>infrastructure</em><br/>for Africa.</h1>
+      <p class="hero-desc">The connected layer that Epic built for the US — Minza is building for Africa. Every facility, every record, every patient. Continent-wide.</p>
+      <div class="hero-btns">
+        <a href="#join" class="btn btn-teal btn-hero">Start free trial</a>
+        <a href="#features" class="link-btn">See how it works</a>
+      </div>
+      <div class="hero-stats">
+        <div class="hs"><div class="hs-n">4<em>+</em></div><div class="hs-l">Active facilities</div></div>
+        <div class="hs-sep"></div>
+        <div class="hs"><div class="hs-n">30<em>d</em></div><div class="hs-l">Free trial</div></div>
+        <div class="hs-sep"></div>
+        <div class="hs"><div class="hs-n">5<em>min</em></div><div class="hs-l">Setup time</div></div>
+        <div class="hs-sep"></div>
+        <div class="hs"><div class="hs-n">75<em>k</em></div><div class="hs-l">UGX / month</div></div>
+      </div>
     </div>
-    <div class="proof-divider"></div>
-    <div class="proof-item">
-      <div class="proof-num">30<span>d</span></div>
-      <div class="proof-label">Free trial</div>
+
+    <!-- SLIDESHOW -->
+    <div class="hero-right">
+      <div class="sf">
+        <div class="sf-chrome">
+          <div class="cd"></div><div class="cd"></div><div class="cd"></div>
+          <div class="sf-url">app.minza.health</div>
+        </div>
+        <div class="sf-body">
+
+          <!-- Slide 0: Pharmacy -->
+          <div class="slide active" id="sl-0">
+            <div class="sl-top"><div class="sl-title">Pharmacy Dashboard</div><div class="sl-badge">Pharmacy</div></div>
+            <div class="sl-cards">
+              <div class="slc"><div class="slc-l">Stock Value</div><div class="slc-n">2.4M</div><div class="slc-s">UGX sellable</div></div>
+              <div class="slc"><div class="slc-l">Items</div><div class="slc-n">84</div><div class="slc-s">in inventory</div></div>
+              <div class="slc"><div class="slc-l">Dispensed</div><div class="slc-n">17</div><div class="slc-s">today</div></div>
+            </div>
+            <div class="sl-rows">
+              <div class="slr"><div class="slr-dot" style="background:#6ee7b7"></div><div class="slr-name">Coartem 20/120mg</div><div class="slr-val">Qty: 240</div><div class="tag t-ok">In Stock</div></div>
+              <div class="slr"><div class="slr-dot" style="background:#fcd34d"></div><div class="slr-name">Amoxicillin 250mg</div><div class="slr-val">Qty: 18</div><div class="tag t-warn">Low Stock</div></div>
+              <div class="slr"><div class="slr-dot" style="background:#6ee7b7"></div><div class="slr-name">ORS Sachets</div><div class="slr-val">Qty: 120</div><div class="tag t-ok">In Stock</div></div>
+              <div class="slr"><div class="slr-dot" style="background:#6ee7b7"></div><div class="slr-name">Paracetamol 500mg</div><div class="slr-val">Qty: 450</div><div class="tag t-ok">In Stock</div></div>
+            </div>
+          </div>
+
+          <!-- Slide 1: Reception queue -->
+          <div class="slide" id="sl-1">
+            <div class="sl-top"><div class="sl-title">Patient Queue — Today</div><div class="sl-badge">Reception</div></div>
+            <div class="sl-cards">
+              <div class="slc"><div class="slc-l">Registered</div><div class="slc-n">12</div><div class="slc-s">today</div></div>
+              <div class="slc"><div class="slc-l">Waiting</div><div class="slc-n">4</div><div class="slc-s">in queue</div></div>
+              <div class="slc"><div class="slc-l">Seen</div><div class="slc-n">8</div><div class="slc-s">consultations</div></div>
+            </div>
+            <div class="sl-rows">
+              <div class="slr"><div class="slr-dot" style="background:#fcd34d"></div><div class="slr-name">Grace Nakato</div><div class="slr-val">Fever, 3 days</div><div class="tag t-warn">Waiting</div></div>
+              <div class="slr"><div class="slr-dot" style="background:#fca5a5"></div><div class="slr-name">James Okello</div><div class="slr-val">Chest pain</div><div class="tag t-danger">Urgent</div></div>
+              <div class="slr"><div class="slr-dot" style="background:#6ee7b7"></div><div class="slr-name">Sarah Apio</div><div class="slr-val">Follow-up</div><div class="tag t-ok">Seen</div></div>
+              <div class="slr"><div class="slr-dot" style="background:#c7d2fe"></div><div class="slr-name">David Mugisha</div><div class="slr-val">Malaria test</div><div class="tag t-info">In Consult</div></div>
+            </div>
+          </div>
+
+          <!-- Slide 2: Prescription queue -->
+          <div class="slide" id="sl-2">
+            <div class="sl-top"><div class="sl-title">Prescription Queue</div><div class="sl-badge">Clinic Pharmacy</div></div>
+            <div class="sl-cards">
+              <div class="slc"><div class="slc-l">Pending</div><div class="slc-n">3</div><div class="slc-s">to fill</div></div>
+              <div class="slc"><div class="slc-l">Dispensed</div><div class="slc-n">9</div><div class="slc-s">today</div></div>
+              <div class="slc"><div class="slc-l">Total</div><div class="slc-n">12</div><div class="slc-s">prescriptions</div></div>
+            </div>
+            <div class="sl-rows">
+              <div class="slr"><div class="slr-dot" style="background:#fcd34d"></div><div class="slr-name">Grace Nakato</div><div class="slr-val">Coartem · ORS</div><div class="tag t-warn">Pending</div></div>
+              <div class="slr"><div class="slr-dot" style="background:#fcd34d"></div><div class="slr-name">James Okello</div><div class="slr-val">Amlodipine · Aspirin</div><div class="tag t-warn">Pending</div></div>
+              <div class="slr"><div class="slr-dot" style="background:#6ee7b7"></div><div class="slr-name">Sarah Apio</div><div class="slr-val">Amoxicillin</div><div class="tag t-ok">Dispensed</div></div>
+              <div class="slr"><div class="slr-dot" style="background:#6ee7b7"></div><div class="slr-name">Peter Ssali</div><div class="slr-val">Metformin</div><div class="tag t-ok">Dispensed</div></div>
+            </div>
+          </div>
+
+          <!-- Slide 3: Lab worklist -->
+          <div class="slide" id="sl-3">
+            <div class="sl-top"><div class="sl-title">Lab Worklist</div><div class="sl-badge">Diagnostic Lab</div></div>
+            <div class="sl-cards">
+              <div class="slc"><div class="slc-l">Pending</div><div class="slc-n">5</div><div class="slc-s">tests today</div></div>
+              <div class="slc"><div class="slc-l">Processing</div><div class="slc-n">2</div><div class="slc-s">in progress</div></div>
+              <div class="slc"><div class="slc-l">Ready</div><div class="slc-n">8</div><div class="slc-s">results out</div></div>
+            </div>
+            <div class="sl-rows">
+              <div class="slr"><div class="slr-dot" style="background:#fcd34d"></div><div class="slr-name">Malaria RDT — Grace Nakato</div><div class="slr-val">10:14 AM</div><div class="tag t-warn">Pending</div></div>
+              <div class="slr"><div class="slr-dot" style="background:#c7d2fe"></div><div class="slr-name">FBC — David Mugisha</div><div class="slr-val">10:02 AM</div><div class="tag t-info">Processing</div></div>
+              <div class="slr"><div class="slr-dot" style="background:#6ee7b7"></div><div class="slr-name">Blood Glucose — A. Nantume</div><div class="slr-val">09:45 AM</div><div class="tag t-ok">Result Ready</div></div>
+              <div class="slr"><div class="slr-dot" style="background:#6ee7b7"></div><div class="slr-name">Urinalysis — John Kato</div><div class="slr-val">09:30 AM</div><div class="tag t-ok">Dispatched</div></div>
+            </div>
+          </div>
+
+        </div><!-- /sf-body -->
+      </div><!-- /sf -->
+
+      <div class="sf-footer">
+        <div class="sf-dots" id="sf-dots">
+          <button class="sd active" onclick="goSlide(0)"></button>
+          <button class="sd" onclick="goSlide(1)"></button>
+          <button class="sd" onclick="goSlide(2)"></button>
+          <button class="sd" onclick="goSlide(3)"></button>
+        </div>
+        <div class="sf-lbl" id="sf-lbl">Pharmacy Dashboard · 1/4</div>
+      </div>
     </div>
-    <div class="proof-divider"></div>
-    <div class="proof-item">
-      <div class="proof-num">5<span>min</span></div>
-      <div class="proof-label">To get started</div>
-    </div>
-    <div class="proof-divider"></div>
-    <div class="proof-item">
-      <div class="proof-num">UGX <span style="font-size:1.4rem;">75k</span></div>
-      <div class="proof-label">Starting price/month</div>
-    </div>
-  </div>
-  <div class="scroll-hint">
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
-    Scroll
   </div>
 </section>
 
+<!-- TRUST BAR -->
+<div class="trust">
+  <div class="trust-in">
+    <span class="trust-label">Active in</span>
+    <div class="trust-items">
+      <span class="trust-item">Wandegeya, Kampala</span>
+      <span class="trust-item">Ntinda, Kampala</span>
+      <span class="trust-item">Kireka, Kampala</span>
+      <span class="trust-item">Expanding across Uganda →</span>
+    </div>
+  </div>
+</div>
+
 <!-- PROBLEM -->
 <section class="problem" id="problem">
-  <div class="problem-inner">
+  <div class="section-in">
     <div class="reveal">
-      <div class="section-label">The Problem</div>
-      <h2>African healthcare runs on paper and memory</h2>
-      <p>A patient walks into a clinic in Wandegeya. Their entire medical history is on a worn exercise book — if they remembered to bring it. The doctor writes a prescription by hand. The pharmacy has no idea it's coming. The lab result goes back on paper.</p>
-      <p>This isn't a technology problem. It's an infrastructure problem. The connected layer that makes modern healthcare possible was never built for Africa.</p>
-      <p style="color: rgba(255,255,255,0.7); font-weight:400;">Minza builds it.</p>
+      <div class="sec-ey">The Problem</div>
+      <h2>African healthcare<br/>runs on paper<br/>and <em>memory</em></h2>
     </div>
-    <div class="problem-cards reveal reveal-delay-2">
-      <div class="problem-card">
-        <div class="pc-icon">📋</div>
-        <div class="pc-text">
-          <strong>No patient history continuity</strong>
-          <span>Records live in paper exercise books. Lost books mean lost histories. Facilities have no visibility into a patient's prior care.</span>
-        </div>
-      </div>
-      <div class="problem-card">
-        <div class="pc-icon">💊</div>
-        <div class="pc-text">
-          <strong>Prescriptions die in transit</strong>
-          <span>Doctor writes, patient carries paper to pharmacy. No tracking. No confirmation. No record of what was dispensed.</span>
-        </div>
-      </div>
-      <div class="problem-card">
-        <div class="pc-icon">🏥</div>
-        <div class="pc-text">
-          <strong>Facilities operate in silos</strong>
-          <span>Clinics, labs, pharmacies, and hospitals cannot see each other's work. Every handoff is manual, prone to error, and invisible.</span>
-        </div>
-      </div>
-      <div class="problem-card">
-        <div class="pc-icon">📊</div>
-        <div class="pc-text">
-          <strong>No data for anyone</strong>
-          <span>Governments can't see epidemics forming. Insurers can't verify claims. Facilities can't manage stock intelligently.</span>
-        </div>
+    <div class="prob-body reveal rd2">
+      <p>Walk into any private clinic in Wandegeya. The patient register is an exercise book. Prescriptions are written by hand and carried to a pharmacy that has no idea they're coming. Lab results come back on paper, if they come back at all.</p>
+      <p>This isn't a technology problem. It's an <strong>infrastructure problem</strong>. The connected layer that makes modern healthcare possible — patient records that travel, facilities that see each other's work, data that informs decisions — was never built for Africa.</p>
+      <p>Minza is building it from scratch. Starting with the 3-room clinic in Wandegeya. Scaling to every facility on the continent.</p>
+      <div class="pc-grid">
+        <div class="pc reveal rd2"><div class="pc-top"><div class="pc-icon">📋</div><div class="pc-ttl">No patient history</div></div><div class="pc-txt">Records live in exercise books. Lost books mean lost histories. No continuity across visits or facilities.</div></div>
+        <div class="pc reveal rd3"><div class="pc-top"><div class="pc-icon">💊</div><div class="pc-ttl">Prescriptions lost in transit</div></div><div class="pc-txt">Doctor writes, patient carries paper to pharmacy. No tracking, no confirmation, no record.</div></div>
+        <div class="pc reveal rd4"><div class="pc-top"><div class="pc-icon">🏥</div><div class="pc-ttl">Facilities in silos</div></div><div class="pc-txt">Clinics, labs, and pharmacies cannot see each other's work. Every handoff is manual and invisible.</div></div>
+        <div class="pc reveal rd5"><div class="pc-top"><div class="pc-icon">📊</div><div class="pc-ttl">No data for anyone</div></div><div class="pc-txt">Governments can't see epidemics. Insurers can't verify claims. Facilities can't manage stock smartly.</div></div>
       </div>
     </div>
   </div>
@@ -897,147 +720,103 @@ footer {
 
 <!-- FEATURES -->
 <section class="features" id="features">
-  <div class="features-inner">
-    <div class="section-header reveal">
-      <div class="section-label">What Minza Does</div>
-      <h2>One platform. Every facility type.</h2>
-      <p>Built for the 3-room clinic in Wandegeya, scalable to the full hospital network. Each module works standalone — together, they become something entirely new.</p>
+  <div class="section-in">
+    <div class="feat-hdr">
+      <div class="reveal">
+        <div class="sec-ey">What Minza Does</div>
+        <h2>Start local.<br/><em>Scale continental.</em></h2>
+      </div>
+      <p class="reveal rd2">Each module works standalone today. Connected across facilities tomorrow, they become Africa's health data network — the infrastructure governments, insurers, and hospitals have never had access to.</p>
     </div>
-    <div class="features-grid">
-      <div class="feature-card reveal reveal-delay-1">
-        <div class="fc-icon">🏥</div>
-        <h3>Clinic Management</h3>
-        <p>Patient registration, vitals capture, diagnosis, treatment notes, referrals, and follow-up tracking — all in one workflow. Replaces the exercise book permanently.</p>
-        <span class="feature-tag">Clinic</span>
-      </div>
-      <div class="feature-card reveal reveal-delay-2">
-        <div class="fc-icon">💊</div>
-        <h3>Pharmacy Operations</h3>
-        <p>Drug inventory with expiry tracking, dispensing log, stock valuation, prescription queue, and revenue reporting. Know your stock value at a glance.</p>
-        <span class="feature-tag">Pharmacy</span>
-      </div>
-      <div class="feature-card reveal reveal-delay-3">
-        <div class="fc-icon">🧪</div>
-        <h3>Diagnostic Lab</h3>
-        <p>Test request queue, worklist management, result entry with reference ranges, turnaround time tracking, and automatic status updates.</p>
-        <span class="feature-tag">Lab</span>
-      </div>
-      <div class="feature-card reveal reveal-delay-1">
-        <div class="fc-icon">🔗</div>
-        <h3>Internal Departments</h3>
-        <p>Doctor writes a prescription — pharmacy sees it instantly. Doctor refers to lab — request appears in the worklist. Connected internally before connecting externally.</p>
-        <span class="feature-tag">Coming Soon</span>
-      </div>
-      <div class="feature-card reveal reveal-delay-2">
-        <div class="fc-icon">📈</div>
-        <h3>Analytics & Insights</h3>
-        <p>Drug velocity, condition frequency, revenue trends, stock valuation, and patient flow — the signals that help you run a better facility.</p>
-        <span class="feature-tag">All Facilities</span>
-      </div>
-      <div class="feature-card reveal reveal-delay-3">
-        <div class="fc-icon">🌍</div>
-        <h3>Network Interoperability</h3>
-        <p>When enough facilities are on Minza, patient records travel with the patient. Cross-facility visibility. The infrastructure layer Africa needs.</p>
-        <span class="feature-tag">Roadmap</span>
-      </div>
+    <div class="feat-grid reveal rd2">
+      <div class="fc"><div class="fc-num">01</div><div class="fc-ic">🏥</div><h3>Clinic Management</h3><p>Patient registration, vitals, diagnosis, treatment notes, referrals, and follow-up tracking. Replaces the exercise book permanently.</p><span class="fc-tag">Clinic</span></div>
+      <div class="fc"><div class="fc-num">02</div><div class="fc-ic">💊</div><h3>Pharmacy Operations</h3><p>Drug inventory with expiry tracking, dispensing log, stock valuation, and revenue reporting. Know your stock value at a glance.</p><span class="fc-tag">Pharmacy</span></div>
+      <div class="fc"><div class="fc-num">03</div><div class="fc-ic">🧪</div><h3>Diagnostic Lab</h3><p>Test request queue, worklist, result entry, turnaround time tracking, and automatic status updates back to the doctor.</p><span class="fc-tag">Lab</span></div>
+      <div class="fc"><div class="fc-num">04</div><div class="fc-ic">🔗</div><h3>Internal Departments</h3><p>Doctor writes a prescription — pharmacy sees it instantly. Doctor refers to lab — request appears in the worklist. Connected internally first.</p><span class="fc-tag">In Development</span></div>
+      <div class="fc"><div class="fc-num">05</div><div class="fc-ic">📈</div><h3>Analytics & Insights</h3><p>Drug velocity, condition frequency, revenue trends, stock valuation, patient flow. The signals that help you run a better facility.</p><span class="fc-tag">All Facilities</span></div>
+      <div class="fc"><div class="fc-num">06</div><div class="fc-ic">🌍</div><h3>Network Interoperability</h3><p>Patient records that travel across facilities. Claims processing for insurers. Population health data for governments. The endgame.</p><span class="fc-tag">The Vision</span></div>
     </div>
   </div>
 </section>
 
 <!-- PRICING -->
 <section class="pricing" id="pricing">
-  <div class="pricing-inner">
-    <div class="section-header reveal">
-      <div class="section-label">Pricing</div>
-      <h2>Pay for what you use</h2>
-      <p>Per-department pricing. Activate what you need, expand as you grow. Every plan starts with a 30-day free trial.</p>
+  <div class="section-in">
+    <div class="price-hdr">
+      <div class="reveal">
+        <div class="sec-ey">Pricing</div>
+        <h2>Pay for what<br/>you <em>activate</em></h2>
+      </div>
+      <p class="reveal rd2">Per-department pricing. Start with what you need, expand as you grow. Every account starts with a 30-day free trial — no payment details required.</p>
     </div>
-    <div class="pricing-grid">
-      <div class="pricing-card reveal reveal-delay-1">
-        <h3>Pharmacy</h3>
-        <div class="pricing-amount"><sub>UGX </sub>75,000</div>
-        <div class="pricing-period">per month</div>
-        <ul class="pricing-features">
+    <div class="price-grid">
+      <div class="pcard reveal rd1">
+        <div class="p-tier">Standalone</div>
+        <div class="p-amt"><span>UGX </span>75,000</div>
+        <div class="p-per">per month · pharmacy or reception</div>
+        <div class="p-div"></div>
+        <ul class="p-feats">
           <li>Drug inventory management</li>
           <li>Dispensing log & receipts</li>
           <li>Stock valuation dashboard</li>
           <li>Expiry tracking & alerts</li>
           <li>Revenue reporting</li>
         </ul>
-        <a href="#join" class="btn btn-ghost" style="width:100%;justify-content:center;">Start Free Trial</a>
+        <a href="#join" class="p-cta p-outline">Start free trial</a>
       </div>
-      <div class="pricing-card featured reveal reveal-delay-2">
-        <h3>Full Clinic</h3>
-        <div class="pricing-amount"><sub>UGX </sub>350,000</div>
-        <div class="pricing-period">per month · 4 departments</div>
-        <ul class="pricing-features">
+      <div class="pcard feat reveal rd2">
+        <div class="pc-pill">Most Popular</div>
+        <div class="p-tier">Full Clinic</div>
+        <div class="p-amt"><span>UGX </span>350,000</div>
+        <div class="p-per">per month · all 4 departments</div>
+        <div class="p-div"></div>
+        <ul class="p-feats">
           <li>Reception + patient queue</li>
-          <li>Doctor consultations & Rx</li>
+          <li>Doctor consultations & prescriptions</li>
           <li>Clinic pharmacy queue</li>
           <li>Diagnostic lab worklist</li>
           <li>All analytics & reporting</li>
         </ul>
-        <a href="#join" class="btn btn-teal" style="width:100%;justify-content:center;">Start Free Trial</a>
+        <a href="#join" class="p-cta p-filled">Start free trial</a>
       </div>
-      <div class="pricing-card reveal reveal-delay-3">
-        <h3>Diagnostic Lab</h3>
-        <div class="pricing-amount"><sub>UGX </sub>100,000</div>
-        <div class="pricing-period">per month</div>
-        <ul class="pricing-features">
+      <div class="pcard reveal rd3">
+        <div class="p-tier">Diagnostic Lab</div>
+        <div class="p-amt"><span>UGX </span>100,000</div>
+        <div class="p-per">per month</div>
+        <div class="p-div"></div>
+        <ul class="p-feats">
           <li>Test request management</li>
           <li>Worklist & priority queue</li>
           <li>Result entry & dispatch</li>
           <li>Turnaround time tracking</li>
           <li>Top tests analytics</li>
         </ul>
-        <a href="#join" class="btn btn-ghost" style="width:100%;justify-content:center;">Start Free Trial</a>
+        <a href="#join" class="p-cta p-outline">Start free trial</a>
       </div>
     </div>
-    <p class="pricing-note reveal">
-      Per-department pricing available. A clinic with Reception + Doctor costs <strong>UGX 175,000/month</strong>.<br/>
-      Need a custom plan for a hospital? <a href="mailto:hello@minza.health" style="color:var(--teal-lt);text-decoration:none;">Contact us →</a>
-    </p>
+    <p class="p-note reveal">Mix and match departments. Reception + Doctor only = <strong style="color:rgba(255,255,255,0.45);">UGX 175,000/month</strong>. Need a custom plan for a hospital? <a href="mailto:hello@minza.health">Talk to us →</a></p>
   </div>
 </section>
 
 <!-- TESTIMONIALS -->
 <section class="testimonials" id="testimonials">
-  <div class="testimonials-inner">
-    <div class="section-header reveal">
-      <div class="section-label">Early Feedback</div>
-      <h2>What facilities are saying</h2>
-      <p>From our first conversations in Wandegeya and beyond.</p>
+  <div class="section-in">
+    <div class="reveal">
+      <div class="sec-ey">Early Feedback</div>
+      <h2>Heard in the field</h2>
     </div>
-    <div class="testimonials-grid">
-      <div class="testimonial-card reveal reveal-delay-1">
-        <p class="testimonial-quote">We needed something that could replace our exercise book, remind us about follow-up patients, and track what drugs we had in stock. This does exactly that.</p>
-        <div class="testimonial-author">
-          <div class="author-avatar">🏥</div>
-          <div>
-            <div class="author-name">Clinic Administrator</div>
-            <div class="author-role">Private Clinic, Wandegeya</div>
-          </div>
-        </div>
+    <div class="t-grid">
+      <div class="tc reveal rd1">
+        <p class="tc-q">We needed something that could replace our exercise book, remind us about follow-up patients, and track what drugs we had in stock.</p>
+        <div class="tc-src"><div class="tc-av">🏥</div><div><div class="tc-nm">Clinic Administrator</div><div class="tc-rl">Private Clinic, Wandegeya</div></div></div>
       </div>
-      <div class="testimonial-card reveal reveal-delay-2">
-        <p class="testimonial-quote">Knowing the value of my stock at any moment — that's something I've always wanted. I used to estimate it in my head. Now I just look at the screen.</p>
-        <div class="testimonial-author">
-          <div class="author-avatar">💊</div>
-          <div>
-            <div class="author-name">Pharmacy Owner</div>
-            <div class="author-role">Community Pharmacy, Kampala</div>
-          </div>
-        </div>
+      <div class="tc reveal rd2">
+        <p class="tc-q">Knowing the value of my stock at any moment — that's something I've always wanted. I used to estimate it in my head.</p>
+        <div class="tc-src"><div class="tc-av">💊</div><div><div class="tc-nm">Pharmacy Owner</div><div class="tc-rl">Community Pharmacy, Kampala</div></div></div>
       </div>
-      <div class="testimonial-card reveal reveal-delay-3">
-        <p class="testimonial-quote">I want departments for my lab, pharmacy, and doctor so they can talk to each other inside the system. That's what we're missing.</p>
-        <div class="testimonial-author">
-          <div class="author-avatar">🏨</div>
-          <div>
-            <div class="author-name">Medical Centre Director</div>
-            <div class="author-role">Multi-department Facility, Kampala</div>
-          </div>
-        </div>
+      <div class="tc reveal rd3">
+        <p class="tc-q">I want departments for my lab, pharmacy, and doctor so they can talk to each other inside the system. That's what we're missing.</p>
+        <div class="tc-src"><div class="tc-av">🏨</div><div><div class="tc-nm">Medical Centre Director</div><div class="tc-rl">Multi-department Facility, Kampala</div></div></div>
       </div>
     </div>
   </div>
@@ -1045,205 +824,175 @@ footer {
 
 <!-- ABOUT -->
 <section class="about" id="about">
-  <div class="about-inner">
+  <div class="section-in">
     <div class="reveal">
-      <div class="section-label">About</div>
-      <h2>Built in Kampala.<br/>For Africa.</h2>
-      <p>Minza started with a simple observation: every private clinic in Wandegeya was running on an exercise book. Not because the staff weren't capable — but because no one had built the right software for them.</p>
-      <p>The infrastructure layer that <strong>Epic, Waystar, and Health Catalyst</strong> built for developed markets was never built for Africa. We're building it from scratch, starting in Uganda, designed for the 3-room clinic before the 300-bed hospital.</p>
-      <p>The operations software gets you installed. The interoperability layer is what makes us impossible to replace.</p>
+      <div class="sec-ey">About</div>
+      <h2>Built in<br/>Kampala.<br/>For <em>Africa</em>.</h2>
     </div>
-    <div class="founder-block reveal reveal-delay-2">
-      <div class="founder-avatar">👤</div>
-      <div>
-        <div class="founder-name">Patience Kamayonza</div>
-        <div class="founder-title">Founder & CEO, Minza Health<br/>
-          <span style="color:var(--teal-lt);">Building health infrastructure for Africa, starting in Uganda.</span>
+    <div class="about-r reveal rd2">
+      <p>Minza started with a simple observation: every private clinic in Wandegeya was running on an exercise book. Not because the staff weren't capable — but because no one had built the right software for them.</p>
+      <p>The infrastructure that <strong>Epic, Waystar, and Health Catalyst</strong> built for developed markets was never built for Africa. We're building it from scratch — designed for the 3-room clinic, scalable to the national hospital network.</p>
+      <p>The operations software gets you installed. The network effect — patient records moving between facilities, drug procurement intelligence, population health data for governments — is what makes Minza <strong>impossible to replace</strong>. The clinic in Wandegeya is where it starts. The continent is where it ends.</p>
+      <div class="founder">
+        <div class="founder-av">👤</div>
+        <div>
+          <div class="founder-nm">Patience Kamayonza</div>
+          <div class="founder-rl">Founder & CEO, Minza Health · Building in Kampala, Uganda</div>
         </div>
       </div>
     </div>
   </div>
 </section>
 
-<!-- CTA / WAITLIST -->
-<section class="cta-section" id="join">
-  <div class="cta-inner">
-    <h2 class="reveal">Ready to modernise<br/>your facility?</h2>
-    <p class="reveal reveal-delay-1">Start your 30-day free trial today. No credit card required. Set up in under 5 minutes.</p>
-
-    <div class="cta-tabs reveal reveal-delay-2">
-      <button class="cta-tab active" onclick="switchCta('signup')">Register Facility</button>
-      <button class="cta-tab" onclick="switchCta('waitlist')">Join Waitlist</button>
+<!-- JOIN -->
+<section class="join-sec" id="join">
+  <div class="section-in">
+    <div class="join-l reveal">
+      <div class="sec-ey">Get Started</div>
+      <h2>Ready to<br/><em>modernise</em><br/>your facility?</h2>
+      <p style="margin-top:1rem;">30-day free trial. No payment details required. Set up in under 5 minutes.</p>
     </div>
-
-    <!-- Direct signup -->
-    <div class="signup-form active" id="cta-signup">
-      <div id="signup-msg" class="form-msg"></div>
-      <input class="wf-input" type="text" id="su-org" placeholder="Facility name e.g. Nakato Clinic"/>
-      <div class="wf-row">
-        <input class="wf-input" type="email" id="su-email" placeholder="Email address" style="flex:1;"/>
-        <input class="wf-input" type="password" id="su-pass" placeholder="Password (min. 6 chars)" style="flex:1;"/>
+    <div class="jform reveal rd2">
+      <div class="jtabs">
+        <button class="jtab active" onclick="switchTab('signup',this)">Register Facility</button>
+        <button class="jtab" onclick="switchTab('waitlist',this)">Join Waitlist</button>
       </div>
-      <select class="wf-select" id="su-type">
-        <option value="">Select facility type</option>
-        <option value="Clinic">Clinic</option>
-        <option value="Pharmacy">Pharmacy</option>
-        <option value="Hospital">Hospital</option>
-        <option value="Diagnostic Lab">Diagnostic Lab</option>
-      </select>
-      <button class="btn btn-teal btn-xl" onclick="doLandingSignup()" style="width:100%;justify-content:center;">
-        Create Account & Start Free Trial →
-      </button>
-      <p style="font-size:0.78rem;color:rgba(255,255,255,0.25);text-align:center;margin-top:0.25rem;">
-        Already have an account? <a href="app.html" style="color:var(--teal-lt);text-decoration:none;">Sign in →</a>
-      </p>
-    </div>
 
-    <!-- Waitlist -->
-    <div class="waitlist-form" id="cta-waitlist">
-      <div id="waitlist-msg" class="form-msg"></div>
-      <input class="wf-input" type="text" id="wl-name" placeholder="Your name"/>
-      <input class="wf-input" type="email" id="wl-email" placeholder="Email address"/>
-      <div class="wf-row">
-        <input class="wf-input" type="text" id="wl-facility" placeholder="Facility name" style="flex:1;"/>
-        <select class="wf-select" id="wl-type" style="flex:1;">
+      <!-- Signup -->
+      <div class="jpanel active" id="jp-signup">
+        <div id="msg-su" class="jmsg"></div>
+        <input class="ji" type="text" id="su-org" placeholder="Facility name"/>
+        <div class="ji-row">
+          <input class="ji" type="email" id="su-email" placeholder="Email address"/>
+          <input class="ji" type="password" id="su-pass" placeholder="Password"/>
+        </div>
+        <select class="ji" id="su-type">
           <option value="">Facility type</option>
-          <option>Clinic</option>
-          <option>Pharmacy</option>
-          <option>Hospital</option>
-          <option>Diagnostic Lab</option>
+          <option value="Clinic">Clinic</option>
+          <option value="Pharmacy">Pharmacy</option>
+          <option value="Hospital">Hospital</option>
+          <option value="Diagnostic Lab">Diagnostic Lab</option>
         </select>
+        <button class="jsub" onclick="doSignup()">Create account & start free trial →</button>
+        <p class="jfootnote">Already have an account? <a href="app.html">Sign in →</a></p>
       </div>
-      <button class="btn btn-teal btn-xl" onclick="doWaitlist()" style="width:100%;justify-content:center;">
-        Join the Waitlist →
-      </button>
+
+      <!-- Waitlist -->
+      <div class="jpanel" id="jp-waitlist">
+        <div id="msg-wl" class="jmsg"></div>
+        <div class="ji-row">
+          <input class="ji" type="text" id="wl-name" placeholder="Your name"/>
+          <input class="ji" type="email" id="wl-email" placeholder="Email address"/>
+        </div>
+        <div class="ji-row">
+          <input class="ji" type="text" id="wl-facility" placeholder="Facility name"/>
+          <select class="ji" id="wl-type">
+            <option value="">Facility type</option>
+            <option>Clinic</option><option>Pharmacy</option>
+            <option>Hospital</option><option>Diagnostic Lab</option>
+          </select>
+        </div>
+        <button class="jsub" onclick="doWaitlist()">Join the waitlist →</button>
+      </div>
     </div>
   </div>
 </section>
 
 <!-- FOOTER -->
 <footer>
-  <a class="footer-logo" href="#">Min<span>za</span></a>
-  <ul class="footer-links">
-    <li><a href="#problem">Problem</a></li>
-    <li><a href="#features">Features</a></li>
-    <li><a href="#pricing">Pricing</a></li>
-    <li><a href="#about">About</a></li>
-    <li><a href="mailto:hello@minza.health">Contact</a></li>
-  </ul>
-  <span class="footer-copy">© 2026 Minza Health. Kampala, Uganda.</span>
+  <div class="footer-l">
+    <a class="flogo" href="#"><span class="logo-dot"></span>Minza</a>
+    <ul class="flinks">
+      <li><a href="#problem">Problem</a></li>
+      <li><a href="#features">Features</a></li>
+      <li><a href="#pricing">Pricing</a></li>
+      <li><a href="#about">About</a></li>
+      <li><a href="mailto:hello@minza.health">Contact</a></li>
+    </ul>
+  </div>
+  <span class="fcopy">© 2026 Minza Health. Kampala, Uganda.</span>
 </footer>
 
 <script>
 const SURL = 'https://qflqwmfdwalvmndaojzl.supabase.co';
 const SKEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFmbHF3bWZkd2Fsdm1uZGFvanpsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE2MjcxMTcsImV4cCI6MjA4NzIwMzExN30.Ewpo8PoGq6PGcHnN85aYCUdPtSv7RXoGh9qthBJHezA';
 
-// ── CTA tab switch ─────────────────────────────────
-function switchCta(tab) {
-  document.querySelectorAll('.cta-tab').forEach(t => t.classList.remove('active'));
-  event.target.classList.add('active');
-  document.getElementById('cta-signup').style.display   = tab === 'signup'   ? 'flex' : 'none';
-  document.getElementById('cta-waitlist').style.display = tab === 'waitlist' ? 'flex' : 'none';
+// SLIDESHOW
+const slideLabels = ['Pharmacy Dashboard','Reception Queue','Prescription Queue','Lab Worklist'];
+let cur = 0, timer;
+
+function goSlide(n) {
+  document.getElementById('sl-'+cur).classList.remove('active');
+  document.querySelectorAll('.sd')[cur].classList.remove('active');
+  cur = n;
+  document.getElementById('sl-'+n).classList.add('active');
+  document.querySelectorAll('.sd')[n].classList.add('active');
+  document.getElementById('sf-lbl').textContent = slideLabels[n]+' · '+(n+1)+'/4';
+  clearInterval(timer); timer = setInterval(()=>goSlide((cur+1)%4), 3500);
+}
+timer = setInterval(()=>goSlide((cur+1)%4), 3500);
+
+// TABS
+function switchTab(name, btn) {
+  document.querySelectorAll('.jtab').forEach(t=>t.classList.remove('active'));
+  btn.classList.add('active');
+  document.querySelectorAll('.jpanel').forEach(p=>p.classList.remove('active'));
+  document.getElementById('jp-'+name).classList.add('active');
 }
 
-// ── Direct signup ──────────────────────────────────
-async function doLandingSignup() {
-  const org   = document.getElementById('su-org').value.trim();
-  const email = document.getElementById('su-email').value.trim();
-  const pass  = document.getElementById('su-pass').value;
-  const type  = document.getElementById('su-type').value;
-  const msg   = document.getElementById('signup-msg');
-
-  if (!org || !email || !pass || !type) {
-    showMsg(msg, 'err', 'All fields required.');
-    return;
-  }
-  if (pass.length < 6) {
-    showMsg(msg, 'err', 'Password must be at least 6 characters.');
-    return;
-  }
-
+// SIGNUP
+async function doSignup() {
+  const org=document.getElementById('su-org').value.trim(),
+        email=document.getElementById('su-email').value.trim(),
+        pass=document.getElementById('su-pass').value,
+        type=document.getElementById('su-type').value,
+        msg=document.getElementById('msg-su');
+  if(!org||!email||!pass||!type) return showMsg(msg,'err','All fields required.');
+  if(pass.length<6) return showMsg(msg,'err','Password must be at least 6 characters.');
   try {
-    const res = await fetch(`${SURL}/auth/v1/signup`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'apikey': SKEY },
-      body: JSON.stringify({ email, password: pass, data: { org_name: org, org_type: type } })
+    const r=await fetch(`${SURL}/auth/v1/signup`,{
+      method:'POST', headers:{'Content-Type':'application/json','apikey':SKEY},
+      body:JSON.stringify({email,password:pass,data:{org_name:org,org_type:type}})
     });
-    const d = await res.json();
-    if (!res.ok) throw new Error(d.error_description || d.msg || 'Signup failed');
-    showMsg(msg, 'ok', '✅ Account created! Check your email to confirm, then sign in.');
-    ['su-org','su-email','su-pass'].forEach(id => document.getElementById(id).value = '');
-    document.getElementById('su-type').value = '';
-  } catch(e) {
-    showMsg(msg, 'err', e.message);
-  }
+    const d=await r.json();
+    if(!r.ok) throw new Error(d.error_description||d.msg||'Signup failed.');
+    showMsg(msg,'ok','✅ Account created! Check your email to confirm, then sign in.');
+    ['su-org','su-email','su-pass'].forEach(id=>document.getElementById(id).value='');
+    document.getElementById('su-type').value='';
+  } catch(e){showMsg(msg,'err',e.message);}
 }
 
-// ── Waitlist ───────────────────────────────────────
+// WAITLIST
 async function doWaitlist() {
-  const name     = document.getElementById('wl-name').value.trim();
-  const email    = document.getElementById('wl-email').value.trim();
-  const facility = document.getElementById('wl-facility').value.trim();
-  const type     = document.getElementById('wl-type').value;
-  const msg      = document.getElementById('waitlist-msg');
-
-  if (!name || !email) {
-    showMsg(msg, 'err', 'Name and email required.');
-    return;
-  }
-
+  const name=document.getElementById('wl-name').value.trim(),
+        email=document.getElementById('wl-email').value.trim(),
+        facility=document.getElementById('wl-facility').value.trim(),
+        type=document.getElementById('wl-type').value,
+        msg=document.getElementById('msg-wl');
+  if(!name||!email) return showMsg(msg,'err','Name and email required.');
   try {
-    const res = await fetch(`${SURL}/rest/v1/waitlist`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'apikey': SKEY,
-        'Authorization': `Bearer ${SKEY}`,
-        'Prefer': 'return=minimal'
-      },
-      body: JSON.stringify({ name, email, facility_name: facility || null, facility_type: type || null })
+    const r=await fetch(`${SURL}/rest/v1/waitlist`,{
+      method:'POST',
+      headers:{'Content-Type':'application/json','apikey':SKEY,'Authorization':`Bearer ${SKEY}`,'Prefer':'return=minimal'},
+      body:JSON.stringify({name,email,facility_name:facility||null,facility_type:type||null})
     });
-    if (!res.ok) {
-      const d = await res.json();
-      throw new Error(d.message || 'Failed to join waitlist');
-    }
-    showMsg(msg, 'ok', '✅ You\'re on the list! We\'ll be in touch soon.');
-    ['wl-name','wl-email','wl-facility'].forEach(id => document.getElementById(id).value = '');
-    document.getElementById('wl-type').value = '';
-  } catch(e) {
-    showMsg(msg, 'err', e.message);
-  }
+    if(!r.ok){const d=await r.json();throw new Error(d.message||'Failed.');}
+    showMsg(msg,'ok','✅ You\'re on the list. We\'ll be in touch.');
+    ['wl-name','wl-email','wl-facility'].forEach(id=>document.getElementById(id).value='');
+    document.getElementById('wl-type').value='';
+  } catch(e){showMsg(msg,'err',e.message);}
 }
 
-function showMsg(el, type, text) {
-  el.textContent = text;
-  el.className = `form-msg ${type}`;
-  el.style.display = 'block';
-  if (type === 'ok') setTimeout(() => el.style.display = 'none', 6000);
+function showMsg(el,type,text){
+  el.textContent=text; el.className='jmsg '+type; el.style.display='block';
+  if(type==='ok') setTimeout(()=>el.style.display='none',6000);
 }
 
-// ── Scroll reveal ──────────────────────────────────
-const observer = new IntersectionObserver((entries) => {
-  entries.forEach(e => {
-    if (e.isIntersecting) {
-      e.target.classList.add('visible');
-      observer.unobserve(e.target);
-    }
-  });
-}, { threshold: 0.12 });
-
-document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
-
-// ── Nav scroll shadow ──────────────────────────────
-window.addEventListener('scroll', () => {
-  const nav = document.getElementById('main-nav');
-  if (window.scrollY > 40) {
-    nav.style.boxShadow = '0 4px 30px rgba(0,0,0,0.3)';
-  } else {
-    nav.style.boxShadow = 'none';
-  }
-});
+// SCROLL REVEAL
+const obs=new IntersectionObserver(es=>{
+  es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('visible');obs.unobserve(e.target);}});
+},{threshold:0.1});
+document.querySelectorAll('.reveal').forEach(el=>obs.observe(el));
 </script>
-
 </body>
 </html>
