@@ -50,15 +50,9 @@ nav {
 
 .logo {
   font-family: 'Syne', sans-serif;
-  font-weight: 800; font-size: 1.1rem;
-  color: var(--white); text-decoration: none; letter-spacing: -0.3px;
-  display: flex; align-items: center; gap: 0.45rem;
-}
-
-.logo-dot {
-  width: 8px; height: 8px; border-radius: 50%;
-  background: var(--teal-lt);
-  animation: blink 3s ease infinite;
+  font-weight: 750; font-size: 1.1rem;
+  color: var(--white); text-decoration: none; letter-spacing: -0.1px;
+  display:flex; align-items:center; gap:0.75rem;
 }
 
 @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
@@ -520,7 +514,7 @@ footer {
 }
 .footer-l { display: flex; align-items: center; gap: 2.5rem; }
 .flogo { font-family: 'Syne', sans-serif; font-weight: 600; font-size: 1rem; color: rgba(255,255,255,0.45); text-decoration: none; display: flex; align-items: center; gap: 0.4rem; }
-.flogo .logo-dot { width: 6px; height: 6px; }
+.flogo { width: 6px; height: 6px; }
 .flinks { display: flex; gap: 1.75rem; list-style: none; }
 .flinks a { font-size: 0.76rem; color: rgba(255,255,255,0.22); text-decoration: none; transition: color 0.15s; }
 .flinks a:hover { color: rgba(255,255,255,0.55); }
@@ -555,8 +549,8 @@ footer {
   .price-grid,.t-grid{grid-template-columns:1fr}
   .feat-grid{grid-template-columns:1fr}
   .fc:nth-child(n){border-right:none}
-  footer{flex-direction:column;align-items:flex-start;padding:2rem 1.5rem}
-  .footer-l{flex-direction:column;align-items:flex-start;gap:1rem}
+  footer{ flex-direction:column; align-items:flex-start; padding:3rem 2rem}
+  .footer-l{ flex-direction:column; align-items: flex-start; gap:1rem}
   .ji-row{flex-direction:column}
   .hero-stats{flex-wrap:wrap; gap:1rem}
   .hs-sep{display:none}
@@ -567,7 +561,7 @@ footer {
 
 <!-- NAV -->
 <nav>
-  <a class="logo" href="#"><span class="logo-dot"></span><span>Min<span style="color:var(--teal-lt);">za</span></span></a>
+  <a class="logo" href="#"><span>Min<span style="color:var(--teal-lt);">za</span></span></a>
   <div class="nav-mid">
     <a href="#problem">Problem</a>
     <a href="#features">Features</a>
@@ -909,7 +903,7 @@ footer {
 <!-- FOOTER -->
 <footer>
   <div class="footer-l">
-    <a class="flogo" href="#"><span class="logo-dot"></span><span>Min<span style="color:var(--teal-lt);">za</span></span></a>
+    <a class="flogo" href="#"></span><span>Min<span style="color:var(--teal-lt);">za</span></span></a>
     <ul class="flinks">
       <li><a href="#problem">Problem</a></li>
       <li><a href="#features">Features</a></li>
