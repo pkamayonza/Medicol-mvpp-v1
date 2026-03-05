@@ -627,8 +627,172 @@
 
 
 
+
   /* ══════════════════════════════════
-     POS / DISPENSING v2
+     PHARMACY DASHBOARD v2
+  ══════════════════════════════════ */
+  .ph-dash-header{
+    display:flex; align-items:flex-start; justify-content:space-between;
+    gap:1rem; flex-wrap:wrap; margin-bottom:1.25rem;
+  }
+  .ph-dash-actions{ display:flex; gap:0.5rem; align-items:center; padding-top:0.2rem; }
+  .ph-action-btn{
+    display:flex; align-items:center; gap:0.4rem;
+    padding:0.5rem 1rem; border-radius:8px;
+    font-size:0.8rem; font-weight:700; font-family:'Syne',sans-serif;
+    cursor:pointer; transition:all 0.15s; border:none; white-space:nowrap;
+  }
+  .ph-action-primary{ background:#0B1F3A; color:white; }
+  .ph-action-primary:hover{ background:#0D6E6E; }
+  .ph-action-secondary{ background:white; color:#0B1F3A; border:1px solid #E0DFDB; }
+  .ph-action-secondary:hover{ border-color:#0D6E6E; color:#0D6E6E; }
+
+  /* Revenue section */
+  .ph-revenue-section{
+    background:#0B1F3A; border-radius:14px;
+    padding:1.4rem 1.6rem 1rem; margin-bottom:1rem;
+    color:white;
+  }
+  .ph-revenue-main{ display:flex; align-items:flex-start; justify-content:space-between; gap:1.5rem; flex-wrap:wrap; margin-bottom:1rem; }
+  .ph-revenue-left{ display:flex; flex-direction:column; gap:0.5rem; }
+  .ph-rev-period-tabs{ display:flex; gap:0.25rem; }
+  .ph-rev-tab{
+    padding:0.28rem 0.75rem; border-radius:100px;
+    border:1px solid rgba(255,255,255,0.15); background:transparent;
+    font-size:0.72rem; font-weight:700; font-family:'Syne',sans-serif;
+    color:rgba(255,255,255,0.45); cursor:pointer; transition:all 0.15s;
+  }
+  .ph-rev-tab:hover{ color:white; border-color:rgba(255,255,255,0.35); }
+  .ph-rev-tab.active{ background:rgba(13,110,110,0.4); border-color:#0D6E6E; color:white; }
+
+  .ph-rev-amount{ font-size:2.4rem; font-weight:700; line-height:1; letter-spacing:-1px; color:white; }
+  .ph-rev-meta{ display:flex; align-items:center; gap:0.5rem; flex-wrap:wrap; }
+  .ph-rev-label{ font-size:0.72rem; color:rgba(255,255,255,0.4); }
+  .ph-trend-badge{
+    font-size:0.7rem; font-weight:700; padding:0.18rem 0.5rem;
+    border-radius:100px; display:none;
+  }
+  .ph-trend-badge.up{ display:inline-block; background:rgba(5,150,105,0.25); color:#6ee7b7; }
+  .ph-trend-badge.down{ display:inline-block; background:rgba(220,38,38,0.2); color:#fca5a5; }
+  .ph-trend-badge.flat{ display:inline-block; background:rgba(255,255,255,0.1); color:rgba(255,255,255,0.5); }
+
+  .ph-revenue-right{ display:flex; align-items:center; gap:0; }
+  .ph-rev-mini-stat{ display:flex; flex-direction:column; gap:0.2rem; padding:0 1.25rem; }
+  .ph-rev-mini-stat:first-child{ padding-left:0; }
+  .ph-rev-mini-lbl{ font-size:0.6rem; font-weight:700; text-transform:uppercase; letter-spacing:0.8px; color:rgba(255,255,255,0.35); white-space:nowrap; }
+  .ph-rev-mini-val{ font-size:1.05rem; font-weight:700; color:white; }
+  .ph-rev-mini-divider{ width:1px; background:rgba(255,255,255,0.1); align-self:stretch; }
+
+  /* Mini bar chart */
+  .ph-rev-chart{
+    display:flex; align-items:flex-end; gap:3px;
+    height:42px; padding-top:0.25rem;
+    border-top:1px solid rgba(255,255,255,0.08);
+  }
+  .ph-rev-bar{
+    flex:1; border-radius:3px 3px 0 0;
+    background:rgba(13,110,110,0.5);
+    transition:background 0.15s; cursor:default;
+    min-height:2px; position:relative;
+  }
+  .ph-rev-bar.today{ background:#0D6E6E; }
+  .ph-rev-bar:hover{ background:#4ECDB4; }
+
+  /* Stock alert cards */
+  .ph-alert-grid{
+    display:grid; grid-template-columns:repeat(4,1fr);
+    gap:0.75rem; margin-bottom:1rem;
+  }
+  .ph-alert-card{
+    border-radius:12px; padding:1rem 1.1rem;
+    cursor:pointer; transition:all 0.18s;
+    border:1px solid transparent;
+  }
+  .ph-alert-card:hover{ transform:translateY(-2px); box-shadow:0 6px 18px rgba(11,31,58,0.1); }
+  .ph-alert-danger{ background:#fef2f2; border-color:#fecaca; }
+  .ph-alert-warn{ background:#fffbeb; border-color:#fde68a; }
+  .ph-alert-orange{ background:#fff7ed; border-color:#fed7aa; }
+  .ph-alert-neutral{ background:#F8F7F3; border-color:#E8E6E1; }
+
+  .ph-alert-card-top{ display:flex; align-items:center; justify-content:space-between; margin-bottom:0.5rem; }
+  .ph-alert-label{ font-size:0.63rem; font-weight:700; text-transform:uppercase; letter-spacing:0.8px; color:#9AA3AE; }
+  .ph-alert-num{ font-size:2rem; font-weight:700; color:#0B1F3A; line-height:1; margin-bottom:0.4rem; }
+  .ph-alert-danger .ph-alert-num{ color:#dc2626; }
+  .ph-alert-warn .ph-alert-num{ color:#d97706; }
+  .ph-alert-orange .ph-alert-num{ color:#c2410c; }
+  .ph-alert-drugs{ font-size:0.72rem; color:#9AA3AE; line-height:1.6; min-height:1.4rem; }
+  .ph-alert-cta{ font-size:0.7rem; font-weight:700; color:#0D6E6E; margin-top:0.5rem; }
+
+  /* Bottom grid */
+  .ph-bottom-grid{
+    display:grid; grid-template-columns:1fr 1fr;
+    gap:0.75rem;
+  }
+  .ph-bottom-card{
+    background:white; border:1px solid #E8E6E1;
+    border-radius:12px; overflow:hidden;
+  }
+  .ph-bottom-card-header{
+    display:flex; align-items:center; justify-content:space-between;
+    padding:1rem 1.25rem 0.75rem; border-bottom:1px solid #F0EFEB;
+  }
+  .ph-bottom-card-title{ font-size:0.83rem; font-weight:700; color:#0B1F3A; }
+  .ph-see-all-btn{ font-size:0.72rem; font-weight:700; color:#0D6E6E; background:none; border:none; cursor:pointer; font-family:'Syne',sans-serif; }
+  .ph-velocity-tabs,.ph-see-all-btn{ display:flex; gap:0.25rem; }
+  .ph-vel-tab{
+    padding:0.22rem 0.6rem; border-radius:100px;
+    border:1px solid #E0DFDB; background:white;
+    font-size:0.7rem; font-weight:700; font-family:'Syne',sans-serif;
+    cursor:pointer; color:#9AA3AE; transition:all 0.15s;
+  }
+  .ph-vel-tab.active{ background:#0B1F3A; border-color:#0B1F3A; color:white; }
+
+  /* Top drug rows */
+  .ph-drug-row{
+    display:flex; align-items:center; gap:0.85rem;
+    padding:0.75rem 1.25rem; border-bottom:1px solid #F5F4F0;
+  }
+  .ph-drug-row:last-child{ border-bottom:none; }
+  .ph-drug-rank{
+    width:22px; height:22px; border-radius:50%;
+    background:#F0EFEB; display:flex; align-items:center;
+    justify-content:center; font-size:0.65rem; font-weight:700;
+    color:#9AA3AE; flex-shrink:0;
+  }
+  .ph-drug-rank.top{ background:#0B1F3A; color:white; }
+  .ph-drug-info{ flex:1; min-width:0; }
+  .ph-drug-info-name{ font-size:0.83rem; font-weight:700; color:#0B1F3A; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .ph-drug-bar-wrap{ height:3px; background:#E8E6E1; border-radius:100px; margin-top:0.3rem; overflow:hidden; }
+  .ph-drug-bar{ height:100%; border-radius:100px; background:#0D6E6E; }
+  .ph-drug-stats{ text-align:right; flex-shrink:0; }
+  .ph-drug-qty{ font-size:0.83rem; font-weight:700; color:#0B1F3A; }
+  .ph-drug-rev{ font-size:0.7rem; color:#9AA3AE; }
+
+  /* Recent sales rows */
+  .ph-sale-row{
+    display:flex; align-items:center; gap:0.85rem;
+    padding:0.75rem 1.25rem; border-bottom:1px solid #F5F4F0;
+    cursor:pointer; transition:background 0.1s;
+  }
+  .ph-sale-row:last-child{ border-bottom:none; }
+  .ph-sale-row:hover{ background:#FAFAF8; }
+  .ph-sale-time{ font-size:0.72rem; color:#9AA3AE; min-width:38px; text-align:center; line-height:1.4; }
+  .ph-sale-info{ flex:1; min-width:0; }
+  .ph-sale-drugs{ font-size:0.82rem; font-weight:600; color:#0B1F3A; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .ph-sale-customer{ font-size:0.7rem; color:#9AA3AE; }
+  .ph-sale-amount{ font-size:0.88rem; font-weight:700; color:#0D6E6E; white-space:nowrap; }
+
+  @media(max-width:1024px){ .ph-alert-grid{ grid-template-columns:repeat(2,1fr); } }
+  @media(max-width:768px){
+    .ph-bottom-grid{ grid-template-columns:1fr; }
+    .ph-revenue-right{ flex-wrap:wrap; gap:0.75rem; }
+    .ph-rev-mini-divider{ display:none; }
+    .ph-rev-mini-stat{ padding:0; }
+  }
+  @media(max-width:640px){
+    .ph-alert-grid{ grid-template-columns:1fr 1fr; }
+    .ph-rev-amount{ font-size:1.8rem; }
+  }
   ══════════════════════════════════ */
   .pos-stat-bar{
     display:flex; align-items:center; flex-wrap:wrap;
@@ -1102,119 +1266,143 @@
   </nav>
 
   <!-- ══════════════════════════════════
-       PHARMACY DASHBOARD
+       PHARMACY DASHBOARD v2
   ══════════════════════════════════ -->
   <div class="page" id="page-pharmacy">
 
-    <!-- header -->
-    <div class="dash-header">
+    <!-- HEADER -->
+    <div class="ph-dash-header">
       <div>
         <div class="dash-greeting">Good <em id="time-greeting">morning</em>, <span id="wb-pharmacy-name">—</span></div>
         <div class="dash-date" id="dash-date-str"></div>
       </div>
-      <div id="dash-quick-note" style="font-size:0.8rem;color:#9AA3AE;text-align:right;max-width:260px;line-height:1.6;padding-top:0.2rem;"></div>
+      <div class="ph-dash-actions">
+        <button class="ph-action-btn ph-action-secondary" onclick="showPage('ph-inventory')">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          Add Drug
+        </button>
+        <button class="ph-action-btn ph-action-primary" onclick="showPage('ph-patients')">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+          New Sale
+        </button>
+      </div>
     </div>
 
-    <!-- low-stock alert — only visible when there's actually a problem -->
+    <!-- ALERT BAR -->
     <div class="alert-bar" id="low-stock-alert">
       ⚠️ <span id="low-stock-msg"></span>
       <a onclick="showPage('ph-inventory')">View inventory →</a>
     </div>
 
-    <!-- 5 stat cards — colour applied by JS only when non-zero -->
-    <div class="stats-5">
-
-      <div class="stat-card" id="sc-total">
-        <div class="stat-card-top">
-          <span class="stat-label">Total Drugs</span>
-          <div class="stat-icon" style="background:#f0fdf4;">💊</div>
+    <!-- REVENUE SECTION -->
+    <div class="ph-revenue-section">
+      <div class="ph-revenue-main">
+        <div class="ph-revenue-left">
+          <div class="ph-rev-period-tabs">
+            <button class="ph-rev-tab active" onclick="setRevPeriod('today',this)">Today</button>
+            <button class="ph-rev-tab" onclick="setRevPeriod('week',this)">7 Days</button>
+            <button class="ph-rev-tab" onclick="setRevPeriod('month',this)">30 Days</button>
+          </div>
+          <div class="ph-rev-amount" id="ph-rev-amount">UGX 0</div>
+          <div class="ph-rev-meta">
+            <span id="ph-rev-trend" class="ph-trend-badge"></span>
+            <span id="ph-rev-sub" class="ph-rev-label"></span>
+          </div>
         </div>
-        <div class="stat-num" id="ph-total">—</div>
-        <div class="stat-sub">in inventory</div>
+        <div class="ph-revenue-right">
+          <div class="ph-rev-mini-stat">
+            <div class="ph-rev-mini-lbl">Transactions</div>
+            <div class="ph-rev-mini-val" id="ph-rev-txns">—</div>
+          </div>
+          <div class="ph-rev-mini-divider"></div>
+          <div class="ph-rev-mini-stat">
+            <div class="ph-rev-mini-lbl">Avg. Sale</div>
+            <div class="ph-rev-mini-val" id="ph-rev-avg">—</div>
+          </div>
+          <div class="ph-rev-mini-divider"></div>
+          <div class="ph-rev-mini-stat">
+            <div class="ph-rev-mini-lbl">Items Sold</div>
+            <div class="ph-rev-mini-val" id="ph-rev-items">—</div>
+          </div>
+        </div>
+      </div>
+      <!-- mini bar chart -->
+      <div class="ph-rev-chart" id="ph-rev-chart"></div>
+    </div>
+
+    <!-- STOCK ALERT CARDS -->
+    <div class="ph-alert-grid">
+
+      <div class="ph-alert-card ph-alert-danger" id="pac-low" onclick="setInvFilterAndGo('low')">
+        <div class="ph-alert-card-top">
+          <span class="ph-alert-label">Low Stock</span>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#dc2626" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 18 13.5 8.5 8.5 13.5 1 6"/><polyline points="17 18 23 18 23 12"/></svg>
+        </div>
+        <div class="ph-alert-num" id="pac-low-num">—</div>
+        <div class="ph-alert-drugs" id="pac-low-drugs"></div>
+        <div class="ph-alert-cta">View all →</div>
       </div>
 
-      <div class="stat-card" id="sc-low">
-        <div class="stat-card-top">
-          <span class="stat-label">Low Stock</span>
-          <div class="stat-icon" style="background:#fef2f2;">📉</div>
+      <div class="ph-alert-card ph-alert-warn" id="pac-expiring" onclick="setInvFilterAndGo('expiring')">
+        <div class="ph-alert-card-top">
+          <span class="ph-alert-label">Expiring ≤ 30d</span>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#d97706" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
         </div>
-        <div class="stat-num" id="ph-low">—</div>
-        <div class="stat-sub">≤ 10 units</div>
+        <div class="ph-alert-num" id="pac-exp-num">—</div>
+        <div class="ph-alert-drugs" id="pac-exp-drugs"></div>
+        <div class="ph-alert-cta">View all →</div>
       </div>
 
-      <div class="stat-card" id="sc-exp-soon">
-        <div class="stat-card-top">
-          <span class="stat-label">Expiring Soon</span>
-          <div class="stat-icon" style="background:#fffbeb;">⏳</div>
+      <div class="ph-alert-card ph-alert-orange" id="pac-expired" onclick="setInvFilterAndGo('expired')">
+        <div class="ph-alert-card-top">
+          <span class="ph-alert-label">Expired</span>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#c2410c" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
         </div>
-        <div class="stat-num" id="ph-exp-soon">—</div>
-        <div class="stat-sub">within 30 days</div>
+        <div class="ph-alert-num" id="pac-expired-num">—</div>
+        <div class="ph-alert-drugs" id="pac-expired-drugs"></div>
+        <div class="ph-alert-cta">View all →</div>
       </div>
 
-      <div class="stat-card" id="sc-expired">
-        <div class="stat-card-top">
-          <span class="stat-label">Expired</span>
-          <div class="stat-icon" style="background:#fef2f2;">🚫</div>
+      <div class="ph-alert-card ph-alert-neutral" id="pac-out" onclick="setInvFilterAndGo('out')">
+        <div class="ph-alert-card-top">
+          <span class="ph-alert-label">Out of Stock</span>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#555" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
         </div>
-        <div class="stat-num" id="ph-expired">—</div>
-        <div class="stat-sub">remove from stock</div>
-      </div>
-
-      <div class="stat-card" id="sc-dispensed">
-        <div class="stat-card-top">
-          <span class="stat-label">Dispensed</span>
-          <div class="stat-icon" style="background:#f0fdf4;">📋</div>
-        </div>
-        <div class="stat-num" id="ph-pts">—</div>
-        <div class="stat-sub">last 24 hours</div>
+        <div class="ph-alert-num" id="pac-out-num">—</div>
+        <div class="ph-alert-drugs" id="pac-out-drugs"></div>
+        <div class="ph-alert-cta">View all →</div>
       </div>
 
     </div>
 
-    <!-- revenue strip -->
-    <div class="rev-strip">
-      <div>
-        <div class="rev-strip-label">Revenue — Last 24h</div>
-        <div class="rev-strip-num" id="ph-revenue-strip">UGX 0</div>
-      </div>
-      <button class="rev-strip-btn" onclick="showPage('ph-patients')">View Dispensing Log →</button>
-    </div>
+    <!-- BOTTOM GRID: top drugs + recent sales -->
+    <div class="ph-bottom-grid">
 
-    <!-- product velocity -->
-    <div id="velocity-section" style="display:none;">
-      <div class="velocity-section-label">Drug Velocity</div>
-      <div class="velocity-grid">
-
-        <div class="velocity-card" onclick="toggleVelocityList('fast')">
-          <div class="velocity-card-top">
-            <span class="velocity-label">Fast Moving</span>
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
+      <!-- Top drugs -->
+      <div class="ph-bottom-card">
+        <div class="ph-bottom-card-header">
+          <span class="ph-bottom-card-title">Top Drugs</span>
+          <div class="ph-velocity-tabs">
+            <button class="ph-vel-tab active" onclick="setVelPeriod('all',this)">All Time</button>
+            <button class="ph-vel-tab" onclick="setVelPeriod('week',this)">7 Days</button>
           </div>
-          <div class="velocity-num" id="velocity-fast-count" style="color:#059669;">—</div>
-          <div class="velocity-action" style="color:#059669;">Top sellers · Expand →</div>
         </div>
-
-        <div class="velocity-card" onclick="toggleVelocityList('slow')">
-          <div class="velocity-card-top">
-            <span class="velocity-label">Slow Moving</span>
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#d97706" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 18 13.5 8.5 8.5 13.5 1 6"/><polyline points="17 18 23 18 23 12"/></svg>
-          </div>
-          <div class="velocity-num" id="velocity-slow-count" style="color:#d97706;">—</div>
-          <div class="velocity-action" style="color:#d97706;">Consider restocking · Expand →</div>
-        </div>
-
-      </div>
-
-      <!-- expandable panel -->
-      <div id="velocity-list-panel">
-        <div class="card" style="margin-bottom:0;margin-top:1rem;">
-          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.2rem;border-bottom:1px solid #F0EFEB;padding-bottom:0.85rem;">
-            <h2 id="velocity-list-title" style="margin:0;border:none;padding:0;font-size:0.9rem;"></h2>
-            <button onclick="toggleVelocityList(null)" style="background:none;border:none;color:#9AA3AE;cursor:pointer;font-size:0.8rem;font-weight:700;font-family:'Syne',sans-serif;">✕ Close</button>
-          </div>
-          <div id="velocity-list-body"></div>
+        <div id="ph-top-drugs-body">
+          <div class="loading" style="padding:2rem;">Loading…</div>
         </div>
       </div>
+
+      <!-- Recent sales -->
+      <div class="ph-bottom-card">
+        <div class="ph-bottom-card-header">
+          <span class="ph-bottom-card-title">Recent Sales</span>
+          <button class="ph-see-all-btn" onclick="showPage('ph-patients')">See all →</button>
+        </div>
+        <div id="ph-recent-sales-body">
+          <div class="loading" style="padding:2rem;">Loading…</div>
+        </div>
+      </div>
+
     </div>
 
   </div>
@@ -2728,116 +2916,208 @@ function viewPatientModal(p){
 }
 
 // ── PHARMACY HOME ──
+// ── PHARMACY DASHBOARD v2 ──
+let phAllDispLog=[], phRevPeriod='today', phVelPeriod='all';
+
 async function loadPharmacyHome(){
   const m=user?.user_metadata||{};
   document.getElementById('wb-pharmacy-name').textContent=m.org_name||'';
+  const now=new Date(), hr=now.getHours();
+  document.getElementById('time-greeting').textContent=hr<12?'morning':hr<17?'afternoon':'evening';
+  document.getElementById('dash-date-str').textContent=now.toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
 
-  try{
-    const d=await db('inventory?order=drug_name.asc');
-    drugs=d;
-    const now=new Date(),in30=new Date();
-    in30.setDate(now.getDate()+30);
-    const low=d.filter(x=>x.quantity<=10).length;
-    const expSoon=d.filter(x=>x.expiry_date&&new Date(x.expiry_date)>now&&new Date(x.expiry_date)<=in30).length;
-    const expired=d.filter(x=>x.expiry_date&&new Date(x.expiry_date)<now).length;
+  // load both in parallel
+  const [inv, dl] = await Promise.all([
+    db('inventory?order=drug_name.asc').catch(()=>[]),
+    db('dispensing_log?select=*&order=created_at.desc').catch(()=>[])
+  ]);
+  drugs=inv; phAllDispLog=dl;
 
-    document.getElementById('ph-total').textContent=d.length;
-    document.getElementById('ph-low').textContent=low;
-    document.getElementById('ph-exp-soon').textContent=expSoon;
-    document.getElementById('ph-expired').textContent=expired;
-
-    // ONLY apply colour classes when there is actually a problem
-    const scLow=document.getElementById('sc-low');
-    const scExpSoon=document.getElementById('sc-exp-soon');
-    const scExpired=document.getElementById('sc-expired');
-
-    scLow.classList.toggle('is-danger', low>0);
-    scExpSoon.classList.toggle('is-warn', expSoon>0);
-    scExpired.classList.toggle('is-danger', expired>0);
-
-    const bar=document.getElementById('low-stock-alert');
-    if(low>0){
-      document.getElementById('low-stock-msg').textContent=`${low} drug${low>1?'s are':' is'} running low or out of stock.`;
-      bar.classList.add('show');
-    }else{bar.classList.remove('show');}
-
-  }catch(e){}
-
-  try{
-    const since=new Date(Date.now()-24*60*60*1000);
-    const dl=await db('dispensing_log?select=*&order=created_at.desc');
-    const todayLogs=dl.filter(x=>new Date(x.created_at)>=since);
-    document.getElementById('ph-pts').textContent=todayLogs.length;
-
-    const revenue=todayLogs.reduce((s,x)=>s+(Number(x.total_cost)||0),0);
-    document.getElementById('ph-revenue-strip').textContent='UGX '+revenue.toLocaleString();
-
-    // quick note
-    const noteEl=document.getElementById('dash-quick-note');
-    noteEl.textContent=todayLogs.length>0?`${todayLogs.length} dispensing${todayLogs.length>1?'s':''} recorded today`:'';
-
-    renderProductVelocity(dl);
-  }catch(e){}
+  renderPhAlertCards(inv);
+  renderPhRevenue(dl);
+  renderPhTopDrugs(dl);
+  renderPhRecentSales(dl);
 }
 
-let velocityData={fast:[],slow:[]};
-let velocityOpen=null;
+// ── ALERT CARDS ──
+function renderPhAlertCards(inv){
+  const now=new Date(), in30=new Date(); in30.setDate(now.getDate()+30);
+  const low=inv.filter(x=>Number(x.quantity)>0&&Number(x.quantity)<=(x.reorder_level||10));
+  const expiring=inv.filter(x=>x.expiry_date&&new Date(x.expiry_date)>now&&new Date(x.expiry_date)<=in30);
+  const expired=inv.filter(x=>x.expiry_date&&new Date(x.expiry_date)<now);
+  const out=inv.filter(x=>Number(x.quantity)<=0);
 
-function renderProductVelocity(dl){
-  const tally={};
-  dl.forEach(row=>{
-    if(!row.drug_name)return;
-    if(!tally[row.drug_name])tally[row.drug_name]={qty:0,revenue:0};
-    tally[row.drug_name].qty+=Number(row.quantity_dispensed)||0;
-    tally[row.drug_name].revenue+=Number(row.total_cost)||0;
-  });
-  const sorted=Object.entries(tally).sort((a,b)=>b[1].qty-a[1].qty);
-  if(!sorted.length){document.getElementById('velocity-section').style.display='none';return;}
-  document.getElementById('velocity-section').style.display='block';
-  velocityData.fast=sorted.slice(0,5);
-  velocityData.slow=[...sorted].slice(-5).reverse();
-  document.getElementById('velocity-fast-count').textContent=velocityData.fast.length;
-  document.getElementById('velocity-slow-count').textContent=velocityData.slow.length;
+  // low stock
+  document.getElementById('pac-low-num').textContent=low.length;
+  document.getElementById('pac-low-drugs').textContent=low.length?low.slice(0,3).map(x=>x.drug_name).join(', ')+(low.length>3?` +${low.length-3} more`:''):'All good';
+  document.getElementById('pac-low').style.opacity=low.length?1:0.5;
+
+  // expiring
+  document.getElementById('pac-exp-num').textContent=expiring.length;
+  document.getElementById('pac-exp-drugs').textContent=expiring.length?expiring.slice(0,3).map(x=>x.drug_name).join(', ')+(expiring.length>3?` +${expiring.length-3} more`:''):'All good';
+
+  // expired
+  document.getElementById('pac-expired-num').textContent=expired.length;
+  document.getElementById('pac-expired-drugs').textContent=expired.length?expired.slice(0,3).map(x=>x.drug_name).join(', ')+(expired.length>3?` +${expired.length-3} more`:''):'None';
+
+  // out of stock
+  document.getElementById('pac-out-num').textContent=out.length;
+  document.getElementById('pac-out-drugs').textContent=out.length?out.slice(0,3).map(x=>x.drug_name).join(', ')+(out.length>3?` +${out.length-3} more`:''):'None';
+
+  // alert bar for critical issues
+  const bar=document.getElementById('low-stock-alert');
+  if(low.length||out.length){
+    const msgs=[];
+    if(out.length) msgs.push(`${out.length} drug${out.length>1?'s are':' is'} out of stock`);
+    if(low.length) msgs.push(`${low.length} running low`);
+    document.getElementById('low-stock-msg').textContent=msgs.join(' · ')+ '.';
+    bar.classList.add('show');
+  } else bar.classList.remove('show');
 }
 
-function toggleVelocityList(type){
-  const panel=document.getElementById('velocity-list-panel');
-  const title=document.getElementById('velocity-list-title');
-  const body=document.getElementById('velocity-list-body');
-  if(velocityOpen===type||type===null){panel.style.display='none';velocityOpen=null;return;}
-  velocityOpen=type;
-  panel.style.display='block';
-  const isFast=type==='fast';
-  const items=velocityData[type];
-  const maxQty=velocityData.fast[0]?.[1].qty||1;
-  const color=isFast?'#059669':'#d97706';
+function setInvFilterAndGo(filter){
+  // set the inventory filter and navigate
+  invFilter=filter;
+  document.querySelectorAll('.inv-fp').forEach(b=>b.classList.toggle('active', b.dataset.filter===filter));
+  showPage('ph-inventory');
+}
 
-  title.innerHTML=isFast
-    ?`<span style="color:#059669">Fast Moving Drugs</span> — Top sellers`
-    :`<span style="color:#d97706">Slow Moving Drugs</span> — Least sold`;
+// ── REVENUE ──
+function setRevPeriod(period, btn){
+  phRevPeriod=period;
+  document.querySelectorAll('.ph-rev-tab').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  renderPhRevenue(phAllDispLog);
+}
 
-  body.innerHTML=items.map(([name,data],i)=>{
-    const pct=Math.max(3,Math.round((data.qty/maxQty)*100));
-    return`<div style="display:flex;align-items:center;gap:1rem;padding:0.8rem 1rem;
-                border-radius:8px;margin-bottom:0.5rem;background:#FAFAF8;
-                border:1px solid #E8E6E1;">
-      <div style="width:26px;height:26px;border-radius:50%;background:${color};color:white;
-                  font-size:0.72rem;font-weight:700;display:flex;align-items:center;
-                  justify-content:center;flex-shrink:0;">${i+1}</div>
-      <div style="flex:1;min-width:0;">
-        <div style="font-weight:700;font-size:0.87rem;color:#0B1F3A;margin-bottom:0.3rem;">${name}</div>
-        <div style="background:#E8E6E1;border-radius:100px;height:4px;overflow:hidden;">
-          <div style="width:${pct}%;height:100%;border-radius:100px;background:${color};"></div>
-        </div>
-      </div>
-      <div style="text-align:right;flex-shrink:0;">
-        <div style="font-size:0.85rem;font-weight:700;color:${color};">${data.qty.toLocaleString()} units</div>
-        <div style="font-size:0.72rem;color:#9AA3AE;">UGX ${data.revenue.toLocaleString()}</div>
-      </div>
-    </div>`;
+function renderPhRevenue(dl){
+  const now=new Date();
+  const {start, prevStart, prevEnd, label} = getRevWindow(phRevPeriod, now);
+
+  const cur=dl.filter(x=>new Date(x.created_at)>=start&&new Date(x.created_at)<=now);
+  const prev=dl.filter(x=>new Date(x.created_at)>=prevStart&&new Date(x.created_at)<prevEnd);
+
+  const curRev=cur.reduce((s,x)=>s+(Number(x.total_cost)||0),0);
+  const prevRev=prev.reduce((s,x)=>s+(Number(x.total_cost)||0),0);
+
+  // sessions (unique transactions)
+  const sessions=new Set(cur.map(x=>x.session_id).filter(Boolean));
+  const txns=sessions.size||cur.length;
+  const avgSale=txns>0?Math.round(curRev/txns):0;
+  const items=cur.reduce((s,x)=>s+(Number(x.quantity_dispensed)||0),0);
+
+  document.getElementById('ph-rev-amount').textContent='UGX '+curRev.toLocaleString();
+  document.getElementById('ph-rev-txns').textContent=txns;
+  document.getElementById('ph-rev-avg').textContent=avgSale?'UGX '+avgSale.toLocaleString():'—';
+  document.getElementById('ph-rev-items').textContent=items;
+  document.getElementById('ph-rev-sub').textContent=label;
+
+  // trend badge
+  const badge=document.getElementById('ph-rev-trend');
+  if(prevRev>0){
+    const pct=Math.round(((curRev-prevRev)/prevRev)*100);
+    badge.textContent=(pct>=0?'▲ +':'▼ ')+Math.abs(pct)+'% vs prev';
+    badge.className='ph-trend-badge '+(pct>0?'up':pct<0?'down':'flat');
+  } else badge.className='ph-trend-badge';
+
+  // mini bar chart — last N days
+  renderRevChart(dl, phRevPeriod, now);
+}
+
+function getRevWindow(period, now){
+  const start=new Date(now); const prevStart=new Date(now); const prevEnd=new Date(now);
+  if(period==='today'){
+    start.setHours(0,0,0,0);
+    prevStart.setDate(prevStart.getDate()-1); prevStart.setHours(0,0,0,0);
+    prevEnd.setHours(0,0,0,0);
+    return{start,prevStart,prevEnd,label:'vs yesterday'};
+  }
+  if(period==='week'){
+    start.setDate(start.getDate()-7);
+    prevStart.setDate(prevStart.getDate()-14);
+    prevEnd.setDate(prevEnd.getDate()-7);
+    return{start,prevStart,prevEnd,label:'vs prev 7 days'};
+  }
+  start.setDate(start.getDate()-30);
+  prevStart.setDate(prevStart.getDate()-60);
+  prevEnd.setDate(prevEnd.getDate()-30);
+  return{start,prevStart,prevEnd,label:'vs prev 30 days'};
+}
+
+function renderRevChart(dl, period, now){
+  const chart=document.getElementById('ph-rev-chart');
+  const days=period==='today'?24:period==='week'?7:30;
+  const isHourly=period==='today';
+  const buckets=[];
+  for(let i=days-1;i>=0;i--){
+    const s=new Date(now); const e=new Date(now);
+    if(isHourly){ s.setHours(now.getHours()-i,0,0,0); e.setHours(now.getHours()-i+1,0,0,0); }
+    else{ s.setDate(now.getDate()-i); s.setHours(0,0,0,0); e.setDate(now.getDate()-i+1); e.setHours(0,0,0,0); }
+    const rev=dl.filter(x=>new Date(x.created_at)>=s&&new Date(x.created_at)<e)
+               .reduce((sum,x)=>sum+(Number(x.total_cost)||0),0);
+    buckets.push({rev, isNow:i===0});
+  }
+  const maxRev=Math.max(...buckets.map(b=>b.rev),1);
+  chart.innerHTML=buckets.map(b=>{
+    const h=Math.max(2,Math.round((b.rev/maxRev)*36));
+    return`<div class="ph-rev-bar${b.isNow?' today':''}" style="height:${h}px;" title="UGX ${b.rev.toLocaleString()}"></div>`;
   }).join('');
-  panel.scrollIntoView({behavior:'smooth',block:'nearest'});
 }
+
+// ── TOP DRUGS ──
+function setVelPeriod(period, btn){
+  phVelPeriod=period;
+  document.querySelectorAll('.ph-vel-tab').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  renderPhTopDrugs(phAllDispLog);
+}
+
+function renderPhTopDrugs(dl){
+  const now=new Date();
+  let filtered=dl;
+  if(phVelPeriod==='week'){ const w=new Date(now); w.setDate(now.getDate()-7); filtered=dl.filter(x=>new Date(x.created_at)>=w); }
+  const tally={};
+  filtered.forEach(x=>{ if(!x.drug_name)return; if(!tally[x.drug_name])tally[x.drug_name]={qty:0,rev:0}; tally[x.drug_name].qty+=Number(x.quantity_dispensed)||0; tally[x.drug_name].rev+=Number(x.total_cost)||0; });
+  const sorted=Object.entries(tally).sort((a,b)=>b[1].qty-a[1].qty).slice(0,8);
+  const body=document.getElementById('ph-top-drugs-body');
+  if(!sorted.length){ body.innerHTML=`<div class="loading" style="padding:2rem;">No sales data yet.</div>`; return; }
+  const maxQty=sorted[0][1].qty;
+  body.innerHTML=sorted.map(([name,d],i)=>`
+    <div class="ph-drug-row">
+      <div class="ph-drug-rank ${i<3?'top':''}">${i+1}</div>
+      <div class="ph-drug-info">
+        <div class="ph-drug-info-name">${name}</div>
+        <div class="ph-drug-bar-wrap"><div class="ph-drug-bar" style="width:${Math.round((d.qty/maxQty)*100)}%"></div></div>
+      </div>
+      <div class="ph-drug-stats">
+        <div class="ph-drug-qty">${d.qty.toLocaleString()} units</div>
+        <div class="ph-drug-rev">UGX ${d.rev.toLocaleString()}</div>
+      </div>
+    </div>`).join('');
+}
+
+// ── RECENT SALES ──
+function renderPhRecentSales(dl){
+  const body=document.getElementById('ph-recent-sales-body');
+  if(!dl.length){ body.innerHTML=`<div class="loading" style="padding:2rem;">No sales yet.</div>`; return; }
+  // group by session
+  const sessions={};
+  dl.forEach(x=>{ const sid=x.session_id||x.id; if(!sessions[sid]){ sessions[sid]={items:[],time:x.created_at,customer:x.customer_name,total:0}; } sessions[sid].items.push(x.drug_name); sessions[sid].total+=Number(x.total_cost)||0; });
+  const recent=Object.values(sessions).slice(0,6);
+  body.innerHTML=recent.map(s=>`
+    <div class="ph-sale-row" onclick="showPage('ph-patients')">
+      <div class="ph-sale-time">
+        <div>${new Date(s.time).toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'})}</div>
+        <div>${new Date(s.time).toLocaleDateString('en-GB',{day:'2-digit',month:'short'})}</div>
+      </div>
+      <div class="ph-sale-info">
+        <div class="ph-sale-drugs">${s.items.join(', ')}</div>
+        <div class="ph-sale-customer">${s.customer||'Walk-in'} · ${s.items.length} item${s.items.length!==1?'s':''}</div>
+      </div>
+      <div class="ph-sale-amount">UGX ${s.total.toLocaleString()}</div>
+    </div>`).join('');
+}
+
 
 // ── INVENTORY v2 ──
 let invFilter='all', invSort={field:'drug_name',dir:'asc'}, invSelected=new Set();
