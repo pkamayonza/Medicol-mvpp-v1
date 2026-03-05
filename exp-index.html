@@ -1,806 +1,1249 @@
-3<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Medicol — Health Infrastructure for Africa</title>
-<meta name="description" content="Medicol is building the interoperability layer for African healthcare — connecting clinics, pharmacies, labs, insurers, and governments on one platform."/>
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+<title>Minza Health — Health Infrastructure for Africa</title>
+<meta name="description" content="Minza connects clinics, pharmacies, labs and hospitals across Africa on one platform. Built for Uganda, scaling across the continent."/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet"/>
 
 <style>
 :root {
-  --navy:    #0B1F3A;
-  --teal:    #0D6E6E;
-  --teal-hi: #0F8A8A;
-  --amber:   #D97706;
-  --bg:      #F4F3EF;
-  --bg-alt:  #ECEAE4;
-  --white:   #FFFFFF;
-  --border:  #E2E0DA;
-  --t2:      #4A5568;
-  --t3:      #9AA3AE;
-  --sans:    'Syne', system-ui, sans-serif;
+  --navy:   #0B1F3A;
+  --teal:   #0D6E6E;
+  --teal-lt:#4ECDB4;
+  --cream:  #F0EFEB;
+  --mid:    #E8E6E1;
+  --muted:  #9AA3AE;
+  --white:  #FFFFFF;
+  --danger: #dc2626;
 }
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
 html { scroll-behavior: smooth; }
+
 body {
-  font-family: var(--sans);
-  background: var(--bg);
-  color: var(--navy);
+  font-family: 'DM Sans', system-ui, sans-serif;
+  background: var(--navy);
+  color: var(--white);
   overflow-x: hidden;
-  -webkit-font-smoothing: antialiased;
+}
+
+/* ── GRAIN OVERLAY ── */
+body::before {
+  content: '';
+  position: fixed; inset: 0; z-index: 0;
+  pointer-events: none;
+  opacity: 0.035;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+  background-size: 200px;
 }
 
 /* ── NAV ── */
 nav {
   position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  padding: 1.25rem 3rem;
   display: flex; align-items: center; justify-content: space-between;
-  padding: 1rem 6%;
-  background: rgba(244,243,239,0.92);
-  backdrop-filter: blur(16px);
-  border-bottom: 1px solid rgba(11,31,58,0.06);
+  background: rgba(11,31,58,0.85);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+  transition: all 0.3s;
 }
 
 .nav-logo {
-  font-size: 1.35rem; font-weight: 700;
-  color: var(--navy); letter-spacing: -0.3px;
+  font-family: 'Syne', sans-serif;
+  font-size: 1.4rem; font-weight: 800;
+  letter-spacing: -0.5px; color: var(--white);
   text-decoration: none;
 }
-.nav-logo span { color: var(--teal); }
 
-.nav-links { display: flex; gap: 2rem; list-style: none; }
-.nav-links a {
-  font-size: 0.8rem; font-weight: 600; letter-spacing: 0.1px;
-  color: var(--navy); text-decoration: none;
-  opacity: 0.45; transition: opacity 0.2s;
+.nav-logo span { color: var(--teal-lt); }
+
+.nav-links {
+  display: flex; align-items: center; gap: 2.5rem;
+  list-style: none;
 }
-.nav-links a:hover { opacity: 1; }
+
+.nav-links a {
+  font-size: 0.85rem; font-weight: 500;
+  color: rgba(255,255,255,0.55);
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+.nav-links a:hover { color: var(--white); }
 
 .nav-cta {
-  background: var(--navy); color: white;
-  padding: 0.52rem 1.25rem; border-radius: 7px;
-  font-size: 0.8rem; font-weight: 700; letter-spacing: 0.2px;
-  text-decoration: none; transition: background 0.2s;
+  display: flex; gap: 0.75rem; align-items: center;
 }
-.nav-cta:hover { background: var(--teal); }
+
+.btn {
+  font-family: 'Syne', sans-serif;
+  font-weight: 700; font-size: 0.85rem;
+  padding: 0.6rem 1.4rem; border-radius: 8px;
+  cursor: pointer; border: none;
+  text-decoration: none; display: inline-flex;
+  align-items: center; gap: 0.4rem;
+  transition: all 0.2s;
+}
+
+.btn-ghost {
+  background: transparent;
+  color: rgba(255,255,255,0.6);
+  border: 1px solid rgba(255,255,255,0.12);
+}
+
+.btn-ghost:hover {
+  background: rgba(255,255,255,0.07);
+  color: var(--white);
+  border-color: rgba(255,255,255,0.2);
+}
+
+.btn-teal {
+  background: var(--teal);
+  color: var(--white);
+}
+
+.btn-teal:hover { background: #0D8080; transform: translateY(-1px); }
+
+.btn-lg {
+  padding: 0.85rem 2rem;
+  font-size: 0.95rem;
+}
+
+.btn-xl {
+  padding: 1rem 2.4rem;
+  font-size: 1rem;
+  border-radius: 10px;
+}
+
+/* ── SECTIONS ── */
+section { position: relative; z-index: 1; }
 
 /* ── HERO ── */
-#hero {
+.hero {
   min-height: 100vh;
-  display: flex; flex-direction: column; justify-content: center;
-  padding: 10rem 6% 7rem;
-  position: relative; overflow: hidden;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  text-align: center;
+  padding: 8rem 2rem 6rem;
+  position: relative;
+  overflow: hidden;
 }
 
-#hero::before {
+/* hero radial glow */
+.hero::after {
   content: '';
-  position: absolute; inset: 0; z-index: 0;
-  background-image: radial-gradient(circle, rgba(11,31,58,0.065) 1px, transparent 1px);
-  background-size: 26px 26px;
-  mask-image: radial-gradient(ellipse 85% 80% at 50% 50%, black 10%, transparent 72%);
+  position: absolute;
+  top: 20%; left: 50%; transform: translateX(-50%);
+  width: 700px; height: 500px;
+  background: radial-gradient(ellipse, rgba(13,110,110,0.18) 0%, transparent 70%);
+  pointer-events: none;
 }
 
-#hero::after {
-  content: '';
-  position: absolute; inset: 0; z-index: 0;
-  background:
-    radial-gradient(ellipse 55% 55% at 68% 32%, rgba(13,110,110,0.1) 0%, transparent 65%),
-    radial-gradient(ellipse 38% 40% at 12% 80%, rgba(217,119,6,0.065) 0%, transparent 60%);
-}
-
-.hero-content {
-  position: relative; z-index: 1;
-  max-width: 820px;
-}
-
-.hero-badge {
+.hero-eyebrow {
   display: inline-flex; align-items: center; gap: 0.5rem;
-  background: rgba(13,110,110,0.09);
-  border: 1px solid rgba(13,110,110,0.16);
-  color: var(--teal); padding: 0.32rem 0.85rem;
-  border-radius: 100px; font-size: 0.72rem;
-  font-weight: 700; letter-spacing: 0.6px; text-transform: uppercase;
+  background: rgba(78,205,180,0.1);
+  border: 1px solid rgba(78,205,180,0.2);
+  border-radius: 100px; padding: 0.35rem 1rem;
+  font-size: 0.78rem; font-weight: 600;
+  color: var(--teal-lt); letter-spacing: 0.5px;
   margin-bottom: 2rem;
-  opacity: 0; animation: fadeUp 0.5s 0.1s forwards;
-}
-.hero-badge::before {
-  content: ''; width: 6px; height: 6px;
-  border-radius: 50%; background: var(--teal);
-  animation: blink 2.2s ease-in-out infinite;
-}
-@keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
-
-h1 {
-  font-size: clamp(2.7rem, 6.2vw, 5rem);
-  font-weight: 800; line-height: 1.04; letter-spacing: -2.5px;
-  color: var(--navy); margin-bottom: 1.6rem;
-  opacity: 0; animation: fadeUp 0.65s 0.2s forwards;
+  opacity: 0; animation: fadeUp 0.6s ease 0.2s forwards;
 }
 
-h1 em {
-  font-style: normal; color: var(--teal);
-  position: relative; display: inline-block;
-}
-h1 em::after {
+.hero-eyebrow::before {
   content: '';
-  position: absolute; bottom: 4px; left: 0; right: 0;
-  height: 3px; background: var(--teal); opacity: 0.2; border-radius: 2px;
+  width: 6px; height: 6px; border-radius: 50%;
+  background: var(--teal-lt);
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.5; transform: scale(0.8); }
+}
+
+.hero h1 {
+  font-family: 'Syne', sans-serif;
+  font-size: clamp(3rem, 7vw, 5.5rem);
+  font-weight: 800;
+  line-height: 1.05;
+  letter-spacing: -2px;
+  max-width: 900px;
+  margin: 0 auto 1.5rem;
+  opacity: 0; animation: fadeUp 0.7s ease 0.35s forwards;
+}
+
+.hero h1 em {
+  font-style: normal;
+  color: var(--teal-lt);
 }
 
 .hero-sub {
-  font-size: clamp(0.95rem, 1.8vw, 1.08rem);
-  font-weight: 400; color: var(--t2); line-height: 1.8;
-  max-width: 540px; margin-bottom: 2.4rem;
-  opacity: 0; animation: fadeUp 0.65s 0.32s forwards;
+  font-size: clamp(1rem, 2vw, 1.2rem);
+  font-weight: 300;
+  color: rgba(255,255,255,0.55);
+  max-width: 560px; margin: 0 auto 3rem;
+  line-height: 1.7;
+  opacity: 0; animation: fadeUp 0.7s ease 0.5s forwards;
 }
 
 .hero-actions {
-  display: flex; gap: 1rem; flex-wrap: wrap; align-items: center;
-  margin-bottom: 4rem;
-  opacity: 0; animation: fadeUp 0.65s 0.46s forwards;
+  display: flex; gap: 1rem; flex-wrap: wrap;
+  justify-content: center;
+  opacity: 0; animation: fadeUp 0.7s ease 0.65s forwards;
 }
 
-.btn-primary {
-  background: var(--navy); color: white;
-  padding: 0.8rem 1.9rem; border-radius: 8px;
-  font-size: 0.88rem; font-weight: 700; letter-spacing: 0.15px;
-  text-decoration: none; transition: all 0.18s;
-}
-.btn-primary:hover { background: var(--teal); transform: translateY(-1px); }
-
-.btn-ghost {
-  color: var(--t2); font-size: 0.88rem; font-weight: 600;
-  text-decoration: none; display: flex; align-items: center;
-  gap: 0.4rem; transition: color 0.2s;
-}
-.btn-ghost:hover { color: var(--navy); }
-
-/* stats bar */
-.hero-stats {
-  display: flex; flex-wrap: wrap;
-  background: var(--white);
-  border: 1px solid var(--border); border-radius: 12px;
-  overflow: hidden; max-width: 640px;
-  box-shadow: 0 4px 28px rgba(11,31,58,0.06);
-  opacity: 0; animation: fadeUp 0.65s 0.6s forwards;
-}
-.hstat {
-  flex: 1; min-width: 160px; padding: 1.2rem 1.5rem;
-  border-right: 1px solid var(--border);
-}
-.hstat:last-child { border-right: none; }
-.hstat-num {
-  font-size: 1.75rem; font-weight: 800; letter-spacing: -1px;
-  color: var(--navy); line-height: 1; margin-bottom: 0.28rem;
-}
-.hstat-num sup { font-size: 0.95rem; letter-spacing: 0; }
-.hstat-label { font-size: 0.7rem; color: var(--t3); font-weight: 500; line-height: 1.4; }
-
-/* ── SECTION BASE ── */
-section { padding: 6.5rem 6%; }
-
-.stag {
-  display: block; font-size: 0.65rem; font-weight: 700;
-  letter-spacing: 2.5px; text-transform: uppercase;
-  color: var(--teal); margin-bottom: 1.1rem;
+.hero-proof {
+  margin-top: 5rem;
+  display: flex; align-items: center; gap: 2rem;
+  flex-wrap: wrap; justify-content: center;
+  opacity: 0; animation: fadeUp 0.7s ease 0.8s forwards;
 }
 
-h2 {
-  font-size: clamp(1.9rem, 4vw, 3rem);
-  font-weight: 800; line-height: 1.08; letter-spacing: -1.2px;
-  color: var(--navy); max-width: 640px;
+.proof-item {
+  display: flex; flex-direction: column; align-items: center;
+  gap: 0.25rem;
 }
-h2 em { font-style: normal; color: var(--teal); }
 
-.ssub {
-  font-size: 0.96rem; color: var(--t2); line-height: 1.78;
-  max-width: 520px; margin-top: 0.9rem; font-weight: 400;
+.proof-num {
+  font-family: 'Syne', sans-serif;
+  font-size: 2rem; font-weight: 800;
+  color: var(--white); line-height: 1;
+}
+
+.proof-num span { color: var(--teal-lt); }
+
+.proof-label {
+  font-size: 0.75rem; color: var(--muted);
+  font-weight: 400; text-align: center;
+}
+
+.proof-divider {
+  width: 1px; height: 40px;
+  background: rgba(255,255,255,0.1);
+}
+
+/* scroll indicator */
+.scroll-hint {
+  position: absolute; bottom: 2.5rem; left: 50%;
+  transform: translateX(-50%);
+  display: flex; flex-direction: column; align-items: center; gap: 0.5rem;
+  color: rgba(255,255,255,0.2); font-size: 0.7rem; font-weight: 500;
+  letter-spacing: 1px; text-transform: uppercase;
+  animation: bounce 2s infinite;
+}
+
+.scroll-hint svg { opacity: 0.3; }
+
+@keyframes bounce {
+  0%, 100% { transform: translateX(-50%) translateY(0); }
+  50% { transform: translateX(-50%) translateY(6px); }
+}
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(24px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 /* ── PROBLEM ── */
-#problem { background: var(--bg-alt); }
-
-.pgrid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-  gap: 1.1rem; margin-top: 3.5rem;
+.problem {
+  background: #070F1C;
+  padding: 7rem 2rem;
+  border-top: 1px solid rgba(255,255,255,0.05);
+  border-bottom: 1px solid rgba(255,255,255,0.05);
 }
 
-.pcard {
-  background: var(--white);
-  border: 1px solid var(--border);
-  border-radius: 14px; padding: 2rem;
-  position: relative; overflow: hidden;
-  transition: transform 0.2s, box-shadow 0.2s;
-}
-.pcard::after {
-  content: ''; position: absolute; top: 0; left: 0; right: 0;
-  height: 3px; background: var(--teal); opacity: 0; transition: opacity 0.2s;
-}
-.pcard:hover { transform: translateY(-3px); box-shadow: 0 14px 40px rgba(11,31,58,0.09); }
-.pcard:hover::after { opacity: 1; }
-
-.pcard-icon {
-  width: 40px; height: 40px; border-radius: 9px;
-  background: rgba(13,110,110,0.09);
-  display: flex; align-items: center; justify-content: center;
-  font-size: 1.1rem; margin-bottom: 1.15rem;
+.problem-inner {
+  max-width: 1100px; margin: 0 auto;
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 5rem; align-items: center;
 }
 
-.pcard h3 {
-  font-size: 1rem; font-weight: 700; color: var(--navy);
-  margin-bottom: 0.55rem; letter-spacing: -0.2px;
-}
-.pcard p {
-  font-size: 0.875rem; color: var(--t2); line-height: 1.7;
-}
-.pchip {
-  display: inline-block; margin-top: 1.1rem;
-  background: rgba(217,119,6,0.1); color: #92400e;
-  padding: 0.25rem 0.7rem; border-radius: 100px;
-  font-size: 0.71rem; font-weight: 700;
+.section-label {
+  font-size: 0.68rem; font-weight: 700;
+  letter-spacing: 2px; text-transform: uppercase;
+  color: var(--teal-lt); margin-bottom: 1.2rem;
 }
 
-/* ── VISION ── */
-#vision { background: var(--navy); }
-#vision .stag { color: #F59E0B; }
-#vision h2 { color: white; }
-#vision .ssub { color: rgba(255,255,255,0.48); }
-
-.os {
-  margin-top: 4rem;
-  display: flex; flex-direction: column; align-items: center;
+.problem h2 {
+  font-family: 'Syne', sans-serif;
+  font-size: clamp(2rem, 4vw, 3rem);
+  font-weight: 800; line-height: 1.1;
+  letter-spacing: -1px; margin-bottom: 1.5rem;
 }
 
-.os-hub {
-  background: linear-gradient(140deg, var(--teal), #084F4F);
-  border-radius: 14px; padding: 2rem 3rem;
-  text-align: center;
-  box-shadow: 0 0 80px rgba(13,110,110,0.4);
-  width: 100%; max-width: 320px;
-}
-.os-hub-name {
-  font-size: 1.6rem; font-weight: 800; color: white;
-  letter-spacing: -0.5px; margin-bottom: 0.25rem;
-}
-.os-hub p { font-size: 0.78rem; color: rgba(255,255,255,0.65); }
-
-.os-line {
-  width: 1px; height: 32px;
-  background: linear-gradient(to bottom, rgba(255,255,255,0.15), rgba(255,255,255,0.05));
+.problem p {
+  color: rgba(255,255,255,0.55);
+  font-size: 1.05rem; line-height: 1.8;
+  font-weight: 300; margin-bottom: 1.2rem;
 }
 
-.os-nodes {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(165px, 1fr));
-  gap: 0.75rem; width: 100%;
+.problem-cards {
+  display: flex; flex-direction: column; gap: 1rem;
 }
 
-.os-node {
-  background: rgba(255,255,255,0.04);
-  border: 1px solid rgba(255,255,255,0.08);
-  border-radius: 10px; padding: 1rem 1.3rem;
-  display: flex; align-items: center; gap: 0.7rem;
-  transition: all 0.18s;
-}
-.os-node:hover {
-  background: rgba(13,110,110,0.18);
-  border-color: rgba(13,110,110,0.45);
-  transform: translateY(-2px);
-}
-.os-node-icon { font-size: 1.15rem; }
-.os-node-text { font-size: 0.82rem; color: rgba(255,255,255,0.72); font-weight: 500; }
-
-/* ── WHY NOW ── */
-#whynow { background: var(--bg); }
-
-.wgrid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
-  gap: 1.1rem; margin-top: 3.5rem;
+.problem-card {
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.07);
+  border-radius: 12px; padding: 1.25rem 1.4rem;
+  display: flex; align-items: flex-start; gap: 1rem;
+  transition: all 0.3s;
 }
 
-.wcard {
-  border-left: 3px solid var(--teal);
-  border-radius: 0 12px 12px 0;
-  background: var(--white);
-  border-top: 1px solid var(--border);
-  border-right: 1px solid var(--border);
-  border-bottom: 1px solid var(--border);
-  padding: 1.8rem 1.8rem 1.8rem 1.5rem;
-}
-.wcard-num {
-  font-size: 2.4rem; font-weight: 800;
-  color: var(--teal); letter-spacing: -1.5px;
-  line-height: 1; margin-bottom: 0.7rem;
-}
-.wcard p { font-size: 0.875rem; color: var(--t2); line-height: 1.68; }
-
-/* ── FOUNDER ── */
-#founder { background: var(--bg-alt); padding: 5.5rem 6%; }
-
-.founder-box {
-  max-width: 700px;
-  background: var(--white);
-  border: 1px solid var(--border);
-  border-radius: 16px; padding: 2.75rem 3rem;
-  position: relative;
-}
-.founder-box::before {
-  content: '"';
-  position: absolute; top: 1rem; left: 2.75rem;
-  font-size: 6rem; font-weight: 800; line-height: 1;
-  color: var(--teal); opacity: 0.08;
+.problem-card:hover {
+  background: rgba(255,255,255,0.05);
+  border-color: rgba(78,205,180,0.15);
+  transform: translateX(4px);
 }
 
-.fquote {
-  font-size: 1rem; line-height: 1.85;
-  color: var(--navy); margin-bottom: 1.75rem;
-  position: relative; z-index: 1;
-}
-
-.fbyline { display: flex; align-items: center; gap: 0.8rem; }
-
-.favatar {
-  width: 42px; height: 42px; border-radius: 50%;
-  background: rgba(13,110,110,0.1); border: 2px solid var(--teal);
-  display: flex; align-items: center; justify-content: center;
-  font-weight: 800; font-size: 0.85rem; color: var(--teal);
-  flex-shrink: 0; letter-spacing: 0.5px;
-}
-.fname { font-size: 0.85rem; font-weight: 700; color: var(--navy); }
-.frole { font-size: 0.74rem; color: var(--t3); margin-top: 0.1rem; }
-
-/* ── WAITLIST ── */
-#waitlist { background: var(--navy); padding: 7rem 6%; }
-#waitlist .stag  { color: #F59E0B; }
-#waitlist h2     { color: white; }
-#waitlist .ssub  { color: rgba(255,255,255,0.46); }
-
-.wl-layout {
-  display: grid;
-  grid-template-columns: 1fr 1.1fr;
-  gap: 6rem; margin-top: 3.5rem; align-items: start;
-}
-
-.wl-left { }
-.wl-note { font-size: 0.88rem; color: rgba(255,255,255,0.42); line-height: 1.75; margin-top: 1.5rem; }
-
-.wl-trust { display: flex; flex-direction: column; gap: 0.7rem; margin-top: 2rem; }
-.trust-row {
-  display: flex; align-items: flex-start; gap: 0.6rem;
-  font-size: 0.82rem; color: rgba(255,255,255,0.48); font-weight: 500; line-height: 1.5;
-}
-.trust-row::before {
-  content: '';
-  width: 16px; height: 16px; border-radius: 50%; flex-shrink: 0; margin-top: 1px;
-  background: rgba(13,110,110,0.25);
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%234ECDB4' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='20 6 9 17 4 12'/%3E%3C/svg%3E");
-  background-size: 10px; background-repeat: no-repeat; background-position: center;
-}
-
-.wl-form { display: flex; flex-direction: column; gap: 0.85rem; }
-
-.fg2 { display: grid; grid-template-columns: 1fr 1fr; gap: 0.85rem; }
-.fg  { display: flex; flex-direction: column; gap: 0.32rem; }
-
-.fg label {
-  font-size: 0.65rem; font-weight: 700;
-  color: rgba(255,255,255,0.35);
-  text-transform: uppercase; letter-spacing: 1px;
-}
-
-.fg input, .fg select {
-  background: rgba(255,255,255,0.055);
-  border: 1px solid rgba(255,255,255,0.11);
-  border-radius: 8px; padding: 0.7rem 0.95rem;
-  color: white; font-family: var(--sans);
-  font-size: 0.875rem; outline: none;
-  transition: border-color 0.18s, background 0.18s;
-  -webkit-appearance: none; appearance: none;
-}
-.fg select option { background: #0B1F3A; color: white; }
-.fg input:focus, .fg select:focus {
-  border-color: var(--teal);
-  background: rgba(255,255,255,0.08);
-}
-.fg input::placeholder { color: rgba(255,255,255,0.2); }
-
-.form-err {
-  display: none;
-  background: rgba(220,38,38,0.11);
-  border: 1px solid rgba(220,38,38,0.22);
-  border-radius: 7px; padding: 0.65rem 0.9rem;
-  color: #FCA5A5; font-size: 0.82rem;
-}
-.form-err.on { display: block; }
-
-.btn-sub {
-  background: var(--teal); color: white; border: none;
-  padding: 0.82rem 1.8rem; border-radius: 8px;
-  font-family: var(--sans); font-size: 0.875rem; font-weight: 700;
-  letter-spacing: 0.15px; cursor: pointer;
-  transition: all 0.18s; display: flex;
+.pc-icon {
+  font-size: 1.4rem; flex-shrink: 0;
+  width: 42px; height: 42px;
+  background: rgba(13,110,110,0.15);
+  border-radius: 10px; display: flex;
   align-items: center; justify-content: center;
-  gap: 0.5rem; min-width: 180px; align-self: flex-start;
-  margin-top: 0.2rem;
 }
-.btn-sub:hover:not(:disabled) { background: var(--teal-hi); transform: translateY(-1px); }
-.btn-sub:disabled { opacity: 0.45; cursor: not-allowed; transform: none; }
 
-.spin {
-  width: 14px; height: 14px; border-radius: 50%;
-  border: 2px solid rgba(255,255,255,0.25);
-  border-top-color: white;
-  animation: rot 0.65s linear infinite; display: none;
+.pc-text strong {
+  display: block; font-family: 'Syne', sans-serif;
+  font-size: 0.9rem; font-weight: 700;
+  margin-bottom: 0.3rem; color: var(--white);
 }
-.btn-sub.loading .spin  { display: block; }
-.btn-sub.loading .btxt  { display: none; }
-@keyframes rot { to { transform: rotate(360deg); } }
 
-.fnote { font-size: 0.73rem; color: rgba(255,255,255,0.25); line-height: 1.6; margin-top: 0.2rem; }
-
-.success {
-  display: none;
-  background: rgba(13,110,110,0.16);
-  border: 1px solid rgba(13,110,110,0.32);
-  border-radius: 12px; padding: 1.5rem 1.75rem;
-  color: white; font-size: 0.92rem; line-height: 1.65;
+.pc-text span {
+  font-size: 0.82rem; color: rgba(255,255,255,0.45);
+  line-height: 1.6;
 }
-.success strong { color: #4ECDB4; }
+
+/* ── FEATURES ── */
+.features {
+  padding: 7rem 2rem;
+  background: var(--navy);
+}
+
+.features-inner {
+  max-width: 1100px; margin: 0 auto;
+}
+
+.section-header {
+  text-align: center; margin-bottom: 4rem;
+}
+
+.section-header h2 {
+  font-family: 'Syne', sans-serif;
+  font-size: clamp(2rem, 4vw, 2.8rem);
+  font-weight: 800; letter-spacing: -1px;
+  margin-bottom: 1rem;
+}
+
+.section-header p {
+  color: rgba(255,255,255,0.45);
+  font-size: 1rem; font-weight: 300;
+  max-width: 500px; margin: 0 auto; line-height: 1.7;
+}
+
+.features-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.25rem;
+}
+
+.feature-card {
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.07);
+  border-radius: 14px; padding: 1.75rem;
+  transition: all 0.3s; position: relative;
+  overflow: hidden;
+}
+
+.feature-card::before {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--teal), transparent);
+  opacity: 0; transition: opacity 0.3s;
+}
+
+.feature-card:hover {
+  background: rgba(255,255,255,0.05);
+  border-color: rgba(78,205,180,0.2);
+  transform: translateY(-4px);
+  box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+}
+
+.feature-card:hover::before { opacity: 1; }
+
+.fc-icon {
+  font-size: 1.6rem; margin-bottom: 1.2rem;
+  width: 48px; height: 48px;
+  background: rgba(13,110,110,0.15);
+  border-radius: 12px; display: flex;
+  align-items: center; justify-content: center;
+}
+
+.feature-card h3 {
+  font-family: 'Syne', sans-serif;
+  font-size: 1rem; font-weight: 700;
+  margin-bottom: 0.6rem; color: var(--white);
+}
+
+.feature-card p {
+  font-size: 0.85rem; color: rgba(255,255,255,0.45);
+  line-height: 1.7; font-weight: 300;
+}
+
+.feature-tag {
+  display: inline-block; margin-top: 1rem;
+  font-size: 0.68rem; font-weight: 700;
+  letter-spacing: 0.5px; text-transform: uppercase;
+  color: var(--teal-lt);
+  background: rgba(78,205,180,0.08);
+  border-radius: 100px; padding: 0.2rem 0.6rem;
+}
+
+/* ── PRICING ── */
+.pricing {
+  padding: 7rem 2rem;
+  background: #070F1C;
+  border-top: 1px solid rgba(255,255,255,0.05);
+}
+
+.pricing-inner { max-width: 900px; margin: 0 auto; }
+
+.pricing-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.25rem; margin-top: 3rem;
+}
+
+.pricing-card {
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 14px; padding: 2rem;
+  transition: all 0.3s; position: relative;
+}
+
+.pricing-card.featured {
+  background: rgba(13,110,110,0.12);
+  border-color: rgba(78,205,180,0.3);
+}
+
+.pricing-card.featured::after {
+  content: 'Most Popular';
+  position: absolute; top: -12px; left: 50%; transform: translateX(-50%);
+  background: var(--teal); color: white;
+  font-size: 0.68rem; font-weight: 700;
+  letter-spacing: 0.5px; text-transform: uppercase;
+  padding: 0.25rem 0.85rem; border-radius: 100px;
+  font-family: 'Syne', sans-serif;
+}
+
+.pricing-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+}
+
+.pricing-card h3 {
+  font-family: 'Syne', sans-serif;
+  font-size: 0.85rem; font-weight: 700;
+  text-transform: uppercase; letter-spacing: 1px;
+  color: var(--muted); margin-bottom: 1rem;
+}
+
+.pricing-amount {
+  font-family: 'Syne', sans-serif;
+  font-size: 2.2rem; font-weight: 800;
+  color: var(--white); line-height: 1;
+  margin-bottom: 0.3rem;
+}
+
+.pricing-amount sub {
+  font-size: 0.9rem; font-weight: 500;
+  color: var(--muted); vertical-align: baseline;
+}
+
+.pricing-period {
+  font-size: 0.78rem; color: var(--muted);
+  margin-bottom: 1.5rem;
+}
+
+.pricing-features {
+  list-style: none; display: flex;
+  flex-direction: column; gap: 0.65rem;
+  margin-bottom: 1.75rem;
+}
+
+.pricing-features li {
+  font-size: 0.83rem; color: rgba(255,255,255,0.6);
+  display: flex; align-items: flex-start; gap: 0.5rem;
+  line-height: 1.5;
+}
+
+.pricing-features li::before {
+  content: '✓';
+  color: var(--teal-lt); font-weight: 700;
+  flex-shrink: 0; margin-top: 0.05rem;
+}
+
+.pricing-note {
+  text-align: center; margin-top: 2.5rem;
+  font-size: 0.83rem; color: rgba(255,255,255,0.3);
+  line-height: 1.7;
+}
+
+.pricing-note strong { color: var(--teal-lt); }
+
+/* ── TESTIMONIALS ── */
+.testimonials {
+  padding: 7rem 2rem;
+  background: var(--navy);
+}
+
+.testimonials-inner {
+  max-width: 1100px; margin: 0 auto;
+}
+
+.testimonials-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.25rem; margin-top: 3rem;
+}
+
+.testimonial-card {
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.07);
+  border-radius: 14px; padding: 1.75rem;
+  transition: all 0.3s;
+}
+
+.testimonial-card:hover {
+  background: rgba(255,255,255,0.05);
+  border-color: rgba(78,205,180,0.15);
+  transform: translateY(-3px);
+}
+
+.testimonial-quote {
+  font-size: 0.92rem; color: rgba(255,255,255,0.65);
+  line-height: 1.8; font-weight: 300;
+  font-style: italic; margin-bottom: 1.5rem;
+}
+
+.testimonial-quote::before {
+  content: '"';
+  font-family: 'Syne', sans-serif;
+  font-size: 2.5rem; color: var(--teal);
+  line-height: 0; vertical-align: -0.7rem;
+  margin-right: 0.15rem;
+}
+
+.testimonial-author {
+  display: flex; align-items: center; gap: 0.75rem;
+}
+
+.author-avatar {
+  width: 38px; height: 38px; border-radius: 50%;
+  background: rgba(13,110,110,0.2);
+  border: 1px solid rgba(78,205,180,0.2);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1rem; flex-shrink: 0;
+}
+
+.author-name {
+  font-family: 'Syne', sans-serif;
+  font-size: 0.85rem; font-weight: 700;
+  color: var(--white);
+}
+
+.author-role {
+  font-size: 0.75rem; color: var(--muted);
+}
+
+/* ── ABOUT ── */
+.about {
+  padding: 7rem 2rem;
+  background: #070F1C;
+  border-top: 1px solid rgba(255,255,255,0.05);
+}
+
+.about-inner {
+  max-width: 780px; margin: 0 auto; text-align: center;
+}
+
+.about h2 {
+  font-family: 'Syne', sans-serif;
+  font-size: clamp(1.8rem, 3.5vw, 2.5rem);
+  font-weight: 800; letter-spacing: -1px;
+  margin-bottom: 1.5rem; line-height: 1.15;
+}
+
+.about p {
+  color: rgba(255,255,255,0.5);
+  font-size: 1rem; line-height: 1.9;
+  font-weight: 300; margin-bottom: 1.2rem;
+}
+
+.about p strong {
+  color: var(--white); font-weight: 500;
+}
+
+.founder-block {
+  margin-top: 3rem; padding-top: 2.5rem;
+  border-top: 1px solid rgba(255,255,255,0.07);
+  display: flex; align-items: center; gap: 1.5rem;
+  text-align: left;
+}
+
+.founder-avatar {
+  width: 60px; height: 60px; border-radius: 50%;
+  background: linear-gradient(135deg, var(--teal), var(--navy));
+  border: 2px solid rgba(78,205,180,0.3);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.5rem; flex-shrink: 0;
+}
+
+.founder-name {
+  font-family: 'Syne', sans-serif;
+  font-size: 1rem; font-weight: 700; color: var(--white);
+}
+
+.founder-title {
+  font-size: 0.82rem; color: var(--muted);
+  margin-top: 0.2rem; line-height: 1.5;
+}
+
+/* ── CTA / WAITLIST ── */
+.cta-section {
+  padding: 8rem 2rem;
+  background: var(--navy);
+  position: relative; overflow: hidden;
+}
+
+.cta-section::before {
+  content: '';
+  position: absolute; top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  width: 800px; height: 600px;
+  background: radial-gradient(ellipse, rgba(13,110,110,0.12) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.cta-inner {
+  max-width: 640px; margin: 0 auto;
+  text-align: center; position: relative; z-index: 1;
+}
+
+.cta-inner h2 {
+  font-family: 'Syne', sans-serif;
+  font-size: clamp(2rem, 4vw, 3rem);
+  font-weight: 800; letter-spacing: -1px;
+  margin-bottom: 1rem; line-height: 1.1;
+}
+
+.cta-inner p {
+  color: rgba(255,255,255,0.45);
+  font-size: 1rem; line-height: 1.7;
+  font-weight: 300; margin-bottom: 2.5rem;
+}
+
+/* Tabs */
+.cta-tabs {
+  display: flex; background: rgba(255,255,255,0.05);
+  border-radius: 10px; padding: 0.3rem; gap: 0.25rem;
+  margin-bottom: 2rem;
+}
+
+.cta-tab {
+  flex: 1; padding: 0.6rem;
+  text-align: center; cursor: pointer;
+  font-size: 0.85rem; font-weight: 700;
+  background: transparent; border: none;
+  color: rgba(255,255,255,0.4); border-radius: 7px;
+  transition: all 0.2s; font-family: 'Syne', sans-serif;
+}
+
+.cta-tab.active {
+  background: var(--teal); color: white;
+}
+
+/* Waitlist form */
+.waitlist-form {
+  display: flex; flex-direction: column; gap: 0.85rem;
+}
+
+.wf-row { display: flex; gap: 0.75rem; }
+
+.wf-input {
+  flex: 1; background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 10px; padding: 0.85rem 1.1rem;
+  font-size: 0.9rem; color: var(--white);
+  font-family: 'DM Sans', sans-serif;
+  outline: none; transition: border-color 0.2s;
+}
+
+.wf-input::placeholder { color: rgba(255,255,255,0.25); }
+.wf-input:focus { border-color: var(--teal); }
+
+.wf-select {
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 10px; padding: 0.85rem 1.1rem;
+  font-size: 0.9rem; color: var(--white);
+  font-family: 'DM Sans', sans-serif;
+  outline: none; cursor: pointer;
+  transition: border-color 0.2s;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%239AA3AE' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 1rem center;
+  padding-right: 2.5rem;
+}
+
+.wf-select:focus { border-color: var(--teal); }
+.wf-select option { background: var(--navy); }
+
+.form-msg {
+  padding: 0.75rem 1rem; border-radius: 8px;
+  font-size: 0.83rem; display: none;
+}
+
+.form-msg.ok {
+  background: rgba(16,185,129,0.1);
+  border: 1px solid rgba(16,185,129,0.2);
+  color: #6ee7b7;
+}
+
+.form-msg.err {
+  background: rgba(220,38,38,0.1);
+  border: 1px solid rgba(220,38,38,0.2);
+  color: #fca5a5;
+}
+
+/* Signup form (direct) */
+.signup-form { display: none; flex-direction: column; gap: 0.85rem; }
+.signup-form.active { display: flex; }
+.waitlist-form.active { display: flex; }
+.waitlist-form { display: none; }
 
 /* ── FOOTER ── */
 footer {
-  background: #060F1D;
-  border-top: 1px solid rgba(255,255,255,0.04);
-  padding: 1.8rem 6%;
+  padding: 3rem 3rem 2.5rem;
+  border-top: 1px solid rgba(255,255,255,0.06);
   display: flex; align-items: center;
-  justify-content: space-between; flex-wrap: wrap; gap: 1rem;
+  justify-content: space-between; flex-wrap: wrap; gap: 1.5rem;
 }
-.foot-logo { font-size: 1.1rem; font-weight: 700; color: white; }
-.foot-logo span { color: var(--teal); }
-footer p { font-size: 0.73rem; color: rgba(255,255,255,0.28); }
-.foot-right { display: flex; align-items: center; gap: 0.55rem; }
-.foot-email {
-  font-size: 0.73rem; color: rgba(255,255,255,0.3);
-  text-decoration: none; transition: color 0.2s; margin-right: 0.25rem;
-}
-.foot-email:hover { color: white; }
-.foot-icon {
-  width: 30px; height: 30px; border-radius: 50%;
-  background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.07);
-  display: flex; align-items: center; justify-content: center;
-  color: rgba(255,255,255,0.32); text-decoration: none; transition: all 0.2s;
-}
-.foot-icon:hover { background: rgba(13,110,110,0.2); border-color: rgba(13,110,110,0.4); color: white; }
-.foot-icon svg { width: 12px; height: 12px; }
 
-/* ── ANIMATIONS ── */
-@keyframes fadeUp {
-  from { opacity:0; transform:translateY(18px); }
-  to   { opacity:1; transform:translateY(0); }
+.footer-logo {
+  font-family: 'Syne', sans-serif;
+  font-size: 1.1rem; font-weight: 800;
+  color: var(--white); text-decoration: none;
 }
+
+.footer-logo span { color: var(--teal-lt); }
+
+.footer-links {
+  display: flex; gap: 2rem; list-style: none;
+}
+
+.footer-links a {
+  font-size: 0.8rem; color: rgba(255,255,255,0.35);
+  text-decoration: none; transition: color 0.2s;
+}
+
+.footer-links a:hover { color: rgba(255,255,255,0.7); }
+
+.footer-copy {
+  font-size: 0.78rem; color: rgba(255,255,255,0.2);
+}
+
+/* ── SCROLL REVEAL ── */
 .reveal {
-  opacity: 0; transform: translateY(22px);
-  transition: opacity 0.6s ease, transform 0.6s ease;
+  opacity: 0; transform: translateY(32px);
+  transition: opacity 0.7s ease, transform 0.7s ease;
 }
-.reveal.in { opacity:1; transform:translateY(0); }
+
+.reveal.visible {
+  opacity: 1; transform: translateY(0);
+}
+
+.reveal-delay-1 { transition-delay: 0.1s; }
+.reveal-delay-2 { transition-delay: 0.2s; }
+.reveal-delay-3 { transition-delay: 0.3s; }
+.reveal-delay-4 { transition-delay: 0.4s; }
+.reveal-delay-5 { transition-delay: 0.5s; }
 
 /* ── RESPONSIVE ── */
-@media (max-width: 820px) {
-  .wl-layout { grid-template-columns: 1fr; gap: 2.5rem; }
-}
-@media (max-width: 720px) {
+@media (max-width: 900px) {
+  nav { padding: 1rem 1.5rem; }
   .nav-links { display: none; }
-  nav { padding: 1rem 5%; }
-  section, #waitlist { padding: 4.5rem 5%; }
-  #founder { padding: 4.5rem 5%; }
-  .hero-stats { max-width: 100%; }
-  .hstat { min-width: 120px; padding: 1rem 1.1rem; }
-  footer { flex-direction: column; text-align: center; }
-  .foot-right { justify-content: center; }
-  .founder-box { padding: 2rem 1.75rem; }
+  .problem-inner { grid-template-columns: 1fr; gap: 3rem; }
+  .features-grid { grid-template-columns: 1fr 1fr; }
+  .pricing-grid { grid-template-columns: 1fr; max-width: 400px; margin: 3rem auto 0; }
+  .testimonials-grid { grid-template-columns: 1fr; max-width: 480px; margin: 3rem auto 0; }
+  footer { flex-direction: column; text-align: center; padding: 2rem 1.5rem; }
+  .footer-links { flex-wrap: wrap; justify-content: center; }
 }
-@media (max-width: 480px) {
-  .fg2 { grid-template-columns: 1fr; }
-  .hero-actions { flex-direction: column; align-items: flex-start; }
-  h1 { letter-spacing: -1.5px; }
+
+@media (max-width: 640px) {
+  nav { padding: 1rem; }
+  .hero { padding: 7rem 1.25rem 5rem; }
+  .features-grid { grid-template-columns: 1fr; }
+  .wf-row { flex-direction: column; }
+  .hero-proof { gap: 1.25rem; }
+  .proof-divider { display: none; }
+  .about-inner, .cta-inner { padding: 0 0.5rem; }
+  .founder-block { flex-direction: column; text-align: center; }
 }
 </style>
 </head>
 <body>
 
 <!-- NAV -->
-<nav>
-  <a class="nav-logo" href="#">Medi<span>col</span></a>
+<nav id="main-nav">
+  <a class="nav-logo" href="#">Min<span>za</span></a>
   <ul class="nav-links">
     <li><a href="#problem">Problem</a></li>
-    <li><a href="#vision">Vision</a></li>
-    <li><a href="#founder">Our Why</a></li>
+    <li><a href="#features">Features</a></li>
+    <li><a href="#pricing">Pricing</a></li>
+    <li><a href="#about">About</a></li>
   </ul>
-  <a href="#waitlist" class="nav-cta">Join Waitlist</a>
+  <div class="nav-cta">
+    <a href="app.html" class="btn btn-ghost">Sign In</a>
+    <a href="#join" class="btn btn-teal">Get Started</a>
+  </div>
 </nav>
 
 <!-- HERO -->
-<section id="hero">
-  <div class="hero-content">
-
-    <div class="hero-badge">Early Stage &nbsp;· </div>
-
-    <h1>The missing layer<br>in <em>African healthcare</em></h1>
-
-    <p class="hero-sub">
-      A doctor has no way of knowing what drugs you were given last month, a pharmacist has no way of verifying your prescription and an insurer still has to process claims on paper. This isn't a technology problem, it's an infrastructure problem. Nobody has built the layer underneath yet and that's what we're doing.
-    </p>
-
-    <div class="hero-actions">
-      <a href="#waitlist" class="btn-primary">Get Early Access</a>
-      <a href="#problem" class="btn-ghost">See the problem →</a>
+<section class="hero">
+  <div class="hero-eyebrow">Now live in Kampala, Uganda</div>
+  <h1>The infrastructure<br/>Africa's healthcare<br/><em>was missing</em></h1>
+  <p class="hero-sub">One platform connecting clinics, pharmacies, labs, and hospitals. Manage operations, share patient records, and process insurance — for the first time, digitally.</p>
+  <div class="hero-actions">
+    <a href="#join" class="btn btn-teal btn-xl">Get Started Free →</a>
+    <a href="#features" class="btn btn-ghost btn-xl">See how it works</a>
+  </div>
+  <div class="hero-proof">
+    <div class="proof-item">
+      <div class="proof-num">4<span>+</span></div>
+      <div class="proof-label">Active facilities</div>
     </div>
-
-    <div class="hero-stats">
-
-      <div class="hstat">
-        <div class="hstat-num">1.4B</div>
-        <div class="hstat-label">People with no portable health record</div>
-      </div>
-
-      <div class="hstat">
-        <div class="hstat-num">$259B</div>
-        <div class="hstat-label">African health market by 2030</div>
-      </div>
-
-      <div class="hstat">
-        <div class="hstat-num">~0</div>
-        <div class="hstat-label">Interoperable health systems across the continent</div>
-      </div>
-
+    <div class="proof-divider"></div>
+    <div class="proof-item">
+      <div class="proof-num">30<span>d</span></div>
+      <div class="proof-label">Free trial</div>
     </div>
-
+    <div class="proof-divider"></div>
+    <div class="proof-item">
+      <div class="proof-num">5<span>min</span></div>
+      <div class="proof-label">To get started</div>
+    </div>
+    <div class="proof-divider"></div>
+    <div class="proof-item">
+      <div class="proof-num">UGX <span style="font-size:1.4rem;">75k</span></div>
+      <div class="proof-label">Starting price/month</div>
+    </div>
+  </div>
+  <div class="scroll-hint">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+    Scroll
   </div>
 </section>
 
 <!-- PROBLEM -->
-<section id="problem">
-  <span class="stag reveal">The Problem</span>
-  <h2 class="reveal">Healthcare isn't broken<br>because of <em>bad doctors.</em><br>It's broken underneath.</h2>
-  <p class="ssub reveal">The systems that should connect clinics, labs, pharmacies, and governments simply don't exist. Every actor operates in isolation, and the patient pays for it at every handoff.</p>
-
-  <div class="pgrid">
-    <div class="pcard reveal">
-      <div class="pcard-icon">🗂️</div>
-      <h3>Records live in your head</h3>
-      <p>A patient walks into a new clinic has start from scratch. Previous diagnoses, allergies, chronic conditions all gone. The doctor has nothing so they guess, over-test, or miss something that someone else already caught.</p>
-      <span class="pchip">~90% of records are still paper-based</span>
-    </div>
-
-    <div class="pcard reveal">
-      <div class="pcard-icon">🔌</div>
-      <h3>Nothing talks to anything else</h3>
-      <p>A prescription written at a clinic can't be verified at the pharmacy down the same street. A lab result has no way of reaching the referring doctor. An insurer gets a handwritten claim form. Every single handoff is literally a broken link.</p>
-      <span class="pchip">Zero continent-wide data standard</span>
-    </div>
-
-    <div class="pcard reveal">
-      <div class="pcard-icon">📊</div>
-      <h3>Governments are flying blind</h3>
-      <p>Disease surveillance across most of Africa runs weeks or months behind. Outbreak detection, drug stock-outs, regional health trends are alll mostly estimates. The data exists in fragments because nobody has assembled it into something governments can actually use.</p>
-      <span class="pchip">Policy made without real-time data</span>
-    </div>
-  </div>
-</section>
-
-<!-- VISION -->
-<section id="vision">
-  <span class="stag reveal">What We're Building</span>
-  <h2 class="reveal" style="color:white;">One platform. Every actor.<br><em>One connected system.</em></h2>
-  <p class="ssub reveal">Medicol is not another hospital management app. We're building the API layer — the connective tissue that every actor in African healthcare plugs into. Network effects compound with every new participant and our data moat basically builds itself.</p>
-
-  <div class="os reveal">
-    <div class="os-hub">
-      <div class="os-hub-name">Medicol</div>
-      <p>Unified health data &amp; workflow infrastructure</p>
-    </div>
-    <div class="os-line"></div>
-    <div class="os-nodes">
-      <div class="os-node"><span class="os-node-icon">🏥</span><span class="os-node-text">Clinics &amp; Hospitals</span></div>
-      <div class="os-node"><span class="os-node-icon">💊</span><span class="os-node-text">Pharmacies</span></div>
-      <div class="os-node"><span class="os-node-icon">🧪</span><span class="os-node-text">Diagnostic Labs</span></div>
-      <div class="os-node"><span class="os-node-icon">🛡️</span><span class="os-node-text">Health Insurers</span></div>
-      <div class="os-node"><span class="os-node-icon">🏛️</span><span class="os-node-text">Governments &amp; MOH</span></div>
-      <div class="os-node"><span class="os-node-icon">👤</span><span class="os-node-text">Patients</span></div>
-    </div>
-  </div>
-</section>
-
-<!-- WHY NOW -->
-<section id="whynow">
-  <span class="stag reveal">Why Now</span>
-  <h2 class="reveal">Three things just became<br><em>simultaneously true.</em></h2>
-  <p class="ssub reveal">Infrastructure businesses need specific conditions to work. We think those conditions have arrived, and they won't stay open indefinitely.</p>
-
-  <div class="wgrid">
-    <div class="wcard reveal">
-      <div class="wcard-num">$259B</div>
-      <p>The African healthcare market is estimated to hit $259 billion by 2030 and almost none of the foundational data infrastructure has been built yet. The floor is completely open.</p>
-    </div>
-    <div class="wcard reveal">
-      <div class="wcard-num">UHC</div>
-      <p>Uganda, Kenya, Rwanda, Nigeria and many other governments across the continent are pushing Universal Health Coverage. Every UHC programme needs exactly what we're building: an interoperable layer to manage claims, coverage, and outcomes.</p>
-    </div>
-    <div class="wcard reveal">
-      <div class="wcard-num">4G+</div>
-      <p>Mobile penetration and 4G have hit critical mass across East Africa. A software infrastructure layer that needs reliable connectivity is finally deployable outside major cities. The window is now.</p>
-    </div>
-  </div>
-</section>
-
-<!-- FOUNDER NOTE -->
-<section id="founder">
-  <span class="stag reveal">Our Why</span>
-  <div class="founder-box reveal">
-    <p class="fquote">
-      The ordinary patient in Uganda has to carry a bunch of medical documents, often worn, to every appointment because those few papers hold their entire medical history. Pharmacists often dispense the wrong drug because the handwriting on the prescription slip is illegible. Insurance claims usually sit for months unattended because no one has a way of verifying anything.<br/><br/>
-      These aren't edge cases, they're a normality in Uganda and Africa at large, and none of them are the fault of the doctors, pharmacists or even the patients involved. They're the fault of the missing infrastructure.<br/><br/>
-      The countries that fixed this, Denmark, Singapore and many others did not do it by building better hospital management apps. They instead built the layer underneath first. Africa hasn't built that layer yet. We at Medicol, are going to. 
-    </p>
-    <div class="fbyline">
-      <div class="favatar">PA</div>
-      <div>
-        <div class="fname">Patience Amanya</div>
-        <div class="frole">Founder, Medicol &nbsp;·&nbsp; Kampala, Uganda</div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- WAITLIST -->
-<section id="waitlist">
-  <div class="wl-layout">
-
-    <div class="wl-left">
-      <span class="stag reveal">Get Involved</span>
-      <h2 class="reveal">Be a part of this<br>from the start.</h2>
-      <p class="wl-note reveal">We're in early conversations with clinics, pharmacies, and labs in Kampala. Whether you're a health facility, an investor, or someone who wants to help build this, we want to talk to you.</p>
-      <div class="wl-trust reveal">
-        <div class="trust-row">No spam. Meaningful updates only, when there's something real to say.</div>
-        <div class="trust-row">Early partners will have direct input into what gets built next.</div>
-      </div>
-    </div>
-
+<section class="problem" id="problem">
+  <div class="problem-inner">
     <div class="reveal">
-      <form class="wl-form" id="wlForm">
-        <div class="fg2">
-          <div class="fg">
-            <label>First Name</label>
-            <input type="text" id="fn" placeholder="Grace" required/>
-          </div>
-          <div class="fg">
-            <label>Last Name</label>
-            <input type="text" id="ln" placeholder="Nakato" required/>
-          </div>
+      <div class="section-label">The Problem</div>
+      <h2>African healthcare runs on paper and memory</h2>
+      <p>A patient walks into a clinic in Wandegeya. Their entire medical history is on a worn exercise book — if they remembered to bring it. The doctor writes a prescription by hand. The pharmacy has no idea it's coming. The lab result goes back on paper.</p>
+      <p>This isn't a technology problem. It's an infrastructure problem. The connected layer that makes modern healthcare possible was never built for Africa.</p>
+      <p style="color: rgba(255,255,255,0.7); font-weight:400;">Minza builds it.</p>
+    </div>
+    <div class="problem-cards reveal reveal-delay-2">
+      <div class="problem-card">
+        <div class="pc-icon">📋</div>
+        <div class="pc-text">
+          <strong>No patient history continuity</strong>
+          <span>Records live in paper exercise books. Lost books mean lost histories. Facilities have no visibility into a patient's prior care.</span>
         </div>
-
-        <div class="fg">
-          <label>Email Address</label>
-          <input type="email" id="em" placeholder="grace@clinic.ug" required/>
+      </div>
+      <div class="problem-card">
+        <div class="pc-icon">💊</div>
+        <div class="pc-text">
+          <strong>Prescriptions die in transit</strong>
+          <span>Doctor writes, patient carries paper to pharmacy. No tracking. No confirmation. No record of what was dispensed.</span>
         </div>
-
-        <div class="fg">
-          <label>I am a...</label>
-          <select id="rl" required>
-            <option value="" disabled selected>Select your role</option>
-            <option>Clinic / Hospital</option>
-            <option>Pharmacy</option>
-            <option>Diagnostic Lab</option>
-            <option>Health Insurer</option>
-            <option>Investor</option>
-            <option>Potential Co-founder</option>
-            <option>Government / Public Health</option>
-            <option>Medical Student</option>
-            <option>Other</option>
-          </select>
+      </div>
+      <div class="problem-card">
+        <div class="pc-icon">🏥</div>
+        <div class="pc-text">
+          <strong>Facilities operate in silos</strong>
+          <span>Clinics, labs, pharmacies, and hospitals cannot see each other's work. Every handoff is manual, prone to error, and invisible.</span>
         </div>
-
-        <div class="form-err" id="ferr"></div>
-
-        <button type="submit" class="btn-sub" id="subBtn">
-          <span class="btxt">Join the Waitlist →</span>
-          <div class="spin"></div>
-        </button>
-
-        <p class="fnote">Interested in co-founding? Select "Potential Co-founder" and we'll reach out directly.</p>
-      </form>
-
-      <div class="success" id="succ">
-        <strong>You're on the list.</strong> Thank you for believing in this early. We'll be in touch soon, watch your inbox.
+      </div>
+      <div class="problem-card">
+        <div class="pc-icon">📊</div>
+        <div class="pc-text">
+          <strong>No data for anyone</strong>
+          <span>Governments can't see epidemics forming. Insurers can't verify claims. Facilities can't manage stock intelligently.</span>
+        </div>
       </div>
     </div>
+  </div>
+</section>
 
+<!-- FEATURES -->
+<section class="features" id="features">
+  <div class="features-inner">
+    <div class="section-header reveal">
+      <div class="section-label">What Minza Does</div>
+      <h2>One platform. Every facility type.</h2>
+      <p>Built for the 3-room clinic in Wandegeya, scalable to the full hospital network. Each module works standalone — together, they become something entirely new.</p>
+    </div>
+    <div class="features-grid">
+      <div class="feature-card reveal reveal-delay-1">
+        <div class="fc-icon">🏥</div>
+        <h3>Clinic Management</h3>
+        <p>Patient registration, vitals capture, diagnosis, treatment notes, referrals, and follow-up tracking — all in one workflow. Replaces the exercise book permanently.</p>
+        <span class="feature-tag">Clinic</span>
+      </div>
+      <div class="feature-card reveal reveal-delay-2">
+        <div class="fc-icon">💊</div>
+        <h3>Pharmacy Operations</h3>
+        <p>Drug inventory with expiry tracking, dispensing log, stock valuation, prescription queue, and revenue reporting. Know your stock value at a glance.</p>
+        <span class="feature-tag">Pharmacy</span>
+      </div>
+      <div class="feature-card reveal reveal-delay-3">
+        <div class="fc-icon">🧪</div>
+        <h3>Diagnostic Lab</h3>
+        <p>Test request queue, worklist management, result entry with reference ranges, turnaround time tracking, and automatic status updates.</p>
+        <span class="feature-tag">Lab</span>
+      </div>
+      <div class="feature-card reveal reveal-delay-1">
+        <div class="fc-icon">🔗</div>
+        <h3>Internal Departments</h3>
+        <p>Doctor writes a prescription — pharmacy sees it instantly. Doctor refers to lab — request appears in the worklist. Connected internally before connecting externally.</p>
+        <span class="feature-tag">Coming Soon</span>
+      </div>
+      <div class="feature-card reveal reveal-delay-2">
+        <div class="fc-icon">📈</div>
+        <h3>Analytics & Insights</h3>
+        <p>Drug velocity, condition frequency, revenue trends, stock valuation, and patient flow — the signals that help you run a better facility.</p>
+        <span class="feature-tag">All Facilities</span>
+      </div>
+      <div class="feature-card reveal reveal-delay-3">
+        <div class="fc-icon">🌍</div>
+        <h3>Network Interoperability</h3>
+        <p>When enough facilities are on Minza, patient records travel with the patient. Cross-facility visibility. The infrastructure layer Africa needs.</p>
+        <span class="feature-tag">Roadmap</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PRICING -->
+<section class="pricing" id="pricing">
+  <div class="pricing-inner">
+    <div class="section-header reveal">
+      <div class="section-label">Pricing</div>
+      <h2>Pay for what you use</h2>
+      <p>Per-department pricing. Activate what you need, expand as you grow. Every plan starts with a 30-day free trial.</p>
+    </div>
+    <div class="pricing-grid">
+      <div class="pricing-card reveal reveal-delay-1">
+        <h3>Pharmacy</h3>
+        <div class="pricing-amount"><sub>UGX </sub>75,000</div>
+        <div class="pricing-period">per month</div>
+        <ul class="pricing-features">
+          <li>Drug inventory management</li>
+          <li>Dispensing log & receipts</li>
+          <li>Stock valuation dashboard</li>
+          <li>Expiry tracking & alerts</li>
+          <li>Revenue reporting</li>
+        </ul>
+        <a href="#join" class="btn btn-ghost" style="width:100%;justify-content:center;">Start Free Trial</a>
+      </div>
+      <div class="pricing-card featured reveal reveal-delay-2">
+        <h3>Full Clinic</h3>
+        <div class="pricing-amount"><sub>UGX </sub>350,000</div>
+        <div class="pricing-period">per month · 4 departments</div>
+        <ul class="pricing-features">
+          <li>Reception + patient queue</li>
+          <li>Doctor consultations & Rx</li>
+          <li>Clinic pharmacy queue</li>
+          <li>Diagnostic lab worklist</li>
+          <li>All analytics & reporting</li>
+        </ul>
+        <a href="#join" class="btn btn-teal" style="width:100%;justify-content:center;">Start Free Trial</a>
+      </div>
+      <div class="pricing-card reveal reveal-delay-3">
+        <h3>Diagnostic Lab</h3>
+        <div class="pricing-amount"><sub>UGX </sub>100,000</div>
+        <div class="pricing-period">per month</div>
+        <ul class="pricing-features">
+          <li>Test request management</li>
+          <li>Worklist & priority queue</li>
+          <li>Result entry & dispatch</li>
+          <li>Turnaround time tracking</li>
+          <li>Top tests analytics</li>
+        </ul>
+        <a href="#join" class="btn btn-ghost" style="width:100%;justify-content:center;">Start Free Trial</a>
+      </div>
+    </div>
+    <p class="pricing-note reveal">
+      Per-department pricing available. A clinic with Reception + Doctor costs <strong>UGX 175,000/month</strong>.<br/>
+      Need a custom plan for a hospital? <a href="mailto:hello@minza.health" style="color:var(--teal-lt);text-decoration:none;">Contact us →</a>
+    </p>
+  </div>
+</section>
+
+<!-- TESTIMONIALS -->
+<section class="testimonials" id="testimonials">
+  <div class="testimonials-inner">
+    <div class="section-header reveal">
+      <div class="section-label">Early Feedback</div>
+      <h2>What facilities are saying</h2>
+      <p>From our first conversations in Wandegeya and beyond.</p>
+    </div>
+    <div class="testimonials-grid">
+      <div class="testimonial-card reveal reveal-delay-1">
+        <p class="testimonial-quote">We needed something that could replace our exercise book, remind us about follow-up patients, and track what drugs we had in stock. This does exactly that.</p>
+        <div class="testimonial-author">
+          <div class="author-avatar">🏥</div>
+          <div>
+            <div class="author-name">Clinic Administrator</div>
+            <div class="author-role">Private Clinic, Wandegeya</div>
+          </div>
+        </div>
+      </div>
+      <div class="testimonial-card reveal reveal-delay-2">
+        <p class="testimonial-quote">Knowing the value of my stock at any moment — that's something I've always wanted. I used to estimate it in my head. Now I just look at the screen.</p>
+        <div class="testimonial-author">
+          <div class="author-avatar">💊</div>
+          <div>
+            <div class="author-name">Pharmacy Owner</div>
+            <div class="author-role">Community Pharmacy, Kampala</div>
+          </div>
+        </div>
+      </div>
+      <div class="testimonial-card reveal reveal-delay-3">
+        <p class="testimonial-quote">I want departments for my lab, pharmacy, and doctor so they can talk to each other inside the system. That's what we're missing.</p>
+        <div class="testimonial-author">
+          <div class="author-avatar">🏨</div>
+          <div>
+            <div class="author-name">Medical Centre Director</div>
+            <div class="author-role">Multi-department Facility, Kampala</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ABOUT -->
+<section class="about" id="about">
+  <div class="about-inner">
+    <div class="reveal">
+      <div class="section-label">About</div>
+      <h2>Built in Kampala.<br/>For Africa.</h2>
+      <p>Minza started with a simple observation: every private clinic in Wandegeya was running on an exercise book. Not because the staff weren't capable — but because no one had built the right software for them.</p>
+      <p>The infrastructure layer that <strong>Epic, Waystar, and Health Catalyst</strong> built for developed markets was never built for Africa. We're building it from scratch, starting in Uganda, designed for the 3-room clinic before the 300-bed hospital.</p>
+      <p>The operations software gets you installed. The interoperability layer is what makes us impossible to replace.</p>
+    </div>
+    <div class="founder-block reveal reveal-delay-2">
+      <div class="founder-avatar">👤</div>
+      <div>
+        <div class="founder-name">Patience Kamayonza</div>
+        <div class="founder-title">Founder & CEO, Minza Health<br/>
+          <span style="color:var(--teal-lt);">Building health infrastructure for Africa, starting in Uganda.</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA / WAITLIST -->
+<section class="cta-section" id="join">
+  <div class="cta-inner">
+    <h2 class="reveal">Ready to modernise<br/>your facility?</h2>
+    <p class="reveal reveal-delay-1">Start your 30-day free trial today. No credit card required. Set up in under 5 minutes.</p>
+
+    <div class="cta-tabs reveal reveal-delay-2">
+      <button class="cta-tab active" onclick="switchCta('signup')">Register Facility</button>
+      <button class="cta-tab" onclick="switchCta('waitlist')">Join Waitlist</button>
+    </div>
+
+    <!-- Direct signup -->
+    <div class="signup-form active" id="cta-signup">
+      <div id="signup-msg" class="form-msg"></div>
+      <input class="wf-input" type="text" id="su-org" placeholder="Facility name e.g. Nakato Clinic"/>
+      <div class="wf-row">
+        <input class="wf-input" type="email" id="su-email" placeholder="Email address" style="flex:1;"/>
+        <input class="wf-input" type="password" id="su-pass" placeholder="Password (min. 6 chars)" style="flex:1;"/>
+      </div>
+      <select class="wf-select" id="su-type">
+        <option value="">Select facility type</option>
+        <option value="Clinic">Clinic</option>
+        <option value="Pharmacy">Pharmacy</option>
+        <option value="Hospital">Hospital</option>
+        <option value="Diagnostic Lab">Diagnostic Lab</option>
+      </select>
+      <button class="btn btn-teal btn-xl" onclick="doLandingSignup()" style="width:100%;justify-content:center;">
+        Create Account & Start Free Trial →
+      </button>
+      <p style="font-size:0.78rem;color:rgba(255,255,255,0.25);text-align:center;margin-top:0.25rem;">
+        Already have an account? <a href="app.html" style="color:var(--teal-lt);text-decoration:none;">Sign in →</a>
+      </p>
+    </div>
+
+    <!-- Waitlist -->
+    <div class="waitlist-form" id="cta-waitlist">
+      <div id="waitlist-msg" class="form-msg"></div>
+      <input class="wf-input" type="text" id="wl-name" placeholder="Your name"/>
+      <input class="wf-input" type="email" id="wl-email" placeholder="Email address"/>
+      <div class="wf-row">
+        <input class="wf-input" type="text" id="wl-facility" placeholder="Facility name" style="flex:1;"/>
+        <select class="wf-select" id="wl-type" style="flex:1;">
+          <option value="">Facility type</option>
+          <option>Clinic</option>
+          <option>Pharmacy</option>
+          <option>Hospital</option>
+          <option>Diagnostic Lab</option>
+        </select>
+      </div>
+      <button class="btn btn-teal btn-xl" onclick="doWaitlist()" style="width:100%;justify-content:center;">
+        Join the Waitlist →
+      </button>
+    </div>
   </div>
 </section>
 
 <!-- FOOTER -->
 <footer>
-  <div class="foot-logo">Medi<span>col</span></div>
-  <p>Medicol &nbsp;·&nbsp; Kampala, Uganda</p>
-  <div class="foot-right">
-    <a href="mailto:amanyapatience334@gmail.com" class="foot-email">amanyapatience334@gmail.com</a>
-    <a href="https://x.com/pkamayonza" class="foot-icon" target="_blank" aria-label="X">
-      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.742l7.74-8.854L1.254 2.25H8.08l4.259 5.63 5.905-5.63zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
-    </a>
-    <a href="https://www.linkedin.com/in/patience-a-673618316/" class="foot-icon" target="_blank" aria-label="LinkedIn">
-      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
-    </a>
-  </div>
+  <a class="footer-logo" href="#">Min<span>za</span></a>
+  <ul class="footer-links">
+    <li><a href="#problem">Problem</a></li>
+    <li><a href="#features">Features</a></li>
+    <li><a href="#pricing">Pricing</a></li>
+    <li><a href="#about">About</a></li>
+    <li><a href="mailto:hello@minza.health">Contact</a></li>
+  </ul>
+  <span class="footer-copy">© 2026 Minza Health. Kampala, Uganda.</span>
 </footer>
 
 <script>
 const SURL = 'https://qflqwmfdwalvmndaojzl.supabase.co';
 const SKEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFmbHF3bWZkd2Fsdm1uZGFvanpsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE2MjcxMTcsImV4cCI6MjA4NzIwMzExN30.Ewpo8PoGq6PGcHnN85aYCUdPtSv7RXoGh9qthBJHezA';
 
-document.getElementById('wlForm').addEventListener('submit', async function(e) {
-  e.preventDefault();
+// ── CTA tab switch ─────────────────────────────────
+function switchCta(tab) {
+  document.querySelectorAll('.cta-tab').forEach(t => t.classList.remove('active'));
+  event.target.classList.add('active');
+  document.getElementById('cta-signup').style.display   = tab === 'signup'   ? 'flex' : 'none';
+  document.getElementById('cta-waitlist').style.display = tab === 'waitlist' ? 'flex' : 'none';
+}
 
-  const btn  = document.getElementById('subBtn');
-  const err  = document.getElementById('ferr');
-  const succ = document.getElementById('succ');
+// ── Direct signup ──────────────────────────────────
+async function doLandingSignup() {
+  const org   = document.getElementById('su-org').value.trim();
+  const email = document.getElementById('su-email').value.trim();
+  const pass  = document.getElementById('su-pass').value;
+  const type  = document.getElementById('su-type').value;
+  const msg   = document.getElementById('signup-msg');
 
-  const fn = document.getElementById('fn').value.trim();
-  const ln = document.getElementById('ln').value.trim();
-  const em = document.getElementById('em').value.trim();
-  const rl = document.getElementById('rl').value;
+  if (!org || !email || !pass || !type) {
+    showMsg(msg, 'err', 'All fields required.');
+    return;
+  }
+  if (pass.length < 6) {
+    showMsg(msg, 'err', 'Password must be at least 6 characters.');
+    return;
+  }
 
-  err.classList.remove('on');
-  err.textContent = '';
-  btn.disabled = true;
-  btn.classList.add('loading');
+  try {
+    const res = await fetch(`${SURL}/auth/v1/signup`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'apikey': SKEY },
+      body: JSON.stringify({ email, password: pass, data: { org_name: org, org_type: type } })
+    });
+    const d = await res.json();
+    if (!res.ok) throw new Error(d.error_description || d.msg || 'Signup failed');
+    showMsg(msg, 'ok', '✅ Account created! Check your email to confirm, then sign in.');
+    ['su-org','su-email','su-pass'].forEach(id => document.getElementById(id).value = '');
+    document.getElementById('su-type').value = '';
+  } catch(e) {
+    showMsg(msg, 'err', e.message);
+  }
+}
+
+// ── Waitlist ───────────────────────────────────────
+async function doWaitlist() {
+  const name     = document.getElementById('wl-name').value.trim();
+  const email    = document.getElementById('wl-email').value.trim();
+  const facility = document.getElementById('wl-facility').value.trim();
+  const type     = document.getElementById('wl-type').value;
+  const msg      = document.getElementById('waitlist-msg');
+
+  if (!name || !email) {
+    showMsg(msg, 'err', 'Name and email required.');
+    return;
+  }
 
   try {
     const res = await fetch(`${SURL}/rest/v1/waitlist`, {
       method: 'POST',
       headers: {
-        'Content-Type':  'application/json',
-        'apikey':         SKEY,
+        'Content-Type': 'application/json',
+        'apikey': SKEY,
         'Authorization': `Bearer ${SKEY}`,
-        'Prefer':         'return=minimal'
+        'Prefer': 'return=minimal'
       },
-      body: JSON.stringify({ first_name: fn, last_name: ln, email: em, role: rl })
+      body: JSON.stringify({ name, email, facility_name: facility || null, facility_type: type || null })
     });
-
-    if (res.ok) {
-      document.getElementById('wlForm').style.display = 'none';
-      succ.style.display = 'block';
-      succ.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    } else {
+    if (!res.ok) {
       const d = await res.json();
-      err.textContent = d.code === '23505'
-        ? 'That email is already on the list — we have you.'
-        : 'Something went wrong. Please try again.';
-      err.classList.add('on');
-      btn.disabled = false;
-      btn.classList.remove('loading');
+      throw new Error(d.message || 'Failed to join waitlist');
     }
-  } catch {
-    err.textContent = 'Could not connect. Check your connection and try again.';
-    err.classList.add('on');
-    btn.disabled = false;
-    btn.classList.remove('loading');
+    showMsg(msg, 'ok', '✅ You\'re on the list! We\'ll be in touch soon.');
+    ['wl-name','wl-email','wl-facility'].forEach(id => document.getElementById(id).value = '');
+    document.getElementById('wl-type').value = '';
+  } catch(e) {
+    showMsg(msg, 'err', e.message);
   }
-});
+}
 
-// scroll reveal
-const io = new IntersectionObserver((entries) => {
-  entries.forEach((entry, i) => {
-    if (entry.isIntersecting) {
-      setTimeout(() => entry.target.classList.add('in'), i * 65);
-      io.unobserve(entry.target);
+function showMsg(el, type, text) {
+  el.textContent = text;
+  el.className = `form-msg ${type}`;
+  el.style.display = 'block';
+  if (type === 'ok') setTimeout(() => el.style.display = 'none', 6000);
+}
+
+// ── Scroll reveal ──────────────────────────────────
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      e.target.classList.add('visible');
+      observer.unobserve(e.target);
     }
   });
-}, { threshold: 0.07 });
+}, { threshold: 0.12 });
 
-document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+// ── Nav scroll shadow ──────────────────────────────
+window.addEventListener('scroll', () => {
+  const nav = document.getElementById('main-nav');
+  if (window.scrollY > 40) {
+    nav.style.boxShadow = '0 4px 30px rgba(0,0,0,0.3)';
+  } else {
+    nav.style.boxShadow = 'none';
+  }
+});
 </script>
 
 </body>
