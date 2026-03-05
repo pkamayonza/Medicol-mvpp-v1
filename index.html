@@ -3396,13 +3396,11 @@ function showReceipt(r){
 
 function printReceipt(){
   const content=document.getElementById('receipt-body').innerHTML;
-  const w=window.open('','_blank','width=380,height=600');
-  w.document.write(`<html><head><title>Receipt</title>
-    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700&display=swap" rel="stylesheet"/>
-    <style>body{font-family:'Syne',sans-serif;padding:1.5rem;max-width:340px;margin:0 auto;}
-    .receipt{border:none;padding:0;} @media print{body{margin:0;padding:0.5rem;}}</style>
-    </head><body>${content}<scr`+`ipt>window.onload=()=>window.print()</scr`+`ipt></body></html>`);
-  w.document.close();
+  const css="body{font-family:'Syne',sans-serif;padding:1.5rem;max-width:340px;margin:0 auto;}.receipt{border:none;padding:0;}@media print{body{margin:0;padding:0.5rem;}}";
+  const html='<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Receipt<\/title><link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700&display=swap" rel="stylesheet\/"><sty'+'le>'+css+'<\/sty'+'le><\/head><body>'+content+'<scr'+'ipt>window.onload=function(){window.print();}<\/scr'+'ipt><\/body><\/html>';
+  const blob=new Blob([html],{type:'text/html'});
+  const url=URL.createObjectURL(blob);
+  window.open(url,'_blank','width=380,height=600');
 }
 
 function reprintTxn(){ showReceipt(lastReceipt); cm('m-txn-detail'); }
