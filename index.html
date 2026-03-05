@@ -844,9 +844,10 @@
     .pos-selected-row{ flex-direction:column; align-items:flex-start; }
     .pos-line-total{ text-align:left; }
   }
-  ══════════════════════════════════ */
 
-  /* Intel bar */
+  /* ══════════════════════════════════
+     INTEL BAR
+  ══════════════════════════════════ */
   .inv-intel{
     display:flex; align-items:center; flex-wrap:wrap;
     background:white; border:1px solid #E8E6E1;
@@ -1072,15 +1073,15 @@
             </div>
           </div>
           <input type="hidden" id="s-role" value=""/>
-        <div class="fg" id="dept-selector" style="display:none;">
-          <label>Your Department</label>
-          <select id="s-dept" style="border:1px solid #E0DFDB;border-radius:8px;padding:0.7rem 1rem;font-size:0.9rem;font-family:'Syne',sans-serif;color:#0B1F3A;outline:none;">
-            <option value="">Select department</option>
-            <option value="reception">Reception</option>
-            <option value="doctor">Doctor / Clinician</option>
-            <option value="pharmacy">Clinic Pharmacy</option>
-          </select>
-        </div>
+          <div class="fg" id="dept-selector" style="display:none;">
+            <label>Your Department</label>
+            <select id="s-dept" style="border:1px solid #E0DFDB;border-radius:8px;padding:0.7rem 1rem;font-size:0.9rem;font-family:'Syne',sans-serif;color:#0B1F3A;outline:none;">
+              <option value="">Select department</option>
+              <option value="reception">Reception</option>
+              <option value="doctor">Doctor / Clinician</option>
+              <option value="pharmacy">Clinic Pharmacy</option>
+            </select>
+          </div>
         </div>
         <button class="btn-auth" onclick="doSignup()">Create Account →</button>
       </div>
@@ -1541,7 +1542,7 @@
         </div>
 
         <!-- Filled state -->
-        <div id="basket-filled" style="display:none;height:100%;display:none;flex-direction:column;">
+        <div id="basket-filled" style="display:none;height:100%;flex-direction:column;">
 
           <div class="pos-basket-header">
             <span>Current Sale</span>
