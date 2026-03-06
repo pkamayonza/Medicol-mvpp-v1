@@ -2267,47 +2267,53 @@
     </div>
   </div>
 
-  <!-- Enter Result Modal -->
+  <!-- Enter Result Modal — multi-test per request -->
   <div class="mo" id="m-enter-result">
-    <div class="mb" style="max-width:520px;">
-      <h3>Enter Result</h3>
+    <div class="mb" style="max-width:580px;">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.1rem;">
+        <h3 style="margin:0;">Enter Results</h3>
+        <button class="btn btn-sm" onclick="cm('m-enter-result')">✕</button>
+      </div>
       <input type="hidden" id="er-request-id"/>
       <div id="er-request-info" style="background:#F0EFEB;border-radius:8px;padding:0.8rem 1rem;
-           margin-bottom:1.2rem;font-size:0.85rem;border:1px solid #E0DFDB;"></div>
+           margin-bottom:1.2rem;font-size:0.85rem;border:1px solid #E0DFDB;line-height:1.6;"></div>
 
-      <div style="display:flex;flex-direction:column;gap:0.85rem;">
-        <div class="form-group">
-          <label>Result Value *</label>
-          <input type="text" id="er-value" placeholder="e.g. 5.2  or  Positive  or  Detected"/>
-        </div>
-        <div class="form-group">
-          <label>Unit</label>
-          <input type="text" id="er-unit" placeholder="e.g. mmol/L, g/dL, IU/L"/>
-        </div>
-        <div class="form-group">
-          <label>Reference Range</label>
-          <input type="text" id="er-ref" placeholder="e.g. 4.0–6.0  or  Negative"/>
-        </div>
-        <div class="form-group">
-          <label>Flag</label>
-          <select id="er-flag">
-            <option value="Normal">Normal</option>
-            <option value="High">High</option>
-            <option value="Low">Low</option>
-            <option value="Positive">Positive</option>
-            <option value="Negative">Negative</option>
-            <option value="Inconclusive">Inconclusive</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label>Technician Notes (optional)</label>
-          <input type="text" id="er-notes" placeholder="e.g. Haemolysed sample, repeat recommended"/>
-        </div>
+      <!-- one row per test — rendered dynamically by openEnterResult() -->
+      <div id="er-tests-rows" style="display:flex;flex-direction:column;gap:1rem;"></div>
+
+      <div class="form-group" style="margin-top:1rem;">
+        <label>General Technician Notes (optional)</label>
+        <input type="text" id="er-notes" placeholder="e.g. Haemolysed sample — repeat recommended"/>
       </div>
 
-      <div class="ma">
+      <div class="ma" style="margin-top:1.25rem;">
         <button class="btn btn-sm" onclick="cm('m-enter-result')">Cancel</button>
-        <button class="btn btn-primary" onclick="saveResult()">Save Result</button>
+        <button class="btn btn-primary" onclick="saveResult()">✅ Save All Results</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Result Detail Modal -->
+  <div class="mo" id="m-result-detail">
+    <div class="mb" style="max-width:540px;">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.2rem;">
+        <h3 style="margin:0;">Result Detail</h3>
+        <div style="display:flex;gap:0.5rem;">
+          <button class="btn btn-sm btn-primary" onclick="printResultReport()">🖨 Print Report</button>
+          <button class="btn btn-sm" onclick="cm('m-result-detail')">✕</button>
+        </div>
+      </div>
+      <div id="result-detail-body"></div>
+    </div>
+  </div>
+
+  <!-- Result Report (printable) Modal -->
+  <div class="mo" id="m-result-report">
+    <div class="mb" style="max-width:520px;">
+      <div id="result-report-body"></div>
+      <div class="ma" style="margin-top:1rem;">
+        <button class="btn btn-sm" onclick="cm('m-result-report')">Close</button>
+        <button class="btn btn-primary" onclick="doPrintResultReport()">🖨 Print / Save PDF</button>
       </div>
     </div>
   </div>
@@ -4264,16 +4270,17 @@ async function addTestRequest() {
     document.getElementById('lr-sample').value = '';
     document.getElementById('lr-priority').value = 'Routine';
 
-    // reset picker
+    // Snapshot count BEFORE resetting — was previously always logging 0
+    const submittedCount = selectedTests.length;
     selectedTests = [];
     renderSelectedTests();
     document.querySelectorAll('#lr-tests-picker button').forEach(b => {
       b.style.background='#F0EFEB'; b.style.color='#4A5568'; b.style.borderColor='#E0DFDB';
     });
 
-    posthog.capture('lab_request_submitted', {
-      facility: user?.user_metadata?.org_name||'unknown',
-      test_count: selectedTests.length
+    track('lab_request_submitted', {
+      facility:   user?.user_metadata?.org_name||'unknown',
+      test_count: submittedCount
     });
 
     loadWorklist();
@@ -4302,77 +4309,214 @@ async function saveTestStatus() {
   } catch(e) { toast('Error: '+e.message,'err'); }
 }
 
+// ── currentResultReport: holds data for the printable report ──
+let currentResultReport = null;
+
 function openEnterResult(requestId, patientName, tests) {
+  const req = testRequests.find(r => r.id === requestId);
   document.getElementById('er-request-id').value = requestId;
   document.getElementById('er-request-info').innerHTML =
-    `<strong>${patientName}</strong><br/><span style="color:#9AA3AE;font-size:0.8rem;">${tests}</span>`;
-  document.getElementById('er-value').value  = '';
-  document.getElementById('er-unit').value   = '';
-  document.getElementById('er-ref').value    = '';
-  document.getElementById('er-flag').value   = 'Normal';
-  document.getElementById('er-notes').value  = '';
+    `<strong>${patientName}</strong>
+     ${req?.patient_age  ? `<span style="color:#9AA3AE;font-size:0.8rem;"> · ${req.patient_age}y</span>` : ''}
+     ${req?.patient_gender ? `<span style="color:#9AA3AE;font-size:0.8rem;"> · ${req.patient_gender}</span>` : ''}
+     <br/><span style="color:#9AA3AE;font-size:0.8rem;">${tests}</span>
+     ${req?.requesting_doctor ? `<br/><span style="color:#9AA3AE;font-size:0.78rem;">Requested by: ${req.requesting_doctor}</span>` : ''}`;
+
+  // Build one input row per test
+  const testList = tests.split(',').map(t => t.trim()).filter(Boolean);
+  const flagOpts = ['Normal','High','Low','Positive','Negative','Inconclusive']
+    .map(f => `<option value="${f}">${f}</option>`).join('');
+
+  document.getElementById('er-tests-rows').innerHTML = testList.map((test, i) => `
+    <div style="background:#F8F7F3;border:1px solid #E8E6E1;border-radius:10px;padding:1rem;">
+      <div style="font-size:0.78rem;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;
+                  color:#9AA3AE;margin-bottom:0.75rem;">${test}</div>
+      <div style="display:grid;grid-template-columns:1fr 0.6fr 1fr 0.8fr;gap:0.6rem;align-items:start;">
+        <div class="form-group" style="margin:0;">
+          <label style="font-size:0.72rem;">Result Value *</label>
+          <input type="text" id="er-val-${i}" placeholder="e.g. 5.2 or Positive"/>
+        </div>
+        <div class="form-group" style="margin:0;">
+          <label style="font-size:0.72rem;">Unit</label>
+          <input type="text" id="er-unit-${i}" placeholder="mmol/L"/>
+        </div>
+        <div class="form-group" style="margin:0;">
+          <label style="font-size:0.72rem;">Reference Range</label>
+          <input type="text" id="er-ref-${i}" placeholder="4.0–6.0 or Negative"/>
+        </div>
+        <div class="form-group" style="margin:0;">
+          <label style="font-size:0.72rem;">Flag</label>
+          <select id="er-flag-${i}">${flagOpts}</select>
+        </div>
+      </div>
+    </div>`).join('');
+
+  document.getElementById('er-notes').value = '';
   document.getElementById('m-enter-result').classList.add('open');
 }
 
 async function saveResult() {
   const requestId = document.getElementById('er-request-id').value;
-  const value     = document.getElementById('er-value').value.trim();
-  if (!value) { toast('Result value required.','err'); return; }
+  const req       = testRequests.find(r => r.id === requestId);
+  const techNotes = document.getElementById('er-notes').value.trim() || null;
+  const testList  = (req?.tests_ordered||'').split(',').map(t=>t.trim()).filter(Boolean);
 
-  // get request details for patient name + tests
-  const req = testRequests.find(r => r.id===requestId);
+  // Validate — every test needs a result value
+  for (let i = 0; i < testList.length; i++) {
+    const val = document.getElementById(`er-val-${i}`)?.value.trim();
+    if (!val) { toast(`Result value required for: ${testList[i]}`, 'err'); return; }
+  }
+
+  // Collect rows
+  const resultRows = testList.map((test, i) => ({
+    test,
+    value:     document.getElementById(`er-val-${i}`).value.trim(),
+    unit:      document.getElementById(`er-unit-${i}`).value.trim() || null,
+    ref:       document.getElementById(`er-ref-${i}`).value.trim()  || null,
+    flag:      document.getElementById(`er-flag-${i}`).value
+  }));
+
+  // Determine overall flag — most severe wins
+  const flagSeverity = { 'Inconclusive':1,'Low':2,'High':3,'Positive':3,'Negative':0,'Normal':0 };
+  const overallFlag  = resultRows.reduce((top, r) =>
+    (flagSeverity[r.flag]||0) > (flagSeverity[top]||0) ? r.flag : top, 'Normal');
 
   try {
-    await db('test_results','POST', {
-      request_id:    requestId,
-      patient_name:  req?.patient_name||'Unknown',
-      tests_ordered: req?.tests_ordered||'',
-      result_value:  value,
-      result_unit:   document.getElementById('er-unit').value.trim()||null,
-      reference_range: document.getElementById('er-ref').value.trim()||null,
-      flag:          document.getElementById('er-flag').value,
-      tech_notes:    document.getElementById('er-notes').value.trim()||null,
-      org_id:        user.id
-    });
+    // One test_results row per test in the request
+    for (const row of resultRows) {
+      await db('test_results', 'POST', {
+        request_id:      requestId,
+        patient_name:    req?.patient_name || 'Unknown',
+        tests_ordered:   row.test,
+        result_value:    row.value,
+        result_unit:     row.unit,
+        reference_range: row.ref,
+        flag:            row.flag,
+        tech_notes:      techNotes,
+        org_id:          user.id
+      });
+    }
 
-    // update request status to Result Ready
-    await db(`test_requests?id=eq.${requestId}`,'PATCH', {
-      status: 'Result Ready',
+    // Mark request as Result Ready
+    await db(`test_requests?id=eq.${requestId}`, 'PATCH', {
+      status:          'Result Ready',
       result_ready_at: new Date().toISOString()
     });
 
-    toast('✅ Result saved! Status → Result Ready');
+    toast(`✅ ${resultRows.length} result${resultRows.length>1?'s':''} saved — status → Result Ready`);
     cm('m-enter-result');
+
+    // Offer to print the report immediately
+    currentResultReport = { req, resultRows, techNotes, savedAt: new Date() };
+    showResultReport(currentResultReport);
+
+    track('lab_result_entered', {
+      facility:    user?.user_metadata?.org_name || 'unknown',
+      test_count:  resultRows.length,
+      overall_flag: overallFlag
+    });
+
     loadWorklist();
-  } catch(e) { toast('Error: '+e.message,'err'); }
+  } catch(e) { toast('Error: ' + e.message, 'err'); }
 }
 
 async function loadLabResults() {
   try {
-    labResults = await db('test_results?select=*&order=created_at.desc');
+    // Fetch both so TAT calculation works regardless of navigation order
+    [labResults, testRequests] = await Promise.all([
+      db('test_results?select=*&order=created_at.desc'),
+      db('test_requests?select=*&order=created_at.desc')
+    ]);
     renderResults(labResults);
   } catch(e) {
-    document.getElementById('res-body').innerHTML = `<tr><td colspan="8" class="loading">Error: ${e.message}</td></tr>`;
+    document.getElementById('res-body').innerHTML =
+      `<tr><td colspan="8" class="loading">Error: ${e.message}</td></tr>`;
   }
 }
 
 function renderResults(arr) {
   const b = document.getElementById('res-body');
-  if (!arr.length) { b.innerHTML=`<tr><td colspan="8" class="loading">No results yet.</td></tr>`; return; }
-  b.innerHTML = arr.map(r => `<tr>
-    <td><strong>${r.patient_name||'—'}</strong></td>
-    <td style="font-size:0.82rem;">${(r.tests_ordered||'').split(',')[0]}</td>
-    <td><strong>${r.result_value||'—'} ${r.result_unit||''}</strong></td>
-    <td style="font-size:0.8rem;color:#9AA3AE;">${r.reference_range||'—'}</td>
-    <td>${resultFlagBadge(r.flag)}</td>
-    <td style="font-size:0.78rem;color:#9AA3AE;">
-      ${r.created_at && testRequests.find(x=>x.id===r.request_id)
-        ? fmtDuration(new Date(r.created_at) - new Date(testRequests.find(x=>x.id===r.request_id).created_at))
-        : '—'}
-    </td>
-    <td style="font-size:0.78rem;color:#9AA3AE;">${fmtDate(r.created_at)}</td>
-    <td><button class="btn btn-danger" onclick="delItem('test_results','${r.id}',loadLabResults)">Del</button></td>
-  </tr>`).join('');
+  if (!arr.length) { b.innerHTML=`<tr><td colspan="9" class="loading">No results yet.</td></tr>`; return; }
+  b.innerHTML = arr.map(r => {
+    const parentReq = testRequests.find(x => x.id === r.request_id);
+    const tat = (r.created_at && parentReq?.created_at)
+      ? fmtDuration(new Date(r.created_at) - new Date(parentReq.created_at))
+      : '—';
+    return `<tr>
+      <td><strong>${r.patient_name||'—'}</strong></td>
+      <td style="font-size:0.82rem;">${r.tests_ordered||'—'}</td>
+      <td><strong>${r.result_value||'—'}${r.result_unit?' '+r.result_unit:''}</strong></td>
+      <td style="font-size:0.8rem;color:#9AA3AE;">${r.reference_range||'—'}</td>
+      <td>${resultFlagBadge(r.flag)}</td>
+      <td style="font-size:0.78rem;color:#9AA3AE;">${tat}</td>
+      <td style="font-size:0.78rem;color:#9AA3AE;">${fmtDate(r.created_at)}</td>
+      <td class="td-actions">
+        <button class="btn btn-sm" onclick="viewResult('${r.id}')">View</button>
+        <button class="btn btn-danger" onclick="delItem('test_results','${r.id}',loadLabResults)">Del</button>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+function viewResult(id) {
+  const r   = labResults.find(x => x.id === id);
+  if (!r) return;
+  const req = testRequests.find(x => x.id === r.request_id);
+  const tat = (r.created_at && req?.created_at)
+    ? fmtDuration(new Date(r.created_at) - new Date(req.created_at)) : '—';
+
+  document.getElementById('result-detail-body').innerHTML = `
+    <div style="background:#F0EFEB;border-radius:10px;padding:1rem;margin-bottom:1.2rem;border:1px solid #E0DFDB;">
+      <div style="font-weight:700;font-size:0.95rem;">${r.patient_name||'—'}</div>
+      <div style="font-size:0.8rem;color:#9AA3AE;margin-top:0.2rem;">
+        ${req?.patient_age?req.patient_age+'y · ':''}${req?.patient_gender||''}
+        ${req?.requesting_doctor?' · Req. by: '+req.requesting_doctor:''}
+      </div>
+      <div style="font-size:0.78rem;color:#9AA3AE;margin-top:0.15rem;">
+        ${req?.sample_type?'Sample: '+req.sample_type+' · ':''}
+        Received: ${fmtDate(req?.created_at)} · TAT: ${tat}
+      </div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.6rem;margin-bottom:1rem;">
+      <div style="background:#F8F7F3;border-radius:8px;padding:0.75rem;border:1px solid #E8E6E1;">
+        <div style="font-size:0.7rem;color:#9AA3AE;font-weight:700;text-transform:uppercase;margin-bottom:0.3rem;">Test</div>
+        <div style="font-weight:700;">${r.tests_ordered||'—'}</div>
+      </div>
+      <div style="background:#F8F7F3;border-radius:8px;padding:0.75rem;border:1px solid #E8E6E1;">
+        <div style="font-size:0.7rem;color:#9AA3AE;font-weight:700;text-transform:uppercase;margin-bottom:0.3rem;">Result</div>
+        <div style="font-weight:700;font-size:1.05rem;">${r.result_value||'—'}${r.result_unit?' <span style="font-size:0.8rem;font-weight:400;">'+r.result_unit+'</span>':''}</div>
+      </div>
+      <div style="background:#F8F7F3;border-radius:8px;padding:0.75rem;border:1px solid #E8E6E1;">
+        <div style="font-size:0.7rem;color:#9AA3AE;font-weight:700;text-transform:uppercase;margin-bottom:0.3rem;">Reference Range</div>
+        <div>${r.reference_range||'—'}</div>
+      </div>
+      <div style="background:#F8F7F3;border-radius:8px;padding:0.75rem;border:1px solid #E8E6E1;">
+        <div style="font-size:0.7rem;color:#9AA3AE;font-weight:700;text-transform:uppercase;margin-bottom:0.3rem;">Flag</div>
+        <div>${resultFlagBadge(r.flag)}</div>
+      </div>
+    </div>
+
+    ${r.tech_notes ? `
+    <div style="background:#fffbeb;border:1px solid #fcd34d;border-radius:8px;padding:0.75rem 1rem;
+                font-size:0.83rem;color:#92400e;margin-bottom:1rem;">
+      <strong>Technician Notes:</strong> ${r.tech_notes}
+    </div>` : ''}
+
+    <div style="font-size:0.75rem;color:#9AA3AE;text-align:right;">
+      Recorded: ${r.created_at ? new Date(r.created_at).toLocaleString('en-GB') : '—'}
+    </div>`;
+
+  // Store for print
+  currentResultReport = {
+    req,
+    resultRows: [{ test: r.tests_ordered, value: r.result_value, unit: r.result_unit,
+                   ref: r.reference_range, flag: r.flag }],
+    techNotes:  r.tech_notes,
+    savedAt:    r.created_at ? new Date(r.created_at) : new Date()
+  };
+
+  document.getElementById('m-result-detail').classList.add('open');
 }
 
 function filterResults() {
@@ -4382,6 +4526,90 @@ function filterResults() {
     (!q || (r.patient_name||'').toLowerCase().includes(q) || (r.tests_ordered||'').toLowerCase().includes(q)) &&
     (!fl || r.flag === fl)
   ));
+}
+
+// ── Result report / print ──────────────────────────────────────────────────
+
+function showResultReport(data) {
+  if (!data) return;
+  const { req, resultRows, techNotes, savedAt } = data;
+  const org = user?.user_metadata?.org_name || 'Minza Health';
+  const flagColors = {
+    'Normal':'color:#059669;','High':'color:#dc2626;','Low':'color:#d97706;',
+    'Positive':'color:#dc2626;','Negative':'color:#059669;','Inconclusive':'color:#4A5568;'
+  };
+
+  document.getElementById('result-report-body').innerHTML = `
+    <div class="receipt" style="font-family:'Syne',sans-serif;">
+      <div class="receipt-header">
+        <div class="receipt-org">${org}</div>
+        <div class="receipt-sub">Laboratory Result Report</div>
+        <div class="receipt-sub">${(savedAt||new Date()).toLocaleString('en-GB',{day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'})}</div>
+      </div>
+      <hr class="receipt-divider"/>
+
+      <div style="margin-bottom:0.85rem;">
+        <div style="font-size:0.78rem;font-weight:700;text-transform:uppercase;color:#9AA3AE;margin-bottom:0.4rem;">Patient</div>
+        <div style="font-weight:700;">${req?.patient_name||'—'}</div>
+        <div style="font-size:0.8rem;color:#555;">
+          ${[req?.patient_age?req.patient_age+'y':null, req?.patient_gender, req?.patient_phone].filter(Boolean).join(' · ')}
+        </div>
+        ${req?.requesting_doctor?`<div style="font-size:0.78rem;color:#9AA3AE;">Ref: ${req.requesting_doctor}</div>`:''}
+        ${req?.sample_type?`<div style="font-size:0.78rem;color:#9AA3AE;">Sample: ${req.sample_type}</div>`:''}
+      </div>
+
+      <hr class="receipt-divider"/>
+
+      ${resultRows.map(r => `
+        <div style="margin-bottom:0.85rem;">
+          <div style="font-weight:700;margin-bottom:0.25rem;">${r.test}</div>
+          <div class="receipt-item">
+            <span style="color:#555;">Result</span>
+            <strong>${r.value}${r.unit?' '+r.unit:''}</strong>
+          </div>
+          ${r.ref?`<div class="receipt-item"><span style="color:#555;">Reference</span><span>${r.ref}</span></div>`:''}
+          <div class="receipt-item">
+            <span style="color:#555;">Flag</span>
+            <strong style="${flagColors[r.flag]||''}">${r.flag||'Normal'}</strong>
+          </div>
+        </div>`).join('<hr class="receipt-divider"/>')}
+
+      ${techNotes?`<hr class="receipt-divider"/>
+      <div style="font-size:0.78rem;color:#9AA3AE;line-height:1.6;">
+        <strong>Notes:</strong> ${techNotes}
+      </div>`:''}
+
+      <hr class="receipt-divider"/>
+      <div class="receipt-footer" style="text-align:center;">
+        Verified by ${user?.email||'Lab Technician'}<br/>
+        ${org} · Powered by Minza Health
+      </div>
+    </div>`;
+
+  document.getElementById('m-result-report').classList.add('open');
+}
+
+function printResultReport() {
+  // Called from the detail modal header
+  if (currentResultReport) showResultReport(currentResultReport);
+}
+
+function doPrintResultReport() {
+  const html = document.getElementById('result-report-body').innerHTML;
+  const css  = 'body{font-family:Arial,sans-serif;padding:2rem;max-width:420px;margin:0 auto;font-size:13px;}'
+             + '.receipt-org{font-size:1rem;font-weight:700;color:#0B1F3A;}'
+             + '.receipt-sub{font-size:0.75rem;color:#9AA3AE;margin-top:0.15rem;}'
+             + '.receipt-divider{border:none;border-top:1px dashed #ccc;margin:0.75rem 0;}'
+             + '.receipt-item{display:flex;justify-content:space-between;margin-bottom:0.3rem;}'
+             + '.receipt-footer{font-size:0.72rem;color:#9AA3AE;line-height:1.6;}';
+  const doc  = '<!DOCTYPE html><html><head><meta charset="UTF-8"><sty'+'le>'+css+'<\\/sty'+'le>'
+             + '<\\/head><body>'+html
+             + '<scr'+'ipt>window.onload=function(){window.print();}<\\/scr'+'ipt>'
+             + '<\\/body><\\/html>';
+  const blob = new Blob([doc], {type:'text/html'});
+  const url  = URL.createObjectURL(blob);
+  const w    = window.open(url, '_blank');
+  if (w) w.addEventListener('afterprint', () => URL.revokeObjectURL(url));
 }
 
 // ── HOSPITAL ──
