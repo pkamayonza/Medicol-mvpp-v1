@@ -4108,6 +4108,13 @@ function autoFlag(testName, rawValue) {
   // No pass/fail — just record what was entered, flag as Normal unless tech overrides
   return 'Normal';
 }
+
+if (ref.type === 'min') {
+  const num = parseFloat(val);
+  if (isNaN(num)) return 'Normal';
+  return num < ref.lo ? 'Low' : 'Normal';
+}
+
 }
 
 function autoFlagInput(testName, i) {
