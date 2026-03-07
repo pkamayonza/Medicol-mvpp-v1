@@ -4068,8 +4068,8 @@ const LAB_REFS = {
 
 };
 
-function autoFlag(testName, rawValue) {
-  const ref  = LAB_REFS[testName];
+function autoFlag(testName, rawValue, refOverride) {
+  const ref  = refOverride || LAB_REFS[testName];
   const val  = (rawValue || '').trim().toLowerCase();
   if (!ref || !val) return 'Normal';
 
