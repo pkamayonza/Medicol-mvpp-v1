@@ -4117,9 +4117,24 @@ if (ref.type === 'min') {
 }
 
 function autoFlagInput(testName, i) {
-  const val      = document.getElementById(`er-val-${i}`)?.value || '';
-  const flag     = autoFlag(testName, val);
-  const sel      = document.getElementById(`er-flag-${i}`);
+  const val     = document.getElementById(`er-val-${i}`)?.value || '';
+  const refData = LAB_REFS[testName];
+
+  let flagSource = testName;
+  if (refData?.type === 'multi') {
+    // use the selected parameter's rules instead
+    const paramName = document.getElementById(`er-param-${i}`)?.value;
+    const param     = refData.parameters?.find(p => p.name === paramName);
+    if (param) {
+      const flag = autoFlag(param.name, val, param);
+      const sel  = document.getElementById(`er-flag-${i}`);
+      if (sel) sel.value = flag;
+      return;
+    }
+  }
+
+  const flag = autoFlag(flagSource, val);
+  const sel  = document.getElementById(`er-flag-${i}`);
   if (sel) sel.value = flag;
 }
 
