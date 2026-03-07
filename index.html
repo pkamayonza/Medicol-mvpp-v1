@@ -4511,6 +4511,26 @@ document.getElementById('er-tests-rows').innerHTML = testList.map((test, i) => {
   document.getElementById('m-enter-result').classList.add('open');
 }
 
+function onParamChange(testName, i) {
+  const sel       = document.getElementById(`er-param-${i}`);
+  const paramName = sel?.value;
+  if (!paramName) return;
+
+  const refData = LAB_REFS[testName];
+  const param   = refData?.parameters?.find(p => p.name === paramName);
+  if (!param) return;
+
+  const unitEl = document.getElementById(`er-unit-${i}`);
+  const refEl  = document.getElementById(`er-ref-${i}`);
+  const valEl  = document.getElementById(`er-val-${i}`);
+  const flagEl = document.getElementById(`er-flag-${i}`);
+
+  if (unitEl) unitEl.value = param.unit || '';
+  if (refEl)  refEl.value  = param.ref  || '';
+  if (valEl)  { valEl.value = ''; valEl.focus(); }
+  if (flagEl) flagEl.value = 'Normal';
+}
+
 async function saveResult() {
   const requestId = document.getElementById('er-request-id').value;
   const req       = testRequests.find(r => r.id === requestId);
