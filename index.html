@@ -3998,17 +3998,13 @@ async function addClinicPatient() {
 const LAB_REFS = {
   'Malaria RDT':              { unit:'',        ref:'-',    type:'qualitative', positiveIsAbnormal:true },
   'Malaria Smear':            { unit:'',        ref:'-',    type:'qualitative', positiveIsAbnormal:true },
-  'Full Blood Count':         { unit:'cells/µL',ref:'4000–11000',  type:'range', lo:4000,  hi:11000 },
   'Blood Glucose (RBS)':      { unit:'mmol/L',  ref:'3.9–7.8',     type:'range', lo:3.9,   hi:7.8   },
   'Blood Glucose (FBS)':      { unit:'mmol/L',  ref:'3.9–5.6',     type:'range', lo:3.9,   hi:5.6   },
-  'Urinalysis':               { unit:'',        ref:'Normal',      type:'informational', positiveIsAbnormal:false },
   'HIV Test':                 { unit:'',        ref:'Non-Reactive', type:'qualitative', positiveIsAbnormal:true },
   'Hepatitis B (HBsAg)':      { unit:'',        ref:'Non-Reactive', type:'qualitative', positiveIsAbnormal:true },
   'Widal Test':               { unit:'titre',   ref:'<1:80',       type:'titre', threshold:80 },
   'Typhoid Rapid Test':       { unit:'',        ref:'Negative',    type:'qualitative', positiveIsAbnormal:true },
   'Stool Microscopy':         { unit:'',        ref:'No ova/cysts', type:'qualitative', positiveIsAbnormal:true },
-  'Liver Function Tests':     { unit:'U/L',     ref:'7–56 (ALT)',   type:'range', lo:7,     hi:56    },
-  'Renal Function Tests':     { unit:'µmol/L',  ref:'62–115 (Creat)',type:'range',lo:62,   hi:115   },
   'CD4 Count':                { unit:'cells/µL',ref:'500–1500',    type:'range', lo:500,   hi:1500  },
   'Pregnancy Test (urine)':   { unit:'',        ref:'-',    type:'informational', positiveIsAbnormal:false },
   'CRP':                      { unit:'mg/L',    ref:'<10',         type:'max', hi:10 },
@@ -4016,6 +4012,60 @@ const LAB_REFS = {
   'Blood Group & Rhesus':     { unit:'',        ref:'—',           type:'informational' },
   'Sickle Cell Screening':    { unit:'',        ref:'AA (Normal)', type:'qualitative', positiveIsAbnormal:true },
   'COVID-19 Antigen':         { unit:'',        ref:'-',    type:'qualitative', positiveIsAbnormal:true },
+
+  'Urinalysis': {
+  unit:'', ref:'—', type:'multi',
+  parameters: [
+    { name:'Protein',     unit:'',      ref:'Negative',   type:'qualitative', positiveIsAbnormal:true  },
+    { name:'Glucose',     unit:'',      ref:'Negative',   type:'qualitative', positiveIsAbnormal:true  },
+    { name:'Leucocytes',  unit:'cells/µL', ref:'<10',     type:'max', hi:10  },
+    { name:'Nitrites',    unit:'',      ref:'Negative',   type:'qualitative', positiveIsAbnormal:true  },
+    { name:'Blood',       unit:'',      ref:'Negative',   type:'qualitative', positiveIsAbnormal:true  },
+    { name:'pH',          unit:'',      ref:'4.5–8.0',    type:'range', lo:4.5, hi:8.0 },
+    { name:'Ketones',     unit:'',      ref:'Negative',   type:'qualitative', positiveIsAbnormal:true  },
+    { name:'Bilirubin',   unit:'',      ref:'Negative',   type:'qualitative', positiveIsAbnormal:true  },
+    { name:'Specific Gravity', unit:'', ref:'1.005–1.030',type:'range', lo:1.005, hi:1.030 },
+  ]
+},
+'Full Blood Count': {
+  unit:'', ref:'—', type:'multi',
+  parameters: [
+    { name:'Haemoglobin',   unit:'g/dL',    ref:'12–17',      type:'range', lo:12,   hi:17   },
+    { name:'WBC',           unit:'×10⁹/L',  ref:'4.0–11.0',   type:'range', lo:4.0,  hi:11.0 },
+    { name:'Platelets',     unit:'×10⁹/L',  ref:'150–400',    type:'range', lo:150,  hi:400  },
+    { name:'Haematocrit',   unit:'%',        ref:'36–50',      type:'range', lo:36,   hi:50   },
+    { name:'Neutrophils',   unit:'×10⁹/L',  ref:'1.8–7.5',    type:'range', lo:1.8,  hi:7.5  },
+    { name:'Lymphocytes',   unit:'×10⁹/L',  ref:'1.0–4.8',    type:'range', lo:1.0,  hi:4.8  },
+    { name:'MCV',           unit:'fL',       ref:'80–100',     type:'range', lo:80,   hi:100  },
+    { name:'MCH',           unit:'pg',       ref:'27–33',      type:'range', lo:27,   hi:33   },
+  ]
+},
+'Liver Function Tests': {
+  unit:'', ref:'—', type:'multi',
+  parameters: [
+    { name:'ALT',           unit:'U/L',   ref:'7–56',       type:'range', lo:7,   hi:56   },
+    { name:'AST',           unit:'U/L',   ref:'10–40',      type:'range', lo:10,  hi:40   },
+    { name:'ALP',           unit:'U/L',   ref:'44–147',     type:'range', lo:44,  hi:147  },
+    { name:'Total Bilirubin',unit:'µmol/L',ref:'3–21',      type:'range', lo:3,   hi:21   },
+    { name:'Direct Bilirubin',unit:'µmol/L',ref:'0–5',      type:'range', lo:0,   hi:5    },
+    { name:'Total Protein', unit:'g/L',   ref:'60–80',      type:'range', lo:60,  hi:80   },
+    { name:'Albumin',       unit:'g/L',   ref:'35–50',      type:'range', lo:35,  hi:50   },
+    { name:'GGT',           unit:'U/L',   ref:'8–61',       type:'range', lo:8,   hi:61   },
+  ]
+},
+'Renal Function Tests': {
+  unit:'', ref:'—', type:'multi',
+  parameters: [
+    { name:'Creatinine',    unit:'µmol/L', ref:'62–115',    type:'range', lo:62,  hi:115  },
+    { name:'Urea',          unit:'mmol/L', ref:'2.5–7.8',   type:'range', lo:2.5, hi:7.8  },
+    { name:'Uric Acid',     unit:'µmol/L', ref:'149–416',   type:'range', lo:149, hi:416  },
+    { name:'Sodium',        unit:'mmol/L', ref:'136–145',   type:'range', lo:136, hi:145  },
+    { name:'Potassium',     unit:'mmol/L', ref:'3.5–5.1',   type:'range', lo:3.5, hi:5.1  },
+    { name:'Chloride',      unit:'mmol/L', ref:'98–107',    type:'range', lo:98,  hi:107  },
+    { name:'eGFR',          unit:'mL/min', ref:'>60',       type:'min',   lo:60           },
+  ]
+},
+
 };
 
 function autoFlag(testName, rawValue) {
