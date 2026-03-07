@@ -4162,6 +4162,88 @@ function openPatientModal(id) {
   document.getElementById('m-patient').classList.add('open');
 }
 
+// ── FHIR R5 PATIENT BUILDER ───────────────────────────────────────────────────
+// Converts a Minza patient row into a valid HL7 FHIR R5 Patient resource.
+// Stored as a JSON column alongside existing fields — old records unaffected.
+
+function buildFHIRPatient(row) {
+  const org_id = row.org_id || user?.id || 'unknown';
+
+  // Parse name — last word treated as family name
+  const nameParts  = (row.name || '').trim().split(/\s+/);
+  const familyName = nameParts.length > 1 ? nameParts.pop() : nameParts[0];
+  const givenNames = nameParts;
+
+  // Parse birth year from age string or integer
+  const currentYear = new Date().getFullYear();
+  const ageNum      = parseInt(row.age);
+  const birthYear   = (!isNaN(ageNum) && ageNum > 0 && ageNum < 130)
+                      ? currentYear - ageNum
+                      : null;
+
+  const genderMap = {
+    'male': 'male', 'Male': 'male', 'M': 'male',
+    'female': 'female', 'Female': 'female', 'F': 'female',
+    'other': 'other', 'Other': 'other',
+    'unknown': 'unknown'
+  };
+
+  const resource = {
+    resourceType: 'Patient',
+    meta: {
+      versionId:   '1',
+      lastUpdated: new Date().toISOString(),
+      source:      'https://minza.health',
+      profile:     ['http://hl7.org/fhir/R5/StructureDefinition/Patient']
+    },
+    identifier: [
+      {
+        use:    'secondary',
+        system: 'urn:minza:patient-id',
+        value:  row.id || crypto.randomUUID()
+      }
+    ],
+    name: [{
+      use:    'official',
+      family: familyName,
+      given:  givenNames.length ? givenNames : [row.name]
+    }],
+    gender:    genderMap[row.gender] || 'unknown',
+    birthDate: birthYear ? `${birthYear}` : undefined,
+    telecom:   row.phone
+      ? [{ system: 'phone', value: row.phone, use: 'mobile' }]
+      : [],
+    managingOrganization: {
+      reference: `Organization/${org_id}`
+    },
+    extension: []
+  };
+
+  // Clinical vitals as FHIR extensions
+  if (row.blood_pressure) resource.extension.push({
+    url:         'https://minzahealth.netlify.app/fhir/extension/blood-pressure',
+    valueString: row.blood_pressure
+  });
+  if (row.temperature) resource.extension.push({
+    url:          'https://minzahealth.netlify.app/fhir/extension/temperature',
+    valueDecimal: parseFloat(row.temperature)
+  });
+  if (row.weight) resource.extension.push({
+    url:          'https://minzahealth.netlify.app/fhir/extension/weight-kg',
+    valueDecimal: parseFloat(row.weight)
+  });
+  if (row.pulse) resource.extension.push({
+    url:         'https://minzahealth.netlify.app/fhir/extension/pulse',
+    valueInteger: parseInt(row.pulse)
+  });
+  if (row.condition) resource.extension.push({
+    url:         'https://minzahealth.netlify.app/fhir/extension/presenting-condition',
+    valueString: row.condition
+  });
+
+  return resource;
+}
+
 async function addClinicPatient() {
   const name  = document.getElementById('cp-name').value.trim();
   const cond  = document.getElementById('cp-cond').value.trim();
