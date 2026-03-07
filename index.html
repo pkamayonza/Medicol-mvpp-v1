@@ -3996,12 +3996,12 @@ async function addClinicPatient() {
 // Reference ranges and auto-flag logic per test
 // Sources: WHO, Uganda Clinical Guidelines 2023, standard lab norms
 const LAB_REFS = {
-  'Malaria RDT':              { unit:'',        ref:'Negative',    type:'qualitative', positiveIsAbnormal:true },
-  'Malaria Smear':            { unit:'',        ref:'Negative',    type:'qualitative', positiveIsAbnormal:true },
+  'Malaria RDT':              { unit:'',        ref:'-',    type:'informational', positiveIsAbnormal:true },
+  'Malaria Smear':            { unit:'',        ref:'-',    type:'informational', positiveIsAbnormal:true },
   'Full Blood Count':         { unit:'cells/µL',ref:'4000–11000',  type:'range', lo:4000,  hi:11000 },
   'Blood Glucose (RBS)':      { unit:'mmol/L',  ref:'3.9–7.8',     type:'range', lo:3.9,   hi:7.8   },
   'Blood Glucose (FBS)':      { unit:'mmol/L',  ref:'3.9–5.6',     type:'range', lo:3.9,   hi:5.6   },
-  'Urinalysis':               { unit:'',        ref:'Normal',      type:'qualitative', positiveIsAbnormal:false },
+  'Urinalysis':               { unit:'',        ref:'Normal',      type:'informational', positiveIsAbnormal:false },
   'HIV Test':                 { unit:'',        ref:'Non-Reactive', type:'qualitative', positiveIsAbnormal:true },
   'Hepatitis B (HBsAg)':      { unit:'',        ref:'Non-Reactive', type:'qualitative', positiveIsAbnormal:true },
   'Widal Test':               { unit:'titre',   ref:'<1:80',       type:'titre', threshold:80 },
@@ -4010,12 +4010,12 @@ const LAB_REFS = {
   'Liver Function Tests':     { unit:'U/L',     ref:'7–56 (ALT)',   type:'range', lo:7,     hi:56    },
   'Renal Function Tests':     { unit:'µmol/L',  ref:'62–115 (Creat)',type:'range',lo:62,   hi:115   },
   'CD4 Count':                { unit:'cells/µL',ref:'500–1500',    type:'range', lo:500,   hi:1500  },
-  'Pregnancy Test (urine)':   { unit:'',        ref:'Negative',    type:'qualitative', positiveIsAbnormal:false },
+  'Pregnancy Test (urine)':   { unit:'',        ref:'-',    type:'informational', positiveIsAbnormal:false },
   'CRP':                      { unit:'mg/L',    ref:'<10',         type:'max', hi:10 },
   'ESR':                      { unit:'mm/hr',   ref:'<20 (M) / <30 (F)', type:'max', hi:30 },
   'Blood Group & Rhesus':     { unit:'',        ref:'—',           type:'informational' },
   'Sickle Cell Screening':    { unit:'',        ref:'AA (Normal)', type:'qualitative', positiveIsAbnormal:true },
-  'COVID-19 Antigen':         { unit:'',        ref:'Negative',    type:'qualitative', positiveIsAbnormal:true },
+  'COVID-19 Antigen':         { unit:'',        ref:'-',    type:'qualitative', positiveIsAbnormal:true },
 };
 
 function autoFlag(testName, rawValue) {
