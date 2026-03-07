@@ -129,6 +129,26 @@
   nav h1{ font-size:1.25rem; letter-spacing:-0.3px; }
   nav h1 span{ color:#4ECDB4; }
 
+  .conn-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+  transition: background 0.3s;
+}
+.conn-pill.synced  { background: #D1FAE5; color: #065F46; }
+.conn-pill.offline { background: #FEF3C7; color: #92400E; }
+.conn-pill.syncing { background: #EDE9FE; color: #5B21B6; animation: conn-pulse 1s infinite; }
+
+@keyframes conn-pulse {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.5; }
+}
+
   .org-pill{
     font-size:0.72rem; color:rgba(255,255,255,0.45);
     background:rgba(255,255,255,0.07);
