@@ -2615,7 +2615,7 @@
 
     <!-- Prescription Builder -->
     <div class="card">
-      <h2>💊 Write Prescription</h2>
+      <h2>Write Prescription</h2>
       <div id="rx-items" style="display:flex;flex-direction:column;gap:0.75rem;margin-bottom:1rem;"></div>
       <div style="background:#F0EFEB;border-radius:10px;padding:1rem;border:1px solid #E8E6E1;">
         <div class="form-grid">
@@ -2636,6 +2636,40 @@
         <button class="btn btn-sm" onclick="addRxItem()" style="margin-top:0.5rem;">+ Add Drug</button>
       </div>
     </div>
+
+    <!-- in consult lab request -->
+<div style="background:#f0f4ff;border:1px solid #c7d2fe;border-radius:12px;
+            padding:1.1rem 1.2rem;margin-bottom:1.2rem;">
+  <div style="font-weight:700;color:#1e3a8a;font-size:0.85rem;
+              text-transform:uppercase;letter-spacing:0.6px;margin-bottom:0.8rem;">
+     Send Lab Request
+  </div>
+  <div id="consult-tests-picker" style="display:flex;flex-wrap:wrap;gap:0.4rem;margin-bottom:0.7rem;"></div>
+  <div id="consult-selected-tests" style="display:flex;flex-wrap:wrap;gap:0.4rem;margin-bottom:0.7rem;"></div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.6rem;margin-bottom:0.7rem;">
+    <div class="form-group" style="margin:0;">
+      <label>Priority</label>
+      <select id="consult-lab-priority">
+        <option value="Routine">Routine</option>
+        <option value="Urgent">Urgent</option>
+        <option value="STAT">STAT</option>
+      </select>
+    </div>
+    <div class="form-group" style="margin:0;">
+      <label>Clinical Notes (optional)</label>
+      <input type="text" id="consult-lab-notes" placeholder="e.g. fasting sample">
+    </div>
+  </div>
+  <div id="consult-lab-sent"
+       style="display:none;background:#d1fae5;color:#065f46;border-radius:8px;
+              padding:0.5rem 0.85rem;font-size:0.82rem;font-weight:600;margin-bottom:0.5rem;">
+    ✅ Lab request sent — awaiting results
+  </div>
+  <button class="btn btn-sm" onclick="sendConsultLabRequest()"
+          style="background:#1e3a8a;color:white;border-color:#1e3a8a;">
+    Send to Lab
+  </button>
+</div>
 
     <div class="form-actions" style="display:flex;gap:0.75rem;flex-wrap:wrap;">
       <button class="btn btn-primary" id="cons-save-btn" onclick="saveConsultation()">✅ Save Consultation & Send Prescription</button>
