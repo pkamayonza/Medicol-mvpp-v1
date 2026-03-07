@@ -4057,6 +4057,13 @@ function autoFlag(testName, rawValue) {
   return 'Normal'; // informational (Blood Group etc.)
 }
 
+function autoFlagInput(testName, i) {
+  const val      = document.getElementById(`er-val-${i}`)?.value || '';
+  const flag     = autoFlag(testName, val);
+  const sel      = document.getElementById(`er-flag-${i}`);
+  if (sel) sel.value = flag;
+}
+
 const COMMON_TESTS = [
   'Malaria RDT','Malaria Smear','Full Blood Count','Blood Glucose (RBS)',
   'Blood Glucose (FBS)','Urinalysis','HIV Test','Hepatitis B (HBsAg)',
