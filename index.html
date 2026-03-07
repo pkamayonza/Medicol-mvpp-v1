@@ -4015,17 +4015,20 @@ const LAB_REFS = {
 
   'Urinalysis': {
   unit:'', ref:'—', type:'multi',
-  parameters: [
-    { name:'Protein',     unit:'',      ref:'Negative',   type:'qualitative', positiveIsAbnormal:true  },
-    { name:'Glucose',     unit:'',      ref:'Negative',   type:'qualitative', positiveIsAbnormal:true  },
-    { name:'Leucocytes',  unit:'cells/µL', ref:'<10',     type:'max', hi:10  },
-    { name:'Nitrites',    unit:'',      ref:'Negative',   type:'qualitative', positiveIsAbnormal:true  },
-    { name:'Blood',       unit:'',      ref:'Negative',   type:'qualitative', positiveIsAbnormal:true  },
-    { name:'pH',          unit:'',      ref:'4.5–8.0',    type:'range', lo:4.5, hi:8.0 },
-    { name:'Ketones',     unit:'',      ref:'Negative',   type:'qualitative', positiveIsAbnormal:true  },
-    { name:'Bilirubin',   unit:'',      ref:'Negative',   type:'qualitative', positiveIsAbnormal:true  },
-    { name:'Specific Gravity', unit:'', ref:'1.005–1.030',type:'range', lo:1.005, hi:1.030 },
-  ]
+parameters: [
+  { name:'Protein',          unit:'',    ref:'Negative',    type:'qualitative', positiveIsAbnormal:true  },
+  { name:'Glucose',          unit:'',    ref:'Negative',    type:'qualitative', positiveIsAbnormal:true  },
+  { name:'Leucocytes',       unit:'',    ref:'Negative',    type:'qualitative', positiveIsAbnormal:true  },
+  { name:'Nitrites',         unit:'',    ref:'Negative',    type:'qualitative', positiveIsAbnormal:true  },
+  { name:'Blood',            unit:'',    ref:'Negative',    type:'qualitative', positiveIsAbnormal:true  },
+  { name:'pH',               unit:'',    ref:'4.5–8.0',     type:'range', lo:4.5, hi:8.0 },
+  { name:'Ketones',          unit:'',    ref:'Negative',    type:'qualitative', positiveIsAbnormal:true  },
+  { name:'Bilirubin',        unit:'',    ref:'Negative',    type:'qualitative', positiveIsAbnormal:true  },
+  { name:'Specific Gravity', unit:'',    ref:'1.005–1.030', type:'range', lo:1.005, hi:1.030 },
+  { name:'Appearance',       unit:'',    ref:'—',           type:'informational' },
+  { name:'Colour',           unit:'',    ref:'—',           type:'informational' },
+]
+  
 },
 'Full Blood Count': {
   unit:'', ref:'—', type:'multi',
