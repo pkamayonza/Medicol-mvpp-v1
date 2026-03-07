@@ -3996,8 +3996,8 @@ async function addClinicPatient() {
 // Reference ranges and auto-flag logic per test
 // Sources: WHO, Uganda Clinical Guidelines 2023, standard lab norms
 const LAB_REFS = {
-  'Malaria RDT':              { unit:'',        ref:'-',    type:'informational', positiveIsAbnormal:true },
-  'Malaria Smear':            { unit:'',        ref:'-',    type:'informational', positiveIsAbnormal:true },
+  'Malaria RDT':              { unit:'',        ref:'-',    type:'qualitative', positiveIsAbnormal:true },
+  'Malaria Smear':            { unit:'',        ref:'-',    type:'qualitative', positiveIsAbnormal:true },
   'Full Blood Count':         { unit:'cells/µL',ref:'4000–11000',  type:'range', lo:4000,  hi:11000 },
   'Blood Glucose (RBS)':      { unit:'mmol/L',  ref:'3.9–7.8',     type:'range', lo:3.9,   hi:7.8   },
   'Blood Glucose (FBS)':      { unit:'mmol/L',  ref:'3.9–5.6',     type:'range', lo:3.9,   hi:5.6   },
@@ -4054,7 +4054,10 @@ function autoFlag(testName, rawValue) {
     return 'Normal';
   }
 
-  return 'Normal'; // informational (Blood Group etc.)
+  if (ref.type === 'informational') {
+  // No pass/fail — just record what was entered, flag as Normal unless tech overrides
+  return 'Normal';
+}
 }
 
 function autoFlagInput(testName, i) {
