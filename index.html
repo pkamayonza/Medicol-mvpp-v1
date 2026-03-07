@@ -5503,6 +5503,89 @@ function renderRxItems(){
     </div>`).join('');
 }
 
+// ── in-consult lab request ─────
+
+let consultSelectedTests = [];
+
+function buildConsultTestPicker() {
+  const el = document.getElementById('consult-tests-picker');
+  if (!el) return;
+  el.innerHTML = COMMON_TESTS.map(t =>
+    `<button type="button" onclick="toggleConsultTest('${t}')"
+             id="ctp-${t.replace(/[^a-z0-9]/gi,'_')}"
+             style="padding:0.22rem 0.65rem;border-radius:100px;border:1px solid #c7d2fe;
+                    background:white;font-size:0.74rem;font-weight:600;color:#1e3a8a;
+                    cursor:pointer;font-family:'Syne',sans-serif;transition:all 0.15s;">
+      ${t}
+    </button>`
+  ).join('');
+}
+
+function toggleConsultTest(name) {
+  const idx   = consultSelectedTests.indexOf(name);
+  const btnId = `ctp-${name.replace(/[^a-z0-9]/gi,'_')}`;
+  const btn   = document.getElementById(btnId);
+  if (idx > -1) {
+    consultSelectedTests.splice(idx, 1);
+    if (btn) { btn.style.background='white'; btn.style.color='#1e3a8a'; }
+  } else {
+    consultSelectedTests.push(name);
+    if (btn) { btn.style.background='#1e3a8a'; btn.style.color='white'; }
+  }
+  renderConsultSelectedTests();
+}
+
+function renderConsultSelectedTests() {
+  const el = document.getElementById('consult-selected-tests');
+  if (!el) return;
+  el.innerHTML = consultSelectedTests.map(t =>
+    `<span style="background:#1e3a8a;color:white;padding:0.18rem 0.6rem;
+                  border-radius:100px;font-size:0.74rem;font-weight:600;
+                  display:inline-flex;align-items:center;gap:0.3rem;">
+      ${t}
+      <span onclick="toggleConsultTest('${t}')"
+            style="cursor:pointer;opacity:0.6;">✕</span>
+    </span>`
+  ).join('');
+}
+
+async function sendConsultLabRequest() {
+  if (!currentConsultId) { toast('No patient in consult.', 'err'); return; }
+  if (!consultSelectedTests.length) { toast('Select at least one test.', 'err'); return; }
+  const patient = queuePatients.find(x => x.id === currentConsultId);
+  try {
+    await db('test_requests', 'POST', {
+      patient_name:      patient?.name,
+      patient_age:       patient?.age || null,
+      tests:             JSON.stringify(consultSelectedTests),
+      priority:          document.getElementById('consult-lab-priority').value,
+      requesting_doctor: user?.email,
+      clinical_notes:    document.getElementById('consult-lab-notes').value.trim() || null,
+      status:            'Pending',
+      source:            'clinic-consult',
+      queue_patient_id:  currentConsultId,
+      org_id:            user.id
+    });
+    document.getElementById('consult-lab-sent').style.display = 'block';
+    consultSelectedTests = [];
+    renderConsultSelectedTests();
+    buildConsultTestPicker();
+    toast('✅ Lab request sent.');
+  } catch(e) { toast('Error: ' + e.message, 'err'); }
+}
+
+// ── prescription destination ────
+
+function toggleRxDestination(val) {
+  const note = document.getElementById('rx-external-note');
+  if (note) note.style.display = val === 'external' ? 'block' : 'none';
+}
+
+function getRxDestination() {
+  const el = document.querySelector('input[name="rx-destination"]:checked');
+  return el ? el.value : 'internal';
+}
+
 async function saveConsultation(){
   if(!currentConsultId){ toast('No patient selected.','err'); return; }
   const diagnosis = document.getElementById('cons-diagnosis').value.trim();
