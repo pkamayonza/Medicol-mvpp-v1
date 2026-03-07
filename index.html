@@ -2746,17 +2746,203 @@ function showEl(id,msg,cls){
   if(!cls)setTimeout(()=>e.style.display='none',5000);
 }
 
-async function db(path,method='GET',body=null){
-  const h={'Content-Type':'application/json','apikey':SKEY,'Prefer':'return=representation'};
-  if(session)h['Authorization']=`Bearer ${session.access_token}`;
-  else h['Authorization']=`Bearer ${SKEY}`;
-  const opts={method,headers:h};
-  if(body)opts.body=JSON.stringify(body);
-  const res=await fetch(`${SURL}/rest/v1/${path}`,opts);
-  if(method==='DELETE'||res.status===204)return null;
-  const d=await res.json();
-  if(!res.ok)throw new Error(d.message||d.error_description||'Failed');
-  return d;
+// ── OFFLINE QUEUE ─────────────────────────────────────────────────────────────
+// Uses IndexedDB directly (no dependency). Queues all mutating requests when
+// offline and drains FIFO when connectivity returns.
+
+const OQ = (() => {
+  const DB_NAME  = 'minza_oq';
+  const DB_VER   = 1;
+  const STORE    = 'queue';
+  const MAX_ATT  = 3;
+  let _db        = null;
+
+  function open() {
+    if (_db) return Promise.resolve(_db);
+    return new Promise((res, rej) => {
+      const req = indexedDB.open(DB_NAME, DB_VER);
+      req.onupgradeneeded = e => {
+        const db = e.target.result;
+        if (!db.objectStoreNames.contains(STORE)) {
+          const s = db.createObjectStore(STORE, { keyPath: 'id' });
+          s.createIndex('queuedAt', 'queuedAt', { unique: false });
+        }
+      };
+      req.onsuccess = e => { _db = e.target.result; res(_db); };
+      req.onerror   = e => rej(e.target.error);
+    });
+  }
+
+  async function push(entry) {
+    const db = await open();
+    return new Promise((res, rej) => {
+      const tx = db.transaction(STORE, 'readwrite');
+      tx.objectStore(STORE).add(entry);
+      tx.oncomplete = res;
+      tx.onerror    = e => rej(e.target.error);
+    });
+  }
+
+  async function all() {
+    const db = await open();
+    return new Promise((res, rej) => {
+      const tx  = db.transaction(STORE, 'readonly');
+      const req = tx.objectStore(STORE).index('queuedAt').getAll();
+      req.onsuccess = e => res(e.target.result);
+      req.onerror   = e => rej(e.target.error);
+    });
+  }
+
+  async function remove(id) {
+    const db = await open();
+    return new Promise((res, rej) => {
+      const tx = db.transaction(STORE, 'readwrite');
+      tx.objectStore(STORE).delete(id);
+      tx.oncomplete = res;
+      tx.onerror    = e => rej(e.target.error);
+    });
+  }
+
+  async function update(entry) {
+    const db = await open();
+    return new Promise((res, rej) => {
+      const tx = db.transaction(STORE, 'readwrite');
+      tx.objectStore(STORE).put(entry);
+      tx.oncomplete = res;
+      tx.onerror    = e => rej(e.target.error);
+    });
+  }
+
+  return { push, all, remove, update, MAX_ATT };
+})();
+
+// ── CONNECTIVITY INDICATOR ────────────────────────────────────────────────────
+
+function _setConn(state) {
+  // states: 'synced' | 'offline' | 'syncing'
+  const pill = document.getElementById('conn-pill');
+  if (!pill) return;
+  pill.className = `conn-pill ${state}`;
+  pill.textContent = state === 'synced'  ? '● Online'
+                   : state === 'offline' ? '● Offline'
+                   : '↻ Syncing';
+}
+
+// ── SYNC ENGINE ───────────────────────────────────────────────────────────────
+
+let _syncing = false;
+
+async function syncBackground() {
+  if (_syncing || !navigator.onLine) return;
+  const items = await OQ.all();
+  if (!items.length) { _setConn('synced'); return; }
+
+  _syncing = true;
+  _setConn('syncing');
+
+  for (const item of items) {
+    try {
+      const h = {
+        'Content-Type': 'application/json',
+        'apikey': SKEY,
+        'Prefer': 'return=representation',
+        'Authorization': `Bearer ${item.token || SKEY}`
+      };
+      const opts = { method: item.method, headers: h };
+      if (item.body) opts.body = JSON.stringify(item.body);
+
+      const res = await fetch(`${SURL}/rest/v1/${item.path}`, opts);
+
+      if (res.ok || res.status === 204) {
+        await OQ.remove(item.id);
+      } else if (res.status >= 400 && res.status < 500) {
+        // Server rejected it permanently — remove to avoid infinite retry
+        await OQ.remove(item.id);
+        console.warn('OQ: server rejected', item.path, res.status);
+      } else {
+        // 5xx — increment attempts, keep in queue
+        item.attempts = (item.attempts || 0) + 1;
+        if (item.attempts >= OQ.MAX_ATT) {
+          await OQ.remove(item.id);
+          toast(`Sync failed after ${OQ.MAX_ATT} attempts: ${item.path}`, 'warn');
+        } else {
+          await OQ.update(item);
+        }
+      }
+    } catch (err) {
+      // Network still down — stop the loop
+      _setConn('offline');
+      _syncing = false;
+      return;
+    }
+  }
+
+  _syncing = false;
+  const remaining = await OQ.all();
+  _setConn(remaining.length ? 'offline' : 'synced');
+}
+
+// Trigger sync on reconnect and every 60 seconds
+window.addEventListener('online',  () => { _setConn('synced'); syncBackground(); });
+window.addEventListener('offline', () => _setConn('offline'));
+setInterval(syncBackground, 60_000);
+
+// ── db() — THE MAIN DATABASE FUNCTION ────────────────────────────────────────
+
+async function db(path, method = 'GET', body = null) {
+  const token = session?.access_token || SKEY;
+  const h = {
+    'Content-Type':  'application/json',
+    'apikey':        SKEY,
+    'Prefer':        'return=representation',
+    'Authorization': `Bearer ${token}`
+  };
+  const opts = { method, headers: h };
+  if (body) opts.body = JSON.stringify(body);
+
+  // GETs always attempt live — queue is write-only
+  if (method === 'GET') {
+    if (!navigator.onLine) throw new Error('You are offline. Data shown may not be current.');
+    const res = await fetch(`${SURL}/rest/v1/${path}`, opts);
+    if (method === 'DELETE' || res.status === 204) return null;
+    const d = await res.json();
+    if (!res.ok) throw new Error(d.message || d.error_description || 'Failed');
+    return d;
+  }
+
+  // Mutations: try live first, queue on failure
+  if (navigator.onLine) {
+    try {
+      const res = await fetch(`${SURL}/rest/v1/${path}`, opts);
+      if (res.status === 204) return null;
+      const d = await res.json();
+      if (!res.ok) throw new Error(d.message || d.error_description || 'Failed');
+      return d;
+    } catch (err) {
+      if (err.name === 'TypeError') {
+        // Network error even though navigator.onLine — fall through to queue
+      } else {
+        throw err; // Real server error — surface to caller
+      }
+    }
+  }
+
+  // Offline or flaky — queue the mutation
+  if (method !== 'GET') {
+    await OQ.push({
+      id:        crypto.randomUUID(),
+      path,
+      method,
+      body,
+      token,
+      queuedAt:  Date.now(),
+      attempts:  0
+    });
+    toast('Saved offline — will sync when back online.', 'warn');
+    return null; // Caller gets null; UI should handle gracefully
+  }
+
+  throw new Error('Offline — cannot complete this request.');
 }
 
 async function authPost(path,body){
