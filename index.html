@@ -3128,6 +3128,9 @@ function viewPatientModal(p){
   document.getElementById('m-patient').classList.add('open');
 }
 
+_setConn(navigator.onLine ? 'synced' : 'offline');
+syncBackground();
+
 // ── PHARMACY HOME ──
 // ── PHARMACY DASHBOARD v2 ──
 let phAllDispLog=[], phRevPeriod='today', phVelPeriod='all';
