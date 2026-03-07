@@ -4254,34 +4254,24 @@ async function addClinicPatient() {
   const referral = status==='Referred' ? document.getElementById('cp-referral').value.trim()||null : null;
 
   try {
-    await db('patients','POST', {
-      name,
-      age:             document.getElementById('cp-age').value||null,
-      gender:          document.getElementById('cp-gender').value||null,
-      phone:           document.getElementById('cp-phone').value.trim()||null,
-      condition:       cond||null,
-      notes:           document.getElementById('cp-notes').value.trim()||null,
-      status,
-      referral_to:     referral,
-      blood_pressure:  document.getElementById('cp-bp').value.trim()||null,
-      temperature:     document.getElementById('cp-temp').value||null,
-      weight:          document.getElementById('cp-weight').value||null,
-      pulse:           document.getElementById('cp-pulse').value||null,
-      org_id:          user.id
-    });
+    const patientRow = {
+  name,
+  age:            document.getElementById('cp-age').value || null,
+  gender:         document.getElementById('cp-gender').value || null,
+  phone:          document.getElementById('cp-phone').value.trim() || null,
+  condition:      cond || null,
+  notes:          document.getElementById('cp-notes').value.trim() || null,
+  status,
+  referral_to:    referral,
+  blood_pressure: document.getElementById('cp-bp').value.trim() || null,
+  temperature:    document.getElementById('cp-temp').value || null,
+  weight:         document.getElementById('cp-weight').value || null,
+  pulse:          document.getElementById('cp-pulse').value || null,
+  org_id:         user.id
+};
 
-    toast('✅ Patient registered!');
-    ['cp-name','cp-age','cp-phone','cp-cond','cp-notes','cp-bp','cp-temp','cp-weight','cp-pulse','cp-referral']
-      .forEach(id => { const el=document.getElementById(id); if(el) el.value=''; });
-    document.getElementById('cp-gender').value = '';
-    document.getElementById('cp-status').value = 'Active';
-    const rg = document.getElementById('cp-referral-group');
-    if (rg) rg.style.display = 'none';
-
-    posthog.capture('patient_logged', {org_type:orgRole, facility:user?.user_metadata?.org_name||'unknown', status});
-    loadClPts();
-  } catch(e) { toast('Error: '+e.message,'err'); }
-}
+patientRow.fhir_r5 = buildFHIRPatient(patientRow);
+await db('patients', 'POST', patientRow);
 
 // ── DIAGNOSTIC LAB ──
 
