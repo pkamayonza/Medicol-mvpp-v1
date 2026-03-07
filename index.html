@@ -2633,6 +2633,41 @@
           <div class="form-group"><label>Duration</label><input type="text" id="rx-duration" placeholder="e.g. 3 days, 1 week"/></div>
           <div class="form-group"><label>Instructions</label><input type="text" id="rx-instructions" placeholder="e.g. Take after meals"/></div>
         </div>
+
+        <!-- Prescription destination -->
+      <div style="background:#fafaf9;border:1px solid #E0DFDB;border-radius:10px;
+            padding:0.9rem 1.1rem;margin-bottom:1rem;">
+        <div style="font-weight:700;color:#0B1F3A;font-size:0.82rem;
+              text-transform:uppercase;letter-spacing:0.6px;margin-bottom:0.7rem;">
+        Prescription Route
+      </div>
+      <div style="display:flex;gap:0.6rem;flex-wrap:wrap;">
+      <label style="display:flex;align-items:center;gap:0.4rem;cursor:pointer;
+                  padding:0.45rem 0.9rem;border-radius:8px;border:1px solid #E0DFDB;
+                  background:white;font-size:0.83rem;font-weight:600;">
+      <input type="radio" name="rx-destination" value="internal" checked
+             onchange="toggleRxDestination(this.value)"> Internal Pharmacy
+      </label>
+      <label style="display:flex;align-items:center;gap:0.4rem;cursor:pointer;
+                  padding:0.45rem 0.9rem;border-radius:8px;border:1px solid #E0DFDB;
+                  background:white;font-size:0.83rem;font-weight:600;">
+      <input type="radio" name="rx-destination" value="external"
+             onchange="toggleRxDestination(this.value)"> External Pharmacy
+      </label>
+      <label style="display:flex;align-items:center;gap:0.4rem;cursor:pointer;
+                  padding:0.45rem 0.9rem;border-radius:8px;border:1px solid #E0DFDB;
+                  background:white;font-size:0.83rem;font-weight:600;">
+      <input type="radio" name="rx-destination" value="none"
+             onchange="toggleRxDestination(this.value)"> No Prescription
+      </label>
+      </div>
+    <div id="rx-external-note"
+       style="display:none;margin-top:0.6rem;font-size:0.8rem;color:#92400e;
+              background:#fffbeb;border-radius:6px;padding:0.4rem 0.7rem;">
+    ⚠ Prescription will be printed for the patient to take to an external pharmacy.
+  </div>
+  </div>
+
         <button class="btn btn-sm" onclick="addRxItem()" style="margin-top:0.5rem;">+ Add Drug</button>
       </div>
     </div>
@@ -4329,22 +4364,21 @@ const LAB_REFS = {
   'Sickle Cell Screening':    { unit:'',        ref:'AA (Normal)', type:'qualitative', positiveIsAbnormal:true },
   'COVID-19 Antigen':         { unit:'',        ref:'-',    type:'qualitative', positiveIsAbnormal:true },
 
-  'Urinalysis': {
+'Urinalysis': {
   unit:'', ref:'—', type:'multi',
-parameters: [
-  { name:'Protein',          unit:'',    ref:'Negative',    type:'qualitative', positiveIsAbnormal:true  },
-  { name:'Glucose',          unit:'',    ref:'Negative',    type:'qualitative', positiveIsAbnormal:true  },
-  { name:'Leucocytes',       unit:'',    ref:'Negative',    type:'qualitative', positiveIsAbnormal:true  },
-  { name:'Nitrites',         unit:'',    ref:'Negative',    type:'qualitative', positiveIsAbnormal:true  },
-  { name:'Blood',            unit:'',    ref:'Negative',    type:'qualitative', positiveIsAbnormal:true  },
-  { name:'pH',               unit:'',    ref:'4.5–8.0',     type:'range', lo:4.5, hi:8.0 },
-  { name:'Ketones',          unit:'',    ref:'Negative',    type:'qualitative', positiveIsAbnormal:true  },
-  { name:'Bilirubin',        unit:'',    ref:'Negative',    type:'qualitative', positiveIsAbnormal:true  },
-  { name:'Specific Gravity', unit:'',    ref:'1.005–1.030', type:'range', lo:1.005, hi:1.030 },
-  { name:'Appearance',       unit:'',    ref:'—',           type:'informational' },
-  { name:'Colour',           unit:'',    ref:'—',           type:'informational' },
-]
-  
+  parameters: [
+    { name:'Protein',          unit:'',    ref:'Negative',    type:'qualitative', positiveIsAbnormal:true  },
+    { name:'Glucose',          unit:'',    ref:'Negative',    type:'qualitative', positiveIsAbnormal:true  },
+    { name:'Leucocytes',       unit:'',    ref:'Negative',    type:'qualitative', positiveIsAbnormal:true  },
+    { name:'Nitrites',         unit:'',    ref:'Negative',    type:'qualitative', positiveIsAbnormal:true  },
+    { name:'Blood',            unit:'',    ref:'Negative',    type:'qualitative', positiveIsAbnormal:true  },
+    { name:'pH',               unit:'',    ref:'4.5–8.0',     type:'range', lo:4.5, hi:8.0 },
+    { name:'Ketones',          unit:'',    ref:'Negative',    type:'qualitative', positiveIsAbnormal:true  },
+    { name:'Bilirubin',        unit:'',    ref:'Negative',    type:'qualitative', positiveIsAbnormal:true  },
+    { name:'Specific Gravity', unit:'',    ref:'1.005–1.030', type:'range', lo:1.005, hi:1.030 },
+    { name:'Appearance',       unit:'',    ref:'—',           type:'informational' },
+    { name:'Colour',           unit:'',    ref:'—',           type:'informational' },
+  ]
 },
 'Full Blood Count': {
   unit:'', ref:'—', type:'multi',
