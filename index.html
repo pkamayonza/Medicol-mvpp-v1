@@ -4403,7 +4403,9 @@ function openEnterResult(requestId, patientName, tests) {
         </div>
         <div class="form-group" style="margin:0;">
           <label style="font-size:0.72rem;">Unit</label>
-          <input type="text" id="er-unit-${i}" placeholder="mmol/L"/>
+          <input type="text" id="er-unit-${i}" 
+        value="${LAB_REFS[test]?.unit||''}" 
+        placeholder="mmol/L"/>
         </div>
         <div class="form-group" style="margin:0;">
           <label style="font-size:0.72rem;">Reference Range</label>
