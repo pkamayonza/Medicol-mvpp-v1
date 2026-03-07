@@ -4409,7 +4409,9 @@ function openEnterResult(requestId, patientName, tests) {
         </div>
         <div class="form-group" style="margin:0;">
           <label style="font-size:0.72rem;">Reference Range</label>
-          <input type="text" id="er-ref-${i}" placeholder="4.0–6.0 or Negative"/>
+          <input type="text" id="er-ref-${i}" 
+        value="${LAB_REFS[test]?.ref||''}" 
+        placeholder="Reference range"/>
         </div>
         <div class="form-group" style="margin:0;">
           <label style="font-size:0.72rem;">Flag</label>
