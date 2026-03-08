@@ -5173,33 +5173,34 @@ function onParamChange(testName, i) {
 }
 
 async function saveResult() {
-  const requestId = document.getElementById('er-request-id').value;
-  const req       = testRequests.find(r => r.id === requestId);
-  const techNotes = document.getElementById('er-notes').value.trim() || null;
-  const testList  = (req?.tests_ordered||'').split(',').map(t=>t.trim()).filter(Boolean);
+  const requestId  = document.getElementById('er-request-id').value;
+  const req        = testRequests.find(r => r.id === requestId);
+  const techNotes  = document.getElementById('er-notes').value.trim() || null;
+  const sampleType = document.getElementById('er-sample-type').value;
+  const analysisDt = document.getElementById('er-analysis-dt').value || null;
+  const testList   = getTestsArray(req);
 
-  // Validate — every test needs a result value
+  if (!sampleType) { toast('Sample type required.', 'err'); return; }
+
   for (let i = 0; i < testList.length; i++) {
     const val = document.getElementById(`er-val-${i}`)?.value.trim();
     if (!val) { toast(`Result value required for: ${testList[i]}`, 'err'); return; }
   }
 
-  // Collect rows
   const resultRows = testList.map((test, i) => ({
     test,
-    value:     document.getElementById(`er-val-${i}`).value.trim(),
-    unit:      document.getElementById(`er-unit-${i}`).value.trim() || null,
-    ref:       document.getElementById(`er-ref-${i}`).value.trim()  || null,
-    flag:      document.getElementById(`er-flag-${i}`).value
+    value:   document.getElementById(`er-val-${i}`).value.trim(),
+    unit:    document.getElementById(`er-unit-${i}`).value.trim() || null,
+    ref:     document.getElementById(`er-ref-${i}`).value.trim()  || null,
+    flag:    document.getElementById(`er-flag-${i}`).value,
+    comment: document.getElementById(`er-comment-${i}`)?.value.trim() || null,
   }));
 
-  // Determine overall flag — most severe wins
   const flagSeverity = { 'Inconclusive':1,'Low':2,'High':3,'Positive':3,'Negative':0,'Normal':0 };
   const overallFlag  = resultRows.reduce((top, r) =>
     (flagSeverity[r.flag]||0) > (flagSeverity[top]||0) ? r.flag : top, 'Normal');
 
   try {
-    // One test_results row per test in the request
     for (const row of resultRows) {
       await db('test_results', 'POST', {
         request_id:      requestId,
@@ -5209,27 +5210,29 @@ async function saveResult() {
         result_unit:     row.unit,
         reference_range: row.ref,
         flag:            row.flag,
+        comment:         row.comment,
         tech_notes:      techNotes,
+        analysis_dt:     analysisDt,
         org_id:          user.id
       });
     }
 
-    // Mark request as Result Ready
+    // Update request: set sample_type if it was missing + status → Result Ready
     await db(`test_requests?id=eq.${requestId}`, 'PATCH', {
       status:          'Result Ready',
-      result_ready_at: new Date().toISOString()
+      result_ready_at: new Date().toISOString(),
+      sample_type:     sampleType   // saves back to request so dispatch has the info
     });
 
     toast(`✅ ${resultRows.length} result${resultRows.length>1?'s':''} saved — status → Result Ready`);
     cm('m-enter-result');
 
-    // Offer to print the report immediately
-    currentResultReport = { req, resultRows, techNotes, savedAt: new Date() };
+    currentResultReport = { req: {...req, sample_type: sampleType}, resultRows, techNotes, savedAt: new Date() };
     showResultReport(currentResultReport);
 
     track('lab_result_entered', {
-      facility:    user?.user_metadata?.org_name || 'unknown',
-      test_count:  resultRows.length,
+      facility:     user?.user_metadata?.org_name || 'unknown',
+      test_count:   resultRows.length,
       overall_flag: overallFlag
     });
 
