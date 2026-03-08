@@ -2667,16 +2667,30 @@ function launchApp(){
 }
 
 const NAV_CONFIG={
-  pharmacy:[{id:'pharmacy',label:'Home'},{id:'ph-inventory',label:'Inventory'},{id:'ph-patients',label:'Dispensing Log'}],
-  clinic:[{id:'clinic',label:'Home'},{id:'cl-patients',label:'Patients'}],
-  hospital:[{id:'hospital',label:'Home'},{id:'ho-patients',label:'Patients'},{id:'ho-inventory',label:'Supplies'}],
+  pharmacy:     [{id:'pharmacy',label:'Home'},{id:'ph-inventory',label:'Inventory'},{id:'ph-patients',label:'Dispensing Log'}],
+  clinic:       [{id:'clinic',label:'Overview'},{id:'cl-patients',label:'Patients'}],
+  hospital:     [{id:'hospital',label:'Home'},{id:'ho-patients',label:'Patients'},{id:'ho-inventory',label:'Supplies'}],
   diagnosticlab:[{id:'lab',label:'Home'},{id:'lab-worklist',label:'Worklist'},{id:'lab-results',label:'Results'}]
 };
 
+const CLINIC_NAV = [
+  {id:'clinic',        label:'Overview'},
+  {id:'reception',     label:'Reception'},
+  {id:'doctor',        label:'Doctor'},
+  {id:'dept-pharmacy', label:'Pharmacy'},
+];
+
 function buildNav(){
-  const role=NAV_CONFIG[orgRole]?orgRole:'clinic';
-  const tabs=NAV_CONFIG[role]||NAV_CONFIG.clinic;
-  document.getElementById('nav-tabs').innerHTML=tabs.map(t=>
+  const isClinicRole = ['clinic','reception','doctor','dept-pharmacy'].includes(orgRole);
+  if(isClinicRole){
+    document.getElementById('nav-tabs').innerHTML = CLINIC_NAV.map(t=>
+      `<button class="tab-btn" id="ntab-${t.id}" onclick="showPage('${t.id}')">${t.label}</button>`
+    ).join('');
+    return;
+  }
+  const role = NAV_CONFIG[orgRole] ? orgRole : 'clinic';
+  const tabs = NAV_CONFIG[role] || NAV_CONFIG.clinic;
+  document.getElementById('nav-tabs').innerHTML = tabs.map(t=>
     `<button class="tab-btn" id="ntab-${t.id}" onclick="showPage('${t.id}')">${t.label}</button>`
   ).join('');
 }
@@ -2687,26 +2701,31 @@ function showPage(name){
   document.getElementById(`page-${name}`).classList.add('active');
   const btn=document.getElementById(`ntab-${name}`);
   if(btn)btn.classList.add('active');
-  if(name==='pharmacy')loadPharmacyHome();
-  if(name==='ph-inventory')loadDrugs();
-  if(name==='ph-patients')loadDispensing();
-  if(name==='clinic')loadClinicHome();
-  if(name==='cl-patients')loadClPts();
-  if(name==='hospital')loadHospHome();
-  if(name==='ho-patients')loadHoPts();
-  if(name==='ho-inventory')loadHoDrugs();
-  if(name==='lab')loadLabHome();
-  if(name==='lab-worklist')loadWorklist();
-  if(name==='lab-results')loadLabResults();
+  if(name==='pharmacy')     loadPharmacyHome();
+  if(name==='ph-inventory') loadDrugs();
+  if(name==='ph-patients')  loadDispensing();
+  if(name==='clinic')       loadClinicHome();
+  if(name==='cl-patients')  loadClPts();
+  if(name==='reception')    loadReception();
+  if(name==='doctor')       loadDoctorQueue();
+  if(name==='dept-pharmacy')loadDeptPharmacy();
+  if(name==='hospital')     loadHospHome();
+  if(name==='ho-patients')  loadHoPts();
+  if(name==='ho-inventory') loadHoDrugs();
+  if(name==='lab')          loadLabHome();
+  if(name==='lab-worklist') loadWorklist();
+  if(name==='lab-results')  loadLabResults();
 }
 
 function routeHome(){
-  const r=orgRole;
-  if(r==='pharmacy')showPage('pharmacy');
-  else if(r==='clinic')showPage('clinic');
-  else if(r==='diagnosticlab')showPage('lab');
-  else if(r==='hospital')showPage('hospital');
-  else showPage('clinic');
+  const r = orgRole;
+  if(r==='pharmacy')     { showPage('pharmacy'); return; }
+  if(r==='diagnosticlab'){ showPage('lab'); return; }
+  if(r==='hospital')     { showPage('hospital'); return; }
+  if(r==='reception')    { showPage('reception'); return; }
+  if(r==='doctor')       { showPage('doctor'); return; }
+  if(r==='dept-pharmacy'){ showPage('dept-pharmacy'); return; }
+  showPage('clinic');
 }
 
 // shared utils
