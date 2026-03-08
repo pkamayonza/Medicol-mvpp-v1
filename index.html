@@ -4938,19 +4938,27 @@ async function registerAndQueue(){
 function renderQueueTable(arr, bodyId, view){
   const b = document.getElementById(bodyId);
   if(!b) return;
-  if(!arr.length){ b.innerHTML=`<tr><td colspan="8" class="loading">No patients in queue yet.</td></tr>`; return; }
+  if(!arr.length){
+    const cols = view==='doctor' ? 8 : 6;
+    b.innerHTML=`<tr><td colspan="${cols}" class="loading">No patients in queue yet.</td></tr>`;
+    return;
+  }
   b.innerHTML = arr.map((p,i) => `<tr>
     <td style="color:#9AA3AE;font-size:0.8rem;">${i+1}</td>
     <td><strong>${p.name}</strong></td>
-    <td class="hide-mobile">${p.age||'—'}</td>
-    <td class="hide-mobile">${p.gender||'—'}</td>
+    ${view==='doctor' ? `<td class="hide-mobile">${p.age||'—'}</td>` : ''}
     <td style="font-size:0.83rem;">${p.complaint||'—'}</td>
+    ${view==='doctor' ? `<td id="lab-badge-${p.id}"><span style="color:#ccc;font-size:0.75rem;">—</span></td>` : ''}
     <td>${p.priority==='Urgent'?'<span class="badge b-low">Urgent</span>':'<span class="badge" style="background:#F0EFEB;color:#4A5568;">Normal</span>'}</td>
     <td>${queueStatusBadge(p.status)}</td>
     <td class="td-actions">
       ${view==='doctor' && p.status==='Waiting' ?
-        `<button class="btn btn-primary" style="font-size:0.75rem;padding:0.35rem 0.8rem;" onclick="startConsult('${p.id}')">Consult</button>` :
-        `<button class="btn btn-sm" onclick="markQueueStatus('${p.id}','${p.status==='Waiting'?'Seen':'Waiting'}')">${p.status==='Waiting'?'Mark Seen':'Reset'}</button>`
+        `<button class="btn btn-primary" style="font-size:0.75rem;padding:0.35rem 0.8rem;"
+                 onclick="startConsult('${p.id}')">Consult →</button>` :
+        `<button class="btn btn-sm"
+                 onclick="markQueueStatus('${p.id}','${p.status==='Waiting'?'Seen':'Waiting'}')">
+           ${p.status==='Waiting'?'Mark Seen':'Reset'}
+         </button>`
       }
     </td>
   </tr>`).join('');
