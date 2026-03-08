@@ -4986,10 +4986,12 @@ function renderClinicRequests(arr) {
 function filterWorklist() {
   const q  = document.getElementById('lr-search').value.toLowerCase();
   const st = document.getElementById('lr-status-filter').value;
-  renderWorklist(testRequests.filter(r =>
-    (!q || r.patient_name.toLowerCase().includes(q) || (r.tests_ordered||'').toLowerCase().includes(q)) &&
+  const filtered = testRequests.filter(r =>
+    (!q || (r.patient_name||'').toLowerCase().includes(q) || getTestsDisplay(r).toLowerCase().includes(q)) &&
     (!st || (r.status||'Pending') === st)
-  ));
+  );
+  renderWorklist(filtered);
+  renderClinicRequests(testRequests); // clinic section always shows all clinic requests unfiltered
 }
 
 async function addTestRequest() {
