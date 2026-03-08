@@ -5081,6 +5081,7 @@ async function loadDoctorConsult(){
 }
 
 function startConsult(patientId){
+  if (_labPollInterval) clearInterval(_labPollInterval);
   const p = queuePatients.find(x => x.id === patientId);
   if(!p) return;
   currentConsultId = patientId;
@@ -5407,6 +5408,7 @@ async function saveConsultation(){
     toast('✅ Consultation saved!' + (rxItems.length ? ' Prescription sent to pharmacy.' : ''));
     currentConsultId = null;
     rxItems = [];
+    if (_labPollInterval) clearInterval(_labPollInterval);
     showPage('doctor');
 
   } catch(e){ toast('Error: '+e.message,'err'); }
