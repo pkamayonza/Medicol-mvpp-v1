@@ -2057,212 +2057,203 @@
   <!-- ══════════════════════════════════
        LAB DASHBOARD
   ══════════════════════════════════ -->
-  <div class="page" id="page-lab">
+<!-- ══════════════════════════════════
+       LAB: WORKLIST
+  ══════════════════════════════════ -->
+  <div class="page" id="page-lab-worklist">
+    <div style="margin-top:0.5rem;">
 
-    <div class="dash-header">
-      <div>
-        <div class="dash-greeting">Good <em id="lab-time-greeting">morning</em>, <span id="lab-facility-name">—</span></div>
-        <div class="dash-date" id="lab-date-str"></div>
-      </div>
-      <div id="lab-quick-note" style="font-size:0.8rem;color:#9AA3AE;text-align:right;max-width:260px;line-height:1.6;padding-top:0.2rem;"></div>
-    </div>
-
-    <!-- 4 stat cards -->
-    <div class="stats-5" style="grid-template-columns:repeat(4,1fr);">
-
-      <div class="stat-card" id="sc-lab-pending">
-        <div class="stat-card-top">
-          <span class="stat-label">Pending Today</span>
-          <div class="stat-icon" style="background:#fffbeb;">⏳</div>
+      <!-- Header row with Walk-in button -->
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.2rem;">
+        <div>
+          <h2 style="font-size:1rem;font-weight:700;color:#0B1F3A;margin:0;">Active Worklist</h2>
+          <div style="font-size:0.8rem;color:#9AA3AE;margin-top:0.2rem;">Clinic requests + pending tests</div>
         </div>
-        <div class="stat-num" id="lab-pending">—</div>
-        <div class="stat-sub">tests in queue</div>
-      </div>
-
-      <div class="stat-card" id="sc-lab-completed">
-        <div class="stat-card-top">
-          <span class="stat-label">Completed Today</span>
-          <div class="stat-icon" style="background:#f0fdf4;">✅</div>
-        </div>
-        <div class="stat-num" id="lab-completed">—</div>
-        <div class="stat-sub">results ready</div>
-      </div>
-
-      <div class="stat-card">
-        <div class="stat-card-top">
-          <span class="stat-label">Total This Week</span>
-          <div class="stat-icon" style="background:#f5f3ff;">📊</div>
-        </div>
-        <div class="stat-num" id="lab-week">—</div>
-        <div class="stat-sub">tests processed</div>
-      </div>
-
-      <div class="stat-card">
-        <div class="stat-card-top">
-          <span class="stat-label">Avg Turnaround</span>
-          <div class="stat-icon" style="background:#eff6ff;">⚡</div>
-        </div>
-        <div class="stat-num" id="lab-tat" style="font-size:1.4rem;">—</div>
-        <div class="stat-sub">sample → result</div>
-      </div>
-
-    </div>
-
-    <!-- top tests this week -->
-    <div id="lab-top-tests-strip" style="display:none;margin-bottom:1.5rem;">
-      <div class="velocity-section-label">Most Ordered Tests — This Week</div>
-      <div class="card" style="margin-bottom:0;">
-        <div id="lab-top-tests-body" style="display:flex;flex-wrap:wrap;gap:0.5rem;"></div>
-      </div>
-    </div>
-
-    <!-- live worklist preview — pending tests -->
-    <div class="card">
-      <div style="display:flex;align-items:center;justify-content:space-between;
-                  border-bottom:1px solid #F0EFEB;padding-bottom:0.85rem;margin-bottom:1.2rem;">
-        <h2 style="margin:0;border:none;padding:0;font-size:0.83rem;">Pending Worklist</h2>
-        <button onclick="showPage('lab-worklist')"
-                style="background:#0B1F3A;color:white;border:none;padding:0.45rem 1rem;
-                       border-radius:7px;cursor:pointer;font-size:0.78rem;font-weight:700;
-                       font-family:'Syne',sans-serif;">
-          + New Test Request
+        <button class="btn btn-primary" onclick="showPage('lab-walkin')"
+                style="display:flex;align-items:center;gap:0.4rem;">
+          + Walk-in Test
         </button>
       </div>
-      <div class="table-wrap">
-        <table>
-          <thead>
-            <tr><th>Patient</th><th>Test</th><th>Sample</th><th>Requested By</th><th>Received</th><th>Status</th><th>Actions</th></tr>
-          </thead>
-          <tbody id="lab-pending-body"><tr><td colspan="7" class="loading">Loading...</td></tr></tbody>
-        </table>
-      </div>
-    </div>
 
+      <!-- Clinic Requests (from doctor) -->
+      <div class="card" style="border:1px solid #c7d2fe;background:#f5f7ff;margin-bottom:1.2rem;">
+        <div style="display:flex;align-items:center;justify-content:space-between;
+                    margin-bottom:0.9rem;">
+          <h2 style="color:#1e3a8a;margin:0;padding:0;border:none;font-size:0.83rem;">
+            🏥 Clinic Requests
+          </h2>
+          <span style="font-size:0.75rem;color:#6B7280;">Sent by the doctor</span>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Patient</th><th>Tests Ordered</th><th>Priority</th>
+                <th>Clinical Notes</th><th>Received</th><th>Status</th><th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="clinic-requests-body">
+              <tr><td colspan="7" class="loading">Loading...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Search + filter for main worklist -->
+      <div class="card">
+        <h2 style="font-size:0.83rem;margin-bottom:0.9rem;">All Active Requests</h2>
+        <div style="display:flex;gap:0.75rem;margin-bottom:1rem;flex-wrap:wrap;">
+          <div class="search-bar" style="flex:1;margin:0;">
+            <input type="text" id="lr-search" placeholder="Search patient or test..."
+                   oninput="filterWorklist()" style="margin:0;"/>
+          </div>
+          <select id="lr-status-filter" onchange="filterWorklist()"
+                  style="border:1px solid #E0DFDB;border-radius:8px;padding:0.6rem 0.9rem;
+                         font-size:0.85rem;font-family:'Syne',sans-serif;color:#0B1F3A;
+                         background:#F0EFEB;outline:none;cursor:pointer;min-width:180px;">
+            <option value="">All Statuses</option>
+            <option value="Pending">Pending</option>
+            <option value="Sample Collected">Sample Collected</option>
+            <option value="Processing">Processing</option>
+            <option value="Result Ready">Result Ready</option>
+          </select>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Patient</th><th>Test(s)</th><th>Sample</th><th>Priority</th>
+                <th>Source</th><th>Received</th><th>Status</th><th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="lr-body"><tr><td colspan="8" class="loading">Loading...</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+
+    </div>
   </div>
 
   <!-- ══════════════════════════════════
-       LAB: WORKLIST (new requests + queue)
+       LAB: WALK-IN (separate page)
   ══════════════════════════════════ -->
-<div class="page" id="page-lab-worklist">
-  <div style="margin-top:0.5rem;">
+  <div class="page" id="page-lab-walkin">
+    <div style="margin-top:0.5rem;">
 
-    <!-- ══ CLINIC REQUESTS (from doctor) ════════════════════════════ -->
-    <div class="card" style="border:1px solid #c7d2fe;background:#f5f7ff;">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.9rem;">
-        <h2 style="color:#1e3a8a;margin:0;padding:0;border:none;">Clinic Requests</h2>
-        <span style="font-size:0.75rem;color:#6B7280;">Sent by the doctor — awaiting processing</span>
+      <div style="display:flex;align-items:center;gap:0.75rem;margin-bottom:1.2rem;">
+        <button class="btn btn-sm" onclick="showPage('lab-worklist')">← Back to Worklist</button>
+        <div>
+          <h2 style="font-size:1rem;font-weight:700;color:#0B1F3A;margin:0;">Walk-in Test Request</h2>
+          <div style="font-size:0.8rem;color:#9AA3AE;">Register a patient who has come directly to the lab</div>
+        </div>
       </div>
-      <div class="table-wrap">
-        <table>
-          <thead>
-            <tr>
-              <th>Patient</th><th>Tests Ordered</th><th>Priority</th>
-              <th>Clinical Notes</th><th>Received</th><th>Status</th><th>Actions</th>
-            </tr>
-          </thead>
-          <tbody id="clinic-requests-body">
-            <tr><td colspan="7" class="loading">Loading...</td></tr>
-          </tbody>
-        </table>
+
+      <div class="card">
+        <div class="form-grid">
+          <div class="form-group">
+            <label>Patient Name *</label>
+            <input type="text" id="lr-patient" placeholder="e.g. Grace Nakato"/>
+          </div>
+          <div class="form-group">
+            <label>Age</label>
+            <input type="number" id="lr-age" placeholder="34" min="0"/>
+          </div>
+          <div class="form-group">
+            <label>Gender</label>
+            <select id="lr-gender">
+              <option value="">Select</option>
+              <option>Female</option><option>Male</option><option>Other</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Phone</label>
+            <input type="tel" id="lr-phone" placeholder="0701234567"/>
+          </div>
+
+          <div class="form-group" style="grid-column:span 2">
+            <label>Test(s) Ordered *</label>
+            <div id="lr-tests-picker" style="display:flex;flex-wrap:wrap;gap:0.4rem;margin-bottom:0.5rem;"></div>
+            <input type="text" id="lr-test-custom"
+                   placeholder="Or type a custom test name and press Enter"
+                   onkeydown="addCustomTest(event)"/>
+            <div id="lr-selected-tests"
+                 style="display:flex;flex-wrap:wrap;gap:0.4rem;margin-top:0.5rem;min-height:24px;"></div>
+          </div>
+
+          <div class="form-group">
+            <label>Sample Type *</label>
+            <select id="lr-sample">
+              <option value="">Select sample</option>
+              <option>Whole Blood</option><option>Serum</option><option>Plasma</option>
+              <option>Urine</option><option>Stool</option><option>Swab</option>
+              <option>Sputum</option><option>CSF</option><option>Other</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Priority</label>
+            <select id="lr-priority">
+              <option value="Routine">Routine</option>
+              <option value="Urgent">Urgent</option>
+              <option value="STAT">STAT (Critical)</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Requesting Doctor / Facility</label>
+            <input type="text" id="lr-requester" placeholder="e.g. Dr. Okello / BTW Clinic"/>
+          </div>
+          <div class="form-group">
+            <label>Clinical Notes</label>
+            <input type="text" id="lr-notes" placeholder="e.g. Patient has fever for 3 days"/>
+          </div>
+        </div>
+
+        <div class="form-actions">
+          <button class="btn btn-primary" onclick="addTestRequest()">Submit & Back to Worklist</button>
+          <button class="btn btn-sm" onclick="showPage('lab-worklist')">Cancel</button>
+        </div>
       </div>
+
     </div>
-
-    <!-- ══ WALK-IN / MANUAL REQUEST FORM ════════════════════════════ -->
-    <div class="card">
-      <h2>New Walk-in Test Request</h2>
-      <div class="form-grid">
-        <div class="form-group">
-          <label>Patient Name *</label>
-          <input type="text" id="lr-patient" placeholder="e.g. Grace Nakato"/>
-        </div>
-        <div class="form-group">
-          <label>Age</label>
-          <input type="number" id="lr-age" placeholder="34" min="0"/>
-        </div>
-        <div class="form-group">
-          <label>Gender</label>
-          <select id="lr-gender">
-            <option value="">Select</option>
-            <option>Female</option><option>Male</option><option>Other</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label>Phone</label>
-          <input type="tel" id="lr-phone" placeholder="0701234567"/>
-        </div>
-        <div class="form-group" style="grid-column:span 2">
-          <label>Test(s) Ordered *</label>
-          <div id="lr-tests-picker" style="display:flex;flex-wrap:wrap;gap:0.4rem;margin-bottom:0.5rem;"></div>
-          <input type="text" id="lr-test-custom" placeholder="Or type a custom test and press Enter"
-                 onkeydown="addCustomTest(event)"/>
-          <div id="lr-selected-tests" style="display:flex;flex-wrap:wrap;gap:0.4rem;margin-top:0.5rem;min-height:24px;"></div>
-        </div>
-        <div class="form-group">
-          <label>Sample Type *</label>
-          <select id="lr-sample">
-            <option value="">Select sample</option>
-            <option>Whole Blood</option><option>Serum</option><option>Plasma</option>
-            <option>Urine</option><option>Stool</option><option>Swab</option>
-            <option>Sputum</option><option>CSF</option><option>Other</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label>Priority</label>
-          <select id="lr-priority">
-            <option value="Routine">Routine</option>
-            <option value="Urgent">Urgent</option>
-            <option value="STAT">STAT (Critical)</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label>Requesting Doctor / Facility</label>
-          <input type="text" id="lr-requester" placeholder="e.g. Dr. Okello / BTW Clinic"/>
-        </div>
-        <div class="form-group">
-          <label>Clinical Notes</label>
-          <input type="text" id="lr-notes" placeholder="e.g. Patient has fever for 3 days"/>
-        </div>
-      </div>
-      <div class="form-actions">
-        <button class="btn btn-primary" onclick="addTestRequest()">Submit Test Request</button>
-      </div>
-    </div>
-
-    <!-- ══ FULL WORKLIST (all requests) ═════════════════════════════ -->
-    <div class="card">
-      <h2>Full Worklist</h2>
-      <div class="filter-row" style="display:flex;gap:0.75rem;margin-bottom:1rem;flex-wrap:wrap;">
-        <div class="search-bar" style="flex:1;margin:0;">
-          <input type="text" id="lr-search" placeholder="Search patient or test..."
-                 oninput="filterWorklist()" style="margin:0;"/>
-        </div>
-        <select id="lr-status-filter" onchange="filterWorklist()"
-                style="border:1px solid #E0DFDB;border-radius:8px;padding:0.6rem 0.9rem;
-                       font-size:0.85rem;font-family:'Syne',sans-serif;color:#0B1F3A;
-                       background:#F0EFEB;outline:none;cursor:pointer;min-width:180px;">
-          <option value="">All Statuses</option>
-          <option value="Pending">Pending</option>
-          <option value="Sample Collected">Sample Collected</option>
-          <option value="Processing">Processing</option>
-          <option value="Result Ready">Result Ready</option>
-          <option value="Dispatched">Dispatched</option>
-        </select>
-      </div>
-      <div class="table-wrap">
-        <table>
-          <thead>
-            <tr>
-              <th>Patient</th><th>Test(s)</th><th>Sample</th><th>Priority</th>
-              <th>Source</th><th>Received</th><th>Status</th><th>Actions</th>
-            </tr>
-          </thead>
-          <tbody id="lr-body"><tr><td colspan="8" class="loading">Loading...</td></tr></tbody>
-        </table>
-      </div>
-    </div>
-
   </div>
-</div>
+
+  <!-- ══════════════════════════════════
+       LAB: DISPATCHED (results sent to doctor)
+  ══════════════════════════════════ -->
+  <div class="page" id="page-lab-dispatched">
+    <div style="margin-top:0.5rem;">
+
+      <div style="display:flex;align-items:center;gap:0.75rem;margin-bottom:1.2rem;">
+        <button class="btn btn-sm" onclick="showPage('lab-worklist')">← Back to Worklist</button>
+        <div>
+          <h2 style="font-size:1rem;font-weight:700;color:#0B1F3A;margin:0;">Dispatched Results</h2>
+          <div style="font-size:0.8rem;color:#9AA3AE;">Results sent back to the requesting doctor</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div style="display:flex;gap:0.75rem;margin-bottom:1rem;flex-wrap:wrap;">
+          <div class="search-bar" style="flex:1;margin:0;">
+            <input type="text" id="disp-search" placeholder="Search patient or test..."
+                   oninput="filterDispatched()" style="margin:0;"/>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Patient</th><th>Test(s)</th><th>Sample</th><th>Priority</th>
+                <th>Source</th><th>Dispatched</th><th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="dispatched-body">
+              <tr><td colspan="7" class="loading">Loading...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </div>
+  </div>
 
   <!-- ══════════════════════════════════
        LAB: RESULTS (enter + view results)
