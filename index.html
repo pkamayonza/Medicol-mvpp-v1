@@ -5100,6 +5100,10 @@ function startConsult(patientId){
   document.getElementById('cons-status').value = 'Active';
   const rg = document.getElementById('cons-referral-group');
   if(rg) rg.style.display='none';
+  // Reset diagnosis lock state
+  document.getElementById('diagnosis-lock').style.display = 'block';
+  document.getElementById('diagnosis-form').style.display = 'none';
+  document.getElementById('consult-lab-form').style.display = 'block';
 
   // mark patient as In Consult
   db(`queue_patients?id=eq.${patientId}`,'PATCH',{status:'In Consult'}).catch(()=>{});
@@ -5227,6 +5231,7 @@ async function sendConsultLabRequest() {
     buildConsultTestPicker();
     toast('✅ Lab request sent.');
   } catch(e) { toast('Error: ' + e.message, 'err'); }
+  unlockDiagnosis();
 }
 
 function skipLabStep() {
