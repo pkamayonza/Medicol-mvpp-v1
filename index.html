@@ -3270,7 +3270,7 @@ function launchApp(){
 const NAV_CONFIG={
   pharmacy:    [{id:'pharmacy',label:'Home'},{id:'ph-inventory',label:'Inventory'},{id:'ph-patients',label:'Dispensing Log'}],
   hospital:    [{id:'hospital',label:'Home'},{id:'ho-patients',label:'Patients'},{id:'ho-inventory',label:'Supplies'}],
-  diagnosticlab:[{id:'lab',label:'Home'},{id:'lab-worklist',label:'Worklist'},{id:'lab-results',label:'Results'}]
+  diagnosticlab:[{id:'lab',label:'Home'},{id:'lab-worklist',label:'Worklist'},{id:'lab-results',label:'Results'},{id:'lab-dispatched',label:'Dispatched'}]
 };
 
 const CLINIC_NAV = [
@@ -3313,8 +3313,10 @@ function showPage(name){
   if(name==='ho-patients')  loadHoPts();
   if(name==='ho-inventory') loadHoDrugs();
   if(name==='lab')          loadLabHome();
-  if(name==='lab-worklist') loadWorklist();
-  if(name==='lab-results')  loadLabResults();
+  if(name==='lab-worklist')   loadWorklist();
+  if(name==='lab-walkin')     buildTestPicker();
+  if(name==='lab-results')    loadLabResults();
+  if(name==='lab-dispatched') loadDispatched();
 }
 
 function routeHome(){
