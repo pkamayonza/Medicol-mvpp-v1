@@ -2093,7 +2093,7 @@
     </div>
 
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.1rem;align-items:start;">
-      
+
 <!-- LEFT: vitals + staged workflow -->
 <div style="display:flex;flex-direction:column;gap:1rem;">
 
@@ -5227,6 +5227,21 @@ async function sendConsultLabRequest() {
     buildConsultTestPicker();
     toast('✅ Lab request sent.');
   } catch(e) { toast('Error: ' + e.message, 'err'); }
+}
+
+function skipLabStep() {
+  // Doctor explicitly says no lab needed — unlock diagnosis immediately
+  document.getElementById('consult-lab-form').style.display = 'none';
+  document.getElementById('consult-lab-sent').style.display = 'inline-flex';
+  document.getElementById('consult-lab-sent').textContent = '✓ No lab needed';
+  document.getElementById('consult-lab-sent').style.background = '#F0EFEB';
+  document.getElementById('consult-lab-sent').style.color = '#4A5568';
+  unlockDiagnosis();
+}
+
+function unlockDiagnosis() {
+  document.getElementById('diagnosis-lock').style.display = 'none';
+  document.getElementById('diagnosis-form').style.display = 'block';
 }
 
 // ── prescription destination ────
