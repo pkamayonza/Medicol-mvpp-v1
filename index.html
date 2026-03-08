@@ -5013,7 +5013,26 @@ async function loadDoctorQueue(){
       document.getElementById('doc-rx-count').textContent = todayRx.length;
     } catch(e){}
 
-    renderQueueTable(todayQ, 'doc-queue-body', 'doctor');
+renderQueueTable(todayQ, 'doc-queue-body', 'doctor');
+
+    // populate lab status badges per patient
+    try {
+      const labReqs = await db('test_requests?order=created_at.desc');
+      todayQ.forEach(p => {
+        const badge = document.getElementById(`lab-badge-${p.id}`);
+        if(!badge) return;
+        const req = labReqs.find(r => r.queue_patient_id === p.id);
+        if(!req){ badge.innerHTML='<span style="color:#ccc;font-size:0.75rem;">—</span>'; return; }
+        const map = {
+          'Pending':         '<span class="badge" style="background:#fffbeb;color:#d97706;font-size:0.72rem;">Lab: Pending</span>',
+          'Sample Collected':'<span class="badge" style="background:#eff6ff;color:#1d4ed8;font-size:0.72rem;">Collected</span>',
+          'Processing':      '<span class="badge" style="background:#f5f3ff;color:#7c3aed;font-size:0.72rem;">Processing</span>',
+          'Result Ready':    '<span class="badge" style="background:#d1fae5;color:#065f46;font-size:0.72rem;">✓ Ready</span>',
+        };
+        badge.innerHTML = map[req.status] || `<span class="badge" style="font-size:0.72rem;">${req.status}</span>`;
+      });
+    } catch(e){}
+
   } catch(e){ console.error(e); }
 }
 
