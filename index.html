@@ -1998,7 +1998,7 @@
         <div class="form-group"><label>Priority</label>
           <select id="rec-priority">
             <option value="Normal">Normal</option>
-            <option value="Urgent">🔴 Urgent</option>
+            <option value="Urgent">Urgent</option>
           </select>
         </div>
         <button class="btn btn-primary" style="width:100%;margin-top:0.4rem;"
@@ -2076,7 +2076,7 @@
                 padding:1rem 1.4rem;margin-bottom:1.2rem;
                 display:flex;align-items:center;gap:1rem;flex-wrap:wrap;">
       <div style="width:40px;height:40px;border-radius:50%;background:rgba(255,255,255,0.1);
-                  display:flex;align-items:center;justify-content:center;font-size:1.2rem;flex-shrink:0;">🧑‍⚕️</div>
+                  display:flex;align-items:center;justify-content:center;font-size:1.2rem;flex-shrink:0;"></div>
       <div>
         <div style="font-weight:700;font-size:1rem;color:white;" id="consult-patient-name">—</div>
         <div style="font-size:0.8rem;color:rgba(255,255,255,0.6);" id="consult-patient-meta">—</div>
@@ -2093,84 +2093,124 @@
     </div>
 
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.1rem;align-items:start;">
+      
+<!-- LEFT: vitals + staged workflow -->
+<div style="display:flex;flex-direction:column;gap:1rem;">
 
-      <!-- LEFT: vitals + diagnosis + lab request -->
-      <div style="display:flex;flex-direction:column;gap:1rem;">
+  <!-- Step 1: Vitals -->
+  <div class="card" style="margin:0;">
+    <div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.9rem;">
+      <span style="background:#0B1F3A;color:white;border-radius:50%;width:22px;height:22px;
+                   display:flex;align-items:center;justify-content:center;
+                   font-size:0.7rem;font-weight:700;flex-shrink:0;">1</span>
+      <h2 style="font-size:0.82rem;margin:0;border:none;padding:0;">Vitals</h2>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.6rem;">
+      <div class="form-group" style="margin:0;"><label>Blood Pressure</label>
+        <input type="text" id="cons-bp" placeholder="120/80 mmHg"/></div>
+      <div class="form-group" style="margin:0;"><label>Temperature (°C)</label>
+        <input type="number" id="cons-temp" placeholder="37.5" step="0.1"/></div>
+      <div class="form-group" style="margin:0;"><label>Weight (kg)</label>
+        <input type="number" id="cons-weight" placeholder="68" step="0.1"/></div>
+      <div class="form-group" style="margin:0;"><label>Pulse (bpm)</label>
+        <input type="number" id="cons-pulse" placeholder="72"/></div>
+    </div>
+  </div>
 
-        <div class="card" style="margin:0;">
-          <h2 style="font-size:0.82rem;margin-bottom:0.9rem;">Vitals</h2>
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.6rem;">
-            <div class="form-group" style="margin:0;"><label>Blood Pressure</label>
-              <input type="text" id="cons-bp" placeholder="120/80 mmHg"/></div>
-            <div class="form-group" style="margin:0;"><label>Temperature (°C)</label>
-              <input type="number" id="cons-temp" placeholder="37.5" step="0.1"/></div>
-            <div class="form-group" style="margin:0;"><label>Weight (kg)</label>
-              <input type="number" id="cons-weight" placeholder="68" step="0.1"/></div>
-            <div class="form-group" style="margin:0;"><label>Pulse (bpm)</label>
-              <input type="number" id="cons-pulse" placeholder="72"/></div>
-          </div>
+  <!-- Step 2: Lab request -->
+  <div class="card" style="margin:0;border:1px solid #c7d2fe;background:#f5f7ff;">
+    <div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.75rem;">
+      <span style="background:#1e3a8a;color:white;border-radius:50%;width:22px;height:22px;
+                   display:flex;align-items:center;justify-content:center;
+                   font-size:0.7rem;font-weight:700;flex-shrink:0;">2</span>
+      <h2 style="font-size:0.82rem;margin:0;border:none;padding:0;color:#1e3a8a;">Lab Request</h2>
+      <span id="consult-lab-sent"
+            style="display:none;background:#d1fae5;color:#065f46;border-radius:100px;
+                   padding:0.18rem 0.65rem;font-size:0.72rem;font-weight:700;margin-left:auto;">✓ Sent — awaiting results</span>
+    </div>
+
+    <!-- Lab result returned area -->
+    <div id="consult-lab-result-area"
+         style="display:none;background:#f0fdf4;border:1px solid #a7f3d0;
+                border-radius:8px;padding:0.75rem;margin-bottom:0.75rem;">
+      <div style="font-size:0.7rem;font-weight:700;color:#065f46;text-transform:uppercase;
+                  letter-spacing:0.6px;margin-bottom:0.35rem;">🔬 Lab Result Received</div>
+      <div id="consult-lab-result-content" style="font-size:0.82rem;color:#1a1a2e;"></div>
+    </div>
+
+    <div id="consult-lab-form">
+      <div id="consult-tests-picker" style="display:flex;flex-wrap:wrap;gap:0.35rem;margin-bottom:0.6rem;"></div>
+      <div id="consult-selected-tests" style="display:flex;flex-wrap:wrap;gap:0.35rem;margin-bottom:0.6rem;"></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.5rem;margin-bottom:0.6rem;">
+        <div class="form-group" style="margin:0;"><label>Priority</label>
+          <select id="consult-lab-priority">
+            <option value="Routine">Routine</option>
+            <option value="Urgent">Urgent</option>
+            <option value="STAT">STAT</option>
+          </select>
         </div>
-
-        <div class="card" style="margin:0;">
-          <h2 style="font-size:0.82rem;margin-bottom:0.9rem;">Diagnosis & Notes</h2>
-          <div class="form-group"><label>Diagnosis *</label>
-            <input type="text" id="cons-diagnosis" placeholder="e.g. Malaria, Hypertension"/></div>
-          <div class="form-group"><label>Clinical Notes</label>
-            <textarea id="cons-notes" rows="3"
-                      placeholder="History, examination findings, management plan..."
-                      style="resize:vertical;"></textarea></div>
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.6rem;">
-            <div class="form-group" style="margin:0;"><label>Patient Status</label>
-              <select id="cons-status">
-                <option value="Active">Active</option>
-                <option value="Follow-up">Follow-up Required</option>
-                <option value="Discharged">Discharged</option>
-                <option value="Referred">Referred</option>
-              </select>
-            </div>
-            <div class="form-group" id="cons-referral-group" style="margin:0;display:none;">
-              <label>Referred To</label>
-              <input type="text" id="cons-referral" placeholder="e.g. Mulago Hospital"/>
-            </div>
-          </div>
+        <div class="form-group" style="margin:0;"><label>Sample Notes</label>
+          <input type="text" id="consult-lab-notes" placeholder="e.g. fasting"/>
         </div>
-
-        <!-- Lab request -->
-        <div class="card" style="margin:0;border:1px solid #c7d2fe;background:#f5f7ff;">
-          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.75rem;">
-            <h2 style="font-size:0.82rem;margin:0;border:none;padding:0;color:#1e3a8a;">🔬 Send Lab Request</h2>
-            <span id="consult-lab-sent"
-                  style="display:none;background:#d1fae5;color:#065f46;border-radius:100px;
-                         padding:0.18rem 0.65rem;font-size:0.72rem;font-weight:700;">✓ Sent</span>
-          </div>
-          <div id="consult-tests-picker" style="display:flex;flex-wrap:wrap;gap:0.35rem;margin-bottom:0.6rem;"></div>
-          <div id="consult-selected-tests" style="display:flex;flex-wrap:wrap;gap:0.35rem;margin-bottom:0.6rem;"></div>
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.5rem;margin-bottom:0.6rem;">
-            <div class="form-group" style="margin:0;"><label>Priority</label>
-              <select id="consult-lab-priority">
-                <option value="Routine">Routine</option>
-                <option value="Urgent">Urgent</option>
-                <option value="STAT">STAT</option>
-              </select>
-            </div>
-            <div class="form-group" style="margin:0;"><label>Sample Notes</label>
-              <input type="text" id="consult-lab-notes" placeholder="e.g. fasting"/>
-            </div>
-          </div>
-          <div id="consult-lab-result-area"
-               style="display:none;background:#f0fdf4;border:1px solid #a7f3d0;
-                      border-radius:8px;padding:0.75rem;margin-bottom:0.6rem;">
-            <div style="font-size:0.7rem;font-weight:700;color:#065f46;text-transform:uppercase;
-                        letter-spacing:0.6px;margin-bottom:0.35rem;">Lab Result Received</div>
-            <div id="consult-lab-result-content" style="font-size:0.82rem;color:#1a1a2e;"></div>
-          </div>
-          <button class="btn btn-sm" onclick="sendConsultLabRequest()"
-                  style="background:#1e3a8a;color:white;border-color:#1e3a8a;width:100%;">
-            Send to Lab →
-          </button>
-        </div>
-
       </div>
+      <div style="display:flex;gap:0.5rem;">
+        <button class="btn btn-sm" onclick="sendConsultLabRequest()"
+                style="background:#1e3a8a;color:white;border-color:#1e3a8a;flex:1;">
+          Send to Lab →
+        </button>
+        <button class="btn btn-sm" onclick="skipLabStep()"
+                style="background:white;color:#6B7280;border-color:#E0DFDB;flex:1;"
+                title="Skip lab — proceed directly to diagnosis">
+          Skip — No Lab Needed
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Step 3: Diagnosis — locked until lab done or skipped -->
+  <div class="card" style="margin:0;" id="consult-diagnosis-card">
+    <div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.9rem;">
+      <span style="background:#0B1F3A;color:white;border-radius:50%;width:22px;height:22px;
+                   display:flex;align-items:center;justify-content:center;
+                   font-size:0.7rem;font-weight:700;flex-shrink:0;">3</span>
+      <h2 style="font-size:0.82rem;margin:0;border:none;padding:0;">Diagnosis & Notes</h2>
+    </div>
+
+    <!-- Lock overlay — shown until lab sent/skipped -->
+    <div id="diagnosis-lock" style="background:#F0EFEB;border-radius:8px;padding:1rem;
+         text-align:center;border:1px dashed #E0DFDB;">
+      <div style="font-size:1.3rem;margin-bottom:0.4rem;">🔒</div>
+      <div style="font-size:0.82rem;color:#6B7280;font-weight:600;">
+        Send a lab request above or click<br>"Skip — No Lab Needed" to unlock diagnosis.
+      </div>
+    </div>
+
+    <!-- Actual diagnosis form — hidden until unlocked -->
+    <div id="diagnosis-form" style="display:none;">
+      <div class="form-group"><label>Diagnosis *</label>
+        <input type="text" id="cons-diagnosis" placeholder="e.g. Malaria, Hypertension"/></div>
+      <div class="form-group"><label>Clinical Notes</label>
+        <textarea id="cons-notes" rows="3"
+                  placeholder="History, examination findings, management plan..."
+                  style="resize:vertical;"></textarea></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.6rem;">
+        <div class="form-group" style="margin:0;"><label>Patient Status</label>
+          <select id="cons-status">
+            <option value="Active">Active</option>
+            <option value="Follow-up">Follow-up Required</option>
+            <option value="Discharged">Discharged</option>
+            <option value="Referred">Referred</option>
+          </select>
+        </div>
+        <div class="form-group" id="cons-referral-group" style="margin:0;display:none;">
+          <label>Referred To</label>
+          <input type="text" id="cons-referral" placeholder="e.g. Mulago Hospital"/>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
 
       <!-- RIGHT: prescription -->
       <div style="display:flex;flex-direction:column;gap:1rem;">
