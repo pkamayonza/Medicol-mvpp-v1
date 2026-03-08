@@ -5086,6 +5086,13 @@ function startConsult(patientId){
   currentConsultId = patientId;
   rxItems = [];
   renderRxItems();
+    consultSelectedTests = [];
+  renderConsultSelectedTests();
+  buildConsultTestPicker();
+  document.getElementById('consult-lab-sent').style.display = 'none';
+  document.getElementById('consult-lab-form').style.display = 'block';
+  document.getElementById('diagnosis-lock').style.display = 'block';
+  document.getElementById('diagnosis-form').style.display = 'none';
 
   // populate banner
   document.getElementById('consult-patient-name').textContent = p.name;
