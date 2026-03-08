@@ -2354,18 +2354,23 @@
 </div>
 
   <!-- Result Detail Modal -->
-  <div class="mo" id="m-result-detail">
-    <div class="mb" style="max-width:540px;">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.2rem;">
-        <h3 style="margin:0;">Result Detail</h3>
-        <div style="display:flex;gap:0.5rem;">
-          <button class="btn btn-sm btn-primary" onclick="printResultReport()">🖨 Print Report</button>
-          <button class="btn btn-sm" onclick="cm('m-result-detail')">✕</button>
-        </div>
-      </div>
-      <div id="result-detail-body"></div>
+<div class="mo" id="m-dispatch-confirm">
+  <div class="mb" style="max-width:400px;">
+    <h3>Dispatch Results?</h3>
+    <input type="hidden" id="dispatch-request-id"/>
+    <div id="dispatch-info"
+         style="background:#F0EFEB;border-radius:8px;padding:0.8rem 1rem;
+                margin-bottom:1.2rem;font-size:0.85rem;border:1px solid #E0DFDB;"></div>
+    <p style="font-size:0.85rem;color:#555;margin-bottom:1.2rem;">
+      This will mark the request as <strong>Dispatched</strong> and notify the requesting doctor
+      that results are ready for review.
+    </p>
+    <div class="ma">
+      <button class="btn btn-sm" onclick="cm('m-dispatch-confirm')">Cancel</button>
+      <button class="btn btn-primary" onclick="confirmDispatch()">📤 Confirm Dispatch</button>
     </div>
   </div>
+</div>
 
   <!-- Result Report (printable) Modal -->
   <div class="mo" id="m-result-report">
