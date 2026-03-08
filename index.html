@@ -4922,6 +4922,30 @@ function renderWorklist(arr) {
   }).join('');
 }
 
+// Helper: normalise tests field across both sources
+function getTestsDisplay(r) {
+  if (r.tests_ordered) return r.tests_ordered.split(',').map(t => t.trim()).join(', ');
+  if (r.tests) {
+    try {
+      const arr = JSON.parse(r.tests);
+      return Array.isArray(arr) ? arr.join(', ') : String(arr);
+    } catch { return r.tests; }
+  }
+  return '—';
+}
+
+// Helper: get tests as array for result entry
+function getTestsArray(r) {
+  if (r.tests_ordered) return r.tests_ordered.split(',').map(t => t.trim()).filter(Boolean);
+  if (r.tests) {
+    try {
+      const arr = JSON.parse(r.tests);
+      return Array.isArray(arr) ? arr : [String(arr)];
+    } catch { return [r.tests]; }
+  }
+  return [];
+}
+
 function renderClinicRequests(arr) {
   const b = document.getElementById('clinic-requests-body');
   if (!b) return;
