@@ -1852,59 +1852,77 @@
   <!-- ══════════════════════════════════
        CLINIC DASHBOARD
   ══════════════════════════════════ -->
+ <!-- ══ CLINIC: OVERVIEW ══ -->
   <div class="page" id="page-clinic">
-
-    <!-- header — same pattern as pharmacy -->
     <div class="dash-header">
       <div>
         <div class="dash-greeting">Good <em id="cl-time-greeting">morning</em>, <span id="cl-facility-name">—</span></div>
         <div class="dash-date" id="cl-date-str"></div>
       </div>
-      <div id="cl-quick-note" style="font-size:0.8rem;color:#9AA3AE;text-align:right;max-width:260px;line-height:1.6;padding-top:0.2rem;"></div>
+      <div id="cl-quick-note" style="font-size:0.8rem;color:#9AA3AE;text-align:right;line-height:1.6;padding-top:0.2rem;"></div>
     </div>
 
-    <!-- 4 stat cards -->
-    <div class="stats-5" style="grid-template-columns:repeat(4,1fr);">
-
-      <div class="stat-card">
-        <div class="stat-card-top">
-          <span class="stat-label">Total Patients</span>
-          <div class="stat-icon" style="background:#eff6ff;">👥</div>
+    <!-- Patient flow pipeline -->
+    <div style="background:linear-gradient(135deg,#0B1F3A,#1a3a5c);border-radius:14px;
+                padding:1.2rem 1.5rem;margin-bottom:1.5rem;">
+      <div style="font-size:0.68rem;font-weight:700;letter-spacing:1.2px;opacity:0.55;
+                  text-transform:uppercase;color:white;margin-bottom:0.8rem;">Today's Patient Flow</div>
+      <div style="display:flex;align-items:center;flex-wrap:wrap;gap:0.2rem;">
+        <div style="text-align:center;padding:0.5rem 0.9rem;">
+          <div style="font-size:1.35rem;font-weight:800;color:white;" id="flow-registered">—</div>
+          <div style="font-size:0.68rem;color:rgba(255,255,255,0.55);margin-top:0.15rem;">Registered</div>
         </div>
+        <div style="color:rgba(255,255,255,0.3);font-size:1rem;">→</div>
+        <div style="text-align:center;padding:0.5rem 0.9rem;">
+          <div style="font-size:1.35rem;font-weight:800;color:white;" id="flow-waiting">—</div>
+          <div style="font-size:0.68rem;color:rgba(255,255,255,0.55);margin-top:0.15rem;">Waiting</div>
+        </div>
+        <div style="color:rgba(255,255,255,0.3);font-size:1rem;">→</div>
+        <div style="text-align:center;padding:0.5rem 0.9rem;">
+          <div style="font-size:1.35rem;font-weight:800;color:white;" id="flow-in-consult">—</div>
+          <div style="font-size:0.68rem;color:rgba(255,255,255,0.55);margin-top:0.15rem;">In Consult</div>
+        </div>
+        <div style="color:rgba(255,255,255,0.3);font-size:1rem;">→</div>
+        <div style="text-align:center;padding:0.5rem 0.9rem;">
+          <div style="font-size:1.35rem;font-weight:800;color:white;" id="flow-lab">—</div>
+          <div style="font-size:0.68rem;color:rgba(255,255,255,0.55);margin-top:0.15rem;">Lab Pending</div>
+        </div>
+        <div style="color:rgba(255,255,255,0.3);font-size:1rem;">→</div>
+        <div style="text-align:center;padding:0.5rem 0.9rem;">
+          <div style="font-size:1.35rem;font-weight:800;color:white;" id="flow-rx">—</div>
+          <div style="font-size:0.68rem;color:rgba(255,255,255,0.55);margin-top:0.15rem;">Rx Pending</div>
+        </div>
+        <div style="color:rgba(255,255,255,0.3);font-size:1rem;">→</div>
+        <div style="text-align:center;padding:0.5rem 0.9rem;background:rgba(255,255,255,0.08);border-radius:10px;">
+          <div style="font-size:1.35rem;font-weight:800;color:#6ee7b7;" id="flow-seen">—</div>
+          <div style="font-size:0.68rem;color:rgba(255,255,255,0.55);margin-top:0.15rem;">Completed</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="stats-5" style="grid-template-columns:repeat(4,1fr);">
+      <div class="stat-card">
+        <div class="stat-card-top"><span class="stat-label">Total Patients</span><div class="stat-icon" style="background:#eff6ff;">👥</div></div>
         <div class="stat-num" id="cl-pts">—</div>
         <div class="stat-sub">registered all time</div>
       </div>
-
       <div class="stat-card" id="sc-cl-today">
-        <div class="stat-card-top">
-          <span class="stat-label">Seen Today</span>
-          <div class="stat-icon" style="background:#f0fdf4;">🗓</div>
-        </div>
+        <div class="stat-card-top"><span class="stat-label">Seen Today</span><div class="stat-icon" style="background:#f0fdf4;">🗓</div></div>
         <div class="stat-num" id="cl-today">—</div>
         <div class="stat-sub">visits recorded today</div>
       </div>
-
       <div class="stat-card">
-        <div class="stat-card-top">
-          <span class="stat-label">This Week</span>
-          <div class="stat-icon" style="background:#f5f3ff;">📈</div>
-        </div>
+        <div class="stat-card-top"><span class="stat-label">This Week</span><div class="stat-icon" style="background:#f5f3ff;">📈</div></div>
         <div class="stat-num" id="cl-week">—</div>
         <div class="stat-sub">patients this week</div>
       </div>
-
       <div class="stat-card" id="sc-cl-followup">
-        <div class="stat-card-top">
-          <span class="stat-label">Follow-up Due</span>
-          <div class="stat-icon" style="background:#fffbeb;">🔔</div>
-        </div>
+        <div class="stat-card-top"><span class="stat-label">Follow-up Due</span><div class="stat-icon" style="background:#fffbeb;">🔔</div></div>
         <div class="stat-num" id="cl-followup">—</div>
         <div class="stat-sub">need follow-up</div>
       </div>
-
     </div>
 
-    <!-- top conditions this week -->
     <div id="cl-conditions-strip" style="display:none;margin-bottom:1.5rem;">
       <div class="velocity-section-label">Most Common Conditions — This Week</div>
       <div class="card" style="margin-bottom:0;">
@@ -1912,545 +1930,25 @@
       </div>
     </div>
 
-    <!-- recent patients list -->
     <div class="card">
       <div style="display:flex;align-items:center;justify-content:space-between;
                   border-bottom:1px solid #F0EFEB;padding-bottom:0.85rem;margin-bottom:1.2rem;">
         <h2 style="margin:0;border:none;padding:0;font-size:0.83rem;">Recent Patients</h2>
         <button onclick="showPage('cl-patients')"
-                style="background:var(--navy,#0B1F3A);color:white;border:none;
-                       padding:0.45rem 1rem;border-radius:7px;cursor:pointer;
-                       font-size:0.78rem;font-weight:700;font-family:'Syne',sans-serif;">
-          + Register Patient
-        </button>
+                style="background:#0B1F3A;color:white;border:none;padding:0.45rem 1rem;
+                       border-radius:7px;cursor:pointer;font-size:0.78rem;font-weight:700;
+                       font-family:'Syne',sans-serif;">+ Register Patient</button>
       </div>
       <div class="table-wrap">
         <table>
-          <thead>
-            <tr><th>Name</th><th>Age</th><th>Condition</th><th>Status</th><th>Last Visit</th><th>Actions</th></tr>
-          </thead>
+          <thead><tr><th>Name</th><th>Age</th><th>Condition</th><th>Status</th><th>Last Visit</th><th>Actions</th></tr></thead>
           <tbody id="cl-recent-body"><tr><td colspan="6" class="loading">Loading...</td></tr></tbody>
         </table>
       </div>
     </div>
-
   </div>
 
-  <!-- ══════════════════════════════════
-       CLINIC: PATIENTS (full register + records)
-  ══════════════════════════════════ -->
-  <div class="page" id="page-cl-patients">
-    <div style="margin-top:0.5rem;">
-
-      <!-- register form — now with vitals + status + referral -->
-      <div class="card">
-        <h2>Register Patient / New Visit</h2>
-        <div class="form-grid">
-
-          <!-- row 1: identity -->
-          <div class="form-group">
-            <label>Full Name *</label>
-            <input type="text" id="cp-name" placeholder="e.g. Grace Nakato"/>
-          </div>
-          <div class="form-group">
-            <label>Age</label>
-            <input type="number" id="cp-age" placeholder="34" min="0"/>
-          </div>
-          <div class="form-group">
-            <label>Gender</label>
-            <select id="cp-gender">
-              <option value="">Select</option>
-              <option>Female</option><option>Male</option><option>Other</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label>Phone</label>
-            <input type="tel" id="cp-phone" placeholder="0701234567"/>
-          </div>
-
-          <!-- row 2: vitals -->
-          <div class="form-group">
-            <label>Blood Pressure</label>
-            <input type="text" id="cp-bp" placeholder="e.g. 120/80 mmHg"/>
-          </div>
-          <div class="form-group">
-            <label>Temperature (°C)</label>
-            <input type="number" id="cp-temp" placeholder="e.g. 37.5" step="0.1"/>
-          </div>
-          <div class="form-group">
-            <label>Weight (kg)</label>
-            <input type="number" id="cp-weight" placeholder="e.g. 68" step="0.1"/>
-          </div>
-          <div class="form-group">
-            <label>Pulse (bpm)</label>
-            <input type="number" id="cp-pulse" placeholder="e.g. 72"/>
-          </div>
-
-          <!-- row 3: clinical -->
-          <div class="form-group" style="grid-column:span 2">
-            <label>Condition / Diagnosis *</label>
-            <input type="text" id="cp-cond" placeholder="e.g. Malaria, Hypertension, Diabetes"/>
-          </div>
-          <div class="form-group">
-            <label>Patient Status</label>
-            <select id="cp-status">
-              <option value="Active">Active</option>
-              <option value="Follow-up">Follow-up Required</option>
-              <option value="Discharged">Discharged</option>
-              <option value="Referred">Referred</option>
-            </select>
-          </div>
-          <div class="form-group" id="cp-referral-group" style="display:none;">
-            <label>Referred To</label>
-            <input type="text" id="cp-referral" placeholder="e.g. Mulago Referral Hospital"/>
-          </div>
-
-          <!-- row 4: notes -->
-          <div class="form-group" style="grid-column:span 4">
-            <label>Prescription / Treatment Notes</label>
-            <textarea id="cp-notes" placeholder="e.g. Coartem 20/120mg — 3 tablets twice daily for 3 days. Review in 7 days if no improvement." style="min-height:80px;"></textarea>
-          </div>
-
-        </div>
-        <div class="form-actions">
-          <button class="btn btn-primary" onclick="addClinicPatient()">Register Patient</button>
-        </div>
-      </div>
-
-      <!-- patient records table -->
-      <div class="card">
-        <h2>Patient Records</h2>
-
-        <!-- filter bar: search + status filter -->
-        <div class="filter-row" style="display:flex;gap:0.75rem;margin-bottom:1rem;flex-wrap:wrap;">
-          <div class="search-bar" style="flex:1;margin:0;">
-            <input type="text" id="cp-search" placeholder="Search name, phone, or condition..."
-                   oninput="filterClPts()" style="margin:0;"/>
-          </div>
-          <select id="cp-status-filter" onchange="filterClPts()"
-                  style="border:1px solid #E0DFDB;border-radius:8px;padding:0.6rem 0.9rem;
-                         font-size:0.85rem;font-family:'Syne',sans-serif;color:#0B1F3A;
-                         background:#F0EFEB;outline:none;cursor:pointer;min-width:160px;">
-            <option value="">All Statuses</option>
-            <option value="Active">Active</option>
-            <option value="Follow-up">Follow-up Required</option>
-            <option value="Discharged">Discharged</option>
-            <option value="Referred">Referred</option>
-          </select>
-        </div>
-
-        <div class="table-wrap">
-          <table>
-            <thead>
-              <tr>
-                <th>Name</th><th class="hide-mobile">Age</th><th class="hide-mobile">Gender</th><th class="hide-mobile">Phone</th>
-                <th>Condition</th><th>Status</th><th class="hide-mobile">Last Visit</th><th>Actions</th>
-              </tr>
-            </thead>
-            <tbody id="cp-body"><tr><td colspan="8" class="loading">Loading...</td></tr></tbody>
-          </table>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- ══════════════════════════════════
-       LAB DASHBOARD
-  ══════════════════════════════════ -->
-  <div class="page" id="page-lab">
-
-    <div class="dash-header">
-      <div>
-        <div class="dash-greeting">Good <em id="lab-time-greeting">morning</em>, <span id="lab-facility-name">—</span></div>
-        <div class="dash-date" id="lab-date-str"></div>
-      </div>
-      <div id="lab-quick-note" style="font-size:0.8rem;color:#9AA3AE;text-align:right;max-width:260px;line-height:1.6;padding-top:0.2rem;"></div>
-    </div>
-
-    <!-- 4 stat cards -->
-    <div class="stats-5" style="grid-template-columns:repeat(4,1fr);">
-
-      <div class="stat-card" id="sc-lab-pending">
-        <div class="stat-card-top">
-          <span class="stat-label">Pending Today</span>
-          <div class="stat-icon" style="background:#fffbeb;">⏳</div>
-        </div>
-        <div class="stat-num" id="lab-pending">—</div>
-        <div class="stat-sub">tests in queue</div>
-      </div>
-
-      <div class="stat-card" id="sc-lab-completed">
-        <div class="stat-card-top">
-          <span class="stat-label">Completed Today</span>
-          <div class="stat-icon" style="background:#f0fdf4;">✅</div>
-        </div>
-        <div class="stat-num" id="lab-completed">—</div>
-        <div class="stat-sub">results ready</div>
-      </div>
-
-      <div class="stat-card">
-        <div class="stat-card-top">
-          <span class="stat-label">Total This Week</span>
-          <div class="stat-icon" style="background:#f5f3ff;">📊</div>
-        </div>
-        <div class="stat-num" id="lab-week">—</div>
-        <div class="stat-sub">tests processed</div>
-      </div>
-
-      <div class="stat-card">
-        <div class="stat-card-top">
-          <span class="stat-label">Avg Turnaround</span>
-          <div class="stat-icon" style="background:#eff6ff;">⚡</div>
-        </div>
-        <div class="stat-num" id="lab-tat" style="font-size:1.4rem;">—</div>
-        <div class="stat-sub">sample → result</div>
-      </div>
-
-    </div>
-
-    <!-- top tests this week -->
-    <div id="lab-top-tests-strip" style="display:none;margin-bottom:1.5rem;">
-      <div class="velocity-section-label">Most Ordered Tests — This Week</div>
-      <div class="card" style="margin-bottom:0;">
-        <div id="lab-top-tests-body" style="display:flex;flex-wrap:wrap;gap:0.5rem;"></div>
-      </div>
-    </div>
-
-    <!-- live worklist preview — pending tests -->
-    <div class="card">
-      <div style="display:flex;align-items:center;justify-content:space-between;
-                  border-bottom:1px solid #F0EFEB;padding-bottom:0.85rem;margin-bottom:1.2rem;">
-        <h2 style="margin:0;border:none;padding:0;font-size:0.83rem;">Pending Worklist</h2>
-        <button onclick="showPage('lab-worklist')"
-                style="background:#0B1F3A;color:white;border:none;padding:0.45rem 1rem;
-                       border-radius:7px;cursor:pointer;font-size:0.78rem;font-weight:700;
-                       font-family:'Syne',sans-serif;">
-          + New Test Request
-        </button>
-      </div>
-      <div class="table-wrap">
-        <table>
-          <thead>
-            <tr><th>Patient</th><th>Test</th><th>Sample</th><th>Requested By</th><th>Received</th><th>Status</th><th>Actions</th></tr>
-          </thead>
-          <tbody id="lab-pending-body"><tr><td colspan="7" class="loading">Loading...</td></tr></tbody>
-        </table>
-      </div>
-    </div>
-
-  </div>
-
-  <!-- ══════════════════════════════════
-       LAB: WORKLIST (new requests + queue)
-  ══════════════════════════════════ -->
-  <div class="page" id="page-lab-worklist">
-    <div style="margin-top:0.5rem;">
-
-      <!-- new test request form -->
-      <div class="card">
-        <h2>New Test Request</h2>
-        <div class="form-grid">
-
-          <div class="form-group">
-            <label>Patient Name *</label>
-            <input type="text" id="lr-patient" placeholder="e.g. Grace Nakato"/>
-          </div>
-          <div class="form-group">
-            <label>Age</label>
-            <input type="number" id="lr-age" placeholder="34" min="0"/>
-          </div>
-          <div class="form-group">
-            <label>Gender</label>
-            <select id="lr-gender">
-              <option value="">Select</option>
-              <option>Female</option><option>Male</option><option>Other</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label>Phone</label>
-            <input type="tel" id="lr-phone" placeholder="0701234567"/>
-          </div>
-
-          <div class="form-group" style="grid-column:span 2">
-            <label>Test(s) Ordered *</label>
-            <div id="lr-tests-picker" style="display:flex;flex-wrap:wrap;gap:0.4rem;margin-bottom:0.5rem;"></div>
-            <input type="text" id="lr-test-custom" placeholder="Or type a custom test name and press Enter"
-                   onkeydown="addCustomTest(event)"/>
-            <div id="lr-selected-tests" style="display:flex;flex-wrap:wrap;gap:0.4rem;margin-top:0.5rem;min-height:24px;"></div>
-          </div>
-
-          <div class="form-group">
-            <label>Sample Type *</label>
-            <select id="lr-sample">
-              <option value="">Select sample</option>
-              <option>Whole Blood</option><option>Serum</option><option>Plasma</option>
-              <option>Urine</option><option>Stool</option><option>Swab</option>
-              <option>Sputum</option><option>CSF</option><option>Other</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label>Priority</label>
-            <select id="lr-priority">
-              <option value="Routine">Routine</option>
-              <option value="Urgent">Urgent</option>
-              <option value="STAT">STAT (Critical)</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label>Requesting Doctor / Facility</label>
-            <input type="text" id="lr-requester" placeholder="e.g. Dr. Okello / BTW Clinic"/>
-          </div>
-          <div class="form-group">
-            <label>Clinical Notes</label>
-            <input type="text" id="lr-notes" placeholder="e.g. Patient has fever for 3 days"/>
-          </div>
-
-        </div>
-        <div class="form-actions">
-          <button class="btn btn-primary" onclick="addTestRequest()">Submit Test Request</button>
-        </div>
-      </div>
-
-      <!-- full worklist table -->
-      <div class="card">
-        <h2>Active Worklist</h2>
-        <div class="filter-row" style="display:flex;gap:0.75rem;margin-bottom:1rem;flex-wrap:wrap;">
-          <div class="search-bar" style="flex:1;margin:0;">
-            <input type="text" id="lr-search" placeholder="Search patient or test..."
-                   oninput="filterWorklist()" style="margin:0;"/>
-          </div>
-          <select id="lr-status-filter" onchange="filterWorklist()"
-                  style="border:1px solid #E0DFDB;border-radius:8px;padding:0.6rem 0.9rem;
-                         font-size:0.85rem;font-family:'Syne',sans-serif;color:#0B1F3A;
-                         background:#F0EFEB;outline:none;cursor:pointer;min-width:180px;">
-            <option value="">All Statuses</option>
-            <option value="Pending">Pending</option>
-            <option value="Sample Collected">Sample Collected</option>
-            <option value="Processing">Processing</option>
-            <option value="Result Ready">Result Ready</option>
-            <option value="Dispatched">Dispatched</option>
-          </select>
-        </div>
-        <div class="table-wrap">
-          <table>
-            <thead>
-              <tr>
-                <th>Patient</th><th>Test(s)</th><th>Sample</th><th>Priority</th>
-                <th>Requested By</th><th>Received</th><th>Status</th><th>Actions</th>
-              </tr>
-            </thead>
-            <tbody id="lr-body"><tr><td colspan="8" class="loading">Loading...</td></tr></tbody>
-          </table>
-        </div>
-      </div>
-
-    </div>
-  </div>
-
-  <!-- ══════════════════════════════════
-       LAB: RESULTS (enter + view results)
-  ══════════════════════════════════ -->
-  <div class="page" id="page-lab-results">
-    <div style="margin-top:0.5rem;">
-
-      <div class="card">
-        <h2>Results Log</h2>
-        <div class="filter-row" style="display:flex;gap:0.75rem;margin-bottom:1rem;flex-wrap:wrap;">
-          <div class="search-bar" style="flex:1;margin:0;">
-            <input type="text" id="res-search" placeholder="Search patient or test..."
-                   oninput="filterResults()" style="margin:0;"/>
-          </div>
-          <select id="res-flag-filter" onchange="filterResults()"
-                  style="border:1px solid #E0DFDB;border-radius:8px;padding:0.6rem 0.9rem;
-                         font-size:0.85rem;font-family:'Syne',sans-serif;color:#0B1F3A;
-                         background:#F0EFEB;outline:none;cursor:pointer;min-width:160px;">
-            <option value="">All Results</option>
-            <option value="Normal">Normal</option>
-            <option value="High">High / Positive</option>
-            <option value="Low">Low</option>
-            <option value="Positive">Positive</option>
-            <option value="Negative">Negative</option>
-          </select>
-        </div>
-        <div class="table-wrap">
-          <table>
-            <thead>
-              <tr>
-                <th>Patient</th><th>Test</th><th>Result</th><th>Reference Range</th>
-                <th>Flag</th><th>TAT</th><th>Date</th><th>Actions</th>
-              </tr>
-            </thead>
-            <tbody id="res-body"><tr><td colspan="8" class="loading">Loading...</td></tr></tbody>
-          </table>
-        </div>
-      </div>
-
-    </div>
-  </div>
-
-  <!-- Enter Result Modal — multi-test per request -->
-  <div class="mo" id="m-enter-result">
-    <div class="mb" style="max-width:780px;width:95vw;">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.1rem;">
-        <h3 style="margin:0;">Enter Results</h3>
-        <button class="btn btn-sm" onclick="cm('m-enter-result')">✕</button>
-      </div>
-      <input type="hidden" id="er-request-id"/>
-      <div id="er-request-info" style="background:#F0EFEB;border-radius:8px;padding:0.8rem 1rem;
-           margin-bottom:1.2rem;font-size:0.85rem;border:1px solid #E0DFDB;line-height:1.6;"></div>
-
-      <!-- one row per test — rendered dynamically by openEnterResult() -->
-      <div id="er-tests-rows" style="display:flex;flex-direction:column;gap:1rem;"></div>
-
-      <div class="form-group" style="margin-top:1rem;">
-        <label>General Technician Notes (optional)</label>
-        <input type="text" id="er-notes" placeholder="e.g. Haemolysed sample — repeat recommended"/>
-      </div>
-
-      <div class="ma" style="margin-top:1.25rem;">
-        <button class="btn btn-sm" onclick="cm('m-enter-result')">Cancel</button>
-        <button class="btn btn-primary" onclick="saveResult()">✅ Save All Results</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- Result Detail Modal -->
-  <div class="mo" id="m-result-detail">
-    <div class="mb" style="max-width:540px;">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.2rem;">
-        <h3 style="margin:0;">Result Detail</h3>
-        <div style="display:flex;gap:0.5rem;">
-          <button class="btn btn-sm btn-primary" onclick="printResultReport()">🖨 Print Report</button>
-          <button class="btn btn-sm" onclick="cm('m-result-detail')">✕</button>
-        </div>
-      </div>
-      <div id="result-detail-body"></div>
-    </div>
-  </div>
-
-  <!-- Result Report (printable) Modal -->
-  <div class="mo" id="m-result-report">
-    <div class="mb" style="max-width:520px;">
-      <div id="result-report-body"></div>
-      <div class="ma" style="margin-top:1rem;">
-        <button class="btn btn-sm" onclick="cm('m-result-report')">Close</button>
-        <button class="btn btn-primary" onclick="doPrintResultReport()">🖨 Print / Save PDF</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- Update Status Modal -->
-  <div class="mo" id="m-update-status">
-    <div class="mb" style="max-width:420px;">
-      <h3>Update Test Status</h3>
-      <input type="hidden" id="us-id"/>
-      <div id="us-info" style="background:#F0EFEB;border-radius:8px;padding:0.8rem 1rem;
-           margin-bottom:1.2rem;font-size:0.85rem;border:1px solid #E0DFDB;"></div>
-      <div class="form-group">
-        <label>New Status</label>
-        <select id="us-status">
-          <option value="Pending">Pending</option>
-          <option value="Sample Collected">Sample Collected</option>
-          <option value="Processing">Processing</option>
-          <option value="Result Ready">Result Ready</option>
-          <option value="Dispatched">Dispatched</option>
-        </select>
-      </div>
-      <div class="ma">
-        <button class="btn btn-sm" onclick="cm('m-update-status')">Cancel</button>
-        <button class="btn btn-primary" onclick="saveTestStatus()">Update</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- HOSPITAL DASHBOARD -->
-  <div class="page" id="page-hospital">
-    <div class="welcome-banner hospital">
-      <div class="wb-icon">🏨</div>
-      <div class="wb-text">
-        <h3 id="wb-hosp-title">Welcome</h3>
-        <p>Manage patient admissions, records, prescriptions, and inventory.</p>
-      </div>
-    </div>
-    <div class="stats-3">
-      <div class="stat-card">
-        <div class="stat-card-top"><span class="stat-label">Total Patients</span></div>
-        <div class="stat-num" id="ho-pts">—</div>
-        <div class="stat-sub">all time</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-card-top"><span class="stat-label">Admitted Today</span></div>
-        <div class="stat-num" id="ho-today">—</div>
-        <div class="stat-sub">registered today</div>
-      </div>
-      <div class="stat-card" id="sc-ho-low">
-        <div class="stat-card-top"><span class="stat-label">Low Stock Drugs</span></div>
-        <div class="stat-num" id="ho-low">—</div>
-        <div class="stat-sub">≤ 10 units</div>
-      </div>
-    </div>
-  </div>
-
-  <!-- HOSPITAL: PATIENTS -->
-  <div class="page" id="page-ho-patients">
-    <div style="margin-top:0.5rem">
-      <div class="card">
-        <h2>Admit / Register Patient</h2>
-        <div class="form-grid">
-          <div class="form-group"><label>Full Name *</label><input type="text" id="hp-name" placeholder="e.g. John Okello"/></div>
-          <div class="form-group"><label>Age</label><input type="number" id="hp-age" placeholder="45" min="0"/></div>
-          <div class="form-group"><label>Gender</label><select id="hp-gender"><option value="">Select</option><option>Female</option><option>Male</option><option>Other</option></select></div>
-          <div class="form-group"><label>Phone</label><input type="tel" id="hp-phone" placeholder="0701234567"/></div>
-          <div class="form-group" style="grid-column:span 2"><label>Diagnosis</label><input type="text" id="hp-cond" placeholder="e.g. Severe malaria, Type 2 Diabetes"/></div>
-          <div class="form-group" style="grid-column:span 2"><label>Treatment Notes</label><textarea id="hp-notes" placeholder="Ward, treatment plan, attending doctor..."></textarea></div>
-        </div>
-        <div class="form-actions"><button class="btn btn-primary" onclick="addHospPatient()">Register Patient</button></div>
-      </div>
-      <div class="card">
-        <h2>Patient Records</h2>
-        <div class="search-bar"><input type="text" id="hp-search" placeholder="Search patients..." oninput="filterHoPts()"/></div>
-        <div class="table-wrap">
-          <table>
-            <thead><tr><th>Name</th><th>Age</th><th>Gender</th><th>Phone</th><th>Diagnosis</th><th>Date</th><th>Actions</th></tr></thead>
-            <tbody id="hp-body"><tr><td colspan="7" class="loading">Loading...</td></tr></tbody>
-          </table>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- HOSPITAL: INVENTORY -->
-  <div class="page" id="page-ho-inventory">
-    <div style="margin-top:0.5rem">
-      <div class="card">
-        <h2>Add Drug / Medical Supply</h2>
-        <div class="form-grid">
-          <div class="form-group" style="grid-column:span 2"><label>Item Name *</label><input type="text" id="hi-name" placeholder="e.g. Quinine IV 600mg"/></div>
-          <div class="form-group"><label>Quantity *</label><input type="number" id="hi-qty" min="0" placeholder="100"/></div>
-          <div class="form-group"><label>Unit</label><select id="hi-unit"><option>Vials</option><option>Tablets</option><option>Bottles</option><option>Sachets</option><option>Units</option><option>Other</option></select></div>
-          <div class="form-group"><label>Expiry Date</label><input type="date" id="hi-exp"/></div>
-          <div class="form-group"><label>Supplier</label><input type="text" id="hi-sup" placeholder="e.g. NMS"/></div>
-        </div>
-        <div class="form-actions"><button class="btn btn-primary" onclick="addHospDrug()">Add Item</button></div>
-      </div>
-      <div class="card">
-        <h2>Drug & Supply Inventory</h2>
-        <div class="search-bar"><input type="text" id="hi-search" placeholder="Search items..." oninput="filterHoInv()"/></div>
-        <div class="table-wrap">
-          <table>
-            <thead><tr><th>Item</th><th>Qty</th><th>Unit</th><th>Expiry</th><th>Supplier</th><th>Status</th><th>Actions</th></tr></thead>
-            <tbody id="hi-body"><tr><td colspan="7" class="loading">Loading...</td></tr></tbody>
-          </table>
-        </div>
-      </div>
-    </div>
-  </div>
-
-
-
-  <!-- ══════════════════════════════════
-       CLINIC: RECEPTION DASHBOARD
-  ══════════════════════════════════ -->
+  <!-- ══ CLINIC: RECEPTION ══ -->
   <div class="page" id="page-reception">
     <div class="dash-header">
       <div>
@@ -2462,61 +1960,70 @@
     <div class="stats-5" style="grid-template-columns:repeat(3,1fr);">
       <div class="stat-card">
         <div class="stat-card-top"><span class="stat-label">Registered Today</span><div class="stat-icon" style="background:#eff6ff;">📋</div></div>
-        <div class="stat-num" id="rec-today">—</div>
-        <div class="stat-sub">patients today</div>
+        <div class="stat-num" id="rec-today">—</div><div class="stat-sub">patients today</div>
       </div>
       <div class="stat-card" id="sc-rec-queue">
         <div class="stat-card-top"><span class="stat-label">In Queue</span><div class="stat-icon" style="background:#fffbeb;">⏳</div></div>
-        <div class="stat-num" id="rec-queue">—</div>
-        <div class="stat-sub">waiting to see doctor</div>
+        <div class="stat-num" id="rec-queue">—</div><div class="stat-sub">waiting to see doctor</div>
       </div>
       <div class="stat-card">
         <div class="stat-card-top"><span class="stat-label">Seen Today</span><div class="stat-icon" style="background:#f0fdf4;">✅</div></div>
-        <div class="stat-num" id="rec-seen">—</div>
-        <div class="stat-sub">consultations done</div>
+        <div class="stat-num" id="rec-seen">—</div><div class="stat-sub">consultations done</div>
       </div>
     </div>
 
-    <!-- Register patient form -->
-    <div class="card">
-      <h2>Register Patient</h2>
-      <div class="form-grid">
-        <div class="form-group"><label>Full Name *</label><input type="text" id="rec-name" placeholder="e.g. Grace Nakato"/></div>
-        <div class="form-group"><label>Age</label><input type="number" id="rec-age" placeholder="34" min="0"/></div>
-        <div class="form-group"><label>Gender</label>
-          <select id="rec-gender"><option value="">Select</option><option>Female</option><option>Male</option><option>Other</option></select>
+    <div style="display:grid;grid-template-columns:360px 1fr;gap:1.2rem;align-items:start;">
+
+      <div class="card" style="margin:0;">
+        <h2 style="font-size:0.85rem;margin-bottom:1rem;">Register New Patient</h2>
+        <div class="form-group"><label>Full Name *</label>
+          <input type="text" id="rec-name" placeholder="e.g. Grace Nakato"/>
         </div>
-        <div class="form-group"><label>Phone</label><input type="tel" id="rec-phone" placeholder="0701234567"/></div>
-        <div class="form-group" style="grid-column:span 2"><label>Chief Complaint / Reason for Visit *</label>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.6rem;">
+          <div class="form-group" style="margin:0;"><label>Age</label>
+            <input type="number" id="rec-age" placeholder="34" min="0"/>
+          </div>
+          <div class="form-group" style="margin:0;"><label>Gender</label>
+            <select id="rec-gender">
+              <option value="">Select</option><option>Female</option><option>Male</option><option>Other</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group"><label>Phone</label>
+          <input type="tel" id="rec-phone" placeholder="0701234567"/>
+        </div>
+        <div class="form-group"><label>Chief Complaint *</label>
           <input type="text" id="rec-complaint" placeholder="e.g. Fever, headache for 3 days"/>
         </div>
         <div class="form-group"><label>Priority</label>
           <select id="rec-priority">
             <option value="Normal">Normal</option>
-            <option value="Urgent">Urgent</option>
+            <option value="Urgent">🔴 Urgent</option>
           </select>
         </div>
+        <button class="btn btn-primary" style="width:100%;margin-top:0.4rem;"
+                onclick="registerAndQueue()">Register & Add to Queue →</button>
       </div>
-      <div class="form-actions">
-        <button class="btn btn-primary" onclick="registerAndQueue()">Register & Add to Queue</button>
-      </div>
-    </div>
 
-    <!-- Today's queue -->
-    <div class="card">
-      <h2>Today's Queue</h2>
-      <div class="table-wrap">
-        <table>
-          <thead><tr><th>#</th><th>Name</th><th class="hide-mobile">Age</th><th class="hide-mobile">Gender</th><th>Complaint</th><th>Priority</th><th>Status</th><th>Actions</th></tr></thead>
-          <tbody id="rec-queue-body"><tr><td colspan="8" class="loading">Loading...</td></tr></tbody>
-        </table>
+      <div class="card" style="margin:0;">
+        <div style="display:flex;align-items:center;justify-content:space-between;
+                    border-bottom:1px solid #F0EFEB;padding-bottom:0.75rem;margin-bottom:1rem;">
+          <h2 style="margin:0;border:none;padding:0;font-size:0.85rem;">Live Queue</h2>
+          <button onclick="loadReception()"
+                  style="background:#F0EFEB;border:1px solid #E0DFDB;border-radius:6px;
+                         padding:0.3rem 0.75rem;font-size:0.75rem;cursor:pointer;font-weight:600;">↻ Refresh</button>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>#</th><th>Name</th><th>Complaint</th><th>Priority</th><th>Status</th><th>Action</th></tr></thead>
+            <tbody id="rec-queue-body"><tr><td colspan="6" class="loading">Loading...</td></tr></tbody>
+          </table>
+        </div>
       </div>
     </div>
   </div>
 
-  <!-- ══════════════════════════════════
-       CLINIC: DOCTOR QUEUE
-  ══════════════════════════════════ -->
+  <!-- ══ CLINIC: DOCTOR QUEUE ══ -->
   <div class="page" id="page-doctor">
     <div class="dash-header">
       <div>
@@ -2529,192 +2036,220 @@
     <div class="stats-5" style="grid-template-columns:repeat(3,1fr);">
       <div class="stat-card" id="sc-doc-waiting">
         <div class="stat-card-top"><span class="stat-label">Waiting</span><div class="stat-icon" style="background:#fffbeb;">⏳</div></div>
-        <div class="stat-num" id="doc-waiting">—</div>
-        <div class="stat-sub">patients in queue</div>
+        <div class="stat-num" id="doc-waiting">—</div><div class="stat-sub">patients in queue</div>
       </div>
       <div class="stat-card">
         <div class="stat-card-top"><span class="stat-label">Seen Today</span><div class="stat-icon" style="background:#f0fdf4;">✅</div></div>
-        <div class="stat-num" id="doc-seen">—</div>
-        <div class="stat-sub">consultations done</div>
+        <div class="stat-num" id="doc-seen">—</div><div class="stat-sub">consultations done</div>
       </div>
       <div class="stat-card">
         <div class="stat-card-top"><span class="stat-label">Prescriptions</span><div class="stat-icon" style="background:#eff6ff;">💊</div></div>
-        <div class="stat-num" id="doc-rx-count">—</div>
-        <div class="stat-sub">written today</div>
+        <div class="stat-num" id="doc-rx-count">—</div><div class="stat-sub">written today</div>
       </div>
     </div>
 
     <div class="card">
-      <h2>Patient Queue — Today</h2>
+      <div style="display:flex;align-items:center;justify-content:space-between;
+                  border-bottom:1px solid #F0EFEB;padding-bottom:0.75rem;margin-bottom:1rem;">
+        <h2 style="margin:0;border:none;padding:0;font-size:0.85rem;">Patient Queue — Today</h2>
+        <button onclick="loadDoctorQueue()"
+                style="background:#F0EFEB;border:1px solid #E0DFDB;border-radius:6px;
+                       padding:0.3rem 0.75rem;font-size:0.75rem;cursor:pointer;font-weight:600;">↻ Refresh</button>
+      </div>
       <div class="table-wrap">
         <table>
-          <thead><tr><th>#</th><th>Name</th><th class="hide-mobile">Age</th><th>Complaint</th><th>Priority</th><th>Status</th><th>Actions</th></tr></thead>
-          <tbody id="doc-queue-body"><tr><td colspan="7" class="loading">Loading...</td></tr></tbody>
+          <thead>
+            <tr><th>#</th><th>Name</th><th class="hide-mobile">Age</th><th>Complaint</th>
+                <th>Lab</th><th>Priority</th><th>Status</th><th>Actions</th></tr>
+          </thead>
+          <tbody id="doc-queue-body"><tr><td colspan="8" class="loading">Loading...</td></tr></tbody>
         </table>
       </div>
     </div>
   </div>
 
-  <!-- ══════════════════════════════════
-       CLINIC: DOCTOR CONSULTATION
-  ══════════════════════════════════ -->
+  <!-- ══ CLINIC: DOCTOR CONSULTATION ══ -->
   <div class="page" id="page-doctor-consult">
-    <div id="consult-patient-banner" style="
-      background:linear-gradient(135deg,#eff6ff,#dbeafe);
-      border:1px solid #93c5fd; border-radius:12px;
-      padding:1rem 1.4rem; margin-bottom:1.5rem;
-      display:flex; align-items:center; gap:1rem; flex-wrap:wrap;
-    ">
-      <div style="font-size:1.6rem;">🧑‍⚕️</div>
+
+    <div id="consult-patient-banner"
+         style="background:linear-gradient(135deg,#0B1F3A,#1a3a5c);border-radius:14px;
+                padding:1rem 1.4rem;margin-bottom:1.2rem;
+                display:flex;align-items:center;gap:1rem;flex-wrap:wrap;">
+      <div style="width:40px;height:40px;border-radius:50%;background:rgba(255,255,255,0.1);
+                  display:flex;align-items:center;justify-content:center;font-size:1.2rem;flex-shrink:0;">🧑‍⚕️</div>
       <div>
-        <div style="font-weight:700;font-size:1rem;" id="consult-patient-name">—</div>
-        <div style="font-size:0.82rem;color:#555;" id="consult-patient-meta">—</div>
+        <div style="font-weight:700;font-size:1rem;color:white;" id="consult-patient-name">—</div>
+        <div style="font-size:0.8rem;color:rgba(255,255,255,0.6);" id="consult-patient-meta">—</div>
+      </div>
+      <div id="consult-lab-result-badge"
+           style="display:none;background:#d1fae5;color:#065f46;border-radius:8px;
+                  padding:0.3rem 0.8rem;font-size:0.75rem;font-weight:700;">
+        🔬 Lab Result Available
       </div>
       <div style="margin-left:auto;">
-        <button class="btn btn-sm" onclick="showPage('doctor')">← Back to Queue</button>
+        <button class="btn btn-sm" onclick="showPage('doctor')"
+                style="color:white;border-color:rgba(255,255,255,0.3);background:rgba(255,255,255,0.1);">← Back</button>
       </div>
     </div>
 
-    <!-- Vitals -->
-    <div class="card">
-      <h2>Vitals</h2>
-      <div class="form-grid">
-        <div class="form-group"><label>Blood Pressure</label><input type="text" id="cons-bp" placeholder="e.g. 120/80 mmHg"/></div>
-        <div class="form-group"><label>Temperature (°C)</label><input type="number" id="cons-temp" placeholder="37.5" step="0.1"/></div>
-        <div class="form-group"><label>Weight (kg)</label><input type="number" id="cons-weight" placeholder="68" step="0.1"/></div>
-        <div class="form-group"><label>Pulse (bpm)</label><input type="number" id="cons-pulse" placeholder="72"/></div>
-      </div>
-    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.1rem;align-items:start;">
 
-    <!-- Diagnosis & Notes -->
-    <div class="card">
-      <h2>Diagnosis & Treatment</h2>
-      <div class="form-grid">
-        <div class="form-group" style="grid-column:span 2">
-          <label>Diagnosis *</label>
-          <input type="text" id="cons-diagnosis" placeholder="e.g. Malaria, Hypertension"/>
-        </div>
-        <div class="form-group" style="grid-column:span 2">
-          <label>Clinical Notes</label>
-          <textarea id="cons-notes" placeholder="History, examination findings, management plan..."></textarea>
-        </div>
-        <div class="form-group"><label>Patient Status</label>
-          <select id="cons-status">
-            <option value="Active">Active</option>
-            <option value="Follow-up">Follow-up Required</option>
-            <option value="Discharged">Discharged</option>
-            <option value="Referred">Referred</option>
-          </select>
-        </div>
-        <div class="form-group" id="cons-referral-group" style="display:none;">
-          <label>Referred To</label>
-          <input type="text" id="cons-referral" placeholder="e.g. Mulago Referral Hospital"/>
-        </div>
-      </div>
-    </div>
+      <!-- LEFT: vitals + diagnosis + lab request -->
+      <div style="display:flex;flex-direction:column;gap:1rem;">
 
-    <!-- Prescription Builder -->
-    <div class="card">
-      <h2>Write Prescription</h2>
-      <div id="rx-items" style="display:flex;flex-direction:column;gap:0.75rem;margin-bottom:1rem;"></div>
-      <div style="background:#F0EFEB;border-radius:10px;padding:1rem;border:1px solid #E8E6E1;">
-        <div class="form-grid">
-          <div class="form-group" style="grid-column:span 2">
-            <label>Drug Name *</label>
-            <input type="text" id="rx-drug" placeholder="e.g. Coartem 20/120mg"/>
+        <div class="card" style="margin:0;">
+          <h2 style="font-size:0.82rem;margin-bottom:0.9rem;">Vitals</h2>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.6rem;">
+            <div class="form-group" style="margin:0;"><label>Blood Pressure</label>
+              <input type="text" id="cons-bp" placeholder="120/80 mmHg"/></div>
+            <div class="form-group" style="margin:0;"><label>Temperature (°C)</label>
+              <input type="number" id="cons-temp" placeholder="37.5" step="0.1"/></div>
+            <div class="form-group" style="margin:0;"><label>Weight (kg)</label>
+              <input type="number" id="cons-weight" placeholder="68" step="0.1"/></div>
+            <div class="form-group" style="margin:0;"><label>Pulse (bpm)</label>
+              <input type="number" id="cons-pulse" placeholder="72"/></div>
           </div>
-          <div class="form-group"><label>Dose</label><input type="text" id="rx-dose" placeholder="e.g. 3 tablets"/></div>
-          <div class="form-group"><label>Frequency</label>
-            <select id="rx-freq">
-              <option>Once daily</option><option>Twice daily</option><option>Three times daily</option>
-              <option>Four times daily</option><option>At night</option><option>As needed</option>
-            </select>
-          </div>
-          <div class="form-group"><label>Duration</label><input type="text" id="rx-duration" placeholder="e.g. 3 days, 1 week"/></div>
-          <div class="form-group"><label>Instructions</label><input type="text" id="rx-instructions" placeholder="e.g. Take after meals"/></div>
         </div>
 
-        <!-- Prescription destination -->
-      <div style="background:#fafaf9;border:1px solid #E0DFDB;border-radius:10px;
-            padding:0.9rem 1.1rem;margin-bottom:1rem;">
-        <div style="font-weight:700;color:#0B1F3A;font-size:0.82rem;
-              text-transform:uppercase;letter-spacing:0.6px;margin-bottom:0.7rem;">
-        Prescription Route
+        <div class="card" style="margin:0;">
+          <h2 style="font-size:0.82rem;margin-bottom:0.9rem;">Diagnosis & Notes</h2>
+          <div class="form-group"><label>Diagnosis *</label>
+            <input type="text" id="cons-diagnosis" placeholder="e.g. Malaria, Hypertension"/></div>
+          <div class="form-group"><label>Clinical Notes</label>
+            <textarea id="cons-notes" rows="3"
+                      placeholder="History, examination findings, management plan..."
+                      style="resize:vertical;"></textarea></div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.6rem;">
+            <div class="form-group" style="margin:0;"><label>Patient Status</label>
+              <select id="cons-status">
+                <option value="Active">Active</option>
+                <option value="Follow-up">Follow-up Required</option>
+                <option value="Discharged">Discharged</option>
+                <option value="Referred">Referred</option>
+              </select>
+            </div>
+            <div class="form-group" id="cons-referral-group" style="margin:0;display:none;">
+              <label>Referred To</label>
+              <input type="text" id="cons-referral" placeholder="e.g. Mulago Hospital"/>
+            </div>
+          </div>
+        </div>
+
+        <!-- Lab request -->
+        <div class="card" style="margin:0;border:1px solid #c7d2fe;background:#f5f7ff;">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.75rem;">
+            <h2 style="font-size:0.82rem;margin:0;border:none;padding:0;color:#1e3a8a;">🔬 Send Lab Request</h2>
+            <span id="consult-lab-sent"
+                  style="display:none;background:#d1fae5;color:#065f46;border-radius:100px;
+                         padding:0.18rem 0.65rem;font-size:0.72rem;font-weight:700;">✓ Sent</span>
+          </div>
+          <div id="consult-tests-picker" style="display:flex;flex-wrap:wrap;gap:0.35rem;margin-bottom:0.6rem;"></div>
+          <div id="consult-selected-tests" style="display:flex;flex-wrap:wrap;gap:0.35rem;margin-bottom:0.6rem;"></div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.5rem;margin-bottom:0.6rem;">
+            <div class="form-group" style="margin:0;"><label>Priority</label>
+              <select id="consult-lab-priority">
+                <option value="Routine">Routine</option>
+                <option value="Urgent">Urgent</option>
+                <option value="STAT">STAT</option>
+              </select>
+            </div>
+            <div class="form-group" style="margin:0;"><label>Sample Notes</label>
+              <input type="text" id="consult-lab-notes" placeholder="e.g. fasting"/>
+            </div>
+          </div>
+          <div id="consult-lab-result-area"
+               style="display:none;background:#f0fdf4;border:1px solid #a7f3d0;
+                      border-radius:8px;padding:0.75rem;margin-bottom:0.6rem;">
+            <div style="font-size:0.7rem;font-weight:700;color:#065f46;text-transform:uppercase;
+                        letter-spacing:0.6px;margin-bottom:0.35rem;">Lab Result Received</div>
+            <div id="consult-lab-result-content" style="font-size:0.82rem;color:#1a1a2e;"></div>
+          </div>
+          <button class="btn btn-sm" onclick="sendConsultLabRequest()"
+                  style="background:#1e3a8a;color:white;border-color:#1e3a8a;width:100%;">
+            Send to Lab →
+          </button>
+        </div>
+
       </div>
-      <div style="display:flex;gap:0.6rem;flex-wrap:wrap;">
-      <label style="display:flex;align-items:center;gap:0.4rem;cursor:pointer;
-                  padding:0.45rem 0.9rem;border-radius:8px;border:1px solid #E0DFDB;
-                  background:white;font-size:0.83rem;font-weight:600;">
-      <input type="radio" name="rx-destination" value="internal" checked
-             onchange="toggleRxDestination(this.value)"> Internal Pharmacy
-      </label>
-      <label style="display:flex;align-items:center;gap:0.4rem;cursor:pointer;
-                  padding:0.45rem 0.9rem;border-radius:8px;border:1px solid #E0DFDB;
-                  background:white;font-size:0.83rem;font-weight:600;">
-      <input type="radio" name="rx-destination" value="external"
-             onchange="toggleRxDestination(this.value)"> External Pharmacy
-      </label>
-      <label style="display:flex;align-items:center;gap:0.4rem;cursor:pointer;
-                  padding:0.45rem 0.9rem;border-radius:8px;border:1px solid #E0DFDB;
-                  background:white;font-size:0.83rem;font-weight:600;">
-      <input type="radio" name="rx-destination" value="none"
-             onchange="toggleRxDestination(this.value)"> No Prescription
-      </label>
+
+      <!-- RIGHT: prescription -->
+      <div style="display:flex;flex-direction:column;gap:1rem;">
+        <div class="card" style="margin:0;">
+          <h2 style="font-size:0.82rem;margin-bottom:0.9rem;">💊 Prescription</h2>
+
+          <div id="rx-items" style="display:flex;flex-direction:column;gap:0.6rem;
+               margin-bottom:0.9rem;min-height:40px;"></div>
+
+          <div style="background:#F0EFEB;border-radius:10px;padding:0.85rem;
+                      border:1px solid #E8E6E1;margin-bottom:0.9rem;">
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.5rem;">
+              <div class="form-group" style="margin:0;grid-column:span 2;"><label>Drug Name *</label>
+                <input type="text" id="rx-drug" placeholder="e.g. Coartem 20/120mg"/></div>
+              <div class="form-group" style="margin:0;"><label>Dose</label>
+                <input type="text" id="rx-dose" placeholder="e.g. 3 tablets"/></div>
+              <div class="form-group" style="margin:0;"><label>Frequency</label>
+                <select id="rx-freq">
+                  <option>Once daily</option><option>Twice daily</option>
+                  <option>Three times daily</option><option>Four times daily</option>
+                  <option>At night</option><option>As needed</option>
+                </select>
+              </div>
+              <div class="form-group" style="margin:0;"><label>Duration</label>
+                <input type="text" id="rx-duration" placeholder="e.g. 3 days"/></div>
+              <div class="form-group" style="margin:0;"><label>Instructions</label>
+                <input type="text" id="rx-instructions" placeholder="e.g. After meals"/></div>
+            </div>
+            <button class="btn btn-sm" onclick="addRxItem()" style="margin-top:0.6rem;width:100%;">+ Add Drug</button>
+          </div>
+
+          <!-- Prescription destination -->
+          <div style="background:#fafaf9;border:1px solid #E0DFDB;border-radius:10px;
+                      padding:0.85rem;margin-bottom:0.9rem;">
+            <div style="font-size:0.7rem;font-weight:700;color:#0B1F3A;text-transform:uppercase;
+                        letter-spacing:0.6px;margin-bottom:0.6rem;">Send Prescription To</div>
+            <div style="display:flex;flex-direction:column;gap:0.4rem;">
+              <label style="display:flex;align-items:center;gap:0.5rem;cursor:pointer;
+                            padding:0.45rem 0.75rem;border-radius:8px;border:1px solid #E0DFDB;
+                            background:white;font-size:0.82rem;font-weight:600;">
+                <input type="radio" name="rx-destination" value="internal" checked
+                       onchange="toggleRxDestination(this.value)">
+                Internal Pharmacy
+                <span style="margin-left:auto;font-size:0.68rem;color:#059669;font-weight:700;">● Connected</span>
+              </label>
+              <label style="display:flex;align-items:center;gap:0.5rem;cursor:pointer;
+                            padding:0.45rem 0.75rem;border-radius:8px;border:1px solid #E0DFDB;
+                            background:white;font-size:0.82rem;font-weight:600;">
+                <input type="radio" name="rx-destination" value="external"
+                       onchange="toggleRxDestination(this.value)">
+                External Pharmacy
+                <span style="margin-left:auto;font-size:0.68rem;color:#9AA3AE;">Print for patient</span>
+              </label>
+              <label style="display:flex;align-items:center;gap:0.5rem;cursor:pointer;
+                            padding:0.45rem 0.75rem;border-radius:8px;border:1px solid #E0DFDB;
+                            background:white;font-size:0.82rem;font-weight:600;">
+                <input type="radio" name="rx-destination" value="none"
+                       onchange="toggleRxDestination(this.value)">
+                No Prescription
+              </label>
+            </div>
+            <div id="rx-external-note"
+                 style="display:none;margin-top:0.5rem;font-size:0.78rem;color:#92400e;
+                        background:#fffbeb;border-radius:6px;padding:0.4rem 0.7rem;">
+              ⚠ Prescription will be printed for the patient.
+            </div>
+          </div>
+
+          <button class="btn btn-primary" id="cons-save-btn" onclick="saveConsultation()"
+                  style="width:100%;">Save & Complete Consultation →</button>
+          <button class="btn btn-sm" onclick="showPage('doctor')"
+                  style="width:100%;margin-top:0.5rem;">Cancel</button>
+        </div>
       </div>
-    <div id="rx-external-note"
-       style="display:none;margin-top:0.6rem;font-size:0.8rem;color:#92400e;
-              background:#fffbeb;border-radius:6px;padding:0.4rem 0.7rem;">
-      Prescription will be printed for the patient to take to an external pharmacy.
-  </div>
-  </div>
 
-        <button class="btn btn-sm" onclick="addRxItem()" style="margin-top:0.5rem;">+ Add Drug</button>
-      </div>
-    </div>
-
-    <!-- in consult lab request -->
-<div style="background:#f0f4ff;border:1px solid #c7d2fe;border-radius:12px;
-            padding:1.1rem 1.2rem;margin-bottom:1.2rem;">
-  <div style="font-weight:700;color:#1e3a8a;font-size:0.85rem;
-              text-transform:uppercase;letter-spacing:0.6px;margin-bottom:0.8rem;">
-     Send Lab Request
-  </div>
-  <div id="consult-tests-picker" style="display:flex;flex-wrap:wrap;gap:0.4rem;margin-bottom:0.7rem;"></div>
-  <div id="consult-selected-tests" style="display:flex;flex-wrap:wrap;gap:0.4rem;margin-bottom:0.7rem;"></div>
-  <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.6rem;margin-bottom:0.7rem;">
-    <div class="form-group" style="margin:0;">
-      <label>Priority</label>
-      <select id="consult-lab-priority">
-        <option value="Routine">Routine</option>
-        <option value="Urgent">Urgent</option>
-        <option value="STAT">STAT</option>
-      </select>
-    </div>
-    <div class="form-group" style="margin:0;">
-      <label>Clinical Notes (optional)</label>
-      <input type="text" id="consult-lab-notes" placeholder="e.g. fasting sample">
-    </div>
-  </div>
-  <div id="consult-lab-sent"
-       style="display:none;background:#d1fae5;color:#065f46;border-radius:8px;
-              padding:0.5rem 0.85rem;font-size:0.82rem;font-weight:600;margin-bottom:0.5rem;">
-    ✅ Lab request sent — awaiting results
-  </div>
-  <button class="btn btn-sm" onclick="sendConsultLabRequest()"
-          style="background:#1e3a8a;color:white;border-color:#1e3a8a;">
-    Send to Lab
-  </button>
-</div>
-
-    <div class="form-actions" style="display:flex;gap:0.75rem;flex-wrap:wrap;">
-      <button class="btn btn-primary" id="cons-save-btn" onclick="saveConsultation()">✅ Save Consultation & Send Prescription</button>
-      <button class="btn btn-sm" onclick="showPage('doctor')">Cancel</button>
     </div>
   </div>
 
-  <!-- ══════════════════════════════════
-       CLINIC: DEPT PHARMACY
-  ══════════════════════════════════ -->
+  <!-- ══ CLINIC: DEPT PHARMACY ══ -->
   <div class="page" id="page-dept-pharmacy">
     <div class="dash-header">
       <div>
@@ -2726,42 +2261,50 @@
     <div class="stats-5" style="grid-template-columns:repeat(3,1fr);">
       <div class="stat-card" id="sc-dph-pending">
         <div class="stat-card-top"><span class="stat-label">Pending</span><div class="stat-icon" style="background:#fffbeb;">⏳</div></div>
-        <div class="stat-num" id="dph-pending">—</div>
-        <div class="stat-sub">prescriptions to fill</div>
+        <div class="stat-num" id="dph-pending">—</div><div class="stat-sub">prescriptions to fill</div>
       </div>
       <div class="stat-card">
         <div class="stat-card-top"><span class="stat-label">Dispensed Today</span><div class="stat-icon" style="background:#f0fdf4;">✅</div></div>
-        <div class="stat-num" id="dph-dispensed">—</div>
-        <div class="stat-sub">prescriptions filled</div>
+        <div class="stat-num" id="dph-dispensed">—</div><div class="stat-sub">prescriptions filled</div>
       </div>
       <div class="stat-card">
         <div class="stat-card-top"><span class="stat-label">Total Today</span><div class="stat-icon" style="background:#eff6ff;">📋</div></div>
-        <div class="stat-num" id="dph-total">—</div>
-        <div class="stat-sub">prescriptions received</div>
+        <div class="stat-num" id="dph-total">—</div><div class="stat-sub">prescriptions received</div>
       </div>
     </div>
 
-    <!-- Prescription queue -->
     <div class="card">
-      <h2>Prescription Queue</h2>
-      <div style="display:flex;gap:0.75rem;margin-bottom:1rem;flex-wrap:wrap;">
-        <div class="search-bar" style="flex:1;margin:0;">
-          <input type="text" id="dph-search" placeholder="Search patient or drug..." oninput="filterRxQueue()" style="margin:0;"/>
+      <div style="display:flex;align-items:center;justify-content:space-between;
+                  border-bottom:1px solid #F0EFEB;padding-bottom:0.75rem;margin-bottom:1rem;">
+        <h2 style="margin:0;border:none;padding:0;font-size:0.85rem;">Prescription Queue</h2>
+        <div style="display:flex;gap:0.6rem;align-items:center;">
+          <input type="text" id="dph-search" placeholder="Search patient or drug..."
+                 oninput="filterRxQueue()"
+                 style="border:1px solid #E0DFDB;border-radius:7px;padding:0.38rem 0.75rem;
+                        font-size:0.8rem;font-family:'Syne',sans-serif;outline:none;width:180px;"/>
+          <select id="dph-status-filter" onchange="filterRxQueue()"
+                  style="border:1px solid #E0DFDB;border-radius:7px;padding:0.38rem 0.7rem;
+                         font-size:0.8rem;font-family:'Syne',sans-serif;color:#0B1F3A;
+                         background:#F0EFEB;outline:none;cursor:pointer;">
+            <option value="">All</option>
+            <option value="Pending">Pending</option>
+            <option value="Dispensed">Dispensed</option>
+            <option value="External">External</option>
+            <option value="Cancelled">Cancelled</option>
+          </select>
+          <button onclick="loadDeptPharmacy()"
+                  style="background:#F0EFEB;border:1px solid #E0DFDB;border-radius:7px;
+                         padding:0.38rem 0.7rem;font-size:0.8rem;cursor:pointer;font-weight:600;">↻</button>
         </div>
-        <select id="dph-status-filter" onchange="filterRxQueue()"
-                style="border:1px solid #E0DFDB;border-radius:8px;padding:0.6rem 0.9rem;
-                       font-size:0.85rem;font-family:'Syne',sans-serif;color:#0B1F3A;
-                       background:#F0EFEB;outline:none;cursor:pointer;min-width:160px;">
-          <option value="">All</option>
-          <option value="Pending">Pending</option>
-          <option value="Dispensed">Dispensed</option>
-          <option value="Cancelled">Cancelled</option>
-        </select>
       </div>
       <div class="table-wrap">
         <table>
-          <thead><tr><th>Patient</th><th>Drugs</th><th class="hide-mobile">Doctor</th><th class="hide-mobile">Time</th><th>Status</th><th>Actions</th></tr></thead>
-          <tbody id="dph-rx-body"><tr><td colspan="6" class="loading">Loading...</td></tr></tbody>
+          <thead>
+            <tr><th>Patient</th><th>Drugs</th><th class="hide-mobile">Doctor</th>
+                <th class="hide-mobile">Route</th><th class="hide-mobile">Time</th>
+                <th>Status</th><th>Actions</th></tr>
+          </thead>
+          <tbody id="dph-rx-body"><tr><td colspan="7" class="loading">Loading...</td></tr></tbody>
         </table>
       </div>
     </div>
@@ -4324,23 +3867,32 @@ async function addClinicPatient() {
 
   try {
     const patientRow = {
-  name,
-  age:            document.getElementById('cp-age').value || null,
-  gender:         document.getElementById('cp-gender').value || null,
-  phone:          document.getElementById('cp-phone').value.trim() || null,
-  condition:      cond || null,
-  notes:          document.getElementById('cp-notes').value.trim() || null,
-  status,
-  referral_to:    referral,
-  blood_pressure: document.getElementById('cp-bp').value.trim() || null,
-  temperature:    document.getElementById('cp-temp').value || null,
-  weight:         document.getElementById('cp-weight').value || null,
-  pulse:          document.getElementById('cp-pulse').value || null,
-  org_id:         user.id
-};
+      name,
+      age:            document.getElementById('cp-age').value || null,
+      gender:         document.getElementById('cp-gender').value || null,
+      phone:          document.getElementById('cp-phone').value.trim() || null,
+      condition:      cond || null,
+      notes:          document.getElementById('cp-notes').value.trim() || null,
+      status,
+      referral_to:    referral,
+      blood_pressure: document.getElementById('cp-bp').value.trim() || null,
+      temperature:    document.getElementById('cp-temp').value || null,
+      weight:         document.getElementById('cp-weight').value || null,
+      pulse:          document.getElementById('cp-pulse').value || null,
+      org_id:         user.id
+    };
 
-patientRow.fhir_r5 = buildFHIRPatient(patientRow);
-await db('patients', 'POST', patientRow);
+    patientRow.fhir_r5 = buildFHIRPatient(patientRow);
+    await db('patients', 'POST', patientRow);
+    toast('✅ Patient registered!');
+    ['cp-name','cp-age','cp-phone','cp-cond','cp-notes','cp-bp','cp-temp','cp-weight','cp-pulse'].forEach(id => {
+      const el = document.getElementById(id); if(el) el.value='';
+    });
+    document.getElementById('cp-gender').value = '';
+    document.getElementById('cp-status').value = 'Active';
+    loadClPts();
+  } catch(e) { toast('Error: '+e.message,'err'); }
+}
 
 // ── DIAGNOSTIC LAB ──
 
