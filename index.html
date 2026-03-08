@@ -4874,71 +4874,99 @@ function renderLabPendingPreview(arr) {
 async function loadWorklist() {
   buildTestPicker();
   try {
-    testRequests = await db(`test_requests?select=*&org_id=eq.${user.id}&order=created_at.desc`);
+    // Exclude dispatched — they live on their own page
+    testRequests = await db(`test_requests?select=*&org_id=eq.${user.id}&status=neq.Dispatched&order=created_at.desc`);
     renderWorklist(testRequests);
     renderClinicRequests(testRequests);
   } catch(e) {
-    document.getElementById('lr-body').innerHTML = `<tr><td colspan="8" class="loading">Error: ${e.message}</td></tr>`;
+    document.getElementById('lr-body').innerHTML =
+      `<tr><td colspan="8" class="loading">Error: ${e.message}</td></tr>`;
   }
 }
 
 function renderWorklist(arr) {
   const b = document.getElementById('lr-body');
-  if (!arr.length) {
-    b.innerHTML = `<tr><td colspan="8" class="loading">No test requests yet.</td></tr>`;
+  // Show everything except clinic-consult source (those are in the clinic section above)
+  const walkin = arr.filter(r => r.source !== 'clinic-consult');
+  if (!walkin.length) {
+    b.innerHTML = `<tr><td colspan="8" class="loading">No walk-in requests yet.</td></tr>`;
     return;
   }
-  b.innerHTML = arr.map(r => {
-    // Normalise tests: clinic uses JSON `tests` field, walk-in uses `tests_ordered` CSV
-    const testsDisplay = getTestsDisplay(r);
-    const isClinic = r.source === 'clinic-consult';
-    return `<tr${isClinic ? ' style="background:#f5f7ff;"' : ''}>
+  b.innerHTML = walkin.map(r => {
+    const tests = getTestsDisplay(r);
+    return `<tr>
       <td>
         <strong>${r.patient_name}</strong>
         <div style="font-size:0.73rem;color:#9AA3AE;">${r.patient_age ? r.patient_age+'y' : ''} ${r.patient_gender||''}</div>
       </td>
-      <td style="font-size:0.82rem;max-width:200px;">${testsDisplay}</td>
-      <td>${r.sample_type||'<span style="color:#d97706;font-size:0.75rem;">⚠ Set on result</span>'}</td>
+      <td style="font-size:0.82rem;max-width:180px;">${tests}</td>
+      <td style="font-size:0.82rem;">${r.sample_type||'—'}</td>
       <td>${priorityBadge(r.priority)}</td>
-      <td style="font-size:0.78rem;">
-        ${isClinic
-          ? '<span style="background:#eff6ff;color:#1d4ed8;border-radius:100px;padding:0.15rem 0.55rem;font-size:0.72rem;font-weight:700;">🏥 Clinic</span>'
-          : (r.requesting_doctor||'Walk-in')}
-      </td>
+      <td style="font-size:0.78rem;">${r.requesting_doctor||'Walk-in'}</td>
       <td style="font-size:0.78rem;color:#9AA3AE;">${fmtDate(r.created_at)}</td>
       <td>${labStatusBadge(r.status||'Pending')}</td>
       <td class="td-actions">
         <button class="btn btn-sm" onclick="openEnterResult('${r.id}')">Result</button>
-        ${(r.status === 'Result Ready')
-          ? `<button class="btn btn-sm" style="background:#0B1F3A;color:white;border-color:#0B1F3A;"
-                     onclick="openDispatch('${r.id}','${(r.patient_name||'').replace(/'/g,"\\'")}','${getTestsDisplay(r).replace(/'/g,"\\'")}')">📤 Dispatch</button>`
-          : `<button class="btn btn-sm" onclick="openUpdateStatus('${r.id}','${(r.patient_name||'').replace(/'/g,"\\'")}','${testsDisplay.replace(/'/g,"\\'")}','${r.status||'Pending'}')">Status</button>`}
+        <button class="btn btn-sm"
+                onclick="openUpdateStatus('${r.id}','${(r.patient_name||'').replace(/'/g,"\\'")}','${tests.replace(/'/g,"\\'")}','${r.status||'Pending'}')">Status</button>
         <button class="btn btn-danger" onclick="delItem('test_requests','${r.id}',loadWorklist)">Del</button>
       </td>
     </tr>`;
   }).join('');
 }
 
-// Helper: normalise tests field across both sources
+function renderClinicRequests(arr) {
+  const b = document.getElementById('clinic-requests-body');
+  if (!b) return;
+  const clinic = arr.filter(r => r.source === 'clinic-consult');
+  if (!clinic.length) {
+    b.innerHTML = `<tr><td colspan="7" class="loading" style="color:#6B7280;">No pending clinic requests.</td></tr>`;
+    return;
+  }
+  b.innerHTML = clinic.map(r => {
+    const tests = getTestsDisplay(r);
+    return `<tr>
+      <td>
+        <strong>${r.patient_name}</strong>
+        <div style="font-size:0.73rem;color:#9AA3AE;">${r.patient_age ? r.patient_age+'y' : ''} ${r.patient_gender||''}</div>
+      </td>
+      <td style="font-size:0.82rem;">
+        ${getTestsArray(r).map(t =>
+          `<span style="display:inline-block;background:#eff6ff;color:#1e3a8a;border-radius:6px;
+                        padding:0.15rem 0.5rem;font-size:0.75rem;font-weight:600;margin:0.1rem;">${t}</span>`
+        ).join('')}
+      </td>
+      <td>${priorityBadge(r.priority)}</td>
+      <td style="font-size:0.8rem;color:#555;">${r.clinical_notes||'—'}</td>
+      <td style="font-size:0.78rem;color:#9AA3AE;">${fmtDate(r.created_at)}</td>
+      <td>${labStatusBadge(r.status||'Pending')}</td>
+      <td class="td-actions">
+        <button class="btn btn-sm" style="background:#1e3a8a;color:white;border-color:#1e3a8a;"
+                onclick="openEnterResult('${r.id}')">Enter Result</button>
+        ${r.status === 'Result Ready'
+          ? `<button class="btn btn-sm" style="background:#0B1F3A;color:white;border-color:#0B1F3A;"
+                     onclick="openDispatch('${r.id}','${(r.patient_name||'').replace(/'/g,"\\'")}','${tests.replace(/'/g,"\\'")}')">📤 Dispatch</button>`
+          : ''}
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+// Normalise tests field — clinic uses JSON `tests`, walk-in uses CSV `tests_ordered`
 function getTestsDisplay(r) {
   if (r.tests_ordered) return r.tests_ordered.split(',').map(t => t.trim()).join(', ');
   if (r.tests) {
-    try {
-      const arr = JSON.parse(r.tests);
-      return Array.isArray(arr) ? arr.join(', ') : String(arr);
-    } catch { return r.tests; }
+    try { const a = JSON.parse(r.tests); return Array.isArray(a) ? a.join(', ') : String(a); }
+    catch { return r.tests; }
   }
   return '—';
 }
 
-// Helper: get tests as array for result entry
 function getTestsArray(r) {
   if (r.tests_ordered) return r.tests_ordered.split(',').map(t => t.trim()).filter(Boolean);
   if (r.tests) {
-    try {
-      const arr = JSON.parse(r.tests);
-      return Array.isArray(arr) ? arr : [String(arr)];
-    } catch { return [r.tests]; }
+    try { const a = JSON.parse(r.tests); return Array.isArray(a) ? a : [String(a)]; }
+    catch { return [r.tests]; }
   }
   return [];
 }
@@ -4987,53 +5015,120 @@ function filterWorklist() {
     (!st || (r.status||'Pending') === st)
   );
   renderWorklist(filtered);
-  renderClinicRequests(testRequests); // clinic section always shows all clinic requests unfiltered
+  renderClinicRequests(testRequests); // clinic section ignores the search/status filter
 }
 
 async function addTestRequest() {
   const patient = document.getElementById('lr-patient').value.trim();
-  if (!patient) { toast('Patient name required.','err'); return; }
-  if (!selectedTests.length) { toast('Select at least one test.','err'); return; }
-  const sample  = document.getElementById('lr-sample').value;
-  if (!sample) { toast('Sample type required.','err'); return; }
+  if (!patient) { toast('Patient name required.', 'err'); return; }
+  if (!selectedTests.length) { toast('Select at least one test.', 'err'); return; }
+  const sample = document.getElementById('lr-sample').value;
+  if (!sample) { toast('Sample type required.', 'err'); return; }
 
   try {
-    await db('test_requests','POST', {
+    await db('test_requests', 'POST', {
       patient_name:      patient,
-      patient_age:       document.getElementById('lr-age').value||null,
-      patient_gender:    document.getElementById('lr-gender').value||null,
-      patient_phone:     document.getElementById('lr-phone').value.trim()||null,
+      patient_age:       document.getElementById('lr-age').value || null,
+      patient_gender:    document.getElementById('lr-gender').value || null,
+      patient_phone:     document.getElementById('lr-phone').value.trim() || null,
       tests_ordered:     selectedTests.join(', '),
       sample_type:       sample,
       priority:          document.getElementById('lr-priority').value,
-      requesting_doctor: document.getElementById('lr-requester').value.trim()||null,
-      clinical_notes:    document.getElementById('lr-notes').value.trim()||null,
+      requesting_doctor: document.getElementById('lr-requester').value.trim() || null,
+      clinical_notes:    document.getElementById('lr-notes').value.trim() || null,
       status:            'Pending',
+      source:            'walk-in',
       org_id:            user.id
     });
 
     toast('✅ Test request submitted!');
     ['lr-patient','lr-age','lr-phone','lr-requester','lr-notes','lr-test-custom']
-      .forEach(id => { const el=document.getElementById(id); if(el) el.value=''; });
-    document.getElementById('lr-gender').value = '';
-    document.getElementById('lr-sample').value = '';
+      .forEach(id => { const el = document.getElementById(id); if(el) el.value = ''; });
+    document.getElementById('lr-gender').value   = '';
+    document.getElementById('lr-sample').value   = '';
     document.getElementById('lr-priority').value = 'Routine';
-
-    // Snapshot count BEFORE resetting — was previously always logging 0
     const submittedCount = selectedTests.length;
     selectedTests = [];
     renderSelectedTests();
     document.querySelectorAll('#lr-tests-picker button').forEach(b => {
-      b.style.background='#F0EFEB'; b.style.color='#4A5568'; b.style.borderColor='#E0DFDB';
+      b.style.background = '#F0EFEB'; b.style.color = '#4A5568'; b.style.borderColor = '#E0DFDB';
     });
+    track('lab_request_submitted', { facility: user?.user_metadata?.org_name||'unknown', test_count: submittedCount });
 
-    track('lab_request_submitted', {
-      facility:   user?.user_metadata?.org_name||'unknown',
-      test_count: submittedCount
-    });
+    showPage('lab-worklist'); // go back to worklist after submitting
+  } catch(e) { toast('Error: ' + e.message, 'err'); }
+}
 
-    loadWorklist();
-  } catch(e) { toast('Error: '+e.message,'err'); }
+let dispatchedRequests = [];
+
+async function loadDispatched() {
+  try {
+    dispatchedRequests = await db(
+      `test_requests?select=*&org_id=eq.${user.id}&status=eq.Dispatched&order=dispatched_at.desc`
+    );
+    renderDispatched(dispatchedRequests);
+  } catch(e) {
+    document.getElementById('dispatched-body').innerHTML =
+      `<tr><td colspan="7" class="loading">Error: ${e.message}</td></tr>`;
+  }
+}
+
+function renderDispatched(arr) {
+  const b = document.getElementById('dispatched-body');
+  if (!arr.length) {
+    b.innerHTML = `<tr><td colspan="7" class="loading">No dispatched results yet.</td></tr>`;
+    return;
+  }
+  b.innerHTML = arr.map(r => {
+    const tests = getTestsDisplay(r);
+    const isClinic = r.source === 'clinic-consult';
+    return `<tr>
+      <td>
+        <strong>${r.patient_name}</strong>
+        <div style="font-size:0.73rem;color:#9AA3AE;">${r.patient_age ? r.patient_age+'y' : ''} ${r.patient_gender||''}</div>
+      </td>
+      <td style="font-size:0.82rem;max-width:180px;">${tests}</td>
+      <td style="font-size:0.82rem;">${r.sample_type||'—'}</td>
+      <td>${priorityBadge(r.priority)}</td>
+      <td style="font-size:0.78rem;">
+        ${isClinic
+          ? '<span style="background:#eff6ff;color:#1d4ed8;border-radius:100px;padding:0.15rem 0.55rem;font-size:0.72rem;font-weight:700;">🏥 Clinic</span>'
+          : (r.requesting_doctor||'Walk-in')}
+      </td>
+      <td style="font-size:0.78rem;color:#9AA3AE;">${r.dispatched_at ? fmtDate(r.dispatched_at) : fmtDate(r.created_at)}</td>
+      <td class="td-actions">
+        <button class="btn btn-sm" onclick="viewDispatchedResult('${r.id}')">View Results</button>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+function filterDispatched() {
+  const q = document.getElementById('disp-search').value.toLowerCase();
+  renderDispatched(dispatchedRequests.filter(r =>
+    !q || (r.patient_name||'').toLowerCase().includes(q) || getTestsDisplay(r).toLowerCase().includes(q)
+  ));
+}
+
+async function viewDispatchedResult(requestId) {
+  // Re-use the existing result detail flow — fetch the result rows and open the modal
+  const req = dispatchedRequests.find(r => r.id === requestId);
+  if (!req) return;
+  try {
+    const results = await db(`test_results?request_id=eq.${requestId}&order=created_at.asc`);
+    if (!results.length) { toast('No results found for this request.', 'err'); return; }
+    // Merge all rows into currentResultReport for the print/view modal
+    currentResultReport = {
+      req,
+      resultRows: results.map(r => ({
+        test: r.tests_ordered, value: r.result_value, unit: r.result_unit,
+        ref: r.reference_range, flag: r.flag, comment: r.comment
+      })),
+      techNotes: results[0]?.tech_notes,
+      savedAt:   results[0]?.created_at ? new Date(results[0].created_at) : new Date()
+    };
+    showResultReport(currentResultReport);
+  } catch(e) { toast('Error: ' + e.message, 'err'); }
 }
 
 function openUpdateStatus(id, patientName, tests, currentStatus) {
