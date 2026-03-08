@@ -2215,7 +2215,7 @@
       <!-- RIGHT: prescription -->
       <div style="display:flex;flex-direction:column;gap:1rem;">
         <div class="card" style="margin:0;">
-          <h2 style="font-size:0.82rem;margin-bottom:0.9rem;">💊 Prescription</h2>
+          <h2 style="font-size:0.82rem;margin-bottom:0.9rem;">Prescription</h2>
 
           <div id="rx-items" style="display:flex;flex-direction:column;gap:0.6rem;
                margin-bottom:0.9rem;min-height:40px;"></div>
@@ -5232,11 +5232,15 @@ async function sendConsultLabRequest() {
       queue_patient_id:  currentConsultId,
       org_id:            user.id
     });
-    document.getElementById('consult-lab-sent').style.display = 'block';
+    
+    document.getElementById('consult-lab-sent').style.display = 'inline-flex';
+    document.getElementById('consult-lab-form').style.display = 'none';
     consultSelectedTests = [];
     renderConsultSelectedTests();
     buildConsultTestPicker();
-    toast('✅ Lab request sent.');
+    toast('✅ Lab request sent — diagnosis unlocks when results are back.');
+    // Start polling for results every 20 seconds
+    startLabResultPolling(currentConsultId);
   } catch(e) { toast('Error: ' + e.message, 'err'); }
   unlockDiagnosis();
 }
