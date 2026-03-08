@@ -4887,24 +4887,39 @@ async function loadWorklist() {
 
 function renderWorklist(arr) {
   const b = document.getElementById('lr-body');
-  if (!arr.length) { b.innerHTML=`<tr><td colspan="8" class="loading">No test requests yet. Submit one above.</td></tr>`; return; }
-  b.innerHTML = arr.map(r => `<tr>
-    <td>
-      <strong>${r.patient_name}</strong>
-      <div style="font-size:0.73rem;color:#9AA3AE;">${r.patient_age ? r.patient_age+'y' : ''} ${r.patient_gender||''}</div>
-    </td>
-    <td style="font-size:0.82rem;max-width:200px;">${(r.tests_ordered||'').split(',').join(', ')}</td>
-    <td>${r.sample_type||'—'}</td>
-    <td>${priorityBadge(r.priority)}</td>
-    <td style="font-size:0.8rem;">${r.requesting_doctor||'—'}</td>
-    <td style="font-size:0.78rem;color:#9AA3AE;">${fmtDate(r.created_at)}</td>
-    <td>${labStatusBadge(r.status)}</td>
-    <td class="td-actions">
-      <button class="btn btn-sm" onclick="openUpdateStatus('${r.id}','${r.patient_name}','${(r.tests_ordered||'').replace(/'/g,"\\'")}','${r.status||'Pending'}')">Status</button>
-      <button class="btn btn-sm" onclick="openEnterResult('${r.id}','${r.patient_name}','${(r.tests_ordered||'').replace(/'/g,"\\'")}')">Result</button>
-      <button class="btn btn-danger" onclick="delItem('test_requests','${r.id}',loadWorklist)">Del</button>
-    </td>
-  </tr>`).join('');
+  if (!arr.length) {
+    b.innerHTML = `<tr><td colspan="8" class="loading">No test requests yet.</td></tr>`;
+    return;
+  }
+  b.innerHTML = arr.map(r => {
+    // Normalise tests: clinic uses JSON `tests` field, walk-in uses `tests_ordered` CSV
+    const testsDisplay = getTestsDisplay(r);
+    const isClinic = r.source === 'clinic-consult';
+    return `<tr${isClinic ? ' style="background:#f5f7ff;"' : ''}>
+      <td>
+        <strong>${r.patient_name}</strong>
+        <div style="font-size:0.73rem;color:#9AA3AE;">${r.patient_age ? r.patient_age+'y' : ''} ${r.patient_gender||''}</div>
+      </td>
+      <td style="font-size:0.82rem;max-width:200px;">${testsDisplay}</td>
+      <td>${r.sample_type||'<span style="color:#d97706;font-size:0.75rem;">⚠ Set on result</span>'}</td>
+      <td>${priorityBadge(r.priority)}</td>
+      <td style="font-size:0.78rem;">
+        ${isClinic
+          ? '<span style="background:#eff6ff;color:#1d4ed8;border-radius:100px;padding:0.15rem 0.55rem;font-size:0.72rem;font-weight:700;">🏥 Clinic</span>'
+          : (r.requesting_doctor||'Walk-in')}
+      </td>
+      <td style="font-size:0.78rem;color:#9AA3AE;">${fmtDate(r.created_at)}</td>
+      <td>${labStatusBadge(r.status||'Pending')}</td>
+      <td class="td-actions">
+        <button class="btn btn-sm" onclick="openEnterResult('${r.id}')">Result</button>
+        ${(r.status === 'Result Ready')
+          ? `<button class="btn btn-sm" style="background:#0B1F3A;color:white;border-color:#0B1F3A;"
+                     onclick="openDispatch('${r.id}','${(r.patient_name||'').replace(/'/g,"\\'")}','${getTestsDisplay(r).replace(/'/g,"\\'")}')">📤 Dispatch</button>`
+          : `<button class="btn btn-sm" onclick="openUpdateStatus('${r.id}','${(r.patient_name||'').replace(/'/g,"\\'")}','${testsDisplay.replace(/'/g,"\\'")}','${r.status||'Pending'}')">Status</button>`}
+        <button class="btn btn-danger" onclick="delItem('test_requests','${r.id}',loadWorklist)">Del</button>
+      </td>
+    </tr>`;
+  }).join('');
 }
 
 function filterWorklist() {
