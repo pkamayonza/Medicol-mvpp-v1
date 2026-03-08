@@ -5215,6 +5215,95 @@ function renderConsultSelectedTests() {
   ).join('');
 }
 
+// ── LAB RESULT POLLING ────────────────────────────────────────────────────────
+// Polls every 20s after a lab request is sent from within a consult.
+// When result comes back, unlocks diagnosis and shows the result inline.
+
+let _labPollInterval = null;
+
+function startLabResultPolling(queuePatientId) {
+  // Clear any existing poll
+  if (_labPollInterval) clearInterval(_labPollInterval);
+
+  _labPollInterval = setInterval(async () => {
+    // Stop polling if doctor has left the consult page
+    if (!currentConsultId) { clearInterval(_labPollInterval); return; }
+
+    try {
+      const reqs = await db(
+        `test_requests?queue_patient_id=eq.${queuePatientId}&order=created_at.desc`
+      );
+      const ready = reqs.find(r => r.status === 'Result Ready');
+      if (!ready) return; // still pending — keep polling
+
+      // Result is back — stop polling
+      clearInterval(_labPollInterval);
+
+      // Fetch the actual result rows
+      const results = await db(
+        `test_results?request_id=eq.${ready.id}&order=created_at.asc`
+      );
+
+      // Build result summary string
+      let summary = '';
+      if (results && results.length) {
+        summary = results.map(r =>
+          `<div style="display:flex;justify-content:space-between;align-items:center;
+                       padding:0.3rem 0;border-bottom:1px solid #d1fae5;">
+            <span style="font-weight:600;">${r.test_name}</span>
+            <span style="display:flex;gap:0.4rem;align-items:center;">
+              ${r.result_value || '—'}
+              ${r.flag ? `<span style="font-size:0.7rem;font-weight:700;padding:0.1rem 0.4rem;
+                                      border-radius:100px;background:${r.flag==='Normal'?'#d1fae5':r.flag==='High'||r.flag==='Positive'?'#fee2e2':'#fffbeb'};
+                                      color:${r.flag==='Normal'?'#065f46':r.flag==='High'||r.flag==='Positive'?'#991b1b':'#92400e'};">
+                            ${r.flag}</span>` : ''}
+            </span>
+          </div>`
+        ).join('');
+      } else {
+        summary = '<span style="color:#6B7280;font-size:0.82rem;">Result recorded — see lab results tab for details.</span>';
+      }
+
+      // Show result in consult
+      const area = document.getElementById('consult-lab-result-area');
+      const content = document.getElementById('consult-lab-result-content');
+      if (area) area.style.display = 'block';
+      if (content) content.innerHTML = summary;
+
+      // Show badge on banner
+      const badge = document.getElementById('consult-lab-result-badge');
+      if (badge) badge.style.display = 'inline-flex';
+
+      // Unlock diagnosis
+      unlockDiagnosis();
+
+      toast('🔬 Lab results are back — diagnosis unlocked.');
+
+    } catch(e) { /* silent fail — keep polling */ }
+
+  }, 20000); // poll every 20 seconds
+}
+
+function unlockDiagnosis() {
+  const lock = document.getElementById('diagnosis-lock');
+  const form = document.getElementById('diagnosis-form');
+  if (lock) lock.style.display = 'none';
+  if (form) form.style.display = 'block';
+}
+
+function skipLabStep() {
+  if (_labPollInterval) clearInterval(_labPollInterval);
+  document.getElementById('consult-lab-form').style.display = 'none';
+  const sent = document.getElementById('consult-lab-sent');
+  if (sent) {
+    sent.style.display = 'inline-flex';
+    sent.textContent = '✓ No lab needed';
+    sent.style.background = '#F0EFEB';
+    sent.style.color = '#4A5568';
+  }
+  unlockDiagnosis();
+}
+
 async function sendConsultLabRequest() {
   if (!currentConsultId) { toast('No patient in consult.', 'err'); return; }
   if (!consultSelectedTests.length) { toast('Select at least one test.', 'err'); return; }
@@ -5232,7 +5321,7 @@ async function sendConsultLabRequest() {
       queue_patient_id:  currentConsultId,
       org_id:            user.id
     });
-    
+
     document.getElementById('consult-lab-sent').style.display = 'inline-flex';
     document.getElementById('consult-lab-form').style.display = 'none';
     consultSelectedTests = [];
