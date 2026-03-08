@@ -4330,7 +4330,7 @@ function renderLabPendingPreview(arr) {
 async function loadWorklist() {
   buildTestPicker();
   try {
-    testRequests = await db('test_requests?select=*&order=created_at.desc');
+    testRequests = await db(`test_requests?select=*&org_id=eq.${user.id}&order=created_at.desc`);
     renderWorklist(testRequests);
   } catch(e) {
     document.getElementById('lr-body').innerHTML = `<tr><td colspan="8" class="loading">Error: ${e.message}</td></tr>`;
