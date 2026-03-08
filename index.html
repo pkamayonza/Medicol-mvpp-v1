@@ -3698,8 +3698,25 @@ async function loadClinicHome() {
       }
     }
 
-    // recent patients table on dashboard (top 8)
+// recent patients table on dashboard (top 8)
     renderClRecent(p.slice(0, 8));
+
+    // flow pipeline banner
+    try {
+      const todayStr = new Date().toDateString();
+      const q = await db('queue_patients?order=created_at.asc');
+      const todayQ = q.filter(x => new Date(x.created_at).toDateString() === todayStr);
+      const labPending = await db('test_requests?status=eq.Pending');
+      const rxAll = await db('prescriptions?order=created_at.desc');
+      const todayRx = rxAll.filter(x => new Date(x.created_at).toDateString() === todayStr);
+      const sf = (id, v) => { const el=document.getElementById(id); if(el) el.textContent=v; };
+      sf('flow-registered', todayQ.length);
+      sf('flow-waiting',    todayQ.filter(x=>x.status==='Waiting').length);
+      sf('flow-in-consult', todayQ.filter(x=>x.status==='In Consult').length);
+      sf('flow-lab',        labPending.length);
+      sf('flow-rx',         todayRx.filter(x=>x.status==='Pending').length);
+      sf('flow-seen',       todayQ.filter(x=>x.status==='Seen').length);
+    } catch(e) {}
 
   } catch(e) {}
 }
