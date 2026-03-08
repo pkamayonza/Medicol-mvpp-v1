@@ -5286,16 +5286,23 @@ function viewResult(id) {
     ? fmtDuration(new Date(r.created_at) - new Date(req.created_at)) : '—';
 
   document.getElementById('result-detail-body').innerHTML = `
-    <div style="background:#F0EFEB;border-radius:10px;padding:1rem;margin-bottom:1.2rem;border:1px solid #E0DFDB;">
+    <div style="background:#F0EFEB;border-radius:10px;padding:1rem;
+                margin-bottom:1.2rem;border:1px solid #E0DFDB;">
       <div style="font-weight:700;font-size:0.95rem;">${r.patient_name||'—'}</div>
       <div style="font-size:0.8rem;color:#9AA3AE;margin-top:0.2rem;">
-        ${req?.patient_age?req.patient_age+'y · ':''}${req?.patient_gender||''}
-        ${req?.requesting_doctor?' · Req. by: '+req.requesting_doctor:''}
+        ${[req?.patient_age ? req.patient_age+'y' : null,
+           req?.patient_gender,
+           req?.requesting_doctor ? 'Req. by: '+req.requesting_doctor : null
+          ].filter(Boolean).join(' · ')}
       </div>
       <div style="font-size:0.78rem;color:#9AA3AE;margin-top:0.15rem;">
-        ${req?.sample_type?'Sample: '+req.sample_type+' · ':''}
+        ${req?.sample_type ? 'Sample: '+req.sample_type+' · ' : ''}
         Received: ${fmtDate(req?.created_at)} · TAT: ${tat}
       </div>
+      ${req?.clinical_notes
+        ? `<div style="margin-top:0.5rem;font-size:0.8rem;color:#555;background:white;
+                       border-radius:6px;padding:0.4rem 0.6rem;border:1px solid #E8E6E1;">
+             📋 ${req.clinical_notes}</div>` : ''}
     </div>
 
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.6rem;margin-bottom:1rem;">
@@ -5305,7 +5312,9 @@ function viewResult(id) {
       </div>
       <div style="background:#F8F7F3;border-radius:8px;padding:0.75rem;border:1px solid #E8E6E1;">
         <div style="font-size:0.7rem;color:#9AA3AE;font-weight:700;text-transform:uppercase;margin-bottom:0.3rem;">Result</div>
-        <div style="font-weight:700;font-size:1.05rem;">${r.result_value||'—'}${r.result_unit?' <span style="font-size:0.8rem;font-weight:400;">'+r.result_unit+'</span>':''}</div>
+        <div style="font-weight:700;font-size:1.05rem;">
+          ${r.result_value||'—'}${r.result_unit ? ` <span style="font-size:0.8rem;font-weight:400;">${r.result_unit}</span>` : ''}
+        </div>
       </div>
       <div style="background:#F8F7F3;border-radius:8px;padding:0.75rem;border:1px solid #E8E6E1;">
         <div style="font-size:0.7rem;color:#9AA3AE;font-weight:700;text-transform:uppercase;margin-bottom:0.3rem;">Reference Range</div>
@@ -5315,23 +5324,41 @@ function viewResult(id) {
         <div style="font-size:0.7rem;color:#9AA3AE;font-weight:700;text-transform:uppercase;margin-bottom:0.3rem;">Flag</div>
         <div>${resultFlagBadge(r.flag)}</div>
       </div>
+      ${r.comment ? `
+      <div style="background:#F8F7F3;border-radius:8px;padding:0.75rem;
+                  border:1px solid #E8E6E1;grid-column:span 2;">
+        <div style="font-size:0.7rem;color:#9AA3AE;font-weight:700;text-transform:uppercase;margin-bottom:0.3rem;">Comment</div>
+        <div style="font-size:0.85rem;">${r.comment}</div>
+      </div>` : ''}
     </div>
 
     ${r.tech_notes ? `
-    <div style="background:#fffbeb;border:1px solid #fcd34d;border-radius:8px;padding:0.75rem 1rem;
-                font-size:0.83rem;color:#92400e;margin-bottom:1rem;">
+    <div style="background:#fffbeb;border:1px solid #fcd34d;border-radius:8px;
+                padding:0.75rem 1rem;font-size:0.83rem;color:#92400e;margin-bottom:1rem;">
       <strong>Technician Notes:</strong> ${r.tech_notes}
     </div>` : ''}
 
     <div style="font-size:0.75rem;color:#9AA3AE;text-align:right;">
       Recorded: ${r.created_at ? new Date(r.created_at).toLocaleString('en-GB') : '—'}
+      ${r.analysis_dt ? ' · Analysed: ' + new Date(r.analysis_dt).toLocaleString('en-GB') : ''}
     </div>`;
 
-  // Store for print
+  // Show/hide dispatch button based on status
+  const dispatchBtn = document.getElementById('dispatch-btn');
+  if (dispatchBtn) {
+    if (req && req.status === 'Result Ready') {
+      dispatchBtn.style.display = 'inline-flex';
+      dispatchBtn.dataset.requestId   = req.id;
+      dispatchBtn.dataset.patientName = req.patient_name;
+    } else {
+      dispatchBtn.style.display = 'none';
+    }
+  }
+
   currentResultReport = {
     req,
     resultRows: [{ test: r.tests_ordered, value: r.result_value, unit: r.result_unit,
-                   ref: r.reference_range, flag: r.flag }],
+                   ref: r.reference_range, flag: r.flag, comment: r.comment }],
     techNotes:  r.tech_notes,
     savedAt:    r.created_at ? new Date(r.created_at) : new Date()
   };
@@ -5339,13 +5366,38 @@ function viewResult(id) {
   document.getElementById('m-result-detail').classList.add('open');
 }
 
-function filterResults() {
-  const q  = document.getElementById('res-search').value.toLowerCase();
-  const fl = document.getElementById('res-flag-filter').value;
-  renderResults(labResults.filter(r =>
-    (!q || (r.patient_name||'').toLowerCase().includes(q) || (r.tests_ordered||'').toLowerCase().includes(q)) &&
-    (!fl || r.flag === fl)
-  ));
+// ── DISPATCH ──────────────────────────────────────────────────────────────────
+
+function openDispatch(requestId, patientName, tests) {
+  document.getElementById('dispatch-request-id').value = requestId;
+  document.getElementById('dispatch-info').innerHTML =
+    `<strong>${patientName}</strong><br/>
+     <span style="font-size:0.8rem;color:#9AA3AE;">${tests}</span>`;
+  cm('m-result-detail'); // close detail modal if open
+  document.getElementById('m-dispatch-confirm').classList.add('open');
+}
+
+function dispatchResult() {
+  // Called from the Dispatch button inside m-result-detail
+  const btn = document.getElementById('dispatch-btn');
+  if (!btn) return;
+  const requestId   = btn.dataset.requestId;
+  const patientName = btn.dataset.patientName;
+  const req = testRequests.find(r => r.id === requestId);
+  openDispatch(requestId, patientName, req ? getTestsDisplay(req) : '');
+}
+
+async function confirmDispatch() {
+  const id = document.getElementById('dispatch-request-id').value;
+  try {
+    await db(`test_requests?id=eq.${id}`, 'PATCH', {
+      status:        'Dispatched',
+      dispatched_at: new Date().toISOString()
+    });
+    toast('📤 Results dispatched to the doctor.');
+    cm('m-dispatch-confirm');
+    loadWorklist();
+  } catch(e) { toast('Error: ' + e.message, 'err'); }
 }
 
 // ── Result report / print ──────────────────────────────────────────────────
