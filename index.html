@@ -5117,8 +5117,7 @@ function openEnterResult(requestId) {
         </select>
       </div>` : ''}
 
-      <div style="display:grid;grid-template-columns:1.3fr 0.6fr 1.2fr 0.9fr 1fr;
-                  gap:0.6rem;align-items:start;min-width:0;">
+<div style="display:grid;grid-template-columns:2fr 1fr;gap:0.6rem;margin-bottom:0.5rem;">
         <div class="form-group" style="margin:0;">
           <label style="font-size:0.72rem;">Result Value *</label>
           <input type="text" id="er-val-${i}" placeholder="e.g. 5.2 or Positive"
@@ -5128,8 +5127,10 @@ function openEnterResult(requestId) {
           <label style="font-size:0.72rem;">Unit</label>
           <input type="text" id="er-unit-${i}"
                  value="${isMulti ? '' : (refData?.unit||'')}"
-                 placeholder="unit"/>
+                 placeholder="e.g. g/dL"/>
         </div>
+      </div>
+      <div style="display:grid;grid-template-columns:1.5fr 1fr 1.5fr;gap:0.6rem;">
         <div class="form-group" style="margin:0;">
           <label style="font-size:0.72rem;">Reference Range</label>
           <input type="text" id="er-ref-${i}"
