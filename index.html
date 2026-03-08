@@ -5065,34 +5065,48 @@ async function saveTestStatus() {
 // ── currentResultReport: holds data for the printable report ──
 let currentResultReport = null;
 
-function openEnterResult(requestId, patientName, tests) {
+function openEnterResult(requestId) {
   const req = testRequests.find(r => r.id === requestId);
+  if (!req) { toast('Request not found.', 'err'); return; }
+
   document.getElementById('er-request-id').value = requestId;
+
+  const testList = getTestsArray(req);
+  const isClinic = req.source === 'clinic-consult';
+
   document.getElementById('er-request-info').innerHTML =
-    `<strong>${patientName}</strong>
-     ${req?.patient_age  ? `<span style="color:#9AA3AE;font-size:0.8rem;"> · ${req.patient_age}y</span>` : ''}
-     ${req?.patient_gender ? `<span style="color:#9AA3AE;font-size:0.8rem;"> · ${req.patient_gender}</span>` : ''}
-     <br/><span style="color:#9AA3AE;font-size:0.8rem;">${tests}</span>
-     ${req?.requesting_doctor ? `<br/><span style="color:#9AA3AE;font-size:0.78rem;">Requested by: ${req.requesting_doctor}</span>` : ''}`;
+    `<strong>${req.patient_name}</strong>
+     ${req.patient_age  ? `<span style="color:#9AA3AE;font-size:0.8rem;"> · ${req.patient_age}y</span>` : ''}
+     ${req.patient_gender ? `<span style="color:#9AA3AE;font-size:0.8rem;"> · ${req.patient_gender}</span>` : ''}
+     ${isClinic ? `<span style="background:#eff6ff;color:#1d4ed8;border-radius:100px;padding:0.1rem 0.5rem;font-size:0.72rem;font-weight:700;margin-left:0.4rem;">🏥 Clinic</span>` : ''}
+     <br/>
+     <span style="color:#9AA3AE;font-size:0.8rem;">Tests: ${testList.join(', ')}</span>
+     ${req.requesting_doctor ? `<br/><span style="color:#9AA3AE;font-size:0.78rem;">Requested by: ${req.requesting_doctor}</span>` : ''}
+     ${req.clinical_notes ? `<br/><span style="color:#555;font-size:0.78rem;">Clinical notes: ${req.clinical_notes}</span>` : ''}`;
+
+  // Pre-fill sample type if set; leave blank so tech must choose for clinic requests
+  const sampleEl = document.getElementById('er-sample-type');
+  sampleEl.value = req.sample_type || '';
+
+  // Pre-fill analysis datetime to now
+  const now = new Date();
+  now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+  document.getElementById('er-analysis-dt').value = now.toISOString().slice(0, 16);
 
   // Build one input row per test
-  const testList = tests.split(',').map(t => t.trim()).filter(Boolean);
-  const flagOpts = ['Normal','High','Low','Positive','Negative','Inconclusive']
-    .map(f => `<option value="${f}">${f}</option>`).join('');
+  document.getElementById('er-tests-rows').innerHTML = testList.map((test, i) => {
+    const refData = LAB_REFS[test];
+    const isMulti = refData?.type === 'multi';
+    const flagOpts = ['Normal','High','Low','Positive','Negative','Inconclusive']
+      .map(f => `<option value="${f}">${f}</option>`).join('');
+    const paramOpts = isMulti
+      ? refData.parameters.map(p => `<option value="${p.name}">${p.name}</option>`).join('')
+      : '';
 
-document.getElementById('er-tests-rows').innerHTML = testList.map((test, i) => {
-  const refData  = LAB_REFS[test];
-  const isMulti  = refData?.type === 'multi';
-  const flagOpts = ['Normal','High','Low','Positive','Negative','Inconclusive']
-    .map(f => `<option value="${f}">${f}</option>`).join('');
-  const paramOpts = isMulti
-    ? refData.parameters.map(p => `<option value="${p.name}">${p.name}</option>`).join('')
-    : '';
-
-  return `
+    return `
     <div style="background:#F8F7F3;border:1px solid #E8E6E1;border-radius:10px;padding:1rem;">
-      <div style="font-size:0.78rem;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;
-                  color:#9AA3AE;margin-bottom:0.75rem;">${test}</div>
+      <div style="font-size:0.78rem;font-weight:700;text-transform:uppercase;
+                  letter-spacing:0.5px;color:#0B1F3A;margin-bottom:0.75rem;">${test}</div>
 
       ${isMulti ? `
       <div class="form-group" style="margin:0 0 0.75rem 0;">
@@ -5103,7 +5117,8 @@ document.getElementById('er-tests-rows').innerHTML = testList.map((test, i) => {
         </select>
       </div>` : ''}
 
-      <div style="display:grid;grid-template-columns:1.2fr 0.7fr 1.2fr 0.8fr;gap:0.75rem;align-items:start;min-width:0;">
+      <div style="display:grid;grid-template-columns:1.3fr 0.6fr 1.2fr 0.9fr 1fr;
+                  gap:0.6rem;align-items:start;min-width:0;">
         <div class="form-group" style="margin:0;">
           <label style="font-size:0.72rem;">Result Value *</label>
           <input type="text" id="er-val-${i}" placeholder="e.g. 5.2 or Positive"
@@ -5119,16 +5134,19 @@ document.getElementById('er-tests-rows').innerHTML = testList.map((test, i) => {
           <label style="font-size:0.72rem;">Reference Range</label>
           <input type="text" id="er-ref-${i}"
                  value="${isMulti ? '' : (refData?.ref||'')}"
-                 placeholder="reference range"/>
+                 placeholder="e.g. 3.8–5.5"/>
         </div>
         <div class="form-group" style="margin:0;">
           <label style="font-size:0.72rem;">Flag</label>
           <select id="er-flag-${i}">${flagOpts}</select>
         </div>
+        <div class="form-group" style="margin:0;">
+          <label style="font-size:0.72rem;">Comment</label>
+          <input type="text" id="er-comment-${i}" placeholder="optional"/>
+        </div>
       </div>
     </div>`;
   }).join('');
-
 
   document.getElementById('er-notes').value = '';
   document.getElementById('m-enter-result').classList.add('open');
