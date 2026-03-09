@@ -1244,16 +1244,16 @@
           <label>What type of organisation are you?</label>
           <div class="role-grid">
             <div class="role-card" onclick="selectRole('Pharmacy',this)">
-              <span class="ri">💊</span><span class="rn">Pharmacy</span>
+              <span class="ri"><svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;"><path d="M10.5 3.5a5 5 0 0 1 7.07 7.07l-7.07 7.07a5 5 0 0 1-7.07-7.07l7.07-7.07z"/><line x1="9" y1="15" x2="15" y2="9"/></svg></span><span class="rn">Pharmacy</span>
             </div>
             <div class="role-card" onclick="selectRole('Clinic',this)">
-              <span class="ri">🏥</span><span class="rn">Clinic</span>
+              <span class="ri"><svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></span><span class="rn">Clinic</span>
             </div>
             <div class="role-card" onclick="selectRole('Hospital',this)">
-              <span class="ri">🏨</span><span class="rn">Hospital</span>
+              <span class="ri"><svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M12 8v8M8 12h8"/></svg></span><span class="rn">Hospital</span>
             </div>
             <div class="role-card" onclick="selectRole('Diagnostic Lab',this)">
-              <span class="ri">🧪</span><span class="rn">Diagnostic Lab</span>
+              <span class="ri"><svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;"><path d="M9 3h6l1 7-4 11-4-11z"/><line x1="6.5" y1="10" x2="17.5" y2="10"/></svg></span><span class="rn">Diagnostic Lab</span>
             </div>
           </div>
           <input type="hidden" id="s-role" value=""/>
@@ -1311,7 +1311,7 @@
 
     <!-- ALERT BAR -->
     <div class="alert-bar" id="low-stock-alert">
-      ⚠️ <span id="low-stock-msg"></span>
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg> <span id="low-stock-msg"></span>
       <a onclick="showPage('ph-inventory')">View inventory →</a>
     </div>
 
@@ -1501,8 +1501,8 @@
     <!-- BULK BAR -->
     <div class="inv-bulk-bar" id="inv-bulk-bar">
       <span id="inv-bulk-count" style="font-size:0.83rem;font-weight:700;">0 selected</span>
-      <button class="btn btn-danger" style="padding:0.35rem 0.9rem;font-size:0.78rem;" onclick="bulkDeleteDrugs()">🗑 Delete Selected</button>
-      <button class="btn-sm" onclick="clearInvSelection()">✕ Deselect All</button>
+      <button class="btn btn-danger" style="padding:0.35rem 0.9rem;font-size:0.78rem;" onclick="bulkDeleteDrugs()"> Delete Selected</button>
+      <button class="btn-sm" onclick="clearInvSelection()"> Deselect All</button>
     </div>
 
     <!-- TABLE -->
@@ -1533,7 +1533,7 @@
 
     <!-- EMPTY STATE -->
     <div class="inv-empty" id="inv-empty" style="display:none;">
-      <div style="font-size:3rem;margin-bottom:1rem;">💊</div>
+      <div style="font-size:3rem;margin-bottom:1rem;"></div>
       <div style="font-size:1rem;font-weight:700;color:#0B1F3A;margin-bottom:0.5rem;">No drugs found</div>
       <div style="font-size:0.85rem;color:#9AA3AE;margin-bottom:1.5rem;line-height:1.6;">Add your first drug to start tracking stock,<br/>expiry dates, and valuations.</div>
       <button class="btn btn-primary" onclick="openDrugModal()">+ Add First Drug</button>
@@ -1695,12 +1695,12 @@
 
         <!-- No price warning -->
         <div class="pos-warn" id="pos-no-price-warn" style="display:none;">
-          ⚠️ This drug has no selling price set. <a onclick="showPage('ph-inventory')" style="color:#0D6E6E;cursor:pointer;font-weight:700;">Update inventory →</a>
+           This drug has no selling price set. <a onclick="showPage('ph-inventory')" style="color:#0D6E6E;cursor:pointer;font-weight:700;">Update inventory →</a>
         </div>
 
         <!-- Out of stock warning -->
         <div class="pos-warn pos-warn-red" id="pos-no-stock-warn" style="display:none;">
-          ❌ This drug is out of stock.
+           This drug is out of stock.
         </div>
 
         <!-- Dispensing log below the POS -->
@@ -1746,7 +1746,7 @@
 
         <!-- Empty state -->
         <div class="pos-basket-empty" id="basket-empty">
-          <div style="font-size:2.5rem;opacity:0.2;margin-bottom:0.75rem;">🧾</div>
+          <div style="opacity:0.2;margin-bottom:0.75rem;"><svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;"><path d="M4 2h16a1 1 0 0 1 1 1v18l-3-2-2 2-2-2-2 2-2-2-3 2V3a1 1 0 0 1 1-1z"/><line x1="8" y1="8" x2="16" y2="8"/><line x1="8" y1="12" x2="16" y2="12"/><line x1="8" y1="16" x2="12" y2="16"/></svg></div>
           <div style="font-size:0.85rem;color:#9AA3AE;line-height:1.7;">Search for a drug on the left<br/>to start a new sale</div>
         </div>
 
@@ -1755,7 +1755,7 @@
 
           <div class="pos-basket-header">
             <span>Current Sale</span>
-            <button onclick="clearBasket()" class="pos-clear-btn">✕ Clear</button>
+            <button onclick="clearBasket()" class="pos-clear-btn"> Clear</button>
           </div>
 
           <!-- Items -->
@@ -1832,7 +1832,7 @@
       <div id="receipt-body"></div>
       <div class="ma" style="justify-content:center;gap:0.75rem;">
         <button class="btn btn-sm" onclick="cm('m-receipt')">Close</button>
-        <button class="btn btn-primary" onclick="printReceipt()">🖨 Print Receipt</button>
+        <button class="btn btn-primary" onclick="printReceipt()"> Print Receipt</button>
       </div>
     </div>
   </div>
@@ -1844,7 +1844,7 @@
       <div id="txn-detail-body"></div>
       <div class="ma">
         <button class="btn btn-sm" onclick="cm('m-txn-detail')">Close</button>
-        <button class="btn btn-primary" onclick="reprintTxn()">🖨 Reprint</button>
+        <button class="btn btn-primary" onclick="reprintTxn()"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>&nbsp;Reprint</button>
       </div>
     </div>
   </div>
@@ -1869,7 +1869,7 @@
       <div class="stat-card">
         <div class="stat-card-top">
           <span class="stat-label">Total Patients</span>
-          <div class="stat-icon" style="background:#eff6ff;">👥</div>
+          <div class="stat-icon" style="background:#eff6ff;"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div>
         </div>
         <div class="stat-num" id="cl-pts">—</div>
         <div class="stat-sub">registered all time</div>
@@ -1878,7 +1878,7 @@
       <div class="stat-card" id="sc-cl-today">
         <div class="stat-card-top">
           <span class="stat-label">Seen Today</span>
-          <div class="stat-icon" style="background:#f0fdf4;">🗓</div>
+          <div class="stat-icon" style="background:#f0fdf4;"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div>
         </div>
         <div class="stat-num" id="cl-today">—</div>
         <div class="stat-sub">visits recorded today</div>
@@ -1887,7 +1887,7 @@
       <div class="stat-card">
         <div class="stat-card-top">
           <span class="stat-label">This Week</span>
-          <div class="stat-icon" style="background:#f5f3ff;">📈</div>
+          <div class="stat-icon" style="background:#f5f3ff;"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg></div>
         </div>
         <div class="stat-num" id="cl-week">—</div>
         <div class="stat-sub">patients this week</div>
@@ -1896,7 +1896,7 @@
       <div class="stat-card" id="sc-cl-followup">
         <div class="stat-card-top">
           <span class="stat-label">Follow-up Due</span>
-          <div class="stat-icon" style="background:#fffbeb;">🔔</div>
+          <div class="stat-icon" style="background:#fffbeb;"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg></div>
         </div>
         <div class="stat-num" id="cl-followup">—</div>
         <div class="stat-sub">need follow-up</div>
@@ -2304,7 +2304,7 @@
                 padding:1rem 1.5rem;margin:-1rem -1.5rem 1.1rem;
                 border-bottom:1px solid #E8E6E1;z-index:10;">
       <h3 style="margin:0;">Enter Results</h3>
-      <button class="btn btn-sm" onclick="cm('m-enter-result')">✕</button>
+      <button class="btn btn-sm" onclick="cm('m-enter-result')"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
     </div>
     <input type="hidden" id="er-request-id"/>
 
@@ -2342,7 +2342,7 @@
 
     <div class="ma" style="margin-top:1.25rem;">
       <button class="btn btn-sm" onclick="cm('m-enter-result')">Cancel</button>
-      <button class="btn btn-primary" onclick="saveResult()">✅ Save All Results & Mark Ready</button>
+      <button class="btn btn-primary" onclick="saveResult()"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>&nbsp;Save All Results & Mark Ready</button>
     </div>
   </div>
 </div>
@@ -2361,7 +2361,7 @@
     </p>
     <div class="ma">
       <button class="btn btn-sm" onclick="cm('m-dispatch-confirm')">Cancel</button>
-      <button class="btn btn-primary" onclick="confirmDispatch()">📤 Confirm Dispatch</button>
+      <button class="btn btn-primary" onclick="confirmDispatch()"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>&nbsp;Confirm Dispatch</button>
     </div>
   </div>
 </div>
@@ -2404,7 +2404,7 @@
   <!-- HOSPITAL DASHBOARD -->
   <div class="page" id="page-hospital">
     <div class="welcome-banner hospital">
-      <div class="wb-icon">🏨</div>
+      <div class="wb-icon"><svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M12 8v8M8 12h8"/></svg></div>
       <div class="wb-text">
         <h3 id="wb-hosp-title">Welcome</h3>
         <p>Manage patient admissions, records, prescriptions, and inventory.</p>
@@ -2499,7 +2499,7 @@
 
     <div class="stats-5" style="grid-template-columns:repeat(3,1fr);">
       <div class="stat-card">
-        <div class="stat-card-top"><span class="stat-label">Registered Today</span><div class="stat-icon" style="background:#eff6ff;">📋</div></div>
+        <div class="stat-card-top"><span class="stat-label">Registered Today</span><div class="stat-icon" style="background:#eff6ff;"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/></svg></div></div>
         <div class="stat-num" id="rec-today">—</div>
         <div class="stat-sub">patients today</div>
       </div>
@@ -2509,7 +2509,7 @@
         <div class="stat-sub">waiting to see doctor</div>
       </div>
       <div class="stat-card">
-        <div class="stat-card-top"><span class="stat-label">Seen Today</span><div class="stat-icon" style="background:#f0fdf4;">✅</div></div>
+        <div class="stat-card-top"><span class="stat-label">Seen Today</span><div class="stat-icon" style="background:#f0fdf4;"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg></div></div>
         <div class="stat-num" id="rec-seen">—</div>
         <div class="stat-sub">consultations done</div>
       </div>
@@ -2571,12 +2571,12 @@
         <div class="stat-sub">patients in queue</div>
       </div>
       <div class="stat-card">
-        <div class="stat-card-top"><span class="stat-label">Seen Today</span><div class="stat-icon" style="background:#f0fdf4;">✅</div></div>
+        <div class="stat-card-top"><span class="stat-label">Seen Today</span><div class="stat-icon" style="background:#f0fdf4;"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg></div></div>
         <div class="stat-num" id="doc-seen">—</div>
         <div class="stat-sub">consultations done</div>
       </div>
       <div class="stat-card">
-        <div class="stat-card-top"><span class="stat-label">Prescriptions</span><div class="stat-icon" style="background:#eff6ff;">💊</div></div>
+        <div class="stat-card-top"><span class="stat-label">Prescriptions</span><div class="stat-icon" style="background:#eff6ff;"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;"><path d="M10.5 3.5a5 5 0 0 1 7.07 7.07l-7.07 7.07a5 5 0 0 1-7.07-7.07l7.07-7.07z"/><line x1="9" y1="15" x2="15" y2="9"/></svg></div></div>
         <div class="stat-num" id="doc-rx-count">—</div>
         <div class="stat-sub">written today</div>
       </div>
@@ -2668,7 +2668,7 @@
             <div id="consult-lab-sent"
                  style="display:none;background:#d1fae5;color:#065f46;border-radius:100px;
                         padding:0.18rem 0.65rem;font-size:0.72rem;font-weight:700;margin-left:auto;">
-              ✓ Sent — awaiting results
+              Sent — awaiting results
             </div>
           </div>
 
@@ -2677,7 +2677,7 @@
                style="display:none;background:#f0fdf4;border:1px solid #a7f3d0;
                       border-radius:8px;padding:0.75rem;margin-bottom:0.75rem;">
             <div style="font-size:0.7rem;font-weight:700;color:#065f46;text-transform:uppercase;
-                        letter-spacing:0.6px;margin-bottom:0.35rem;">🔬 Lab Result Received</div>
+                        letter-spacing:0.6px;margin-bottom:0.35rem;"> Lab Result Received</div>
             <div id="consult-lab-result-content" style="font-size:0.82rem;color:#1a1a2e;"></div>
           </div>
 
@@ -2727,7 +2727,7 @@
           <div id="diagnosis-lock"
                style="background:#F0EFEB;border-radius:8px;padding:1.1rem;
                       text-align:center;border:1px dashed #D1D5DB;">
-            <div style="font-size:1.3rem;margin-bottom:0.35rem;">🔒</div>
+            <div style="margin-bottom:0.35rem;"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></div>
             <div style="font-size:0.82rem;color:#6B7280;font-weight:600;line-height:1.5;">
               Send a lab request or click<br>"Skip — No Lab Needed" to unlock.
             </div>
@@ -2840,13 +2840,13 @@
             <div id="rx-external-note"
                  style="display:none;margin-top:0.5rem;font-size:0.78rem;color:#92400e;
                         background:#fffbeb;border-radius:6px;padding:0.4rem 0.7rem;">
-              ⚠ Prescription will be printed for the patient to take to an external pharmacy.
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg> Prescription will be printed for the patient to take to an external pharmacy.
             </div>
           </div>
 
           <button class="btn btn-primary" id="cons-save-btn" onclick="saveConsultation()"
                   style="width:100%;margin-bottom:0.5rem;">
-            ✅ Save Consultation & Send Prescription
+             Save Consultation & Send Prescription
           </button>
           <button class="btn btn-sm" onclick="showPage('doctor')"
                   style="width:100%;">Cancel</button>
@@ -2875,12 +2875,12 @@
         <div class="stat-sub">prescriptions to fill</div>
       </div>
       <div class="stat-card">
-        <div class="stat-card-top"><span class="stat-label">Dispensed Today</span><div class="stat-icon" style="background:#f0fdf4;">✅</div></div>
+        <div class="stat-card-top"><span class="stat-label">Dispensed Today</span><div class="stat-icon" style="background:#f0fdf4;"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg></div></div>
         <div class="stat-num" id="dph-dispensed">—</div>
         <div class="stat-sub">prescriptions filled</div>
       </div>
       <div class="stat-card">
-        <div class="stat-card-top"><span class="stat-label">Total Today</span><div class="stat-icon" style="background:#eff6ff;">📋</div></div>
+        <div class="stat-card-top"><span class="stat-label">Total Today</span><div class="stat-icon" style="background:#eff6ff;"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/></svg></div></div>
         <div class="stat-num" id="dph-total">—</div>
         <div class="stat-sub">prescriptions received</div>
       </div>
@@ -2919,7 +2919,7 @@
       <div id="rx-detail-body"></div>
       <div class="ma">
         <button class="btn btn-sm" onclick="cm('m-rx-detail')">Close</button>
-        <button class="btn btn-primary" id="rx-dispense-btn" onclick="dispenseRx()">✅ Mark as Dispensed</button>
+        <button class="btn btn-primary" id="rx-dispense-btn" onclick="dispenseRx()"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>&nbsp;Mark as Dispensed</button>
       </div>
     </div>
   </div>
@@ -3227,7 +3227,7 @@ async function doSignup(){
     const dept = document.getElementById('s-dept')?.value || null;
     if(role==='Staff' && !dept){showEl('signup-err','Please select your department.');return;}
     await authPost('signup',{email,password:pass,data:{org_name:org,org_type:role,department:dept}});
-    showEl('signup-ok','✅ Account created! Check your email to confirm, then sign in.',true);
+    showEl('signup-ok','Account created! Check your email to confirm, then sign in.',true);
     document.getElementById('signup-ok').style.display='block';
     ['s-org','s-email','s-pass'].forEach(id=>document.getElementById(id).value='');
     document.getElementById('s-role').value='';
@@ -3766,7 +3766,7 @@ async function bulkDeleteDrugs(){
     for(const id of invSelected){
       await db(`inventory?id=eq.${id}`,'DELETE');
     }
-    toast(`✅ Deleted ${invSelected.size} drug(s).`);
+    toast(`Deleted ${invSelected.size} drug(s).`);
     invSelected.clear(); updateBulkBar();
     loadDrugs();
   }catch(e){toast('Error: '+e.message,'err');}
@@ -3823,7 +3823,7 @@ async function saveDrug(){
   try{
     if(id) await db(`inventory?id=eq.${id}`,'PATCH',payload);
     else await db('inventory','POST',payload);
-    toast(id?'✅ Drug updated!':'✅ Drug added!');
+    toast(id?'Drug updated!':'Drug added!');
     cm('m-drug'); loadDrugs();
   }catch(e){toast('Error: '+e.message,'err');}
 }
@@ -3845,7 +3845,7 @@ function openDrugDetail(id){
         ['Buying Price', d.buying_price?'UGX '+Number(d.buying_price).toLocaleString():'—'],
         ['Selling Price', d.price?'UGX '+Number(d.price).toLocaleString():'—'],
         ['Stock Value', val>0?'UGX '+val.toLocaleString():'—'],
-        ['Expiry', d.expiry_date?(new Date(d.expiry_date).toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'}))+(isExpired?' ⚠️ Expired':''):'—'],
+        ['Expiry', d.expiry_date?(new Date(d.expiry_date).toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'}))+(isExpired?' (Expired)':''):'—'],
         ['Batch Number', d.batch_number||'—'],
         ['Supplier', d.supplier||'—'],
       ].map(([k,v])=>`
@@ -3997,7 +3997,7 @@ function addToBasket(){
   document.getElementById('pos-no-stock-warn').style.display='none';
   currentPosItem=null;
   document.getElementById('pos-drug-input').focus();
-  toast('✅ Added to sale');
+  toast('Added to sale');
 }
 
 function removeFromBasket(idx){ basket.splice(idx,1); renderBasket(); }
@@ -4016,7 +4016,7 @@ function renderBasket(){
         <div class="pos-basket-item-meta">${item.qty} ${item.unit} × UGX ${Number(item.unit_price).toLocaleString()}</div>
       </div>
       <div class="pos-basket-item-price">UGX ${Number(item.line_total).toLocaleString()}</div>
-      <button class="pos-basket-item-del" onclick="removeFromBasket(${i})">✕</button>
+      <button class="pos-basket-item-del" onclick="removeFromBasket(${i})"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
     </div>`).join('');
   recalcBasket();
 }
@@ -4090,7 +4090,7 @@ async function saveBasket(){
       });
     }
     track('sale_saved',{drug_count:basket.length,grand_total:grandTotal,payment_method:payment});
-    toast(`✅ Sale saved — UGX ${grandTotal.toLocaleString()}`);
+    toast(`Sale saved — UGX ${grandTotal.toLocaleString()}`);
     lastReceipt={sessionId,basket:[...basket],customer,payment,notes,subtotal,discAmt,grandTotal,time:new Date()};
     showReceipt(lastReceipt);
     clearBasket();
@@ -4506,7 +4506,7 @@ async function addClinicPatient() {
 
     patientRow.fhir_r5 = buildFHIRPatient(patientRow);
     await db('patients', 'POST', patientRow);
-    toast('✅ Patient registered!');
+    toast('Patient registered!');
     ['cp-name','cp-age','cp-phone','cp-cond','cp-notes','cp-bp','cp-temp','cp-weight','cp-pulse'].forEach(id => {
       const el = document.getElementById(id); if(el) el.value='';
     });
@@ -4754,7 +4754,7 @@ function renderSelectedTests() {
       `<span style="background:#0B1F3A;color:white;padding:0.2rem 0.65rem;border-radius:100px;
                     font-size:0.75rem;font-weight:600;display:inline-flex;align-items:center;gap:0.3rem;">
         ${t}
-        <span onclick="toggleTest('${t}')" style="cursor:pointer;opacity:0.6;font-size:0.8rem;">✕</span>
+        <span onclick="toggleTest('${t}')" style="cursor:pointer;opacity:0.6;font-size:0.8rem;"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></span>
       </span>`
     ).join('');
 }
@@ -4946,7 +4946,7 @@ function renderClinicRequests(arr) {
                 onclick="openEnterResult('${r.id}')">Enter Result</button>
         ${r.status === 'Result Ready'
           ? `<button class="btn btn-sm" style="background:#0B1F3A;color:white;border-color:#0B1F3A;"
-                     onclick="openDispatch('${r.id}','${(r.patient_name||'').replace(/'/g,"\\'")}','${tests.replace(/'/g,"\\'")}')">📤 Dispatch</button>`
+                     onclick="openDispatch('${r.id}','${(r.patient_name||'').replace(/'/g,"\\'")}','${tests.replace(/'/g,"\\'")}')"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>&nbsp;Dispatch</button>`
           : ''}
       </td>
     </tr>`;
@@ -5001,7 +5001,7 @@ function renderClinicRequests(arr) {
                 onclick="openEnterResult('${r.id}')">Enter Result</button>
         ${r.status === 'Result Ready'
           ? `<button class="btn btn-sm" style="background:#0B1F3A;color:white;border-color:#0B1F3A;"
-                     onclick="openDispatch('${r.id}','${(r.patient_name||'').replace(/'/g,"\\'")}','${tests.replace(/'/g,"\\'")}')">📤 Dispatch</button>`
+                     onclick="openDispatch('${r.id}','${(r.patient_name||'').replace(/'/g,"\\'")}','${tests.replace(/'/g,"\\'")}')"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>&nbsp;Dispatch</button>`
           : ''}
       </td>
     </tr>`;
@@ -5042,7 +5042,7 @@ async function addTestRequest() {
       org_id:            user.id
     });
 
-    toast('✅ Test request submitted!');
+    toast('Test request submitted!');
     ['lr-patient','lr-age','lr-phone','lr-requester','lr-notes','lr-test-custom']
       .forEach(id => { const el = document.getElementById(id); if(el) el.value = ''; });
     document.getElementById('lr-gender').value   = '';
@@ -5093,7 +5093,7 @@ function renderDispatched(arr) {
       <td>${priorityBadge(r.priority)}</td>
       <td style="font-size:0.78rem;">
         ${isClinic
-          ? '<span style="background:#eff6ff;color:#1d4ed8;border-radius:100px;padding:0.15rem 0.55rem;font-size:0.72rem;font-weight:700;">🏥 Clinic</span>'
+          ? '<span style="background:#eff6ff;color:#1d4ed8;border-radius:100px;padding:0.15rem 0.55rem;font-size:0.72rem;font-weight:700;"><svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>&nbsp;Clinic</span>'
           : (r.requesting_doctor||'Walk-in')}
       </td>
       <td style="font-size:0.78rem;color:#9AA3AE;">${r.dispatched_at ? fmtDate(r.dispatched_at) : fmtDate(r.created_at)}</td>
@@ -5148,7 +5148,7 @@ async function saveTestStatus() {
   if (status === 'Dispatched')   extra.dispatched_at   = new Date().toISOString();
   try {
     await db(`test_requests?id=eq.${id}`,'PATCH', {status, ...extra});
-    toast('✅ Status updated!');
+    toast('Status updated!');
     cm('m-update-status');
     loadWorklist();
   } catch(e) { toast('Error: '+e.message,'err'); }
@@ -5170,7 +5170,7 @@ async function openEnterResult(requestId) {
     `<strong>${req.patient_name}</strong>
      ${req.patient_age  ? `<span style="color:#9AA3AE;font-size:0.8rem;"> · ${req.patient_age}y</span>` : ''}
      ${req.patient_gender ? `<span style="color:#9AA3AE;font-size:0.8rem;"> · ${req.patient_gender}</span>` : ''}
-     ${isClinic ? `<span style="background:#eff6ff;color:#1d4ed8;border-radius:100px;padding:0.1rem 0.5rem;font-size:0.72rem;font-weight:700;margin-left:0.4rem;">🏥 Clinic</span>` : ''}
+     ${isClinic ? `<span style="background:#eff6ff;color:#1d4ed8;border-radius:100px;padding:0.1rem 0.5rem;font-size:0.72rem;font-weight:700;margin-left:0.4rem;"><svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>&nbsp;Clinic</span>` : ''}
      <br/>
      <span style="color:#9AA3AE;font-size:0.8rem;">Tests: ${testList.join(', ')}</span>
      ${req.requesting_doctor ? `<br/><span style="color:#9AA3AE;font-size:0.78rem;">Requested by: ${req.requesting_doctor}</span>` : ''}
@@ -5340,7 +5340,7 @@ async function saveResult() {
       sample_type:     sampleType   // saves back to request so dispatch has the info
     });
 
-    toast(`✅ ${resultRows.length} result${resultRows.length>1?'s':''} saved — status → Result Ready`);
+    toast(`${resultRows.length} result${resultRows.length>1?'s':''} saved — marked Ready`);
     cm('m-enter-result');
 
     currentResultReport = { req: {...req, sample_type: sampleType}, resultRows, techNotes, savedAt: new Date() };
@@ -5418,7 +5418,7 @@ function viewResult(id) {
       ${req?.clinical_notes
         ? `<div style="margin-top:0.5rem;font-size:0.8rem;color:#555;background:white;
                        border-radius:6px;padding:0.4rem 0.6rem;border:1px solid #E8E6E1;">
-             📋 ${req.clinical_notes}</div>` : ''}
+             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>&nbsp;${req.clinical_notes}</div>` : ''}
     </div>
 
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.6rem;margin-bottom:1rem;">
@@ -5510,7 +5510,7 @@ async function confirmDispatch() {
       status:        'Dispatched',
       dispatched_at: new Date().toISOString()
     });
-    toast('📤 Results dispatched to the doctor.');
+    toast('Results dispatched to the doctor.');
     cm('m-dispatch-confirm');
     cm('m-result-detail');
     await loadWorklist();
@@ -5646,7 +5646,7 @@ async function addHospPatient(){
   if(!name){toast('Patient name required.','err');return;}
   try{
     await db('patients','POST',{name,age:document.getElementById('hp-age').value||null,gender:document.getElementById('hp-gender').value||null,phone:document.getElementById('hp-phone').value.trim()||null,condition:document.getElementById('hp-cond').value.trim()||null,notes:document.getElementById('hp-notes').value.trim()||null,org_id:user.id});
-    toast('✅ Patient registered!');
+    toast('Patient registered!');
     ['hp-name','hp-age','hp-phone','hp-cond','hp-notes'].forEach(id=>document.getElementById(id).value='');
     document.getElementById('hp-gender').value='';loadHoPts();
   }catch(e){toast('Error: '+e.message,'err');}
@@ -5679,7 +5679,7 @@ async function addHospDrug(){
   if(!name||isNaN(qty)){toast('Name and quantity required.','err');return;}
   try{
     await db('inventory','POST',{drug_name:name,quantity:qty,unit:document.getElementById('hi-unit').value,expiry_date:document.getElementById('hi-exp').value||null,supplier:document.getElementById('hi-sup').value.trim()||null,org_id:user.id});
-    toast('✅ Item added!');
+    toast('Item added!');
     ['hi-name','hi-qty','hi-exp','hi-sup'].forEach(id=>document.getElementById(id).value='');
     loadHoDrugs();
   }catch(e){toast('Error: '+e.message,'err');}
@@ -5713,7 +5713,7 @@ async function saveQty(){
   if(isNaN(qty)){toast('Enter a valid quantity.','err');return;}
   try{
     await db(`${table}?id=eq.${id}`,'PATCH',{quantity:qty});
-    toast('✅ Updated!');cm('m-drug-edit');
+    toast('Updated!');cm('m-drug-edit');
     if(table==='inventory'){if(orgRole==='hospital')loadHoDrugs();else loadDrugs();}
   }catch(e){toast('Error: '+e.message,'err');}
 }
@@ -5782,7 +5782,7 @@ async function registerAndQueue(){
       status:    'Waiting',
       org_id:    user.id
     });
-    toast('✅ Patient registered and added to queue!');
+    toast('Patient registered and added to queue!');
     ['rec-name','rec-age','rec-phone','rec-complaint'].forEach(id => {
       const el = document.getElementById(id); if(el) el.value='';
     });
@@ -5810,7 +5810,7 @@ function renderQueueTable(arr, bodyId, view){
                  onclick="startConsult('${p.id}')">Consult</button>` :
        view==='doctor' && p.status==='Results Received' ?
         `<button class="btn btn-primary" style="font-size:0.75rem;padding:0.35rem 0.8rem;background:#059669;border-color:#059669;"
-                 onclick="resumeConsult('${p.id}')">🔬 View Results</button>` :
+                 onclick="resumeConsult('${p.id}')"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;"><path d="M6 18h8"/><path d="M3 22h18"/><path d="M14 22a7 7 0 1 0 0-14h-1"/><path d="M9 14h2"/><path d="M9 12a2 2 0 0 1-2-2V6l3-3 3 3v4a2 2 0 0 1-2 2z"/></svg>&nbsp;View Results</button>` :
        view==='doctor' && p.status==='In Consult' ?
         `<button class="btn btn-sm" onclick="resumeConsult('${p.id}')">Resume</button>` :
         `<button class="btn btn-sm" onclick="markQueueStatus('${p.id}','${p.status==='Waiting'?'Seen':'Waiting'}')">${p.status==='Waiting'?'Mark Seen':'Reset'}</button>`
@@ -5901,7 +5901,7 @@ function startConsult(patientId){
   const diagLock = document.getElementById('diagnosis-lock');
   const diagForm = document.getElementById('diagnosis-form');
   if (labForm) labForm.style.display = 'block';
-  if (labSent) { labSent.style.display = 'none'; labSent.textContent = '✓ Sent — awaiting results'; }
+  if (labSent) { labSent.style.display = 'none'; labSent.textContent = 'Sent — awaiting results'; }
   if (labResultArea) labResultArea.style.display = 'none';
   if (labResultBadge) labResultBadge.style.display = 'none';
   if (diagLock) diagLock.style.display = 'block';
@@ -5987,7 +5987,7 @@ async function resumeConsult(patientId) {
       // Show lab as sent + results inline
       document.getElementById('consult-lab-form').style.display = 'none';
       const sent = document.getElementById('consult-lab-sent');
-      if (sent) { sent.style.display = 'inline-flex'; sent.textContent = '✓ Results received'; sent.style.background = '#d1fae5'; sent.style.color = '#065f46'; }
+      if (sent) { sent.style.display = 'inline-flex'; sent.textContent = 'Results received'; sent.style.background = '#d1fae5'; sent.style.color = '#065f46'; }
       const area = document.getElementById('consult-lab-result-area');
       const contentEl = document.getElementById('consult-lab-result-content');
       if (area) area.style.display = 'block';
@@ -6031,7 +6031,7 @@ function addRxItem(){
     document.getElementById(id).value='';
   });
   renderRxItems();
-  toast(`✅ ${drug} added to prescription.`);
+  toast(`${drug} added to prescription.`);
 }
 
 function removeRxItem(i){
@@ -6053,7 +6053,7 @@ function renderRxItems(){
         </div>
       </div>
       <button onclick="removeRxItem(${i})"
-              style="background:none;border:none;color:#dc2626;cursor:pointer;font-size:0.9rem;">✕</button>
+              style="background:none;border:none;color:#dc2626;cursor:pointer;font-size:0.9rem;"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
     </div>`).join('');
 }
 
@@ -6098,7 +6098,7 @@ function renderConsultSelectedTests() {
                   display:inline-flex;align-items:center;gap:0.3rem;">
       ${t}
       <span onclick="toggleConsultTest('${t}')"
-            style="cursor:pointer;opacity:0.6;">✕</span>
+            style="cursor:pointer;opacity:0.6;"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></span>
     </span>`
   ).join('');
 }
@@ -6123,11 +6123,11 @@ async function sendConsultLabRequest() {
     // Hide the form, show "sent" badge
     document.getElementById('consult-lab-form').style.display = 'none';
     const sent = document.getElementById('consult-lab-sent');
-    if (sent) { sent.style.display = 'inline-flex'; sent.textContent = '✓ Sent — awaiting results'; sent.style.background = '#d1fae5'; sent.style.color = '#065f46'; }
+    if (sent) { sent.style.display = 'inline-flex'; sent.textContent = 'Sent — awaiting results'; sent.style.background = '#d1fae5'; sent.style.color = '#065f46'; }
     consultSelectedTests = [];
     renderConsultSelectedTests();
     buildConsultTestPicker();
-    toast('✅ Lab request sent — diagnosis unlocks when results are back.');
+    toast('Lab request sent — diagnosis unlocks when results are back.');
     // Start polling for results
     startLabResultPolling(currentConsultId);
   } catch(e) { toast('Error: ' + e.message, 'err'); }
@@ -6172,7 +6172,7 @@ function startLabResultPolling(queuePatientId) {
       const badge = document.getElementById('consult-lab-result-badge');
       if (badge) badge.style.display = 'inline-flex';
       unlockDiagnosis();
-      toast('🔬 Lab results are back — diagnosis unlocked.');
+      toast('Lab results are back — diagnosis unlocked.');
     } catch(e) { /* keep polling silently */ }
   }, 20000);
 }
@@ -6188,7 +6188,7 @@ function skipLabStep() {
   if (_labPollInterval) clearInterval(_labPollInterval);
   document.getElementById('consult-lab-form').style.display = 'none';
   const sent = document.getElementById('consult-lab-sent');
-  if (sent) { sent.style.display = 'inline-flex'; sent.textContent = '✓ No lab needed'; sent.style.background = '#F0EFEB'; sent.style.color = '#4A5568'; }
+  if (sent) { sent.style.display = 'inline-flex'; sent.textContent = 'No lab needed'; sent.style.background = '#F0EFEB'; sent.style.color = '#4A5568'; }
   unlockDiagnosis();
 }
 
@@ -6247,7 +6247,7 @@ async function saveConsultation(){
     // 3. Mark queue patient as Seen
     await db(`queue_patients?id=eq.${currentConsultId}`,'PATCH',{status:'Seen'});
 
-    toast('✅ Consultation saved!' + (rxItems.length ? ' Prescription sent to pharmacy.' : ''));
+    toast('Consultation saved!' + (rxItems.length ? ' Prescription sent to pharmacy.' : ''));
     currentConsultId = null;
     rxItems = [];
     if (_labPollInterval) clearInterval(_labPollInterval);
@@ -6371,7 +6371,7 @@ async function dispenseRx(){
       dispensed_by: user?.email,
       dispensed_at: new Date().toISOString()
     });
-    toast('✅ Prescription dispensed!');
+    toast('Prescription dispensed!');
     cm('m-rx-detail');
     loadDeptPharmacy();
   } catch(e){ toast('Error: '+e.message,'err'); }
@@ -6385,7 +6385,7 @@ async function quickDispense(id){
       dispensed_by: user?.email,
       dispensed_at: new Date().toISOString()
     });
-    toast('✅ Dispensed!');
+    toast('Dispensed!');
     loadDeptPharmacy();
   } catch(e){ toast('Error: '+e.message,'err'); }
 }
