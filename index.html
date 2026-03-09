@@ -2603,10 +2603,11 @@
       background:linear-gradient(135deg,#0B1F3A,#1a3a5c);
       border-radius:14px; padding:1rem 1.4rem; margin-bottom:1.2rem;
       display:flex; align-items:center; gap:1rem; flex-wrap:wrap;">
-      <div style="width:40px;height:40px;border-radius:50%;
-                  background:rgba(255,255,255,0.1);
+      <div id="consult-patient-avatar" style="width:40px;height:40px;border-radius:50%;
+                  background:rgba(255,255,255,0.15);
                   display:flex;align-items:center;justify-content:center;
-                  font-size:1.2rem;flex-shrink:0;">🧑‍⚕️</div>
+                  font-size:0.85rem;font-weight:700;color:white;
+                  flex-shrink:0;letter-spacing:0.5px;"></div>
       <div>
         <div style="font-weight:700;font-size:1rem;color:white;" id="consult-patient-name">—</div>
         <div style="font-size:0.8rem;color:rgba(255,255,255,0.6);" id="consult-patient-meta">—</div>
@@ -2614,7 +2615,7 @@
       <div id="consult-lab-result-badge"
            style="display:none;background:#d1fae5;color:#065f46;border-radius:8px;
                   padding:0.3rem 0.8rem;font-size:0.75rem;font-weight:700;margin-left:0.5rem;">
-        🔬 Lab Result Available
+         Lab Result Available
       </div>
       <div style="margin-left:auto;">
         <button class="btn btn-sm" onclick="showPage('doctor')"
@@ -5872,6 +5873,11 @@ async function loadDoctorQueue(){
   } catch(e){ console.error(e); }
 }
 
+function getInitials(name) {
+  return (name || '—').trim().split(/\s+/)
+    .slice(0, 2).map(w => w[0].toUpperCase()).join('');
+}
+
 async function loadDoctorConsult(){
   // placeholder — startConsult() sets the active patient and calls this
 }
@@ -5903,6 +5909,7 @@ function startConsult(patientId){
 
   // populate banner
   document.getElementById('consult-patient-name').textContent = p.name;
+  document.getElementById('consult-patient-avatar').textContent = getInitials(p.name);
   document.getElementById('consult-patient-meta').textContent =
     [p.age ? p.age+'y' : null, p.gender, 'Complaint: '+p.complaint].filter(Boolean).join(' · ');
 
@@ -5943,6 +5950,7 @@ async function resumeConsult(patientId) {
 
   // Populate banner
   document.getElementById('consult-patient-name').textContent = p.name;
+  document.getElementById('consult-patient-avatar').textContent = getInitials(p.name);
   document.getElementById('consult-patient-meta').textContent =
     [p.age ? p.age+'y' : null, p.gender, 'Complaint: '+p.complaint].filter(Boolean).join(' · ');
 
