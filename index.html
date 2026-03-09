@@ -5511,7 +5511,8 @@ async function confirmDispatch() {
     });
     toast('📤 Results dispatched to the doctor.');
     cm('m-dispatch-confirm');
-    loadWorklist();
+    cm('m-result-detail');
+    await loadWorklist();
   } catch(e) { toast('Error: ' + e.message, 'err'); }
 }
 
