@@ -2972,7 +2972,7 @@ function toast(msg,type='ok'){
   setTimeout(()=>t.classList.remove('on'),3500);
 }
 
-function cm(id){document.getElementById(id).classList.remove('open');}
+function cm(id){document.getElementById(id)?.classList.remove('open');}
 
 function showEl(id,msg,cls){
   const e=document.getElementById(id);
