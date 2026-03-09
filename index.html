@@ -2080,7 +2080,7 @@
         <div style="display:flex;align-items:center;justify-content:space-between;
                     margin-bottom:0.9rem;">
           <h2 style="color:#1e3a8a;margin:0;padding:0;border:none;font-size:0.83rem;">
-            🏥 Clinic Requests
+             Clinic Requests
           </h2>
           <span style="font-size:0.75rem;color:#6B7280;">Sent by the doctor</span>
         </div>
@@ -2361,7 +2361,7 @@
     </p>
     <div class="ma">
       <button class="btn btn-sm" onclick="cm('m-dispatch-confirm')">Cancel</button>
-      <button class="btn btn-primary" onclick="confirmDispatch()">📤 Confirm Dispatch</button>
+      <button class="btn btn-primary" onclick="confirmDispatch()"></button> Confirm Dispatch</button>
     </div>
   </div>
 </div>
@@ -2372,7 +2372,7 @@
       <div id="result-report-body"></div>
       <div class="ma" style="margin-top:1rem;">
         <button class="btn btn-sm" onclick="cm('m-result-report')">Close</button>
-        <button class="btn btn-primary" onclick="doPrintResultReport()">🖨 Print / Save PDF</button>
+        <button class="btn btn-primary" onclick="doPrintResultReport()">Print / Save PDF</button>
       </div>
     </div>
   </div>
@@ -5241,6 +5241,28 @@ function openEnterResult(requestId) {
   }).join('');
 
   document.getElementById('er-notes').value = '';
+
+  // Pre-fill any already-saved results so the tech doesn't re-enter them
+  try {
+    const saved = await db(`test_results?request_id=eq.${requestId}&order=created_at.asc`);
+    if (saved.length) {
+      saved.forEach((row, i) => {
+        const valEl     = document.getElementById(`er-val-${i}`);
+        const unitEl    = document.getElementById(`er-unit-${i}`);
+        const refEl     = document.getElementById(`er-ref-${i}`);
+        const flagEl    = document.getElementById(`er-flag-${i}`);
+        const commentEl = document.getElementById(`er-comment-${i}`);
+        if (valEl)     valEl.value     = row.result_value     || '';
+        if (unitEl)    unitEl.value    = row.result_unit      || '';
+        if (refEl)     refEl.value     = row.reference_range  || '';
+        if (flagEl)    flagEl.value    = row.flag             || 'Normal';
+        if (commentEl) commentEl.value = row.comment          || '';
+      });
+      if (saved[0]?.tech_notes)
+        document.getElementById('er-notes').value = saved[0].tech_notes;
+    }
+  } catch(_) { /* silently skip — form stays empty if fetch fails */ }
+
   document.getElementById('m-enter-result').classList.add('open');
 }
 
