@@ -5805,7 +5805,13 @@ function renderQueueTable(arr, bodyId, view){
     <td>${queueStatusBadge(p.status)}</td>
     <td class="td-actions">
       ${view==='doctor' && p.status==='Waiting' ?
-        `<button class="btn btn-primary" style="font-size:0.75rem;padding:0.35rem 0.8rem;" onclick="startConsult('${p.id}')">Consult</button>` :
+        `<button class="btn btn-primary" style="font-size:0.75rem;padding:0.35rem 0.8rem;"
+                 onclick="startConsult('${p.id}')">Consult</button>` :
+       view==='doctor' && p.status==='Results Received' ?
+        `<button class="btn btn-primary" style="font-size:0.75rem;padding:0.35rem 0.8rem;background:#059669;border-color:#059669;"
+                 onclick="resumeConsult('${p.id}')">🔬 View Results</button>` :
+       view==='doctor' && p.status==='In Consult' ?
+        `<button class="btn btn-sm" onclick="resumeConsult('${p.id}')">Resume</button>` :
         `<button class="btn btn-sm" onclick="markQueueStatus('${p.id}','${p.status==='Waiting'?'Seen':'Waiting'}')">${p.status==='Waiting'?'Mark Seen':'Reset'}</button>`
       }
     </td>
