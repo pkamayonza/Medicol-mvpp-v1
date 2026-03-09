@@ -5820,9 +5820,10 @@ function renderQueueTable(arr, bodyId, view){
 
 function queueStatusBadge(s){
   const map = {
-    'Waiting':    'background:#fffbeb;color:#d97706;',
-    'In Consult': 'background:#eff6ff;color:#1d4ed8;',
-    'Seen':       'background:#f0fdf4;color:#059669;',
+    'Waiting':          'background:#fffbeb;color:#d97706;',
+    'In Consult':       'background:#eff6ff;color:#1d4ed8;',
+    'Results Received': 'background:#d1fae5;color:#065f46;',
+    'Seen':             'background:#f0fdf4;color:#059669;',
   };
   return `<span class="badge" style="${map[s]||map['Waiting']}">${s||'Waiting'}</span>`;
 }
