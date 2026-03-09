@@ -5930,6 +5930,83 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 });
 
+async function resumeConsult(patientId) {
+  if (typeof _labPollInterval !== 'undefined' && _labPollInterval) clearInterval(_labPollInterval);
+  const p = queuePatients.find(x => x.id === patientId);
+  if (!p) return;
+  currentConsultId = patientId;
+  rxItems = [];
+  renderRxItems();
+  consultSelectedTests = [];
+  renderConsultSelectedTests();
+  buildConsultTestPicker();
+
+  // Populate banner
+  document.getElementById('consult-patient-name').textContent = p.name;
+  document.getElementById('consult-patient-meta').textContent =
+    [p.age ? p.age+'y' : null, p.gender, 'Complaint: '+p.complaint].filter(Boolean).join(' · ');
+
+  // Clear form fields
+  ['cons-bp','cons-temp','cons-weight','cons-pulse','cons-diagnosis','cons-notes','cons-referral',
+   'rx-drug','rx-dose','rx-duration','rx-instructions'].forEach(id => {
+    const el = document.getElementById(id); if(el) el.value='';
+  });
+  document.getElementById('cons-status').value = 'Active';
+  const rg = document.getElementById('cons-referral-group');
+  if(rg) rg.style.display = 'none';
+
+  // Try to load existing lab results for this patient
+  try {
+    const reqs = await db(`test_requests?queue_patient_id=eq.${patientId}&order=created_at.desc`);
+    const done = reqs.find(r => r.status === 'Dispatched' || r.status === 'Result Ready');
+
+    if (done) {
+      const results = await db(`test_results?request_id=eq.${done.id}&order=created_at.asc`);
+      const flagColor = { 'Normal':'d1fae5/065f46','High':'fee2e2/991b1b','Low':'fffbeb/92400e','Positive':'fee2e2/991b1b','Negative':'d1fae5/065f46','Inconclusive':'F0EFEB/4A5568' };
+      const summary = results.length ? results.map(r => {
+        const fc = (flagColor[r.flag] || 'F0EFEB/4A5568').split('/');
+        return `<div style="display:flex;justify-content:space-between;align-items:center;
+                            padding:0.3rem 0;border-bottom:1px solid #d1fae5;">
+          <span style="font-weight:600;">${r.tests_ordered||'—'}</span>
+          <span style="display:flex;gap:0.4rem;align-items:center;">
+            ${r.result_value||'—'}${r.result_unit?' '+r.result_unit:''}
+            ${r.flag ? `<span style="font-size:0.7rem;font-weight:700;padding:0.1rem 0.4rem;
+                              border-radius:100px;background:#${fc[0]};color:#${fc[1]};">${r.flag}</span>` : ''}
+          </span>
+        </div>`;
+      }).join('') : '<span style="color:#6B7280;font-size:0.82rem;">Results recorded — check Lab tab for full report.</span>';
+
+      // Show lab as sent + results inline
+      document.getElementById('consult-lab-form').style.display = 'none';
+      const sent = document.getElementById('consult-lab-sent');
+      if (sent) { sent.style.display = 'inline-flex'; sent.textContent = '✓ Results received'; sent.style.background = '#d1fae5'; sent.style.color = '#065f46'; }
+      const area = document.getElementById('consult-lab-result-area');
+      const contentEl = document.getElementById('consult-lab-result-content');
+      if (area) area.style.display = 'block';
+      if (contentEl) contentEl.innerHTML = summary;
+      const badge = document.getElementById('consult-lab-result-badge');
+      if (badge) badge.style.display = 'inline-flex';
+
+      // Unlock diagnosis immediately
+      unlockDiagnosis();
+    } else {
+      // No results yet — reset to fresh state
+      document.getElementById('consult-lab-form').style.display = 'block';
+      const labSent = document.getElementById('consult-lab-sent');
+      if (labSent) labSent.style.display = 'none';
+      document.getElementById('consult-lab-result-area').style.display = 'none';
+      document.getElementById('consult-lab-result-badge').style.display = 'none';
+      document.getElementById('diagnosis-lock').style.display = 'block';
+      document.getElementById('diagnosis-form').style.display = 'none';
+    }
+  } catch(e) {
+    console.error('resumeConsult fetch error:', e);
+  }
+
+  db(`queue_patients?id=eq.${patientId}`, 'PATCH', { status: 'In Consult' }).catch(()=>{});
+  showPage('doctor-consult');
+}
+
 // ── PRESCRIPTION BUILDER ──────────────────────────────
 
 function addRxItem(){
@@ -6061,7 +6138,7 @@ function startLabResultPolling(queuePatientId) {
       if (!ready) return;
       // Mark the queue patient as Results Received so the doctor's queue updates
       await db(`queue_patients?id=eq.${queuePatientId}`, 'PATCH', { status: 'Results Received' }).catch(()=>{});
-      
+
       clearInterval(_labPollInterval);
       const results = await db(`test_results?request_id=eq.${ready.id}&order=created_at.asc`);
       let summary = '';
