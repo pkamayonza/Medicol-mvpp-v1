@@ -5488,7 +5488,7 @@ function openDispatch(requestId, patientName, tests) {
   document.getElementById('dispatch-info').innerHTML =
     `<strong>${patientName}</strong><br/>
      <span style="font-size:0.8rem;color:#9AA3AE;">${tests}</span>`;
-  cm('m-result-detail'); // close detail modal if open
+  cm('m-enter-result'); // close enter result modal if open
   document.getElementById('m-dispatch-confirm').classList.add('open');
 }
 
