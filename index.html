@@ -2361,7 +2361,7 @@
     </p>
     <div class="ma">
       <button class="btn btn-sm" onclick="cm('m-dispatch-confirm')">Cancel</button>
-      <button class="btn btn-primary" onclick="confirmDispatch()"></button> Confirm Dispatch</button>
+      <button class="btn btn-primary" onclick="confirmDispatch()">📤 Confirm Dispatch</button>
     </div>
   </div>
 </div>
@@ -5156,7 +5156,7 @@ async function saveTestStatus() {
 // ── currentResultReport: holds data for the printable report ──
 let currentResultReport = null;
 
-function openEnterResult(requestId) {
+async function openEnterResult(requestId) {
   const req = testRequests.find(r => r.id === requestId);
   if (!req) { toast('Request not found.', 'err'); return; }
 
