@@ -5315,6 +5315,9 @@ async function saveResult() {
     (flagSeverity[r.flag]||0) > (flagSeverity[top]||0) ? r.flag : top, 'Normal');
 
   try {
+    // Delete any previously saved rows for this request so we don't stack duplicates
+    await db(`test_results?request_id=eq.${requestId}`, 'DELETE');
+
     for (const row of resultRows) {
       await db('test_results', 'POST', {
         request_id:      requestId,
