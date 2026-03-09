@@ -6057,8 +6057,11 @@ function startLabResultPolling(queuePatientId) {
     if (!currentConsultId) { clearInterval(_labPollInterval); return; }
     try {
       const reqs = await db(`test_requests?queue_patient_id=eq.${queuePatientId}&order=created_at.desc`);
-      const ready = reqs.find(r => r.status === 'Result Ready');
+      const ready = reqs.find(r => r.status === 'Result Ready' || r.status === 'Dispatched');
       if (!ready) return;
+      // Mark the queue patient as Results Received so the doctor's queue updates
+      await db(`queue_patients?id=eq.${queuePatientId}`, 'PATCH', { status: 'Results Received' }).catch(()=>{});
+      
       clearInterval(_labPollInterval);
       const results = await db(`test_results?request_id=eq.${ready.id}&order=created_at.asc`);
       let summary = '';
