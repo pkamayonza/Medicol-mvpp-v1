@@ -6419,6 +6419,21 @@ async function saveConsultation(){
         status:        'Pending',
         org_id:        user.id
       });
+
+      // Stock check — warn doctor if any prescribed drug is out of stock
+      try {
+        const inv = await db('inventory?order=drug_name.asc');
+        const outOfStock = rxItems.filter(item => {
+          const match = inv.find(d =>
+            d.drug_name.toLowerCase().includes(item.drug.toLowerCase()) ||
+            item.drug.toLowerCase().includes(d.drug_name.toLowerCase())
+          );
+          return !match || Number(match.quantity) <= 0;
+        });
+        if (outOfStock.length) {
+          toast(`Stock alert: ${outOfStock.map(x=>x.drug).join(', ')} not available in dispensary.`, 'warn');
+        }
+      } catch(_) {}
     }
 
     // 3. Mark queue patient as Seen
