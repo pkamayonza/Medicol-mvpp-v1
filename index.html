@@ -6528,31 +6528,118 @@ function parseDrugs(raw){
 
 let currentRxId = null;
 
-function openRxDetail(id){
+async function openRxDetail(id){
   const rx = rxQueue.find(x => x.id === id);
   if(!rx) return;
   currentRxId = id;
   const drugs = parseDrugs(rx.drugs);
-  document.getElementById('rx-detail-body').innerHTML = `
-    <div class="dr"><strong>Patient:</strong>${rx.patient_name||'—'}</div>
-    <div class="dr"><strong>Doctor:</strong>${rx.doctor_name||'—'}</div>
-    <div class="dr"><strong>Status:</strong>${rxStatusBadge(rx.status)}</div>
-    ${rx.notes ? `<div style="margin:0.8rem 0;padding:0.75rem 1rem;background:#F0EFEB;border-radius:8px;font-size:0.85rem;border:1px solid #E0DFDB;">${rx.notes}</div>` : ''}
-    <div style="margin-top:1rem;">
-      <div style="font-size:0.65rem;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;color:#9AA3AE;margin-bottom:0.6rem;">Prescribed Drugs</div>
-      ${drugs.map(d => `
-        <div style="background:#F0EFEB;border-radius:8px;padding:0.65rem 0.9rem;margin-bottom:0.5rem;">
-          <div style="font-weight:700;">${d.drug}</div>
-          <div style="font-size:0.8rem;color:#555;margin-top:0.15rem;">
-            ${[d.dose, d.frequency, d.duration].filter(Boolean).join(' · ')}
-          </div>
-          ${d.instructions ? `<div style="font-size:0.78rem;color:#9AA3AE;margin-top:0.1rem;">${d.instructions}</div>` : ''}
-        </div>`).join('')}
-    </div>`;
 
+  // Show modal immediately, then enrich with stock data
+  const renderBody = (drugs, invMap) => {
+    return `
+      <!-- Patient header -->
+      <div style="background:#F8F7F3;border:1px solid #E8E6E1;border-radius:10px;
+                  padding:0.75rem 1rem;margin-bottom:1rem;">
+        <div style="display:flex;align-items:center;justify-content:space-between;">
+          <div>
+            <div style="font-weight:700;color:#0B1F3A;">${rx.patient_name||'—'}</div>
+            <div style="font-size:0.78rem;color:#9AA3AE;margin-top:0.15rem;">
+              Prescribed by ${rx.doctor_name||'—'} ·
+              ${new Date(rx.created_at).toLocaleString('en-GB',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'})}
+            </div>
+          </div>
+          <div>${rxStatusBadge(rx.status)}</div>
+        </div>
+      </div>
+
+      <!-- Drug list with stock status -->
+      <div style="font-size:0.68rem;font-weight:700;text-transform:uppercase;
+                  letter-spacing:0.8px;color:#9AA3AE;margin-bottom:0.6rem;">Prescribed Drugs</div>
+
+      ${drugs.map(d => {
+        const inv = invMap ? invMap[d.drug.toLowerCase()] : null;
+        const qty = inv ? Number(inv.quantity) : null;
+        const stockOk   = qty !== null && qty > 0;
+        const stockOut  = qty !== null && qty <= 0;
+        const unknown   = qty === null;
+
+        const stockChip = unknown
+          ? `<span style="font-size:0.7rem;padding:0.15rem 0.5rem;border-radius:100px;
+                          background:#F0EFEB;color:#9AA3AE;font-weight:600;">Not in inventory</span>`
+          : stockOut
+          ? `<span style="font-size:0.7rem;padding:0.15rem 0.5rem;border-radius:100px;
+                          background:#fee2e2;color:#991b1b;font-weight:600;">Out of stock</span>`
+          : `<span style="font-size:0.7rem;padding:0.15rem 0.5rem;border-radius:100px;
+                          background:#d1fae5;color:#065f46;font-weight:600;">${qty} in stock</span>`;
+
+        return `
+          <div style="border:1px solid ${stockOut?'#fecaca':'#E8E6E1'};border-radius:10px;
+                      padding:0.75rem 0.9rem;margin-bottom:0.5rem;
+                      background:${stockOut?'#fff5f5':'white'};">
+            <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:0.5rem;">
+              <div style="flex:1;">
+                <div style="font-weight:700;color:#0B1F3A;margin-bottom:0.25rem;">${d.drug}</div>
+                <div style="font-size:0.8rem;color:#555;">
+                  ${[d.dose, d.frequency, d.duration].filter(Boolean).join(' · ')}
+                </div>
+                ${d.instructions ? `<div style="font-size:0.75rem;color:#9AA3AE;margin-top:0.1rem;">${d.instructions}</div>` : ''}
+              </div>
+              <div style="flex-shrink:0;margin-top:0.1rem;">${stockChip}</div>
+            </div>
+            ${stockOut ? `
+            <div style="margin-top:0.6rem;padding-top:0.5rem;border-top:1px solid #fecaca;
+                        font-size:0.75rem;color:#991b1b;">
+              This drug is out of stock. Notify the doctor to prescribe an alternative.
+            </div>` : ''}
+          </div>`;
+      }).join('')}
+
+      ${rx.notes ? `
+      <div style="margin-top:0.75rem;background:#F8F7F3;border:1px solid #E8E6E1;
+                  border-radius:10px;padding:0.75rem 0.9rem;">
+        <div style="font-size:0.68rem;font-weight:700;text-transform:uppercase;
+                    letter-spacing:0.8px;color:#9AA3AE;margin-bottom:0.3rem;">Doctor's Notes</div>
+        <div style="font-size:0.85rem;color:#333;line-height:1.6;">${rx.notes}</div>
+      </div>` : ''}`;
+  };
+
+  // Show immediately with loading state
+  document.getElementById('rx-detail-body').innerHTML = renderBody(drugs, null);
   const btn = document.getElementById('rx-dispense-btn');
   if(btn) btn.style.display = rx.status==='Pending' ? 'inline-flex' : 'none';
   document.getElementById('m-rx-detail').classList.add('open');
+
+  // Enrich with live stock data
+  try {
+    const inv = await db('inventory?order=drug_name.asc');
+    const invMap = {};
+    inv.forEach(item => { invMap[item.drug_name.toLowerCase()] = item; });
+
+    // fuzzy match — also index partial names
+    const invMapEnriched = {};
+    drugs.forEach(d => {
+      const key = d.drug.toLowerCase();
+      const match = inv.find(i =>
+        i.drug_name.toLowerCase().includes(key) ||
+        key.includes(i.drug_name.toLowerCase())
+      );
+      invMapEnriched[key] = match || null;
+    });
+
+    document.getElementById('rx-detail-body').innerHTML = renderBody(drugs, invMapEnriched);
+
+    // Hide dispense button if ANY drug is out of stock
+    const hasOutOfStock = drugs.some(d => {
+      const match = invMapEnriched[d.drug.toLowerCase()];
+      return match && Number(match.quantity) <= 0;
+    });
+    if(btn && rx.status === 'Pending') {
+      btn.style.display = 'inline-flex';
+      btn.textContent = hasOutOfStock ? 'Dispense Anyway' : 'Mark as Dispensed';
+      btn.style.background = hasOutOfStock ? '#dc2626' : '';
+      btn.style.borderColor = hasOutOfStock ? '#dc2626' : '';
+    }
+  } catch(_) {}
 }
 
 async function dispenseRx(){
