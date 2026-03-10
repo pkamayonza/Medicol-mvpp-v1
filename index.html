@@ -6730,14 +6730,10 @@ async function quickDispense(id){
       dispensed_at: new Date().toISOString()
     });
     toast('✅ Dispensed!');
-    loadDeptPharmacy();
+  loadDeptPharmacy();
   } catch(e){ toast('Error: '+e.message,'err'); }
 }
-<div class="mo" id="m-patient">
-  <div class="mb">
-    <h3>Patient Record</h3><div class="mo" id="m-patient">
-  <div class="mb">
-    <h3>Patient Record</h3>
+
 // restore session
 (async()=>{
   const stored=localStorage.getItem('mc_s');if(!stored)return;
