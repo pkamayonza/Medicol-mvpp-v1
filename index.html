@@ -6644,13 +6644,33 @@ async function openRxDetail(id){
 
 async function dispenseRx(){
   if(!currentRxId) return;
+  const rx = rxQueue.find(x => x.id === currentRxId);
+  const drugs = parseDrugs(rx?.drugs);
+
   try {
+    // Deduct stock for each drug dispensed
+    if(drugs.length) {
+      const inv = await db('inventory?order=drug_name.asc');
+      for(const d of drugs) {
+        const match = inv.find(i =>
+          i.drug_name.toLowerCase().includes(d.drug.toLowerCase()) ||
+          d.drug.toLowerCase().includes(i.drug_name.toLowerCase())
+        );
+        if(match && Number(match.quantity) > 0) {
+          const qty = Number(d.quantity) || 1;
+          const newQty = Math.max(0, Number(match.quantity) - qty);
+          await db(`inventory?id=eq.${match.id}`, 'PATCH', { quantity: newQty }).catch(()=>{});
+        }
+      }
+    }
+
     await db(`prescriptions?id=eq.${currentRxId}`,'PATCH',{
-      status:'Dispensed',
+      status:       'Dispensed',
       dispensed_by: user?.email,
       dispensed_at: new Date().toISOString()
     });
-    toast('Prescription dispensed!');
+
+    toast('Prescription dispensed and stock updated.');
     cm('m-rx-detail');
     loadDeptPharmacy();
   } catch(e){ toast('Error: '+e.message,'err'); }
