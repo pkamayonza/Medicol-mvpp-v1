@@ -6730,7 +6730,7 @@ async function quickDispense(id){
       dispensed_at: new Date().toISOString()
     });
     toast('✅ Dispensed!');
-  loadDeptPharmacy();
+    loadDeptPharmacy();
   } catch(e){ toast('Error: '+e.message,'err'); }
 }
 
