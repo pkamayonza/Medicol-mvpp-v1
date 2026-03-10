@@ -2998,7 +2998,7 @@
 
 <!-- MODALS -->
 <div class="mo" id="m-patient">
-  <div class="mb">
+  <div class="mb" style="max-width:560px;">
     <h3>Patient Record</h3>
     <div id="m-patient-body"></div>
     <div class="ma"><button class="btn btn-sm" onclick="cm('m-patient')">Close</button></div>
@@ -6578,7 +6578,11 @@ async function quickDispense(id){
     loadDeptPharmacy();
   } catch(e){ toast('Error: '+e.message,'err'); }
 }
-
+<div class="mo" id="m-patient">
+  <div class="mb">
+    <h3>Patient Record</h3><div class="mo" id="m-patient">
+  <div class="mb">
+    <h3>Patient Record</h3>
 // restore session
 (async()=>{
   const stored=localStorage.getItem('mc_s');if(!stored)return;
