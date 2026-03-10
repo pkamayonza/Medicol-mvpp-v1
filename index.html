@@ -1244,16 +1244,16 @@
           <label>What type of organisation are you?</label>
           <div class="role-grid">
             <div class="role-card" onclick="selectRole('Pharmacy',this)">
-              <span class="ri"><svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;"><path d="M10.5 3.5a5 5 0 0 1 7.07 7.07l-7.07 7.07a5 5 0 0 1-7.07-7.07l7.07-7.07z"/><line x1="9" y1="15" x2="15" y2="9"/></svg></span><span class="rn">Pharmacy</span>
+              <span class="ri">💊</span><span class="rn">Pharmacy</span>
             </div>
             <div class="role-card" onclick="selectRole('Clinic',this)">
-              <span class="ri"><svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></span><span class="rn">Clinic</span>
+              <span class="ri">🏥</span><span class="rn">Clinic</span>
             </div>
             <div class="role-card" onclick="selectRole('Hospital',this)">
-              <span class="ri"><svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M12 8v8M8 12h8"/></svg></span><span class="rn">Hospital</span>
+              <span class="ri">🏨</span><span class="rn">Hospital</span>
             </div>
             <div class="role-card" onclick="selectRole('Diagnostic Lab',this)">
-              <span class="ri"><svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;"><path d="M9 3h6l1 7-4 11-4-11z"/><line x1="6.5" y1="10" x2="17.5" y2="10"/></svg></span><span class="rn">Diagnostic Lab</span>
+              <span class="ri">🧪</span><span class="rn">Diagnostic Lab</span>
             </div>
           </div>
           <input type="hidden" id="s-role" value=""/>
@@ -1311,7 +1311,7 @@
 
     <!-- ALERT BAR -->
     <div class="alert-bar" id="low-stock-alert">
-      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg> <span id="low-stock-msg"></span>
+      ⚠️ <span id="low-stock-msg"></span>
       <a onclick="showPage('ph-inventory')">View inventory →</a>
     </div>
 
@@ -1746,7 +1746,7 @@
 
         <!-- Empty state -->
         <div class="pos-basket-empty" id="basket-empty">
-          <div style="opacity:0.2;margin-bottom:0.75rem;"><svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;"><path d="M4 2h16a1 1 0 0 1 1 1v18l-3-2-2 2-2-2-2 2-2-2-3 2V3a1 1 0 0 1 1-1z"/><line x1="8" y1="8" x2="16" y2="8"/><line x1="8" y1="12" x2="16" y2="12"/><line x1="8" y1="16" x2="12" y2="16"/></svg></div>
+          <div style="font-size:2.5rem;opacity:0.2;margin-bottom:0.75rem;">🧾</div>
           <div style="font-size:0.85rem;color:#9AA3AE;line-height:1.7;">Search for a drug on the left<br/>to start a new sale</div>
         </div>
 
@@ -1844,7 +1844,7 @@
       <div id="txn-detail-body"></div>
       <div class="ma">
         <button class="btn btn-sm" onclick="cm('m-txn-detail')">Close</button>
-        <button class="btn btn-primary" onclick="reprintTxn()"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>&nbsp;Reprint</button>
+        <button class="btn btn-primary" onclick="reprintTxn()">🖨 Reprint</button>
       </div>
     </div>
   </div>
@@ -1854,7 +1854,7 @@
   ══════════════════════════════════ -->
   <div class="page" id="page-clinic">
 
-    <!-- header — same pattern as pharmacy -->
+    <!-- Header -->
     <div class="dash-header">
       <div>
         <div class="dash-greeting">Good <em id="cl-time-greeting">morning</em>, <span id="cl-facility-name">—</span></div>
@@ -1863,40 +1863,66 @@
       <div id="cl-quick-note" style="font-size:0.8rem;color:#9AA3AE;text-align:right;max-width:260px;line-height:1.6;padding-top:0.2rem;"></div>
     </div>
 
-    <!-- 4 stat cards -->
-    <div class="stats-5" style="grid-template-columns:repeat(4,1fr);">
+    <!-- Critical alerts bar -->
+    <div id="cl-alerts-bar" style="display:none;background:#fef2f2;border:1px solid #fecaca;
+         border-radius:10px;padding:0.65rem 1rem;margin-bottom:1rem;
+         font-size:0.82rem;color:#991b1b;display:flex;gap:1rem;flex-wrap:wrap;align-items:center;">
+      <span id="cl-alerts-text"></span>
+    </div>
 
-      <div class="stat-card">
-        <div class="stat-card-top">
-          <span class="stat-label">Total Patients</span>
-          <div class="stat-icon" style="background:#eff6ff;"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div>
-        </div>
-        <div class="stat-num" id="cl-pts">—</div>
-        <div class="stat-sub">registered all time</div>
-      </div>
+    <!-- Stat cards row -->
+    <div class="stats-5" style="grid-template-columns:repeat(5,1fr);margin-bottom:1.2rem;">
 
       <div class="stat-card" id="sc-cl-today">
         <div class="stat-card-top">
           <span class="stat-label">Seen Today</span>
-          <div class="stat-icon" style="background:#f0fdf4;"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div>
+          <div class="stat-icon" style="background:#f0fdf4;">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          </div>
         </div>
         <div class="stat-num" id="cl-today">—</div>
-        <div class="stat-sub">visits recorded today</div>
+        <div class="stat-sub">patients today</div>
+      </div>
+
+      <div class="stat-card" id="sc-cl-queue">
+        <div class="stat-card-top">
+          <span class="stat-label">In Queue</span>
+          <div class="stat-icon" style="background:#eff6ff;">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          </div>
+        </div>
+        <div class="stat-num" id="cl-queue-count">—</div>
+        <div class="stat-sub">waiting now</div>
       </div>
 
       <div class="stat-card">
         <div class="stat-card-top">
-          <span class="stat-label">This Week</span>
-          <div class="stat-icon" style="background:#f5f3ff;"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg></div>
+          <span class="stat-label">Lab Tests Today</span>
+          <div class="stat-icon" style="background:#f5f3ff;">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3h6l1 7-4 11-4-11z"/><line x1="6.5" y1="10" x2="17.5" y2="10"/></svg>
+          </div>
         </div>
-        <div class="stat-num" id="cl-week">—</div>
-        <div class="stat-sub">patients this week</div>
+        <div class="stat-num" id="cl-lab-today">—</div>
+        <div class="stat-sub">tests requested</div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-card-top">
+          <span class="stat-label">Prescriptions</span>
+          <div class="stat-icon" style="background:#fef9c3;">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M10.5 3.5a5 5 0 0 1 7.07 7.07l-7.07 7.07a5 5 0 0 1-7.07-7.07l7.07-7.07z"/><line x1="9" y1="15" x2="15" y2="9"/></svg>
+          </div>
+        </div>
+        <div class="stat-num" id="cl-rx-today">—</div>
+        <div class="stat-sub">dispensed today</div>
       </div>
 
       <div class="stat-card" id="sc-cl-followup">
         <div class="stat-card-top">
           <span class="stat-label">Follow-up Due</span>
-          <div class="stat-icon" style="background:#fffbeb;"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg></div>
+          <div class="stat-icon" style="background:#fffbeb;">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+          </div>
         </div>
         <div class="stat-num" id="cl-followup">—</div>
         <div class="stat-sub">need follow-up</div>
@@ -1904,34 +1930,78 @@
 
     </div>
 
-    <!-- top conditions this week -->
-    <div id="cl-conditions-strip" style="display:none;margin-bottom:1.5rem;">
-      <div class="velocity-section-label">Most Common Conditions — This Week</div>
-      <div class="card" style="margin-bottom:0;">
-        <div id="cl-conditions-body" style="display:flex;flex-wrap:wrap;gap:0.5rem;"></div>
+    <!-- Live queue status + Activity feed -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.1rem;margin-bottom:1.1rem;">
+
+      <!-- Live Queue Status -->
+      <div class="card" style="margin:0;">
+        <div style="display:flex;align-items:center;justify-content:space-between;
+                    border-bottom:1px solid #F0EFEB;padding-bottom:0.75rem;margin-bottom:1rem;">
+          <h2 style="margin:0;padding:0;border:none;font-size:0.83rem;">Live Queue Status</h2>
+          <span style="font-size:0.72rem;color:#9AA3AE;" id="cl-queue-updated"></span>
+        </div>
+        <div id="cl-queue-flow" style="display:flex;flex-direction:column;gap:0.5rem;">
+          <div style="color:#9AA3AE;font-size:0.82rem;text-align:center;padding:1rem 0;">Loading...</div>
+        </div>
       </div>
+
+      <!-- Activity Feed -->
+      <div class="card" style="margin:0;">
+        <div style="display:flex;align-items:center;justify-content:space-between;
+                    border-bottom:1px solid #F0EFEB;padding-bottom:0.75rem;margin-bottom:1rem;">
+          <h2 style="margin:0;padding:0;border:none;font-size:0.83rem;">Today's Activity</h2>
+        </div>
+        <div id="cl-activity-feed" style="display:flex;flex-direction:column;gap:0.4rem;
+             max-height:220px;overflow-y:auto;">
+          <div style="color:#9AA3AE;font-size:0.82rem;text-align:center;padding:1rem 0;">Loading...</div>
+        </div>
+      </div>
+
     </div>
 
-    <!-- recent patients list -->
-    <div class="card">
-      <div style="display:flex;align-items:center;justify-content:space-between;
-                  border-bottom:1px solid #F0EFEB;padding-bottom:0.85rem;margin-bottom:1.2rem;">
-        <h2 style="margin:0;border:none;padding:0;font-size:0.83rem;">Recent Patients</h2>
-        <button onclick="showPage('cl-patients')"
-                style="background:var(--navy,#0B1F3A);color:white;border:none;
-                       padding:0.45rem 1rem;border-radius:7px;cursor:pointer;
-                       font-size:0.78rem;font-weight:700;font-family:'Syne',sans-serif;">
-          + Register Patient
-        </button>
+    <!-- Stock alerts + Recent patients -->
+    <div style="display:grid;grid-template-columns:1fr 1.6fr;gap:1.1rem;">
+
+      <!-- Stock Alerts -->
+      <div class="card" style="margin:0;">
+        <div style="display:flex;align-items:center;justify-content:space-between;
+                    border-bottom:1px solid #F0EFEB;padding-bottom:0.75rem;margin-bottom:1rem;">
+          <h2 style="margin:0;padding:0;border:none;font-size:0.83rem;">Stock Alerts</h2>
+          <button onclick="showPage('dept-pharmacy')"
+                  style="font-size:0.72rem;color:#0B1F3A;background:none;border:none;
+                         cursor:pointer;font-family:'Syne',sans-serif;font-weight:700;">
+            View pharmacy →
+          </button>
+        </div>
+        <div id="cl-stock-alerts" style="display:flex;flex-direction:column;gap:0.4rem;">
+          <div style="color:#9AA3AE;font-size:0.82rem;text-align:center;padding:1rem 0;">Loading...</div>
+        </div>
       </div>
-      <div class="table-wrap">
-        <table>
-          <thead>
-            <tr><th>Name</th><th>Age</th><th>Condition</th><th>Status</th><th>Last Visit</th><th>Actions</th></tr>
-          </thead>
-          <tbody id="cl-recent-body"><tr><td colspan="6" class="loading">Loading...</td></tr></tbody>
-        </table>
+
+      <!-- Recent Patients -->
+      <div class="card" style="margin:0;">
+        <div style="display:flex;align-items:center;justify-content:space-between;
+                    border-bottom:1px solid #F0EFEB;padding-bottom:0.75rem;margin-bottom:1rem;">
+          <h2 style="margin:0;padding:0;border:none;font-size:0.83rem;">Recent Patients</h2>
+          <button onclick="showPage('cl-patients')"
+                  style="background:#0B1F3A;color:white;border:none;padding:0.4rem 0.9rem;
+                         border-radius:7px;cursor:pointer;font-size:0.75rem;font-weight:700;
+                         font-family:'Syne',sans-serif;">
+            + Register Patient
+          </button>
+        </div>
+        <div class="table-wrap" style="margin:0;">
+          <table>
+            <thead>
+              <tr><th>Patient</th><th>Condition</th><th>Status</th><th>Last Visit</th><th></th></tr>
+            </thead>
+            <tbody id="cl-recent-body">
+              <tr><td colspan="5" class="loading">Loading...</td></tr>
+            </tbody>
+          </table>
+        </div>
       </div>
+
     </div>
 
   </div>
@@ -2304,7 +2374,7 @@
                 padding:1rem 1.5rem;margin:-1rem -1.5rem 1.1rem;
                 border-bottom:1px solid #E8E6E1;z-index:10;">
       <h3 style="margin:0;">Enter Results</h3>
-      <button class="btn btn-sm" onclick="cm('m-enter-result')"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+      <button class="btn btn-sm" onclick="cm('m-enter-result')">✕</button>
     </div>
     <input type="hidden" id="er-request-id"/>
 
@@ -2342,7 +2412,7 @@
 
     <div class="ma" style="margin-top:1.25rem;">
       <button class="btn btn-sm" onclick="cm('m-enter-result')">Cancel</button>
-      <button class="btn btn-primary" onclick="saveResult()"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>&nbsp;Save All Results & Mark Ready</button>
+      <button class="btn btn-primary" onclick="saveResult()">✅ Save All Results & Mark Ready</button>
     </div>
   </div>
 </div>
@@ -2361,7 +2431,7 @@
     </p>
     <div class="ma">
       <button class="btn btn-sm" onclick="cm('m-dispatch-confirm')">Cancel</button>
-      <button class="btn btn-primary" onclick="confirmDispatch()"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>&nbsp;Confirm Dispatch</button>
+      <button class="btn btn-primary" onclick="confirmDispatch()">📤 Confirm Dispatch</button>
     </div>
   </div>
 </div>
@@ -2404,7 +2474,7 @@
   <!-- HOSPITAL DASHBOARD -->
   <div class="page" id="page-hospital">
     <div class="welcome-banner hospital">
-      <div class="wb-icon"><svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M12 8v8M8 12h8"/></svg></div>
+      <div class="wb-icon">🏨</div>
       <div class="wb-text">
         <h3 id="wb-hosp-title">Welcome</h3>
         <p>Manage patient admissions, records, prescriptions, and inventory.</p>
@@ -2499,7 +2569,7 @@
 
     <div class="stats-5" style="grid-template-columns:repeat(3,1fr);">
       <div class="stat-card">
-        <div class="stat-card-top"><span class="stat-label">Registered Today</span><div class="stat-icon" style="background:#eff6ff;"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/></svg></div></div>
+        <div class="stat-card-top"><span class="stat-label">Registered Today</span><div class="stat-icon" style="background:#eff6ff;">📋</div></div>
         <div class="stat-num" id="rec-today">—</div>
         <div class="stat-sub">patients today</div>
       </div>
@@ -2509,7 +2579,7 @@
         <div class="stat-sub">waiting to see doctor</div>
       </div>
       <div class="stat-card">
-        <div class="stat-card-top"><span class="stat-label">Seen Today</span><div class="stat-icon" style="background:#f0fdf4;"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg></div></div>
+        <div class="stat-card-top"><span class="stat-label">Seen Today</span><div class="stat-icon" style="background:#f0fdf4;">✅</div></div>
         <div class="stat-num" id="rec-seen">—</div>
         <div class="stat-sub">consultations done</div>
       </div>
@@ -2571,12 +2641,12 @@
         <div class="stat-sub">patients in queue</div>
       </div>
       <div class="stat-card">
-        <div class="stat-card-top"><span class="stat-label">Seen Today</span><div class="stat-icon" style="background:#f0fdf4;"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg></div></div>
+        <div class="stat-card-top"><span class="stat-label">Seen Today</span><div class="stat-icon" style="background:#f0fdf4;">✅</div></div>
         <div class="stat-num" id="doc-seen">—</div>
         <div class="stat-sub">consultations done</div>
       </div>
       <div class="stat-card">
-        <div class="stat-card-top"><span class="stat-label">Prescriptions</span><div class="stat-icon" style="background:#eff6ff;"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;"><path d="M10.5 3.5a5 5 0 0 1 7.07 7.07l-7.07 7.07a5 5 0 0 1-7.07-7.07l7.07-7.07z"/><line x1="9" y1="15" x2="15" y2="9"/></svg></div></div>
+        <div class="stat-card-top"><span class="stat-label">Prescriptions</span><div class="stat-icon" style="background:#eff6ff;">💊</div></div>
         <div class="stat-num" id="doc-rx-count">—</div>
         <div class="stat-sub">written today</div>
       </div>
@@ -2668,7 +2738,7 @@
             <div id="consult-lab-sent"
                  style="display:none;background:#d1fae5;color:#065f46;border-radius:100px;
                         padding:0.18rem 0.65rem;font-size:0.72rem;font-weight:700;margin-left:auto;">
-              Sent — awaiting results
+              ✓ Sent — awaiting results
             </div>
           </div>
 
@@ -2727,7 +2797,7 @@
           <div id="diagnosis-lock"
                style="background:#F0EFEB;border-radius:8px;padding:1.1rem;
                       text-align:center;border:1px dashed #D1D5DB;">
-            <div style="margin-bottom:0.35rem;"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></div>
+            <div style="font-size:1.3rem;margin-bottom:0.35rem;">🔒</div>
             <div style="font-size:0.82rem;color:#6B7280;font-weight:600;line-height:1.5;">
               Send a lab request or click<br>"Skip — No Lab Needed" to unlock.
             </div>
@@ -2840,7 +2910,7 @@
             <div id="rx-external-note"
                  style="display:none;margin-top:0.5rem;font-size:0.78rem;color:#92400e;
                         background:#fffbeb;border-radius:6px;padding:0.4rem 0.7rem;">
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg> Prescription will be printed for the patient to take to an external pharmacy.
+              ⚠ Prescription will be printed for the patient to take to an external pharmacy.
             </div>
           </div>
 
@@ -2875,12 +2945,12 @@
         <div class="stat-sub">prescriptions to fill</div>
       </div>
       <div class="stat-card">
-        <div class="stat-card-top"><span class="stat-label">Dispensed Today</span><div class="stat-icon" style="background:#f0fdf4;"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg></div></div>
+        <div class="stat-card-top"><span class="stat-label">Dispensed Today</span><div class="stat-icon" style="background:#f0fdf4;">✅</div></div>
         <div class="stat-num" id="dph-dispensed">—</div>
         <div class="stat-sub">prescriptions filled</div>
       </div>
       <div class="stat-card">
-        <div class="stat-card-top"><span class="stat-label">Total Today</span><div class="stat-icon" style="background:#eff6ff;"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/></svg></div></div>
+        <div class="stat-card-top"><span class="stat-label">Total Today</span><div class="stat-icon" style="background:#eff6ff;">📋</div></div>
         <div class="stat-num" id="dph-total">—</div>
         <div class="stat-sub">prescriptions received</div>
       </div>
@@ -2919,7 +2989,7 @@
       <div id="rx-detail-body"></div>
       <div class="ma">
         <button class="btn btn-sm" onclick="cm('m-rx-detail')">Close</button>
-        <button class="btn btn-primary" id="rx-dispense-btn" onclick="dispenseRx()"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>&nbsp;Mark as Dispensed</button>
+        <button class="btn btn-primary" id="rx-dispense-btn" onclick="dispenseRx()">✅ Mark as Dispensed</button>
       </div>
     </div>
   </div>
@@ -2928,7 +2998,7 @@
 
 <!-- MODALS -->
 <div class="mo" id="m-patient">
-  <div class="mb" style="max-width:560px;">
+  <div class="mb">
     <h3>Patient Record</h3>
     <div id="m-patient-body"></div>
     <div class="ma"><button class="btn btn-sm" onclick="cm('m-patient')">Close</button></div>
@@ -3227,7 +3297,7 @@ async function doSignup(){
     const dept = document.getElementById('s-dept')?.value || null;
     if(role==='Staff' && !dept){showEl('signup-err','Please select your department.');return;}
     await authPost('signup',{email,password:pass,data:{org_name:org,org_type:role,department:dept}});
-    showEl('signup-ok','Account created! Check your email to confirm, then sign in.',true);
+    showEl('signup-ok','✅ Account created! Check your email to confirm, then sign in.',true);
     document.getElementById('signup-ok').style.display='block';
     ['s-org','s-email','s-pass'].forEach(id=>document.getElementById(id).value='');
     document.getElementById('s-role').value='';
@@ -3766,7 +3836,7 @@ async function bulkDeleteDrugs(){
     for(const id of invSelected){
       await db(`inventory?id=eq.${id}`,'DELETE');
     }
-    toast(`Deleted ${invSelected.size} drug(s).`);
+    toast(`✅ Deleted ${invSelected.size} drug(s).`);
     invSelected.clear(); updateBulkBar();
     loadDrugs();
   }catch(e){toast('Error: '+e.message,'err');}
@@ -3823,7 +3893,7 @@ async function saveDrug(){
   try{
     if(id) await db(`inventory?id=eq.${id}`,'PATCH',payload);
     else await db('inventory','POST',payload);
-    toast(id?'Drug updated!':'Drug added!');
+    toast(id?'✅ Drug updated!':'✅ Drug added!');
     cm('m-drug'); loadDrugs();
   }catch(e){toast('Error: '+e.message,'err');}
 }
@@ -3845,7 +3915,7 @@ function openDrugDetail(id){
         ['Buying Price', d.buying_price?'UGX '+Number(d.buying_price).toLocaleString():'—'],
         ['Selling Price', d.price?'UGX '+Number(d.price).toLocaleString():'—'],
         ['Stock Value', val>0?'UGX '+val.toLocaleString():'—'],
-        ['Expiry', d.expiry_date?(new Date(d.expiry_date).toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'}))+(isExpired?' (Expired)':''):'—'],
+        ['Expiry', d.expiry_date?(new Date(d.expiry_date).toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'}))+(isExpired?' ⚠️ Expired':''):'—'],
         ['Batch Number', d.batch_number||'—'],
         ['Supplier', d.supplier||'—'],
       ].map(([k,v])=>`
@@ -3997,7 +4067,7 @@ function addToBasket(){
   document.getElementById('pos-no-stock-warn').style.display='none';
   currentPosItem=null;
   document.getElementById('pos-drug-input').focus();
-  toast('Added to sale');
+  toast('✅ Added to sale');
 }
 
 function removeFromBasket(idx){ basket.splice(idx,1); renderBasket(); }
@@ -4016,7 +4086,7 @@ function renderBasket(){
         <div class="pos-basket-item-meta">${item.qty} ${item.unit} × UGX ${Number(item.unit_price).toLocaleString()}</div>
       </div>
       <div class="pos-basket-item-price">UGX ${Number(item.line_total).toLocaleString()}</div>
-      <button class="pos-basket-item-del" onclick="removeFromBasket(${i})"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+      <button class="pos-basket-item-del" onclick="removeFromBasket(${i})">✕</button>
     </div>`).join('');
   recalcBasket();
 }
@@ -4090,7 +4160,7 @@ async function saveBasket(){
       });
     }
     track('sale_saved',{drug_count:basket.length,grand_total:grandTotal,payment_method:payment});
-    toast(`Sale saved — UGX ${grandTotal.toLocaleString()}`);
+    toast(`✅ Sale saved — UGX ${grandTotal.toLocaleString()}`);
     lastReceipt={sessionId,basket:[...basket],customer,payment,notes,subtotal,discAmt,grandTotal,time:new Date()};
     showReceipt(lastReceipt);
     clearBasket();
@@ -4243,8 +4313,9 @@ function statusBadge(s) {
 
 async function loadClinicHome() {
   const m = user?.user_metadata || {};
-  // greeting
   const now = new Date(), hr = now.getHours();
+
+  // Greeting
   const greetEl = document.getElementById('cl-time-greeting');
   if (greetEl) greetEl.textContent = hr<12?'morning':hr<17?'afternoon':'evening';
   const nameEl = document.getElementById('cl-facility-name');
@@ -4252,71 +4323,189 @@ async function loadClinicHome() {
   const dateEl = document.getElementById('cl-date-str');
   if (dateEl) dateEl.textContent = now.toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
 
+  const tod = now.toDateString();
+
+  // Fetch all data in parallel
   try {
-    const p = await db('patients?order=created_at.desc');
-    patients = p;
+    const [pts, queue, labReqs, rxList, inv] = await Promise.all([
+      db('patients?order=created_at.desc').catch(()=>[]),
+      db('queue_patients?order=created_at.desc').catch(()=>[]),
+      db('test_requests?order=created_at.desc').catch(()=>[]),
+      db('prescriptions?order=created_at.desc').catch(()=>[]),
+      db('inventory?order=drug_name.asc').catch(()=>[]),
+    ]);
+    patients = pts;
 
-    const tod = new Date().toDateString();
-    const weekAgo = new Date(Date.now() - 7*24*60*60*1000);
+    // ── Stat cards ──────────────────────────────────────────────────
+    const todayPts   = pts.filter(x => new Date(x.created_at).toDateString() === tod);
+    const todayQueue = queue.filter(x => new Date(x.created_at).toDateString() === tod);
+    const waiting    = todayQueue.filter(x => x.status === 'Waiting').length;
+    const inConsult  = todayQueue.filter(x => x.status === 'In Consult').length;
+    const resultsRx  = todayQueue.filter(x => x.status === 'Results Received').length;
+    const todayLab   = labReqs.filter(x => new Date(x.created_at).toDateString() === tod);
+    const todayRx    = rxList.filter(x => new Date(x.created_at).toDateString() === tod);
+    const followup   = pts.filter(x => x.status === 'Follow-up').length;
 
-    const todayCount = p.filter(x => new Date(x.created_at).toDateString()===tod).length;
-    const weekCount  = p.filter(x => new Date(x.created_at) >= weekAgo).length;
-    const followup   = p.filter(x => x.status==='Follow-up').length;
+    const setEl = (id, val) => { const el = document.getElementById(id); if(el) el.textContent = val; };
+    setEl('cl-today',      todayPts.length);
+    setEl('cl-queue-count',waiting);
+    setEl('cl-lab-today',  todayLab.length);
+    setEl('cl-rx-today',   todayRx.filter(x => x.status === 'Dispensed').length);
+    setEl('cl-followup',   followup);
 
-    document.getElementById('cl-pts').textContent = p.length;
-    document.getElementById('cl-today').textContent = todayCount;
-    document.getElementById('cl-week').textContent = weekCount;
-    document.getElementById('cl-followup').textContent = followup;
+    document.getElementById('sc-cl-queue')?.classList.toggle('is-warn', waiting > 0);
+    document.getElementById('sc-cl-followup')?.classList.toggle('is-warn', followup > 0);
 
-    // colour follow-up card if there are any
-    const scFu = document.getElementById('sc-cl-followup');
-    if (scFu) scFu.classList.toggle('is-warn', followup > 0);
-
-    // quick note
     const noteEl = document.getElementById('cl-quick-note');
-    if (noteEl) noteEl.textContent = todayCount > 0 ? `${todayCount} patient${todayCount>1?'s':''} seen today` : '';
+    if (noteEl) noteEl.textContent = waiting > 0
+      ? `${waiting} patient${waiting>1?'s':''} waiting`
+      : todayPts.length > 0 ? `${todayPts.length} seen today` : '';
 
-    // top conditions this week
-    const weekPts = p.filter(x => new Date(x.created_at) >= weekAgo && x.condition);
-    if (weekPts.length) {
-      const tally = {};
-      weekPts.forEach(x => {
-        const key = (x.condition||'').trim();
-        if (key) tally[key] = (tally[key]||0) + 1;
-      });
-      const sorted = Object.entries(tally).sort((a,b) => b[1]-a[1]).slice(0,8);
-      const strip = document.getElementById('cl-conditions-strip');
-      const body  = document.getElementById('cl-conditions-body');
-      if (strip && body && sorted.length) {
-        strip.style.display = 'block';
-        body.innerHTML = sorted.map(([cond, count]) =>
-          `<div style="background:#F0EFEB;border:1px solid #E0DFDB;border-radius:100px;
-                       padding:0.3rem 0.85rem;font-size:0.8rem;font-weight:600;color:#0B1F3A;
-                       display:flex;align-items:center;gap:0.4rem;">
-            ${cond}
-            <span style="background:#0B1F3A;color:white;border-radius:100px;
-                         padding:0.05rem 0.45rem;font-size:0.68rem;">${count}</span>
-          </div>`
-        ).join('');
+    // ── Critical alerts ──────────────────────────────────────────────
+    const alerts = [];
+    const outOfStock = inv.filter(x => Number(x.quantity) <= 0);
+    const lowStock   = inv.filter(x => Number(x.quantity) > 0 && Number(x.quantity) <= (x.reorder_level||10));
+    const overdueReq = labReqs.filter(x => x.status === 'Result Ready' && x.source === 'clinic-consult');
+    if (outOfStock.length) alerts.push(`${outOfStock.length} drug${outOfStock.length>1?'s':''} out of stock`);
+    if (lowStock.length)   alerts.push(`${lowStock.length} running low`);
+    if (overdueReq.length) alerts.push(`${overdueReq.length} lab result${overdueReq.length>1?'s':''} ready — not yet dispatched`);
+    const alertBar = document.getElementById('cl-alerts-bar');
+    const alertTxt = document.getElementById('cl-alerts-text');
+    if (alertBar && alertTxt) {
+      if (alerts.length) {
+        alertTxt.textContent = alerts.join('  ·  ');
+        alertBar.style.display = 'flex';
+      } else {
+        alertBar.style.display = 'none';
       }
     }
 
-    // recent patients table on dashboard (top 8)
-    renderClRecent(p.slice(0, 8));
+    // ── Live Queue Flow ──────────────────────────────────────────────
+    const queueFlow = document.getElementById('cl-queue-flow');
+    if (queueFlow) {
+      const steps = [
+        { label: 'Reception',         count: waiting,     color: '#fffbeb', text: '#d97706', icon: 'Waiting' },
+        { label: 'With Doctor',        count: inConsult,   color: '#eff6ff', text: '#1d4ed8', icon: 'In Consult' },
+        { label: 'Awaiting Results',   count: resultsRx,   color: '#f5f3ff', text: '#7c3aed', icon: 'Results Received' },
+        { label: 'Lab Tests Today',    count: todayLab.filter(x=>['Pending','Processing','Sample Collected'].includes(x.status)).length, color: '#fef9c3', text: '#92400e', icon: 'Lab' },
+        { label: 'Pending Dispense',   count: todayRx.filter(x=>x.status==='Pending').length, color: '#ecfdf5', text: '#065f46', icon: 'Pharmacy' },
+      ];
+      queueFlow.innerHTML = steps.map(s => `
+        <div style="display:flex;align-items:center;justify-content:space-between;
+                    padding:0.55rem 0.8rem;border-radius:8px;background:${s.color};
+                    border:1px solid ${s.color};">
+          <span style="font-size:0.82rem;font-weight:600;color:#0B1F3A;">${s.label}</span>
+          <span style="font-size:1rem;font-weight:800;color:${s.text};min-width:28px;text-align:right;">${s.count}</span>
+        </div>`).join('');
 
-  } catch(e) {}
+      const upd = document.getElementById('cl-queue-updated');
+      if (upd) upd.textContent = 'Updated ' + now.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'});
+    }
+
+    // ── Activity Feed ────────────────────────────────────────────────
+    const feed = document.getElementById('cl-activity-feed');
+    if (feed) {
+      // Build events from all today data, sorted newest first
+      const events = [];
+
+      todayPts.forEach(p => events.push({
+        time: new Date(p.created_at),
+        text: `${p.name} — consultation saved`,
+        sub:  p.condition || '',
+        color: '#0B1F3A'
+      }));
+
+      todayQueue.filter(x=>x.status==='Seen').forEach(q => events.push({
+        time: new Date(q.created_at),
+        text: `${q.name} — registered at reception`,
+        sub:  q.complaint || '',
+        color: '#1d4ed8'
+      }));
+
+      todayLab.forEach(r => events.push({
+        time: new Date(r.created_at),
+        text: `${r.patient_name} — lab test requested`,
+        sub:  r.status || '',
+        color: '#7c3aed'
+      }));
+
+      todayRx.forEach(r => events.push({
+        time: new Date(r.created_at),
+        text: `${r.patient_name} — prescription ${r.status === 'Dispensed' ? 'dispensed' : 'sent to pharmacy'}`,
+        sub:  r.status || '',
+        color: '#065f46'
+      }));
+
+      events.sort((a,b) => b.time - a.time);
+
+      if (!events.length) {
+        feed.innerHTML = `<div style="color:#9AA3AE;font-size:0.82rem;text-align:center;padding:1rem 0;">No activity recorded today yet.</div>`;
+      } else {
+        feed.innerHTML = events.slice(0, 20).map(e => `
+          <div style="display:flex;gap:0.7rem;align-items:flex-start;padding:0.3rem 0;
+                      border-bottom:1px solid #F8F7F3;">
+            <span style="font-size:0.7rem;color:#9AA3AE;white-space:nowrap;padding-top:0.15rem;min-width:38px;">
+              ${e.time.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'})}
+            </span>
+            <div style="flex:1;min-width:0;">
+              <div style="font-size:0.8rem;font-weight:600;color:#0B1F3A;
+                          white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${e.text}</div>
+              ${e.sub ? `<div style="font-size:0.72rem;color:#9AA3AE;">${e.sub}</div>` : ''}
+            </div>
+          </div>`).join('');
+      }
+    }
+
+    // ── Stock Alerts ─────────────────────────────────────────────────
+    const stockEl = document.getElementById('cl-stock-alerts');
+    if (stockEl) {
+      const critical = [...outOfStock, ...lowStock].slice(0, 6);
+      if (!critical.length) {
+        stockEl.innerHTML = `<div style="color:#059669;font-size:0.82rem;font-weight:600;
+                                         padding:0.5rem 0;">All stock levels OK</div>`;
+      } else {
+        stockEl.innerHTML = critical.map(d => {
+          const qty  = Number(d.quantity);
+          const isOut = qty <= 0;
+          return `<div style="display:flex;align-items:center;justify-content:space-between;
+                              padding:0.45rem 0.7rem;border-radius:8px;margin-bottom:0.3rem;
+                              background:${isOut?'#fff5f5':'#fffbeb'};
+                              border:1px solid ${isOut?'#fecaca':'#fde68a'};">
+            <span style="font-size:0.8rem;font-weight:600;color:#0B1F3A;">${d.drug_name}</span>
+            <span style="font-size:0.72rem;font-weight:700;padding:0.1rem 0.5rem;border-radius:100px;
+                         background:${isOut?'#fee2e2':'#fef9c3'};
+                         color:${isOut?'#991b1b':'#92400e'};">
+              ${isOut ? 'Out of stock' : qty + ' left'}
+            </span>
+          </div>`;
+        }).join('');
+      }
+    }
+
+    // ── Recent Patients ──────────────────────────────────────────────
+    renderClRecent(pts.slice(0, 8));
+
+  } catch(e) { console.error('loadClinicHome error:', e); }
 }
 
 function renderClRecent(arr) {
   const b = document.getElementById('cl-recent-body');
   if (!b) return;
-  if (!arr.length) { b.innerHTML=`<tr><td colspan="6" class="loading">No patients yet. Register your first patient.</td></tr>`; return; }
+  if (!arr.length) {
+    b.innerHTML = `<tr><td colspan="5" class="loading">No patients yet.</td></tr>`;
+    return;
+  }
   b.innerHTML = arr.map(p => `<tr>
-    <td><strong>${p.name}</strong></td>
-    <td>${p.age||'—'}</td>
-    <td>${p.condition||'<span style="color:#ccc">—</span>'}</td>
+    <td>
+      <strong>${p.name}</strong>
+      <div style="font-size:0.72rem;color:#9AA3AE;">${p.age?p.age+'y':''} ${p.gender||''}</div>
+    </td>
+    <td style="font-size:0.82rem;max-width:160px;white-space:nowrap;
+               overflow:hidden;text-overflow:ellipsis;">
+      ${p.condition||'<span style="color:#ccc">—</span>'}
+    </td>
     <td>${statusBadge(p.status)}</td>
-    <td class="hide-mobile" style="font-size:0.8rem;color:#9AA3AE;">${fmtDate(p.created_at)}</td>
+    <td style="font-size:0.78rem;color:#9AA3AE;">${fmtDate(p.created_at)}</td>
     <td class="td-actions">
       <button class="btn btn-sm" onclick="openPatientModal('${p.id}')">View</button>
     </td>
@@ -4359,217 +4548,41 @@ function filterClPts() {
   ));
 }
 
-async function openPatientModal(id) {
-  const p = patients.find(x => x.id === id);
+function openPatientModal(id) {
+  const p = patients.find(x => x.id===id);
   if (!p) return;
 
-  // Show modal immediately with skeleton while data loads
+  // build vitals line if any exist
+  const vitals = [
+    p.blood_pressure ? `BP: ${p.blood_pressure}` : null,
+    p.temperature    ? `Temp: ${p.temperature}°C` : null,
+    p.weight         ? `Weight: ${p.weight}kg` : null,
+    p.pulse          ? `Pulse: ${p.pulse}bpm` : null,
+  ].filter(Boolean).join('  ·  ');
+
   document.getElementById('m-patient-body').innerHTML = `
-    <div style="display:flex;align-items:center;gap:1rem;
-                background:linear-gradient(135deg,#0B1F3A,#1a3a5c);
-                border-radius:12px;padding:1.1rem 1.3rem;margin-bottom:1.2rem;">
-      <div style="width:44px;height:44px;border-radius:50%;background:rgba(255,255,255,0.15);
-                  display:flex;align-items:center;justify-content:center;
-                  font-size:0.9rem;font-weight:700;color:white;flex-shrink:0;">
-        ${(p.name||'?').trim().split(/\s+/).slice(0,2).map(w=>w[0].toUpperCase()).join('')}
-      </div>
-      <div>
-        <div style="font-weight:700;font-size:1rem;color:white;">${p.name}</div>
-        <div style="font-size:0.8rem;color:rgba(255,255,255,0.6);">
-          ${[p.age?p.age+'y':null, p.gender].filter(Boolean).join(' · ')}
-          ${p.phone ? ' · ' + p.phone : ''}
-        </div>
-      </div>
-      <div style="margin-left:auto;">${statusBadge(p.status)}</div>
-    </div>
-    <div style="color:#9AA3AE;font-size:0.85rem;text-align:center;padding:1.5rem 0;">
-      Loading full history…
-    </div>`;
+    <div class="dr"><strong>Name:</strong>${p.name}</div>
+    <div class="dr"><strong>Age:</strong>${p.age||'—'}</div>
+    <div class="dr"><strong>Gender:</strong>${p.gender||'—'}</div>
+    <div class="dr"><strong>Phone:</strong>${p.phone||'—'}</div>
+    <div class="dr"><strong>Condition:</strong>${p.condition||'—'}</div>
+    <div class="dr"><strong>Status:</strong>${statusBadge(p.status)}</div>
+    ${p.referral_to ? `<div class="dr"><strong>Referred to:</strong>${p.referral_to}</div>` : ''}
+    ${vitals ? `<div style="margin:0.8rem 0;padding:0.75rem 1rem;background:#F0EFEB;border-radius:8px;
+                             font-size:0.83rem;color:#4A5568;border:1px solid #E0DFDB;">
+                  <strong style="color:#0B1F3A;display:block;margin-bottom:0.3rem;font-size:0.68rem;
+                                  text-transform:uppercase;letter-spacing:0.8px;">Vitals</strong>
+                  ${vitals}
+                </div>` : ''}
+    <div class="dr"><strong>Registered:</strong>${fmtDate(p.created_at)}</div>
+    ${p.notes ? `<div style="margin-top:0.8rem;padding:0.9rem 1rem;background:#F0EFEB;
+                              border-radius:8px;font-size:0.87rem;line-height:1.7;
+                              border:1px solid #E0DFDB;">
+                  <strong style="color:#0B1F3A;display:block;margin-bottom:0.4rem;font-size:0.68rem;
+                                  text-transform:uppercase;letter-spacing:0.8px;">Prescription / Notes</strong>
+                  ${p.notes}
+                </div>` : ''}`;
   document.getElementById('m-patient').classList.add('open');
-
-  // Fetch linked data in parallel
-  try {
-    const qid = p.queue_patient_id || null;
-    const [testReqs, rxRows] = await Promise.all([
-      qid ? db(`test_requests?queue_patient_id=eq.${qid}&order=created_at.desc`).catch(()=>[]) : Promise.resolve([]),
-      db(`prescriptions?patient_name=eq.${encodeURIComponent(p.name)}&order=created_at.desc`).catch(()=>[])
-    ]);
-
-    // Fetch test results for each request
-    const resultsByReq = {};
-    await Promise.all(testReqs.map(async req => {
-      const res = await db(`test_results?request_id=eq.${req.id}&order=created_at.asc`).catch(()=>[]);
-      resultsByReq[req.id] = res;
-    }));
-
-    // ── Vitals block ──────────────────────────────────────────────────
-    const vitals = [
-      p.blood_pressure ? `BP: ${p.blood_pressure}` : null,
-      p.temperature    ? `Temp: ${p.temperature}°C` : null,
-      p.weight         ? `Weight: ${p.weight} kg` : null,
-      p.pulse          ? `Pulse: ${p.pulse} bpm` : null,
-    ].filter(Boolean);
-
-    // ── Lab results block ─────────────────────────────────────────────
-    const flagStyle = {
-      'Normal':       'background:#d1fae5;color:#065f46;',
-      'Negative':     'background:#d1fae5;color:#065f46;',
-      'High':         'background:#fee2e2;color:#991b1b;',
-      'Positive':     'background:#fee2e2;color:#991b1b;',
-      'Low':          'background:#fffbeb;color:#92400e;',
-      'Inconclusive': 'background:#F0EFEB;color:#4A5568;',
-    };
-
-    const labHTML = testReqs.length ? testReqs.map(req => {
-      const results = resultsByReq[req.id] || [];
-      const tests = req.tests_ordered
-        ? req.tests_ordered.split(',').map(t=>t.trim())
-        : (() => { try { return JSON.parse(req.tests||'[]'); } catch { return [req.tests||'?']; } })();
-
-      return `
-        <div style="border:1px solid #E8E6E1;border-radius:10px;overflow:hidden;margin-bottom:0.6rem;">
-          <div style="background:#F8F7F3;padding:0.55rem 0.9rem;display:flex;
-                      align-items:center;justify-content:space-between;
-                      border-bottom:1px solid #E8E6E1;">
-            <span style="font-size:0.72rem;font-weight:700;text-transform:uppercase;
-                         letter-spacing:0.5px;color:#0B1F3A;">
-              ${tests.join(', ')}
-            </span>
-            <span style="font-size:0.7rem;color:#9AA3AE;">${fmtDate(req.created_at)}</span>
-          </div>
-          ${results.length ? results.map(r => `
-            <div style="display:flex;align-items:center;justify-content:space-between;
-                        padding:0.45rem 0.9rem;border-bottom:1px solid #F0EFEB;font-size:0.82rem;">
-              <span style="color:#333;font-weight:500;">${r.tests_ordered||'—'}</span>
-              <span style="display:flex;align-items:center;gap:0.5rem;">
-                <span style="font-weight:600;color:#0B1F3A;">
-                  ${r.result_value||'—'}${r.result_unit?' '+r.result_unit:''}
-                </span>
-                ${r.reference_range ? `<span style="font-size:0.7rem;color:#9AA3AE;">(${r.reference_range})</span>` : ''}
-                <span style="font-size:0.7rem;font-weight:700;padding:0.1rem 0.45rem;border-radius:100px;
-                             ${flagStyle[r.flag]||flagStyle['Inconclusive']}">${r.flag||'—'}</span>
-              </span>
-            </div>`).join('') :
-            `<div style="padding:0.55rem 0.9rem;font-size:0.8rem;color:#9AA3AE;">
-              No results recorded · Status: ${req.status||'Pending'}
-            </div>`
-          }
-        </div>`;
-    }).join('') : `<div style="font-size:0.82rem;color:#9AA3AE;padding:0.3rem 0;">No lab tests requested.</div>`;
-
-    // ── Prescription block ────────────────────────────────────────────
-    const rxHTML = rxRows.length ? rxRows.map(rx => {
-      let drugs = [];
-      try { drugs = JSON.parse(rx.drugs||'[]'); } catch { drugs = []; }
-      return `
-        <div style="border:1px solid #E8E6E1;border-radius:10px;overflow:hidden;margin-bottom:0.6rem;">
-          <div style="background:#F8F7F3;padding:0.55rem 0.9rem;display:flex;
-                      align-items:center;justify-content:space-between;
-                      border-bottom:1px solid #E8E6E1;">
-            <span style="font-size:0.72rem;font-weight:700;text-transform:uppercase;
-                         letter-spacing:0.5px;color:#0B1F3A;">Prescription</span>
-            <span style="font-size:0.7rem;color:#9AA3AE;">${fmtDate(rx.created_at)}</span>
-          </div>
-          ${drugs.map(d => `
-            <div style="display:flex;align-items:flex-start;justify-content:space-between;
-                        padding:0.45rem 0.9rem;border-bottom:1px solid #F0EFEB;font-size:0.82rem;">
-              <span style="font-weight:600;color:#0B1F3A;">${d.drug||d.name||'—'}</span>
-              <span style="color:#555;font-size:0.78rem;text-align:right;">
-                ${[d.dose,d.frequency,d.duration].filter(Boolean).join(' · ')}
-              </span>
-            </div>`).join('')}
-          ${rx.notes ? `<div style="padding:0.45rem 0.9rem;font-size:0.78rem;color:#555;
-                                    font-style:italic;">${rx.notes}</div>` : ''}
-        </div>`;
-    }).join('') : `<div style="font-size:0.82rem;color:#9AA3AE;padding:0.3rem 0;">No prescription recorded.</div>`;
-
-    // ── Compose full modal ────────────────────────────────────────────
-    document.getElementById('m-patient-body').innerHTML = `
-
-      <!-- Header banner -->
-      <div style="display:flex;align-items:center;gap:1rem;
-                  background:linear-gradient(135deg,#0B1F3A,#1a3a5c);
-                  border-radius:12px;padding:1.1rem 1.3rem;margin-bottom:1.2rem;">
-        <div style="width:44px;height:44px;border-radius:50%;background:rgba(255,255,255,0.15);
-                    display:flex;align-items:center;justify-content:center;
-                    font-size:0.9rem;font-weight:700;color:white;flex-shrink:0;">
-          ${(p.name||'?').trim().split(/\s+/).slice(0,2).map(w=>w[0].toUpperCase()).join('')}
-        </div>
-        <div>
-          <div style="font-weight:700;font-size:1rem;color:white;">${p.name}</div>
-          <div style="font-size:0.8rem;color:rgba(255,255,255,0.6);">
-            ${[p.age?p.age+'y':null, p.gender].filter(Boolean).join(' · ')}
-            ${p.phone ? ' · ' + p.phone : ''}
-          </div>
-        </div>
-        <div style="margin-left:auto;">${statusBadge(p.status)}</div>
-      </div>
-
-      <!-- Diagnosis & Status -->
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.6rem;margin-bottom:1rem;">
-        <div style="background:#F8F7F3;border:1px solid #E8E6E1;border-radius:10px;padding:0.75rem 0.9rem;">
-          <div style="font-size:0.68rem;font-weight:700;text-transform:uppercase;
-                      letter-spacing:0.8px;color:#9AA3AE;margin-bottom:0.3rem;">Diagnosis</div>
-          <div style="font-weight:600;color:#0B1F3A;font-size:0.88rem;">${p.condition||'—'}</div>
-        </div>
-        <div style="background:#F8F7F3;border:1px solid #E8E6E1;border-radius:10px;padding:0.75rem 0.9rem;">
-          <div style="font-size:0.68rem;font-weight:700;text-transform:uppercase;
-                      letter-spacing:0.8px;color:#9AA3AE;margin-bottom:0.3rem;">Status</div>
-          <div>${statusBadge(p.status)}</div>
-        </div>
-        ${p.referral_to ? `
-        <div style="background:#fffbeb;border:1px solid #fcd34d;border-radius:10px;
-                    padding:0.75rem 0.9rem;grid-column:span 2;">
-          <div style="font-size:0.68rem;font-weight:700;text-transform:uppercase;
-                      letter-spacing:0.8px;color:#92400e;margin-bottom:0.3rem;">Referred To</div>
-          <div style="font-weight:600;color:#92400e;font-size:0.88rem;">${p.referral_to}</div>
-        </div>` : ''}
-      </div>
-
-      <!-- Vitals -->
-      ${vitals.length ? `
-      <div style="margin-bottom:1rem;">
-        <div style="font-size:0.72rem;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;
-                    color:#9AA3AE;margin-bottom:0.5rem;">Vitals</div>
-        <div style="display:flex;flex-wrap:wrap;gap:0.5rem;">
-          ${vitals.map(v => `<span style="background:#F0EFEB;border:1px solid #E0DFDB;border-radius:8px;
-                                         padding:0.35rem 0.75rem;font-size:0.8rem;color:#0B1F3A;
-                                         font-weight:500;">${v}</span>`).join('')}
-        </div>
-      </div>` : ''}
-
-      <!-- Lab Results -->
-      <div style="margin-bottom:1rem;">
-        <div style="font-size:0.72rem;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;
-                    color:#9AA3AE;margin-bottom:0.5rem;">Lab Results</div>
-        ${labHTML}
-      </div>
-
-      <!-- Treatment / Prescription -->
-      <div style="margin-bottom:1rem;">
-        <div style="font-size:0.72rem;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;
-                    color:#9AA3AE;margin-bottom:0.5rem;">Treatment Given</div>
-        ${rxHTML}
-      </div>
-
-      <!-- Doctor Notes -->
-      ${p.notes ? `
-      <div style="background:#F8F7F3;border:1px solid #E8E6E1;border-radius:10px;
-                  padding:0.75rem 0.9rem;">
-        <div style="font-size:0.68rem;font-weight:700;text-transform:uppercase;
-                    letter-spacing:0.8px;color:#9AA3AE;margin-bottom:0.3rem;">Doctor's Notes</div>
-        <div style="font-size:0.85rem;color:#333;line-height:1.6;">${p.notes}</div>
-      </div>` : ''}
-
-      <!-- Footer -->
-      <div style="margin-top:1rem;font-size:0.72rem;color:#9AA3AE;text-align:right;">
-        Registered ${fmtDate(p.created_at)}
-      </div>`;
-
-  } catch(e) {
-    document.getElementById('m-patient-body').innerHTML +=
-      `<div style="color:#dc2626;font-size:0.83rem;padding:0.5rem;">Error loading history: ${e.message}</div>`;
-  }
 }
 
 // ── FHIR R5 PATIENT BUILDER ───────────────────────────────────────────────────
@@ -4682,7 +4695,7 @@ async function addClinicPatient() {
 
     patientRow.fhir_r5 = buildFHIRPatient(patientRow);
     await db('patients', 'POST', patientRow);
-    toast('Patient registered!');
+    toast('✅ Patient registered!');
     ['cp-name','cp-age','cp-phone','cp-cond','cp-notes','cp-bp','cp-temp','cp-weight','cp-pulse'].forEach(id => {
       const el = document.getElementById(id); if(el) el.value='';
     });
@@ -4930,7 +4943,7 @@ function renderSelectedTests() {
       `<span style="background:#0B1F3A;color:white;padding:0.2rem 0.65rem;border-radius:100px;
                     font-size:0.75rem;font-weight:600;display:inline-flex;align-items:center;gap:0.3rem;">
         ${t}
-        <span onclick="toggleTest('${t}')" style="cursor:pointer;opacity:0.6;font-size:0.8rem;"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></span>
+        <span onclick="toggleTest('${t}')" style="cursor:pointer;opacity:0.6;font-size:0.8rem;">✕</span>
       </span>`
     ).join('');
 }
@@ -5122,7 +5135,7 @@ function renderClinicRequests(arr) {
                 onclick="openEnterResult('${r.id}')">Enter Result</button>
         ${r.status === 'Result Ready'
           ? `<button class="btn btn-sm" style="background:#0B1F3A;color:white;border-color:#0B1F3A;"
-                     onclick="openDispatch('${r.id}','${(r.patient_name||'').replace(/'/g,"\\'")}','${tests.replace(/'/g,"\\'")}')"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>&nbsp;Dispatch</button>`
+                     onclick="openDispatch('${r.id}','${(r.patient_name||'').replace(/'/g,"\\'")}','${tests.replace(/'/g,"\\'")}')">📤 Dispatch</button>`
           : ''}
       </td>
     </tr>`;
@@ -5177,7 +5190,7 @@ function renderClinicRequests(arr) {
                 onclick="openEnterResult('${r.id}')">Enter Result</button>
         ${r.status === 'Result Ready'
           ? `<button class="btn btn-sm" style="background:#0B1F3A;color:white;border-color:#0B1F3A;"
-                     onclick="openDispatch('${r.id}','${(r.patient_name||'').replace(/'/g,"\\'")}','${tests.replace(/'/g,"\\'")}')"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>&nbsp;Dispatch</button>`
+                     onclick="openDispatch('${r.id}','${(r.patient_name||'').replace(/'/g,"\\'")}','${tests.replace(/'/g,"\\'")}')">📤 Dispatch</button>`
           : ''}
       </td>
     </tr>`;
@@ -5218,7 +5231,7 @@ async function addTestRequest() {
       org_id:            user.id
     });
 
-    toast('Test request submitted!');
+    toast('✅ Test request submitted!');
     ['lr-patient','lr-age','lr-phone','lr-requester','lr-notes','lr-test-custom']
       .forEach(id => { const el = document.getElementById(id); if(el) el.value = ''; });
     document.getElementById('lr-gender').value   = '';
@@ -5269,7 +5282,7 @@ function renderDispatched(arr) {
       <td>${priorityBadge(r.priority)}</td>
       <td style="font-size:0.78rem;">
         ${isClinic
-          ? '<span style="background:#eff6ff;color:#1d4ed8;border-radius:100px;padding:0.15rem 0.55rem;font-size:0.72rem;font-weight:700;"><svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>&nbsp;Clinic</span>'
+          ? '<span style="background:#eff6ff;color:#1d4ed8;border-radius:100px;padding:0.15rem 0.55rem;font-size:0.72rem;font-weight:700;">🏥 Clinic</span>'
           : (r.requesting_doctor||'Walk-in')}
       </td>
       <td style="font-size:0.78rem;color:#9AA3AE;">${r.dispatched_at ? fmtDate(r.dispatched_at) : fmtDate(r.created_at)}</td>
@@ -5324,7 +5337,7 @@ async function saveTestStatus() {
   if (status === 'Dispatched')   extra.dispatched_at   = new Date().toISOString();
   try {
     await db(`test_requests?id=eq.${id}`,'PATCH', {status, ...extra});
-    toast('Status updated!');
+    toast('✅ Status updated!');
     cm('m-update-status');
     loadWorklist();
   } catch(e) { toast('Error: '+e.message,'err'); }
@@ -5346,7 +5359,7 @@ async function openEnterResult(requestId) {
     `<strong>${req.patient_name}</strong>
      ${req.patient_age  ? `<span style="color:#9AA3AE;font-size:0.8rem;"> · ${req.patient_age}y</span>` : ''}
      ${req.patient_gender ? `<span style="color:#9AA3AE;font-size:0.8rem;"> · ${req.patient_gender}</span>` : ''}
-     ${isClinic ? `<span style="background:#eff6ff;color:#1d4ed8;border-radius:100px;padding:0.1rem 0.5rem;font-size:0.72rem;font-weight:700;margin-left:0.4rem;"><svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>&nbsp;Clinic</span>` : ''}
+     ${isClinic ? `<span style="background:#eff6ff;color:#1d4ed8;border-radius:100px;padding:0.1rem 0.5rem;font-size:0.72rem;font-weight:700;margin-left:0.4rem;">🏥 Clinic</span>` : ''}
      <br/>
      <span style="color:#9AA3AE;font-size:0.8rem;">Tests: ${testList.join(', ')}</span>
      ${req.requesting_doctor ? `<br/><span style="color:#9AA3AE;font-size:0.78rem;">Requested by: ${req.requesting_doctor}</span>` : ''}
@@ -5516,7 +5529,7 @@ async function saveResult() {
       sample_type:     sampleType   // saves back to request so dispatch has the info
     });
 
-    toast(`${resultRows.length} result${resultRows.length>1?'s':''} saved — marked Ready`);
+    toast(`✅ ${resultRows.length} result${resultRows.length>1?'s':''} saved — status → Result Ready`);
     cm('m-enter-result');
 
     currentResultReport = { req: {...req, sample_type: sampleType}, resultRows, techNotes, savedAt: new Date() };
@@ -5594,7 +5607,7 @@ function viewResult(id) {
       ${req?.clinical_notes
         ? `<div style="margin-top:0.5rem;font-size:0.8rem;color:#555;background:white;
                        border-radius:6px;padding:0.4rem 0.6rem;border:1px solid #E8E6E1;">
-             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>&nbsp;${req.clinical_notes}</div>` : ''}
+             📋 ${req.clinical_notes}</div>` : ''}
     </div>
 
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.6rem;margin-bottom:1rem;">
@@ -5686,7 +5699,7 @@ async function confirmDispatch() {
       status:        'Dispatched',
       dispatched_at: new Date().toISOString()
     });
-    toast('Results dispatched to the doctor.');
+    toast('📤 Results dispatched to the doctor.');
     cm('m-dispatch-confirm');
     cm('m-result-detail');
     await loadWorklist();
@@ -5822,7 +5835,7 @@ async function addHospPatient(){
   if(!name){toast('Patient name required.','err');return;}
   try{
     await db('patients','POST',{name,age:document.getElementById('hp-age').value||null,gender:document.getElementById('hp-gender').value||null,phone:document.getElementById('hp-phone').value.trim()||null,condition:document.getElementById('hp-cond').value.trim()||null,notes:document.getElementById('hp-notes').value.trim()||null,org_id:user.id});
-    toast('Patient registered!');
+    toast('✅ Patient registered!');
     ['hp-name','hp-age','hp-phone','hp-cond','hp-notes'].forEach(id=>document.getElementById(id).value='');
     document.getElementById('hp-gender').value='';loadHoPts();
   }catch(e){toast('Error: '+e.message,'err');}
@@ -5855,7 +5868,7 @@ async function addHospDrug(){
   if(!name||isNaN(qty)){toast('Name and quantity required.','err');return;}
   try{
     await db('inventory','POST',{drug_name:name,quantity:qty,unit:document.getElementById('hi-unit').value,expiry_date:document.getElementById('hi-exp').value||null,supplier:document.getElementById('hi-sup').value.trim()||null,org_id:user.id});
-    toast('Item added!');
+    toast('✅ Item added!');
     ['hi-name','hi-qty','hi-exp','hi-sup'].forEach(id=>document.getElementById(id).value='');
     loadHoDrugs();
   }catch(e){toast('Error: '+e.message,'err');}
@@ -5889,7 +5902,7 @@ async function saveQty(){
   if(isNaN(qty)){toast('Enter a valid quantity.','err');return;}
   try{
     await db(`${table}?id=eq.${id}`,'PATCH',{quantity:qty});
-    toast('Updated!');cm('m-drug-edit');
+    toast('✅ Updated!');cm('m-drug-edit');
     if(table==='inventory'){if(orgRole==='hospital')loadHoDrugs();else loadDrugs();}
   }catch(e){toast('Error: '+e.message,'err');}
 }
@@ -5958,7 +5971,7 @@ async function registerAndQueue(){
       status:    'Waiting',
       org_id:    user.id
     });
-    toast('Patient registered and added to queue!');
+    toast('✅ Patient registered and added to queue!');
     ['rec-name','rec-age','rec-phone','rec-complaint'].forEach(id => {
       const el = document.getElementById(id); if(el) el.value='';
     });
@@ -5986,7 +5999,7 @@ function renderQueueTable(arr, bodyId, view){
                  onclick="startConsult('${p.id}')">Consult</button>` :
        view==='doctor' && p.status==='Results Received' ?
         `<button class="btn btn-primary" style="font-size:0.75rem;padding:0.35rem 0.8rem;background:#059669;border-color:#059669;"
-                 onclick="resumeConsult('${p.id}')"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;"><path d="M6 18h8"/><path d="M3 22h18"/><path d="M14 22a7 7 0 1 0 0-14h-1"/><path d="M9 14h2"/><path d="M9 12a2 2 0 0 1-2-2V6l3-3 3 3v4a2 2 0 0 1-2 2z"/></svg>&nbsp;View Results</button>` :
+                 onclick="resumeConsult('${p.id}')">🔬 View Results</button>` :
        view==='doctor' && p.status==='In Consult' ?
         `<button class="btn btn-sm" onclick="resumeConsult('${p.id}')">Resume</button>` :
         `<button class="btn btn-sm" onclick="markQueueStatus('${p.id}','${p.status==='Waiting'?'Seen':'Waiting'}')">${p.status==='Waiting'?'Mark Seen':'Reset'}</button>`
@@ -6077,7 +6090,7 @@ function startConsult(patientId){
   const diagLock = document.getElementById('diagnosis-lock');
   const diagForm = document.getElementById('diagnosis-form');
   if (labForm) labForm.style.display = 'block';
-  if (labSent) { labSent.style.display = 'none'; labSent.textContent = 'Sent — awaiting results'; }
+  if (labSent) { labSent.style.display = 'none'; labSent.textContent = '✓ Sent — awaiting results'; }
   if (labResultArea) labResultArea.style.display = 'none';
   if (labResultBadge) labResultBadge.style.display = 'none';
   if (diagLock) diagLock.style.display = 'block';
@@ -6163,7 +6176,7 @@ async function resumeConsult(patientId) {
       // Show lab as sent + results inline
       document.getElementById('consult-lab-form').style.display = 'none';
       const sent = document.getElementById('consult-lab-sent');
-      if (sent) { sent.style.display = 'inline-flex'; sent.textContent = 'Results received'; sent.style.background = '#d1fae5'; sent.style.color = '#065f46'; }
+      if (sent) { sent.style.display = 'inline-flex'; sent.textContent = '✓ Results received'; sent.style.background = '#d1fae5'; sent.style.color = '#065f46'; }
       const area = document.getElementById('consult-lab-result-area');
       const contentEl = document.getElementById('consult-lab-result-content');
       if (area) area.style.display = 'block';
@@ -6207,7 +6220,7 @@ function addRxItem(){
     document.getElementById(id).value='';
   });
   renderRxItems();
-  toast(`${drug} added to prescription.`);
+  toast(`✅ ${drug} added to prescription.`);
 }
 
 function removeRxItem(i){
@@ -6229,7 +6242,7 @@ function renderRxItems(){
         </div>
       </div>
       <button onclick="removeRxItem(${i})"
-              style="background:none;border:none;color:#dc2626;cursor:pointer;font-size:0.9rem;"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+              style="background:none;border:none;color:#dc2626;cursor:pointer;font-size:0.9rem;">✕</button>
     </div>`).join('');
 }
 
@@ -6274,7 +6287,7 @@ function renderConsultSelectedTests() {
                   display:inline-flex;align-items:center;gap:0.3rem;">
       ${t}
       <span onclick="toggleConsultTest('${t}')"
-            style="cursor:pointer;opacity:0.6;"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></span>
+            style="cursor:pointer;opacity:0.6;">✕</span>
     </span>`
   ).join('');
 }
@@ -6299,11 +6312,11 @@ async function sendConsultLabRequest() {
     // Hide the form, show "sent" badge
     document.getElementById('consult-lab-form').style.display = 'none';
     const sent = document.getElementById('consult-lab-sent');
-    if (sent) { sent.style.display = 'inline-flex'; sent.textContent = 'Sent — awaiting results'; sent.style.background = '#d1fae5'; sent.style.color = '#065f46'; }
+    if (sent) { sent.style.display = 'inline-flex'; sent.textContent = '✓ Sent — awaiting results'; sent.style.background = '#d1fae5'; sent.style.color = '#065f46'; }
     consultSelectedTests = [];
     renderConsultSelectedTests();
     buildConsultTestPicker();
-    toast('Lab request sent — diagnosis unlocks when results are back.');
+    toast('✅ Lab request sent — diagnosis unlocks when results are back.');
     // Start polling for results
     startLabResultPolling(currentConsultId);
   } catch(e) { toast('Error: ' + e.message, 'err'); }
@@ -6348,7 +6361,7 @@ function startLabResultPolling(queuePatientId) {
       const badge = document.getElementById('consult-lab-result-badge');
       if (badge) badge.style.display = 'inline-flex';
       unlockDiagnosis();
-      toast('Lab results are back — diagnosis unlocked.');
+      toast('🔬 Lab results are back — diagnosis unlocked.');
     } catch(e) { /* keep polling silently */ }
   }, 20000);
 }
@@ -6364,7 +6377,7 @@ function skipLabStep() {
   if (_labPollInterval) clearInterval(_labPollInterval);
   document.getElementById('consult-lab-form').style.display = 'none';
   const sent = document.getElementById('consult-lab-sent');
-  if (sent) { sent.style.display = 'inline-flex'; sent.textContent = 'No lab needed'; sent.style.background = '#F0EFEB'; sent.style.color = '#4A5568'; }
+  if (sent) { sent.style.display = 'inline-flex'; sent.textContent = '✓ No lab needed'; sent.style.background = '#F0EFEB'; sent.style.color = '#4A5568'; }
   unlockDiagnosis();
 }
 
@@ -6392,20 +6405,19 @@ async function saveConsultation(){
   try {
     // 1. Save to patients table (full record)
     await db('patients','POST',{
-      name:             patient?.name,
-      age:              patient?.age || null,
-      gender:           patient?.gender || null,
-      phone:            patient?.phone || null,
-      condition:        diagnosis,
-      notes:            document.getElementById('cons-notes').value.trim() || null,
+      name:           patient?.name,
+      age:            patient?.age || null,
+      gender:         patient?.gender || null,
+      phone:          patient?.phone || null,
+      condition:      diagnosis,
+      notes:          document.getElementById('cons-notes').value.trim() || null,
       status,
-      referral_to:      referral,
-      blood_pressure:   document.getElementById('cons-bp').value.trim() || null,
-      temperature:      document.getElementById('cons-temp').value || null,
-      weight:           document.getElementById('cons-weight').value || null,
-      pulse:            document.getElementById('cons-pulse').value || null,
-      queue_patient_id: currentConsultId,
-      org_id:           user.id
+      referral_to:    referral,
+      blood_pressure: document.getElementById('cons-bp').value.trim() || null,
+      temperature:    document.getElementById('cons-temp').value || null,
+      weight:         document.getElementById('cons-weight').value || null,
+      pulse:          document.getElementById('cons-pulse').value || null,
+      org_id:         user.id
     });
 
     // 2. Save prescription if drugs were added
@@ -6419,27 +6431,12 @@ async function saveConsultation(){
         status:        'Pending',
         org_id:        user.id
       });
-
-      // Stock check — warn doctor if any prescribed drug is out of stock
-      try {
-        const inv = await db('inventory?order=drug_name.asc');
-        const outOfStock = rxItems.filter(item => {
-          const match = inv.find(d =>
-            d.drug_name.toLowerCase().includes(item.drug.toLowerCase()) ||
-            item.drug.toLowerCase().includes(d.drug_name.toLowerCase())
-          );
-          return !match || Number(match.quantity) <= 0;
-        });
-        if (outOfStock.length) {
-          toast(`Stock alert: ${outOfStock.map(x=>x.drug).join(', ')} not available in dispensary.`, 'warn');
-        }
-      } catch(_) {}
     }
 
     // 3. Mark queue patient as Seen
     await db(`queue_patients?id=eq.${currentConsultId}`,'PATCH',{status:'Seen'});
 
-    toast('Consultation saved!' + (rxItems.length ? ' Prescription sent to pharmacy.' : ''));
+    toast('✅ Consultation saved!' + (rxItems.length ? ' Prescription sent to pharmacy.' : ''));
     currentConsultId = null;
     rxItems = [];
     if (_labPollInterval) clearInterval(_labPollInterval);
@@ -6528,149 +6525,42 @@ function parseDrugs(raw){
 
 let currentRxId = null;
 
-async function openRxDetail(id){
+function openRxDetail(id){
   const rx = rxQueue.find(x => x.id === id);
   if(!rx) return;
   currentRxId = id;
   const drugs = parseDrugs(rx.drugs);
-
-  // Show modal immediately, then enrich with stock data
-  const renderBody = (drugs, invMap) => {
-    return `
-      <!-- Patient header -->
-      <div style="background:#F8F7F3;border:1px solid #E8E6E1;border-radius:10px;
-                  padding:0.75rem 1rem;margin-bottom:1rem;">
-        <div style="display:flex;align-items:center;justify-content:space-between;">
-          <div>
-            <div style="font-weight:700;color:#0B1F3A;">${rx.patient_name||'—'}</div>
-            <div style="font-size:0.78rem;color:#9AA3AE;margin-top:0.15rem;">
-              Prescribed by ${rx.doctor_name||'—'} ·
-              ${new Date(rx.created_at).toLocaleString('en-GB',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'})}
-            </div>
+  document.getElementById('rx-detail-body').innerHTML = `
+    <div class="dr"><strong>Patient:</strong>${rx.patient_name||'—'}</div>
+    <div class="dr"><strong>Doctor:</strong>${rx.doctor_name||'—'}</div>
+    <div class="dr"><strong>Status:</strong>${rxStatusBadge(rx.status)}</div>
+    ${rx.notes ? `<div style="margin:0.8rem 0;padding:0.75rem 1rem;background:#F0EFEB;border-radius:8px;font-size:0.85rem;border:1px solid #E0DFDB;">${rx.notes}</div>` : ''}
+    <div style="margin-top:1rem;">
+      <div style="font-size:0.65rem;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;color:#9AA3AE;margin-bottom:0.6rem;">Prescribed Drugs</div>
+      ${drugs.map(d => `
+        <div style="background:#F0EFEB;border-radius:8px;padding:0.65rem 0.9rem;margin-bottom:0.5rem;">
+          <div style="font-weight:700;">${d.drug}</div>
+          <div style="font-size:0.8rem;color:#555;margin-top:0.15rem;">
+            ${[d.dose, d.frequency, d.duration].filter(Boolean).join(' · ')}
           </div>
-          <div>${rxStatusBadge(rx.status)}</div>
-        </div>
-      </div>
+          ${d.instructions ? `<div style="font-size:0.78rem;color:#9AA3AE;margin-top:0.1rem;">${d.instructions}</div>` : ''}
+        </div>`).join('')}
+    </div>`;
 
-      <!-- Drug list with stock status -->
-      <div style="font-size:0.68rem;font-weight:700;text-transform:uppercase;
-                  letter-spacing:0.8px;color:#9AA3AE;margin-bottom:0.6rem;">Prescribed Drugs</div>
-
-      ${drugs.map(d => {
-        const inv = invMap ? invMap[d.drug.toLowerCase()] : null;
-        const qty = inv ? Number(inv.quantity) : null;
-        const stockOk   = qty !== null && qty > 0;
-        const stockOut  = qty !== null && qty <= 0;
-        const unknown   = qty === null;
-
-        const stockChip = unknown
-          ? `<span style="font-size:0.7rem;padding:0.15rem 0.5rem;border-radius:100px;
-                          background:#F0EFEB;color:#9AA3AE;font-weight:600;">Not in inventory</span>`
-          : stockOut
-          ? `<span style="font-size:0.7rem;padding:0.15rem 0.5rem;border-radius:100px;
-                          background:#fee2e2;color:#991b1b;font-weight:600;">Out of stock</span>`
-          : `<span style="font-size:0.7rem;padding:0.15rem 0.5rem;border-radius:100px;
-                          background:#d1fae5;color:#065f46;font-weight:600;">${qty} in stock</span>`;
-
-        return `
-          <div style="border:1px solid ${stockOut?'#fecaca':'#E8E6E1'};border-radius:10px;
-                      padding:0.75rem 0.9rem;margin-bottom:0.5rem;
-                      background:${stockOut?'#fff5f5':'white'};">
-            <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:0.5rem;">
-              <div style="flex:1;">
-                <div style="font-weight:700;color:#0B1F3A;margin-bottom:0.25rem;">${d.drug}</div>
-                <div style="font-size:0.8rem;color:#555;">
-                  ${[d.dose, d.frequency, d.duration].filter(Boolean).join(' · ')}
-                </div>
-                ${d.instructions ? `<div style="font-size:0.75rem;color:#9AA3AE;margin-top:0.1rem;">${d.instructions}</div>` : ''}
-              </div>
-              <div style="flex-shrink:0;margin-top:0.1rem;">${stockChip}</div>
-            </div>
-            ${stockOut ? `
-            <div style="margin-top:0.6rem;padding-top:0.5rem;border-top:1px solid #fecaca;
-                        font-size:0.75rem;color:#991b1b;">
-              This drug is out of stock. Notify the doctor to prescribe an alternative.
-            </div>` : ''}
-          </div>`;
-      }).join('')}
-
-      ${rx.notes ? `
-      <div style="margin-top:0.75rem;background:#F8F7F3;border:1px solid #E8E6E1;
-                  border-radius:10px;padding:0.75rem 0.9rem;">
-        <div style="font-size:0.68rem;font-weight:700;text-transform:uppercase;
-                    letter-spacing:0.8px;color:#9AA3AE;margin-bottom:0.3rem;">Doctor's Notes</div>
-        <div style="font-size:0.85rem;color:#333;line-height:1.6;">${rx.notes}</div>
-      </div>` : ''}`;
-  };
-
-  // Show immediately with loading state
-  document.getElementById('rx-detail-body').innerHTML = renderBody(drugs, null);
   const btn = document.getElementById('rx-dispense-btn');
   if(btn) btn.style.display = rx.status==='Pending' ? 'inline-flex' : 'none';
   document.getElementById('m-rx-detail').classList.add('open');
-
-  // Enrich with live stock data
-  try {
-    const inv = await db('inventory?order=drug_name.asc');
-    const invMap = {};
-    inv.forEach(item => { invMap[item.drug_name.toLowerCase()] = item; });
-
-    // fuzzy match — also index partial names
-    const invMapEnriched = {};
-    drugs.forEach(d => {
-      const key = d.drug.toLowerCase();
-      const match = inv.find(i =>
-        i.drug_name.toLowerCase().includes(key) ||
-        key.includes(i.drug_name.toLowerCase())
-      );
-      invMapEnriched[key] = match || null;
-    });
-
-    document.getElementById('rx-detail-body').innerHTML = renderBody(drugs, invMapEnriched);
-
-    // Hide dispense button if ANY drug is out of stock
-    const hasOutOfStock = drugs.some(d => {
-      const match = invMapEnriched[d.drug.toLowerCase()];
-      return match && Number(match.quantity) <= 0;
-    });
-    if(btn && rx.status === 'Pending') {
-      btn.style.display = 'inline-flex';
-      btn.textContent = hasOutOfStock ? 'Dispense Anyway' : 'Mark as Dispensed';
-      btn.style.background = hasOutOfStock ? '#dc2626' : '';
-      btn.style.borderColor = hasOutOfStock ? '#dc2626' : '';
-    }
-  } catch(_) {}
 }
 
 async function dispenseRx(){
   if(!currentRxId) return;
-  const rx = rxQueue.find(x => x.id === currentRxId);
-  const drugs = parseDrugs(rx?.drugs);
-
   try {
-    // Deduct stock for each drug dispensed
-    if(drugs.length) {
-      const inv = await db('inventory?order=drug_name.asc');
-      for(const d of drugs) {
-        const match = inv.find(i =>
-          i.drug_name.toLowerCase().includes(d.drug.toLowerCase()) ||
-          d.drug.toLowerCase().includes(i.drug_name.toLowerCase())
-        );
-        if(match && Number(match.quantity) > 0) {
-          const qty = Number(d.quantity) || 1;
-          const newQty = Math.max(0, Number(match.quantity) - qty);
-          await db(`inventory?id=eq.${match.id}`, 'PATCH', { quantity: newQty }).catch(()=>{});
-        }
-      }
-    }
-
     await db(`prescriptions?id=eq.${currentRxId}`,'PATCH',{
-      status:       'Dispensed',
+      status:'Dispensed',
       dispensed_by: user?.email,
       dispensed_at: new Date().toISOString()
     });
-
-    toast('Prescription dispensed and stock updated.');
+    toast('✅ Prescription dispensed!');
     cm('m-rx-detail');
     loadDeptPharmacy();
   } catch(e){ toast('Error: '+e.message,'err'); }
@@ -6684,7 +6574,7 @@ async function quickDispense(id){
       dispensed_by: user?.email,
       dispensed_at: new Date().toISOString()
     });
-    toast('Dispensed!');
+    toast('✅ Dispensed!');
     loadDeptPharmacy();
   } catch(e){ toast('Error: '+e.message,'err'); }
 }
