@@ -4581,7 +4581,6 @@ async function openPatientModal(id) {
   document.getElementById('m-patient').classList.add('open');
 
   try {
-    // Fetch linked records — by queue_patient_id if available, fallback to name match
     const qid = p.queue_patient_id || null;
     const [testReqs, rxRows] = await Promise.all([
       qid
@@ -4590,7 +4589,6 @@ async function openPatientModal(id) {
       db(`prescriptions?patient_name=eq.${encodeURIComponent(p.name)}&order=created_at.desc`).catch(()=>[])
     ]);
 
-    // Fetch results for each test request
     const resultsByReq = {};
     await Promise.all(testReqs.map(async req => {
       resultsByReq[req.id] = await db(`test_results?request_id=eq.${req.id}&order=created_at.asc`).catch(()=>[]);
@@ -4600,8 +4598,8 @@ async function openPatientModal(id) {
     const vitals = [
       p.blood_pressure ? `BP: ${p.blood_pressure}` : null,
       p.temperature    ? `Temp: ${p.temperature}°C` : null,
-      p.weight         ? `Weight: ${p.weight} kg`  : null,
-      p.pulse          ? `Pulse: ${p.pulse} bpm`   : null,
+      p.weight         ? `Weight: ${p.weight} kg`   : null,
+      p.pulse          ? `Pulse: ${p.pulse} bpm`    : null,
     ].filter(Boolean);
 
     // ── Flag colours
@@ -4635,13 +4633,9 @@ async function openPatientModal(id) {
             <div style="display:flex;align-items:center;justify-content:space-between;
                         padding:0.45rem 0.9rem;border-bottom:1px solid #F0EFEB;font-size:0.82rem;">
               <span style="color:#333;font-weight:500;">${r.tests_ordered||'—'}</span>
-              <span style="display:flex;align-items:center;gap:0.5rem;">
-                <span style="font-weight:600;color:#0B1F3A;">
-                  ${r.result_value||'—'}${r.result_unit?' '+r.result_unit:''}
-                </span>
-                ${r.reference_range?`<span style="font-size:0.7rem;color:#9AA3AE;">(${r.reference_range})</span>`:''}
-                <span style="font-size:0.7rem;font-weight:700;padding:0.1rem 0.45rem;border-radius:100px;
-                             ${flagStyle[r.flag]||flagStyle['Inconclusive']}">${r.flag||'—'}</span>
+              <span style="font-size:0.78rem;font-weight:700;padding:0.18rem 0.6rem;
+                           border-radius:100px;${flagStyle[r.flag]||flagStyle['Inconclusive']}">
+                ${r.flag||'—'}
               </span>
             </div>`).join('')
           : `<div style="padding:0.55rem 0.9rem;font-size:0.8rem;color:#9AA3AE;">
@@ -4651,7 +4645,7 @@ async function openPatientModal(id) {
     }).join('')
     : `<div style="font-size:0.82rem;color:#9AA3AE;padding:0.3rem 0;">No lab tests requested.</div>`;
 
-    // ── Prescription section
+    // ── Prescription section (no notes here — notes live in Doctor's Notes only)
     const rxHTML = rxRows.length ? rxRows.map(rx => {
       let drugs = [];
       try { drugs = JSON.parse(rx.drugs||'[]'); } catch {}
@@ -4675,7 +4669,6 @@ async function openPatientModal(id) {
                 ${[d.dose,d.frequency,d.duration].filter(Boolean).join(' · ')}
               </span>
             </div>`).join('')}
-          ${rx.notes?`<div style="padding:0.45rem 0.9rem;font-size:0.78rem;color:#555;font-style:italic;">${rx.notes}</div>`:''}
         </div>`;
     }).join('')
     : `<div style="font-size:0.82rem;color:#9AA3AE;padding:0.3rem 0;">No prescription recorded.</div>`;
@@ -4729,13 +4722,13 @@ async function openPatientModal(id) {
       </div>
 
       ${p.notes ? `
-      <div style="background:#F8F7F3;border:1px solid #E8E6E1;border-radius:10px;padding:0.75rem 0.9rem;">
+      <div style="background:#F8F7F3;border:1px solid #E8E6E1;border-radius:10px;padding:0.75rem 0.9rem;margin-bottom:1rem;">
         <div style="font-size:0.68rem;font-weight:700;text-transform:uppercase;
                     letter-spacing:0.8px;color:#9AA3AE;margin-bottom:0.3rem;">Doctor's Notes</div>
         <div style="font-size:0.85rem;color:#333;line-height:1.6;">${p.notes}</div>
       </div>` : ''}
 
-      <div style="margin-top:1rem;font-size:0.72rem;color:#9AA3AE;text-align:right;">
+      <div style="font-size:0.72rem;color:#9AA3AE;text-align:right;">
         Registered ${fmtDate(p.created_at)}
       </div>`;
 
