@@ -5265,7 +5265,6 @@ function renderWorklist(arr) {
   }).join('');
 }
 
-
 // Normalise tests field — clinic uses JSON `tests`, walk-in uses CSV `tests_ordered`
 function getTestsDisplay(r) {
   if (r.tests_ordered) return r.tests_ordered.split(',').map(t => t.trim()).join(', ');
@@ -5714,76 +5713,6 @@ function viewResult(id) {
   const tat = (r.created_at && req?.created_at)
     ? fmtDuration(new Date(r.created_at) - new Date(req.created_at)) : '—';
 
-  document.getElementById('result-detail-body').innerHTML = `
-    <div style="background:#F0EFEB;border-radius:10px;padding:1rem;
-                margin-bottom:1.2rem;border:1px solid #E0DFDB;">
-      <div style="font-weight:700;font-size:0.95rem;">${r.patient_name||'—'}</div>
-      <div style="font-size:0.8rem;color:#9AA3AE;margin-top:0.2rem;">
-        ${[req?.patient_age ? req.patient_age+'y' : null,
-           req?.patient_gender,
-           req?.requesting_doctor ? 'Req. by: '+req.requesting_doctor : null
-          ].filter(Boolean).join(' · ')}
-      </div>
-      <div style="font-size:0.78rem;color:#9AA3AE;margin-top:0.15rem;">
-        ${req?.sample_type ? 'Sample: '+req.sample_type+' · ' : ''}
-        Received: ${fmtDate(req?.created_at)} · TAT: ${tat}
-      </div>
-      ${req?.clinical_notes
-        ? `<div style="margin-top:0.5rem;font-size:0.8rem;color:#555;background:white;
-                       border-radius:6px;padding:0.4rem 0.6rem;border:1px solid #E8E6E1;">
-             📋 ${req.clinical_notes}</div>` : ''}
-    </div>
-
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.6rem;margin-bottom:1rem;">
-      <div style="background:#F8F7F3;border-radius:8px;padding:0.75rem;border:1px solid #E8E6E1;">
-        <div style="font-size:0.7rem;color:#9AA3AE;font-weight:700;text-transform:uppercase;margin-bottom:0.3rem;">Test</div>
-        <div style="font-weight:700;">${r.tests_ordered||'—'}</div>
-      </div>
-      <div style="background:#F8F7F3;border-radius:8px;padding:0.75rem;border:1px solid #E8E6E1;">
-        <div style="font-size:0.7rem;color:#9AA3AE;font-weight:700;text-transform:uppercase;margin-bottom:0.3rem;">Result</div>
-        <div style="font-weight:700;font-size:1.05rem;">
-          ${r.result_value||'—'}${r.result_unit ? ` <span style="font-size:0.8rem;font-weight:400;">${r.result_unit}</span>` : ''}
-        </div>
-      </div>
-      <div style="background:#F8F7F3;border-radius:8px;padding:0.75rem;border:1px solid #E8E6E1;">
-        <div style="font-size:0.7rem;color:#9AA3AE;font-weight:700;text-transform:uppercase;margin-bottom:0.3rem;">Reference Range</div>
-        <div>${r.reference_range||'—'}</div>
-      </div>
-      <div style="background:#F8F7F3;border-radius:8px;padding:0.75rem;border:1px solid #E8E6E1;">
-        <div style="font-size:0.7rem;color:#9AA3AE;font-weight:700;text-transform:uppercase;margin-bottom:0.3rem;">Flag</div>
-        <div>${resultFlagBadge(r.flag)}</div>
-      </div>
-      ${r.comment ? `
-      <div style="background:#F8F7F3;border-radius:8px;padding:0.75rem;
-                  border:1px solid #E8E6E1;grid-column:span 2;">
-        <div style="font-size:0.7rem;color:#9AA3AE;font-weight:700;text-transform:uppercase;margin-bottom:0.3rem;">Comment</div>
-        <div style="font-size:0.85rem;">${r.comment}</div>
-      </div>` : ''}
-    </div>
-
-    ${r.tech_notes ? `
-    <div style="background:#fffbeb;border:1px solid #fcd34d;border-radius:8px;
-                padding:0.75rem 1rem;font-size:0.83rem;color:#92400e;margin-bottom:1rem;">
-      <strong>Technician Notes:</strong> ${r.tech_notes}
-    </div>` : ''}
-
-    <div style="font-size:0.75rem;color:#9AA3AE;text-align:right;">
-      Recorded: ${r.created_at ? new Date(r.created_at).toLocaleString('en-GB') : '—'}
-      ${r.analysis_dt ? ' · Analysed: ' + new Date(r.analysis_dt).toLocaleString('en-GB') : ''}
-    </div>`;
-
-  // Show/hide dispatch button based on status
-  const dispatchBtn = document.getElementById('dispatch-btn');
-  if (dispatchBtn) {
-    if (req && req.status === 'Result Ready') {
-      dispatchBtn.style.display = 'inline-flex';
-      dispatchBtn.dataset.requestId   = req.id;
-      dispatchBtn.dataset.patientName = req.patient_name;
-    } else {
-      dispatchBtn.style.display = 'none';
-    }
-  }
-
   currentResultReport = {
     req,
     resultRows: [{ test: r.tests_ordered, value: r.result_value, unit: r.result_unit,
@@ -5791,8 +5720,7 @@ function viewResult(id) {
     techNotes:  r.tech_notes,
     savedAt:    r.created_at ? new Date(r.created_at) : new Date()
   };
-
-  document.getElementById('m-result-detail').classList.add('open');
+  showResultReport(currentResultReport);
 }
 
 // ── DISPATCH ──────────────────────────────────────────────────────────────────
