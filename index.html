@@ -1800,6 +1800,22 @@
             <span id="pos-change" style="color:#059669;font-weight:700;">UGX 0</span>
           </div>
 
+          <!-- Mobile Money row -->
+          <div id="pos-momo-row" style="display:none;flex-direction:column;gap:0.5rem;padding:0.65rem 1rem;border-top:1px solid #F0EFEB;">
+            <div style="display:flex;gap:0.5rem;align-items:center;">
+              <input type="tel" id="pos-momo-phone" placeholder="07XXXXXXXX"
+                     style="flex:1;border:1px solid #E0DFDB;border-radius:8px;padding:0.55rem 0.8rem;
+                            font-size:0.88rem;font-family:'Syne',sans-serif;outline:none;"/>
+              <button id="pos-momo-req-btn" onclick="requestMomoPayment()"
+                      style="background:#0B1F3A;color:white;border:none;padding:0.55rem 1rem;
+                             border-radius:8px;cursor:pointer;font-size:0.8rem;font-weight:700;
+                             font-family:'Syne',sans-serif;white-space:nowrap;">
+                Request →
+              </button>
+            </div>
+            <div id="pos-momo-status" style="display:none;font-size:0.82rem;padding:0.3rem 0;"></div>
+          </div>
+
           <!-- Customer + payment -->
           <div class="pos-basket-meta">
             <div class="form-group">
@@ -1865,7 +1881,19 @@
         <div class="dash-greeting">Good <em id="cl-time-greeting">morning</em>, <span id="cl-facility-name">—</span></div>
         <div class="dash-date" id="cl-date-str"></div>
       </div>
-      <div id="cl-quick-note" style="font-size:0.8rem;color:#9AA3AE;text-align:right;max-width:260px;line-height:1.6;padding-top:0.2rem;"></div>
+      <div style="display:flex;align-items:center;gap:1rem;flex-wrap:wrap;">
+        <div id="cl-quick-note" style="font-size:0.8rem;color:#9AA3AE;text-align:right;max-width:260px;line-height:1.6;padding-top:0.2rem;"></div>
+        <div id="cl-export-wrap" style="display:none;">
+          <button id="cl-export-btn" onclick="exportClinicData()"
+                  style="background:#F8F7F3;border:1px solid #E8E6E1;color:#0B1F3A;
+                         padding:0.45rem 1rem;border-radius:8px;cursor:pointer;
+                         font-size:0.78rem;font-weight:700;font-family:'Syne',sans-serif;
+                         display:flex;align-items:center;gap:0.4rem;transition:background 0.15s;">
+            <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            Export Data
+          </button>
+        </div>
+      </div>
     </div>
 
     <!-- Critical alerts bar -->
@@ -2112,6 +2140,14 @@
             <option value="Discharged">Discharged</option>
             <option value="Referred">Referred</option>
           </select>
+          <div id="cl-import-btn-wrap" style="display:none;">
+            <button onclick="openImportModal()"
+                    style="background:#F8F7F3;border:1px solid #E8E6E1;color:#0B1F3A;
+                           padding:0.6rem 1rem;border-radius:8px;cursor:pointer;
+                           font-size:0.82rem;font-weight:700;font-family:'Syne',sans-serif;">
+              ↑ Import CSV
+            </button>
+          </div>
         </div>
 
         <div class="table-wrap">
@@ -2477,48 +2513,498 @@
   </div>
 
   <!-- HOSPITAL DASHBOARD -->
+  <!-- ══════════════════════════════════════════════════
+       HOSPITAL: HOME DASHBOARD
+  ══════════════════════════════════════════════════ -->
   <div class="page" id="page-hospital">
-    <div class="welcome-banner hospital">
-      <div class="wb-icon">🏨</div>
-      <div class="wb-text">
-        <h3 id="wb-hosp-title">Welcome</h3>
-        <p>Manage patient admissions, records, prescriptions, and inventory.</p>
+
+    <!-- Header -->
+    <div class="dash-header">
+      <div>
+        <div class="dash-greeting">Good <em id="ho-greeting">morning</em>, <span id="ho-facility-name">Hospital</span></div>
+        <div class="dash-date" id="ho-date-str"></div>
+      </div>
+      <div style="display:flex;gap:0.6rem;align-items:center;flex-wrap:wrap;">
+        <button onclick="showPage('ho-triage')"
+                style="background:#dc2626;color:white;border:none;padding:0.5rem 1.1rem;
+                       border-radius:8px;cursor:pointer;font-size:0.82rem;font-weight:700;
+                       font-family:'Syne',sans-serif;display:flex;align-items:center;gap:0.4rem;">
+          🚨 New Triage
+        </button>
+        <button onclick="showPage('ho-beds')"
+                style="background:#0B1F3A;color:white;border:none;padding:0.5rem 1.1rem;
+                       border-radius:8px;cursor:pointer;font-size:0.82rem;font-weight:700;
+                       font-family:'Syne',sans-serif;">
+          🛏 Bed Board
+        </button>
       </div>
     </div>
-    <div class="stats-3">
-      <div class="stat-card">
-        <div class="stat-card-top"><span class="stat-label">Total Patients</span></div>
-        <div class="stat-num" id="ho-pts">—</div>
-        <div class="stat-sub">all time</div>
+
+    <!-- Critical alert bar -->
+    <div id="ho-alert-bar"
+         style="display:none;background:#fef2f2;border:1px solid #fecaca;border-radius:10px;
+                padding:0.65rem 1rem;margin-bottom:1rem;font-size:0.82rem;color:#991b1b;
+                align-items:center;gap:0.75rem;">
+      <span>⚠</span><span id="ho-alert-text"></span>
+    </div>
+
+    <!-- Stats row -->
+    <div class="stats-5" style="grid-template-columns:repeat(5,1fr);margin-bottom:1.25rem;">
+      <div class="stat-card" id="sc-ho-census">
+        <div class="stat-card-top">
+          <span class="stat-label">Inpatient Census</span>
+          <div class="stat-icon" style="background:#eff6ff;">🛏</div>
+        </div>
+        <div class="stat-num" id="ho-census">—</div>
+        <div class="stat-sub">beds occupied</div>
+      </div>
+      <div class="stat-card" id="sc-ho-ed">
+        <div class="stat-card-top">
+          <span class="stat-label">ED Today</span>
+          <div class="stat-icon" style="background:#fef2f2;">🚨</div>
+        </div>
+        <div class="stat-num" id="ho-ed-count">—</div>
+        <div class="stat-sub">encounters open</div>
       </div>
       <div class="stat-card">
-        <div class="stat-card-top"><span class="stat-label">Admitted Today</span></div>
-        <div class="stat-num" id="ho-today">—</div>
-        <div class="stat-sub">registered today</div>
+        <div class="stat-card-top">
+          <span class="stat-label">Admitted Today</span>
+          <div class="stat-icon" style="background:#f0fdf4;">✅</div>
+        </div>
+        <div class="stat-num" id="ho-admitted-today">—</div>
+        <div class="stat-sub">new admissions</div>
       </div>
-      <div class="stat-card" id="sc-ho-low">
-        <div class="stat-card-top"><span class="stat-label">Low Stock Drugs</span></div>
-        <div class="stat-num" id="ho-low">—</div>
-        <div class="stat-sub">≤ 10 units</div>
+      <div class="stat-card">
+        <div class="stat-card-top">
+          <span class="stat-label">Discharged Today</span>
+          <div class="stat-icon" style="background:#f5f3ff;">🚪</div>
+        </div>
+        <div class="stat-num" id="ho-discharged-today">—</div>
+        <div class="stat-sub">closed today</div>
+      </div>
+      <div class="stat-card" id="sc-ho-avail">
+        <div class="stat-card-top">
+          <span class="stat-label">Beds Available</span>
+          <div class="stat-icon" style="background:#ecfdf5;">🟢</div>
+        </div>
+        <div class="stat-num" id="ho-avail">—</div>
+        <div class="stat-sub">ready now</div>
+      </div>
+    </div>
+
+    <!-- ED Live Board + Inpatient summary -->
+    <div style="display:grid;grid-template-columns:1.2fr 1fr;gap:1rem;margin-bottom:1rem;">
+
+      <!-- ED Board -->
+      <div class="card" style="margin:0;">
+        <h2 style="justify-content:space-between;">
+          <span>🚨 Emergency Department</span>
+          <button onclick="showPage('ho-triage')"
+                  style="font-size:0.72rem;color:#dc2626;background:none;border:none;
+                         cursor:pointer;font-family:'Syne',sans-serif;font-weight:700;">
+            + New Triage →
+          </button>
+        </h2>
+        <div id="ho-ed-board" style="display:flex;flex-direction:column;gap:0.4rem;min-height:80px;">
+          <div style="color:#9AA3AE;font-size:0.82rem;text-align:center;padding:1rem 0;">Loading…</div>
+        </div>
+      </div>
+
+      <!-- Bed occupancy by ward -->
+      <div class="card" style="margin:0;">
+        <h2 style="justify-content:space-between;">
+          <span>🛏 Ward Occupancy</span>
+          <button onclick="showPage('ho-beds')"
+                  style="font-size:0.72rem;color:#0D6E6E;background:none;border:none;
+                         cursor:pointer;font-family:'Syne',sans-serif;font-weight:700;">
+            Full Board →
+          </button>
+        </h2>
+        <div id="ho-ward-summary" style="display:flex;flex-direction:column;gap:0.4rem;min-height:80px;">
+          <div style="color:#9AA3AE;font-size:0.82rem;text-align:center;padding:1rem 0;">Loading…</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Recent encounters table -->
+    <div class="card">
+      <h2 style="justify-content:space-between;">
+        <span>Recent Encounters</span>
+        <button onclick="showPage('ho-encounters')"
+                style="background:#0B1F3A;color:white;border:none;padding:0.35rem 0.9rem;
+                       border-radius:7px;cursor:pointer;font-size:0.75rem;font-weight:700;
+                       font-family:'Syne',sans-serif;">
+          All Encounters
+        </button>
+      </h2>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Patient</th><th>Type</th><th>Triage</th>
+              <th class="hide-mobile">Ward / Bed</th>
+              <th>Status</th><th>Admitted</th><th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="ho-recent-enc-body">
+            <tr><td colspan="7" class="loading">Loading…</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+
+
+  <!-- ══════════════════════════════════════════════════
+       HOSPITAL: TRIAGE & REGISTRATION
+  ══════════════════════════════════════════════════ -->
+  <div class="page" id="page-ho-triage">
+    <div style="margin-top:0.5rem;">
+
+      <div class="dash-header" style="margin-bottom:1rem;">
+        <div>
+          <h2 style="font-size:1rem;font-weight:700;color:#0B1F3A;margin:0;">New Encounter — Triage & Registration</h2>
+          <div style="font-size:0.8rem;color:#9AA3AE;margin-top:0.2rem;">Emergency walk-in, scheduled admission, or referral</div>
+        </div>
+        <button onclick="showPage('hospital')"
+                style="background:#F0EFEB;border:1px solid #E0DFDB;color:#0B1F3A;padding:0.45rem 1rem;
+                       border-radius:8px;cursor:pointer;font-size:0.78rem;font-weight:700;
+                       font-family:'Syne',sans-serif;">
+          ← Back
+        </button>
+      </div>
+
+      <!-- Triage category selector — prominent at top -->
+      <div class="card" style="border:2px solid #E8E6E1;margin-bottom:1rem;">
+        <h2>1. Triage Category</h2>
+        <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:0.6rem;">
+          <label id="tc-1" style="display:flex;flex-direction:column;align-items:center;gap:0.4rem;
+                                   padding:0.85rem 0.5rem;border-radius:10px;border:2px solid #fecaca;
+                                   background:#fef2f2;cursor:pointer;transition:all 0.15s;"
+                 onclick="selectTriageCategory(1,this)">
+            <span style="font-size:1.4rem;">🔴</span>
+            <span style="font-size:0.72rem;font-weight:700;color:#dc2626;text-align:center;">1 — Resuscitation</span>
+            <span style="font-size:0.65rem;color:#9AA3AE;text-align:center;">Immediate</span>
+          </label>
+          <label id="tc-2" style="display:flex;flex-direction:column;align-items:center;gap:0.4rem;
+                                   padding:0.85rem 0.5rem;border-radius:10px;border:2px solid #fed7aa;
+                                   background:#fff7ed;cursor:pointer;transition:all 0.15s;"
+                 onclick="selectTriageCategory(2,this)">
+            <span style="font-size:1.4rem;">🟠</span>
+            <span style="font-size:0.72rem;font-weight:700;color:#c2410c;text-align:center;">2 — Emergency</span>
+            <span style="font-size:0.65rem;color:#9AA3AE;text-align:center;">10 min</span>
+          </label>
+          <label id="tc-3" style="display:flex;flex-direction:column;align-items:center;gap:0.4rem;
+                                   padding:0.85rem 0.5rem;border-radius:10px;border:2px solid #fde68a;
+                                   background:#fffbeb;cursor:pointer;transition:all 0.15s;"
+                 onclick="selectTriageCategory(3,this)">
+            <span style="font-size:1.4rem;">🟡</span>
+            <span style="font-size:0.72rem;font-weight:700;color:#d97706;text-align:center;">3 — Urgent</span>
+            <span style="font-size:0.65rem;color:#9AA3AE;text-align:center;">30 min</span>
+          </label>
+          <label id="tc-4" style="display:flex;flex-direction:column;align-items:center;gap:0.4rem;
+                                   padding:0.85rem 0.5rem;border-radius:10px;border:2px solid #bbf7d0;
+                                   background:#f0fdf4;cursor:pointer;transition:all 0.15s;"
+                 onclick="selectTriageCategory(4,this)">
+            <span style="font-size:1.4rem;">🟢</span>
+            <span style="font-size:0.72rem;font-weight:700;color:#059669;text-align:center;">4 — Semi-urgent</span>
+            <span style="font-size:0.65rem;color:#9AA3AE;text-align:center;">60 min</span>
+          </label>
+          <label id="tc-5" style="display:flex;flex-direction:column;align-items:center;gap:0.4rem;
+                                   padding:0.85rem 0.5rem;border-radius:10px;border:2px solid #bfdbfe;
+                                   background:#eff6ff;cursor:pointer;transition:all 0.15s;"
+                 onclick="selectTriageCategory(5,this)">
+            <span style="font-size:1.4rem;">🔵</span>
+            <span style="font-size:0.72rem;font-weight:700;color:#1d4ed8;text-align:center;">5 — Non-urgent</span>
+            <span style="font-size:0.65rem;color:#9AA3AE;text-align:center;">120 min</span>
+          </label>
+        </div>
+        <input type="hidden" id="tr-category" value=""/>
+      </div>
+
+      <!-- Patient identity -->
+      <div class="card" style="margin-bottom:1rem;">
+        <h2>2. Patient Identity</h2>
+        <div class="form-grid">
+          <div class="form-group">
+            <label>Full Name *</label>
+            <input type="text" id="tr-name" placeholder="e.g. John Okello"
+                   oninput="searchExistingPatient()"/>
+          </div>
+          <div class="form-group">
+            <label>Age</label>
+            <input type="number" id="tr-age" placeholder="e.g. 34" min="0"/>
+          </div>
+          <div class="form-group">
+            <label>Gender</label>
+            <select id="tr-gender">
+              <option value="">Select</option>
+              <option>Female</option><option>Male</option><option>Other</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Phone</label>
+            <input type="tel" id="tr-phone" placeholder="0701234567"
+                   oninput="searchExistingPatient()"/>
+          </div>
+        </div>
+        <!-- Existing patient match banner -->
+        <div id="tr-existing-banner" style="display:none;margin-top:0.75rem;padding:0.65rem 1rem;
+             background:#f0fdf4;border:1px solid #86efac;border-radius:8px;font-size:0.82rem;
+             color:#166534;display:none;align-items:center;gap:0.5rem;">
+          <span>✅</span>
+          <span id="tr-existing-text">Existing patient record found — will link to encounter.</span>
+        </div>
+      </div>
+
+      <!-- Vitals -->
+      <div class="card" style="margin-bottom:1rem;">
+        <h2>3. Vital Signs</h2>
+        <div class="form-grid" style="grid-template-columns:repeat(auto-fit,minmax(160px,1fr));">
+          <div class="form-group">
+            <label>BP Systolic (mmHg)</label>
+            <input type="number" id="tr-bp-sys" placeholder="120" oninput="computeNEWS2()"/>
+          </div>
+          <div class="form-group">
+            <label>BP Diastolic (mmHg)</label>
+            <input type="number" id="tr-bp-dia" placeholder="80"/>
+          </div>
+          <div class="form-group">
+            <label>Temperature (°C)</label>
+            <input type="number" id="tr-temp" placeholder="37.0" step="0.1" oninput="computeNEWS2()"/>
+          </div>
+          <div class="form-group">
+            <label>Pulse (bpm)</label>
+            <input type="number" id="tr-pulse" placeholder="72" oninput="computeNEWS2()"/>
+          </div>
+          <div class="form-group">
+            <label>Resp. Rate (/min)</label>
+            <input type="number" id="tr-resp" placeholder="16" oninput="computeNEWS2()"/>
+          </div>
+          <div class="form-group">
+            <label>SpO₂ (%)</label>
+            <input type="number" id="tr-spo2" placeholder="98" oninput="computeNEWS2()"/>
+          </div>
+          <div class="form-group">
+            <label>Weight (kg)</label>
+            <input type="number" id="tr-weight" placeholder="68" step="0.1"/>
+          </div>
+          <div class="form-group">
+            <label>Pain Score (0–10)</label>
+            <input type="number" id="tr-pain" placeholder="0" min="0" max="10" oninput="computeNEWS2()"/>
+          </div>
+        </div>
+        <!-- NEWS2 live display -->
+        <div id="tr-news2-display" style="margin-top:1rem;display:none;">
+          <div style="display:flex;align-items:center;gap:1rem;padding:0.75rem 1rem;
+                      border-radius:8px;border:1px solid #E8E6E1;background:#F8F7F3;">
+            <div>
+              <div style="font-size:0.63rem;font-weight:700;text-transform:uppercase;
+                          letter-spacing:0.8px;color:#9AA3AE;margin-bottom:0.2rem;">NEWS2 Score</div>
+              <div id="tr-news2-score" style="font-size:2rem;font-weight:700;color:#0B1F3A;line-height:1;">—</div>
+            </div>
+            <div id="tr-news2-risk" style="flex:1;font-size:0.82rem;font-weight:600;color:#555;"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Clinical presentation -->
+      <div class="card" style="margin-bottom:1rem;">
+        <h2>4. Clinical Presentation</h2>
+        <div class="form-grid">
+          <div class="form-group" style="grid-column:span 2;">
+            <label>Chief Complaint *</label>
+            <input type="text" id="tr-complaint"
+                   placeholder="e.g. Severe chest pain radiating to left arm, onset 2 hours ago"/>
+          </div>
+          <div class="form-group">
+            <label>Entry Point</label>
+            <select id="tr-entry">
+              <option value="emergency">Emergency Walk-in</option>
+              <option value="scheduled">Scheduled Admission</option>
+              <option value="referral">Inter-facility Referral</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Attending Clinician</label>
+            <input type="text" id="tr-doctor" placeholder="Dr. name"/>
+          </div>
+          <div class="form-group" style="grid-column:span 2;">
+            <label>Initial Clinical Notes</label>
+            <textarea id="tr-notes" placeholder="Relevant history, findings, initial impression…"
+                      style="min-height:80px;"></textarea>
+          </div>
+        </div>
+      </div>
+
+      <!-- Action buttons -->
+      <div style="display:flex;gap:0.75rem;justify-content:flex-end;flex-wrap:wrap;">
+        <button onclick="showPage('hospital')" class="btn btn-sm" style="padding:0.65rem 1.4rem;">Cancel</button>
+        <button onclick="saveTriageEncounter()" class="btn btn-primary" id="tr-save-btn"
+                style="padding:0.65rem 1.8rem;font-size:0.9rem;">
+          Register &amp; Open Encounter →
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+
+  <!-- ══════════════════════════════════════════════════
+       HOSPITAL: BED BOARD
+  ══════════════════════════════════════════════════ -->
+  <div class="page" id="page-ho-beds">
+    <div style="margin-top:0.5rem;">
+
+      <!-- Header -->
+      <div class="dash-header" style="margin-bottom:1rem;">
+        <div>
+          <h2 style="font-size:1rem;font-weight:700;color:#0B1F3A;margin:0;">Bed Board</h2>
+          <div style="font-size:0.8rem;color:#9AA3AE;margin-top:0.2rem;"
+               id="bed-board-updated">Loading…</div>
+        </div>
+        <div style="display:flex;gap:0.6rem;align-items:center;flex-wrap:wrap;">
+          <!-- Ward filter -->
+          <select id="bed-ward-filter" onchange="renderBedBoard()"
+                  style="border:1px solid #E0DFDB;border-radius:8px;padding:0.45rem 0.8rem;
+                         font-size:0.82rem;font-family:'Syne',sans-serif;color:#0B1F3A;
+                         background:#F0EFEB;outline:none;cursor:pointer;">
+            <option value="">All Wards</option>
+            <option value="General">General</option>
+            <option value="HDU">HDU</option>
+            <option value="ICU">ICU</option>
+            <option value="Paediatric">Paediatric</option>
+            <option value="Maternity">Maternity</option>
+            <option value="Isolation">Isolation</option>
+          </select>
+          <!-- Status filter -->
+          <select id="bed-status-filter" onchange="renderBedBoard()"
+                  style="border:1px solid #E0DFDB;border-radius:8px;padding:0.45rem 0.8rem;
+                         font-size:0.82rem;font-family:'Syne',sans-serif;color:#0B1F3A;
+                         background:#F0EFEB;outline:none;cursor:pointer;">
+            <option value="">All Statuses</option>
+            <option value="available">Available</option>
+            <option value="occupied">Occupied</option>
+            <option value="cleaning">Cleaning</option>
+            <option value="maintenance">Maintenance</option>
+          </select>
+          <button onclick="openAddBedModal()"
+                  style="background:#0B1F3A;color:white;border:none;padding:0.45rem 1rem;
+                         border-radius:8px;cursor:pointer;font-size:0.78rem;font-weight:700;
+                         font-family:'Syne',sans-serif;">
+            + Add Bed
+          </button>
+        </div>
+      </div>
+
+      <!-- Bed summary strip -->
+      <div style="display:flex;gap:0.6rem;margin-bottom:1rem;flex-wrap:wrap;">
+        <div id="bbs-occupied"
+             style="background:#0B1F3A;color:white;border-radius:8px;padding:0.5rem 1rem;
+                    font-size:0.82rem;font-weight:700;">
+          🔴 — Occupied
+        </div>
+        <div id="bbs-available"
+             style="background:#f0fdf4;border:1px solid #86efac;color:#166534;border-radius:8px;
+                    padding:0.5rem 1rem;font-size:0.82rem;font-weight:700;">
+          🟢 — Available
+        </div>
+        <div id="bbs-cleaning"
+             style="background:#fffbeb;border:1px solid #fde68a;color:#92400e;border-radius:8px;
+                    padding:0.5rem 1rem;font-size:0.82rem;font-weight:700;">
+          🟡 — Cleaning
+        </div>
+        <div id="bbs-maintenance"
+             style="background:#F0EFEB;border:1px solid #E0DFDB;color:#555;border-radius:8px;
+                    padding:0.5rem 1rem;font-size:0.82rem;font-weight:700;">
+          ⚫ — Maintenance
+        </div>
+      </div>
+
+      <!-- Bed grid -->
+      <div id="bed-board-grid" style="display:flex;flex-direction:column;gap:1.5rem;">
+        <div style="text-align:center;padding:3rem;color:#9AA3AE;font-size:0.85rem;">Loading beds…</div>
+      </div>
+
+    </div>
+  </div>
+
+
+  <!-- ══════════════════════════════════════════════════
+       HOSPITAL: ENCOUNTERS LIST
+  ══════════════════════════════════════════════════ -->
+  <div class="page" id="page-ho-encounters">
+    <div style="margin-top:0.5rem;">
+
+      <div class="dash-header" style="margin-bottom:1rem;">
+        <div>
+          <h2 style="font-size:1rem;font-weight:700;color:#0B1F3A;margin:0;">All Encounters</h2>
+          <div style="font-size:0.8rem;color:#9AA3AE;margin-top:0.2rem;">Full encounter history</div>
+        </div>
+        <button onclick="showPage('ho-triage')" class="btn btn-primary">+ New Triage</button>
+      </div>
+
+      <!-- Filter bar -->
+      <div style="display:flex;gap:0.75rem;margin-bottom:1rem;flex-wrap:wrap;">
+        <div class="search-bar" style="flex:1;margin:0;">
+          <input type="text" id="ho-enc-search"
+                 placeholder="Search patient name or complaint…"
+                 oninput="filterEncounters()" style="margin:0;"/>
+        </div>
+        <select id="ho-enc-status" onchange="filterEncounters()"
+                style="border:1px solid #E0DFDB;border-radius:8px;padding:0.55rem 0.9rem;
+                       font-size:0.85rem;font-family:'Syne',sans-serif;color:#0B1F3A;
+                       background:#F0EFEB;outline:none;min-width:160px;">
+          <option value="">All Statuses</option>
+          <option value="registered">Registered</option>
+          <option value="triaged">Triaged</option>
+          <option value="in_assessment">In Assessment</option>
+          <option value="admitted">Admitted</option>
+          <option value="observation">Observation</option>
+          <option value="discharged">Discharged</option>
+        </select>
+        <select id="ho-enc-type" onchange="filterEncounters()"
+                style="border:1px solid #E0DFDB;border-radius:8px;padding:0.55rem 0.9rem;
+                       font-size:0.85rem;font-family:'Syne',sans-serif;color:#0B1F3A;
+                       background:#F0EFEB;outline:none;min-width:140px;">
+          <option value="">All Types</option>
+          <option value="emergency">Emergency</option>
+          <option value="scheduled">Scheduled</option>
+          <option value="referral">Referral</option>
+        </select>
+      </div>
+
+      <div class="card" style="padding:0;overflow:hidden;">
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Patient</th>
+                <th>Triage</th>
+                <th class="hide-mobile">Chief Complaint</th>
+                <th>Type</th>
+                <th class="hide-mobile">Bed</th>
+                <th>Status</th>
+                <th>Opened</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="ho-enc-body">
+              <tr><td colspan="8" class="loading">Loading…</td></tr>
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   </div>
 
-  <!-- HOSPITAL: PATIENTS -->
+
+  <!-- ══════════════════════════════════════════════════
+       HOSPITAL: PATIENTS (legacy, kept for compatibility)
+  ══════════════════════════════════════════════════ -->
   <div class="page" id="page-ho-patients">
     <div style="margin-top:0.5rem">
-      <div class="card">
-        <h2>Admit / Register Patient</h2>
-        <div class="form-grid">
-          <div class="form-group"><label>Full Name *</label><input type="text" id="hp-name" placeholder="e.g. John Okello"/></div>
-          <div class="form-group"><label>Age</label><input type="number" id="hp-age" placeholder="45" min="0"/></div>
-          <div class="form-group"><label>Gender</label><select id="hp-gender"><option value="">Select</option><option>Female</option><option>Male</option><option>Other</option></select></div>
-          <div class="form-group"><label>Phone</label><input type="tel" id="hp-phone" placeholder="0701234567"/></div>
-          <div class="form-group" style="grid-column:span 2"><label>Diagnosis</label><input type="text" id="hp-cond" placeholder="e.g. Severe malaria, Type 2 Diabetes"/></div>
-          <div class="form-group" style="grid-column:span 2"><label>Treatment Notes</label><textarea id="hp-notes" placeholder="Ward, treatment plan, attending doctor..."></textarea></div>
-        </div>
-        <div class="form-actions"><button class="btn btn-primary" onclick="addHospPatient()">Register Patient</button></div>
-      </div>
       <div class="card">
         <h2>Patient Records</h2>
         <div class="search-bar"><input type="text" id="hp-search" placeholder="Search patients..." oninput="filterHoPts()"/></div>
@@ -2999,6 +3485,80 @@
     </div>
   </div>
 
+  <!-- ══════════════════════════════════
+       CLINIC: STAFF MANAGEMENT (admin only)
+  ══════════════════════════════════ -->
+  <div class="page" id="page-cl-staff">
+    <div style="margin-top:0.5rem;">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.2rem;">
+        <div>
+          <h2 style="font-size:1rem;font-weight:700;color:#0B1F3A;margin:0;">Staff Management</h2>
+          <div style="font-size:0.8rem;color:#9AA3AE;margin-top:0.2rem;">Invite and manage your team</div>
+        </div>
+        <button onclick="document.getElementById('m-invite-staff').classList.add('open')"
+                class="btn btn-primary">+ Invite Staff</button>
+      </div>
+
+      <div class="card">
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Name</th><th>Email</th><th>Department</th><th>Status</th><th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="staff-table-body">
+              <tr><td colspan="5" class="loading">Loading…</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════
+       CLINIC: REPORTS (admin only)
+  ══════════════════════════════════ -->
+  <div class="page" id="page-cl-reports">
+    <div style="margin-top:0.5rem;">
+      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:0.75rem;margin-bottom:1.2rem;">
+        <div>
+          <h2 style="font-size:1rem;font-weight:700;color:#0B1F3A;margin:0;">Management Reports</h2>
+          <div style="font-size:0.8rem;color:#9AA3AE;margin-top:0.2rem;">Date-range analytics across all departments</div>
+        </div>
+        <button onclick="exportReport()"
+                style="background:#F8F7F3;border:1px solid #E8E6E1;color:#0B1F3A;
+                       padding:0.45rem 1rem;border-radius:8px;cursor:pointer;
+                       font-size:0.78rem;font-weight:700;font-family:'Syne',sans-serif;">
+          ↓ Export CSV
+        </button>
+      </div>
+
+      <!-- Date range picker -->
+      <div style="background:white;border:1px solid #E8E6E1;border-radius:10px;
+                  padding:1rem 1.25rem;margin-bottom:1rem;
+                  display:flex;align-items:center;gap:1rem;flex-wrap:wrap;">
+        <div style="display:flex;align-items:center;gap:0.5rem;">
+          <label style="font-size:0.72rem;font-weight:700;text-transform:uppercase;letter-spacing:0.7px;color:#9AA3AE;">From</label>
+          <input type="date" id="report-from"
+                 style="border:1px solid #E0DFDB;border-radius:8px;padding:0.5rem 0.75rem;
+                        font-family:'Syne',sans-serif;font-size:0.85rem;color:#0B1F3A;outline:none;"/>
+        </div>
+        <div style="display:flex;align-items:center;gap:0.5rem;">
+          <label style="font-size:0.72rem;font-weight:700;text-transform:uppercase;letter-spacing:0.7px;color:#9AA3AE;">To</label>
+          <input type="date" id="report-to"
+                 style="border:1px solid #E0DFDB;border-radius:8px;padding:0.5rem 0.75rem;
+                        font-family:'Syne',sans-serif;font-size:0.85rem;color:#0B1F3A;outline:none;"/>
+        </div>
+        <button onclick="runReports()" class="btn btn-primary" style="padding:0.5rem 1.2rem;">Apply</button>
+      </div>
+
+      <div id="report-content">
+        <div style="text-align:center;padding:2rem;color:#9AA3AE;font-size:0.85rem;">Select a date range and press Apply.</div>
+      </div>
+    </div>
+  </div>
+
 </div><!-- /app-screen -->
 
 <!-- MODALS -->
@@ -3032,11 +3592,251 @@
 
 <div class="toast" id="toast"></div>
 
+<!-- IMPORT PATIENTS MODAL -->
+<div class="mo" id="m-import-patients">
+  <div class="mb" style="max-width:680px;">
+    <h3>Import Patients from CSV</h3>
+    <div style="background:#F8F7F3;border:1px solid #E8E6E1;border-radius:8px;padding:0.75rem 1rem;
+                margin-bottom:1rem;font-size:0.8rem;color:#555;line-height:1.7;">
+      Expected columns: <strong>name</strong>, <strong>age</strong>, <strong>gender</strong>,
+      <strong>phone</strong>, <strong>condition</strong>, <strong>created_at</strong>
+      (all optional except name). Duplicates matched by name + phone are skipped.
+    </div>
+    <div style="margin-bottom:1rem;">
+      <input type="file" id="import-file-input" accept=".csv"
+             onchange="onImportFileChange(this)"
+             style="border:2px dashed #E0DFDB;border-radius:8px;padding:1rem;width:100%;
+                    font-family:'Syne',sans-serif;font-size:0.85rem;cursor:pointer;background:#FAFAF8;"/>
+    </div>
+
+    <!-- Preview table -->
+    <div id="import-preview" style="display:none;margin-bottom:1rem;max-height:260px;overflow-y:auto;border:1px solid #E8E6E1;border-radius:8px;">
+      <table style="width:100%;border-collapse:collapse;">
+        <thead id="import-preview-head"></thead>
+        <tbody id="import-preview-body"></tbody>
+      </table>
+    </div>
+
+    <div id="import-result" style="display:none;margin-bottom:1rem;"></div>
+
+    <div class="ma">
+      <button class="btn btn-sm" onclick="cm('m-import-patients')">Close</button>
+      <button id="import-confirm-btn" class="btn btn-primary" onclick="confirmImport()" style="display:none;">Import Records</button>
+    </div>
+  </div>
+</div>
+
+<!-- INVITE STAFF MODAL -->
+<div class="mo" id="m-invite-staff">
+  <div class="mb" style="max-width:440px;">
+    <h3>Invite Staff Member</h3>
+    <div class="a-err" id="invite-err" style="display:none;margin-bottom:0.75rem;"></div>
+    <div class="a-ok"  id="invite-ok"  style="display:none;margin-bottom:0.75rem;"></div>
+    <div class="form-group" style="margin-bottom:0.9rem;">
+      <label>Email Address *</label>
+      <input type="email" id="invite-email" placeholder="staff@clinic.com"
+             style="border:1px solid #E0DFDB;border-radius:8px;padding:0.7rem 1rem;
+                    width:100%;font-size:0.9rem;font-family:'Syne',sans-serif;
+                    color:#0B1F3A;outline:none;"/>
+    </div>
+    <div class="form-group" style="margin-bottom:1rem;">
+      <label>Department *</label>
+      <select id="invite-dept"
+              style="border:1px solid #E0DFDB;border-radius:8px;padding:0.7rem 1rem;
+                     width:100%;font-size:0.9rem;font-family:'Syne',sans-serif;
+                     color:#0B1F3A;outline:none;background:white;">
+        <option value="">Select department</option>
+        <option value="admin">Admin</option>
+        <option value="reception">Reception</option>
+        <option value="doctor">Doctor</option>
+        <option value="pharmacy">Pharmacy</option>
+        <option value="lab">Lab</option>
+      </select>
+    </div>
+    <div class="ma">
+      <button class="btn btn-sm" onclick="cm('m-invite-staff')">Cancel</button>
+      <button id="invite-submit-btn" class="btn btn-primary" onclick="submitInviteStaff()">Send Invite</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ HOSPITAL: ENCOUNTER DETAIL MODAL ══ -->
+<div class="mo" id="m-encounter">
+  <div class="mb" style="max-width:640px;">
+    <h3 id="enc-modal-title">Encounter</h3>
+    <div id="enc-modal-body"></div>
+    <div class="ma" id="enc-modal-actions"></div>
+  </div>
+</div>
+
+<!-- ══ HOSPITAL: ADMISSION DECISION MODAL ══ -->
+<div class="mo" id="m-admission">
+  <div class="mb" style="max-width:520px;">
+    <h3>Admission Decision</h3>
+    <input type="hidden" id="adm-enc-id"/>
+    <div style="margin-bottom:1rem;">
+      <div style="font-size:0.72rem;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;
+                  color:#9AA3AE;margin-bottom:0.6rem;">Decision</div>
+      <div style="display:flex;flex-direction:column;gap:0.5rem;" id="adm-decision-options">
+        <label style="display:flex;align-items:center;gap:0.75rem;padding:0.7rem 1rem;
+                      border-radius:8px;border:1px solid #E0DFDB;cursor:pointer;background:white;
+                      font-size:0.85rem;font-weight:600;">
+          <input type="radio" name="adm-decision" value="admitted" onchange="showAdmissionFields()"/>
+          🛏 Admit to Ward
+        </label>
+        <label style="display:flex;align-items:center;gap:0.75rem;padding:0.7rem 1rem;
+                      border-radius:8px;border:1px solid #E0DFDB;cursor:pointer;background:white;
+                      font-size:0.85rem;font-weight:600;">
+          <input type="radio" name="adm-decision" value="observation" onchange="showAdmissionFields()"/>
+          🔎 Observation (awaiting results)
+        </label>
+        <label style="display:flex;align-items:center;gap:0.75rem;padding:0.7rem 1rem;
+                      border-radius:8px;border:1px solid #E0DFDB;cursor:pointer;background:white;
+                      font-size:0.85rem;font-weight:600;">
+          <input type="radio" name="adm-decision" value="discharged" onchange="showAdmissionFields()"/>
+          🚪 Discharge (not admitted)
+        </label>
+        <label style="display:flex;align-items:center;gap:0.75rem;padding:0.7rem 1rem;
+                      border-radius:8px;border:1px solid #E0DFDB;cursor:pointer;background:white;
+                      font-size:0.85rem;font-weight:600;">
+          <input type="radio" name="adm-decision" value="referred" onchange="showAdmissionFields()"/>
+          ➡ Refer to another facility
+        </label>
+      </div>
+    </div>
+    <!-- Bed assignment — shown only for Admit -->
+    <div id="adm-bed-section" style="display:none;margin-bottom:1rem;">
+      <div style="font-size:0.72rem;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;
+                  color:#9AA3AE;margin-bottom:0.5rem;">Assign Bed</div>
+      <select id="adm-bed-select"
+              style="width:100%;border:1px solid #E0DFDB;border-radius:8px;padding:0.65rem 0.9rem;
+                     font-size:0.88rem;font-family:'Syne',sans-serif;color:#0B1F3A;outline:none;">
+        <option value="">Loading available beds…</option>
+      </select>
+    </div>
+    <!-- Diagnosis -->
+    <div id="adm-diagnosis-section" style="margin-bottom:1rem;">
+      <div class="form-group">
+        <label>Working Diagnosis</label>
+        <input type="text" id="adm-diagnosis"
+               placeholder="e.g. Severe malaria with complications"/>
+      </div>
+    </div>
+    <!-- Notes -->
+    <div class="form-group" style="margin-bottom:0;">
+      <label>Doctor's Notes</label>
+      <textarea id="adm-notes" placeholder="Admission plan, instructions…"
+                style="min-height:70px;"></textarea>
+    </div>
+    <div class="ma">
+      <button class="btn btn-sm" onclick="cm('m-admission')">Cancel</button>
+      <button class="btn btn-primary" onclick="saveAdmissionDecision()">Confirm Decision</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ HOSPITAL: ADD BED MODAL ══ -->
+<div class="mo" id="m-add-bed">
+  <div class="mb" style="max-width:460px;">
+    <h3 id="add-bed-title">Add Bed</h3>
+    <input type="hidden" id="bed-edit-id"/>
+    <div class="form-grid" style="grid-template-columns:1fr 1fr;gap:1rem;">
+      <div class="form-group">
+        <label>Ward *</label>
+        <select id="bed-ward">
+          <option value="General">General</option>
+          <option value="HDU">HDU</option>
+          <option value="ICU">ICU</option>
+          <option value="Paediatric">Paediatric</option>
+          <option value="Maternity">Maternity</option>
+          <option value="Isolation">Isolation</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Room</label>
+        <input type="text" id="bed-room" placeholder="e.g. Room 3"/>
+      </div>
+      <div class="form-group">
+        <label>Bed Number *</label>
+        <input type="text" id="bed-number" placeholder="e.g. B-04"/>
+      </div>
+      <div class="form-group">
+        <label>Status</label>
+        <select id="bed-status">
+          <option value="available">Available</option>
+          <option value="maintenance">Maintenance</option>
+        </select>
+      </div>
+    </div>
+    <div class="ma">
+      <button class="btn btn-sm" onclick="cm('m-add-bed')">Cancel</button>
+      <button class="btn btn-primary" onclick="saveBed()">Save Bed</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ HOSPITAL: DISCHARGE MODAL ══ -->
+<div class="mo" id="m-discharge">
+  <div class="mb" style="max-width:560px;">
+    <h3>Discharge Patient</h3>
+    <input type="hidden" id="disch-enc-id"/>
+    <div id="disch-patient-info"
+         style="background:#F8F7F3;border-radius:8px;padding:0.75rem 1rem;
+                margin-bottom:1rem;font-size:0.85rem;color:#555;"></div>
+    <div class="form-grid" style="grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1rem;">
+      <div class="form-group" style="grid-column:span 2;">
+        <label>Primary Diagnosis (ICD-10 if known) *</label>
+        <input type="text" id="disch-diagnosis"
+               placeholder="e.g. Severe malaria — B50.8"/>
+      </div>
+      <div class="form-group" style="grid-column:span 2;">
+        <label>Discharge Medications & Instructions</label>
+        <textarea id="disch-meds"
+                  placeholder="e.g. Coartem 20/120mg — 3 tablets BD x 3 days. Paracetamol 1g TDS PRN pain."
+                  style="min-height:80px;"></textarea>
+      </div>
+      <div class="form-group" style="grid-column:span 2;">
+        <label>Follow-up Plan</label>
+        <input type="text" id="disch-followup"
+               placeholder="e.g. Review in OPD in 1 week"/>
+      </div>
+      <div class="form-group" style="grid-column:span 2;">
+        <label>Discharging Doctor</label>
+        <input type="text" id="disch-doctor" placeholder="Dr. name"/>
+      </div>
+    </div>
+    <div id="disch-err"
+         style="display:none;background:#fef2f2;border:1px solid #fca5a5;color:#dc2626;
+                padding:0.6rem 0.9rem;border-radius:8px;font-size:0.82rem;margin-bottom:0.75rem;">
+    </div>
+    <div class="ma">
+      <button class="btn btn-sm" onclick="cm('m-discharge')">Cancel</button>
+      <button class="btn btn-primary" onclick="confirmDischarge()" id="disch-confirm-btn">
+        Confirm Discharge
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ HOSPITAL: BED ACTION MODAL ══ -->
+<div class="mo" id="m-bed-action">
+  <div class="mb" style="max-width:420px;">
+    <h3 id="bed-action-title">Bed Actions</h3>
+    <input type="hidden" id="ba-bed-id"/>
+    <div id="ba-bed-info" style="margin-bottom:1rem;font-size:0.85rem;color:#555;"></div>
+    <div id="ba-buttons" style="display:flex;flex-direction:column;gap:0.6rem;"></div>
+    <div class="ma">
+      <button class="btn btn-sm" onclick="cm('m-bed-action')">Close</button>
+    </div>
+  </div>
+</div>
+
 <script>
 function track(event,props={}){if(window.posthog)posthog.capture(event,props);}
 
 const SURL='https://qflqwmfdwalvmndaojzl.supabase.co';
 const SKEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFmbHF3bWZkd2Fsdm1uZGFvanpsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE2MjcxMTcsImV4cCI6MjA4NzIwMzExN30.Ewpo8PoGq6PGcHnN85aYCUdPtSv7RXoGh9qthBJHezA';
+const MOMO_KEY='';
 
 let session=null,user=null,orgRole=null;
 let drugs=[],patients=[];
@@ -3345,7 +4145,7 @@ function launchApp(){
 
 const NAV_CONFIG={
   pharmacy:    [{id:'pharmacy',label:'Home'},{id:'ph-inventory',label:'Inventory'},{id:'ph-patients',label:'Dispensing Log'}],
-  hospital:    [{id:'hospital',label:'Home'},{id:'ho-patients',label:'Patients'},{id:'ho-inventory',label:'Supplies'}],
+  hospital:    [{id:'hospital',label:'Dashboard'},{id:'ho-triage',label:'Triage'},{id:'ho-beds',label:'Bed Board'},{id:'ho-encounters',label:'Encounters'},{id:'ho-patients',label:'Patients'},{id:'ho-inventory',label:'Supplies'}],
   diagnosticlab:[{id:'lab',label:'Home'},{id:'lab-worklist',label:'Worklist'},{id:'lab-results',label:'Results'},{id:'lab-dispatched',label:'Dispatched'}]
 };
 
@@ -3355,12 +4155,17 @@ const CLINIC_NAV = [
   {id:'doctor',        label:'Doctor'},
   {id:'lab-worklist',  label:'Lab'},
   {id:'dept-pharmacy', label:'Pharmacy'},
+  {id:'cl-reports',    label:'Reports',  adminOnly: true},
+  {id:'cl-staff',      label:'Staff',    adminOnly: true},
 ];
 
 function buildNav(){
   const isClinicRole = ['clinic','reception','doctor','dept-pharmacy'].includes(orgRole);
   if(isClinicRole){
-    document.getElementById('nav-tabs').innerHTML = CLINIC_NAV.map(t=>
+    const dept = user?.user_metadata?.department;
+    const isAdmin = dept === 'admin';
+    const tabs = CLINIC_NAV.filter(t => !t.adminOnly || isAdmin);
+    document.getElementById('nav-tabs').innerHTML = tabs.map(t=>
       `<button class="tab-btn" id="ntab-${t.id}" onclick="showPage('${t.id}')">${t.label}</button>`
     ).join('');
     return;
@@ -3386,6 +4191,9 @@ function showPage(name){
   if(name==='doctor')       loadDoctorQueue();
   if(name==='dept-pharmacy')loadDeptPharmacy();
   if(name==='hospital')     loadHospHome();
+  if(name==='ho-triage')    initTriagePage();
+  if(name==='ho-beds')      loadBedBoard();
+  if(name==='ho-encounters')loadEncounters();
   if(name==='ho-patients')  loadHoPts();
   if(name==='ho-inventory') loadHoDrugs();
   if(name==='lab')          loadLabHome();
@@ -3393,6 +4201,8 @@ function showPage(name){
   if(name==='lab-walkin')     buildTestPicker();
   if(name==='lab-results')    loadLabResults();
   if(name==='lab-dispatched') loadDispatched();
+  if(name==='cl-reports')    loadReportsPage();
+  if(name==='cl-staff')      loadStaffPage();
 }
 
 function routeHome(){
@@ -4330,6 +5140,10 @@ async function loadClinicHome() {
 
   const tod = now.toDateString();
 
+  // Show export button for admins only
+  const exportWrap = document.getElementById('cl-export-wrap');
+  if (exportWrap) exportWrap.style.display = (user?.user_metadata?.department === 'admin') ? 'block' : 'none';
+
   // Fetch all data in parallel
   try {
     const [pts, queue, labReqs, rxList, inv] = await Promise.all([
@@ -4517,7 +5331,478 @@ function renderClRecent(arr) {
   </tr>`).join('');
 }
 
+// ══════════════════════════════════════════════════════
+// FEATURE 1 — CSV DATA EXPORT
+// ══════════════════════════════════════════════════════
+async function exportClinicData() {
+  const btn = document.getElementById('cl-export-btn');
+  const orgId = user.id;
+  btn.textContent = '⏳ Exporting…';
+  btn.disabled = true;
+  try {
+    // 1. Patients
+    const pts = await db(`patients?org_id=eq.${orgId}`).catch(()=>[]);
+    // 2. Prescriptions
+    const rxs = await db(`prescriptions?org_id=eq.${orgId}`).catch(()=>[]);
+    // 3. Lab results via test_requests
+    const reqs = await db(`test_requests?org_id=eq.${orgId}`).catch(()=>[]);
+    let labResults = [];
+    if (reqs.length) {
+      const ids = reqs.map(r => r.id);
+      // fetch in batches of 20
+      for (let i = 0; i < ids.length; i += 20) {
+        const batch = ids.slice(i, i+20);
+        const rows = await db(`test_results?request_id=in.(${batch.join(',')})`).catch(()=>[]);
+        labResults = labResults.concat(rows);
+      }
+    }
+    // Download helper
+    function dlCsv(data, filename) {
+      if (!data.length) return;
+      const csv = Papa.unparse(data);
+      const blob = new Blob([csv], { type: 'text/csv' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url; a.download = filename;
+      document.body.appendChild(a); a.click();
+      document.body.removeChild(a);
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+    }
+    dlCsv(pts,        'minza-patients.csv');
+    setTimeout(() => dlCsv(rxs, 'minza-prescriptions.csv'), 400);
+    setTimeout(() => dlCsv(labResults, 'minza-lab-results.csv'), 800);
+    setTimeout(() => toast(`✅ Exported ${pts.length} patients, ${rxs.length} prescriptions, ${labResults.length} lab results`), 900);
+  } catch(e) {
+    toast('Export failed: ' + e.message, 'err');
+  } finally {
+    btn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> Export Data';
+    btn.disabled = false;
+  }
+}
+
+// ══════════════════════════════════════════════════════
+// FEATURE 2 — BULK PATIENT CSV IMPORT
+// ══════════════════════════════════════════════════════
+let _importParsed = [];
+
+function openImportModal() {
+  _importParsed = [];
+  document.getElementById('import-file-input').value = '';
+  document.getElementById('import-preview').style.display = 'none';
+  document.getElementById('import-preview-body').innerHTML = '';
+  document.getElementById('import-result').style.display = 'none';
+  document.getElementById('import-confirm-btn').style.display = 'none';
+  document.getElementById('m-import-patients').classList.add('open');
+}
+
+function onImportFileChange(input) {
+  const file = input.files[0];
+  if (!file) return;
+  Papa.parse(file, {
+    header: true,
+    skipEmptyLines: true,
+    complete: (results) => {
+      _importParsed = results.data;
+      const preview = _importParsed.slice(0, 10);
+      const keys = Object.keys(preview[0] || {});
+      const previewEl = document.getElementById('import-preview');
+      const tbody = document.getElementById('import-preview-body');
+      const thead = document.getElementById('import-preview-head');
+      thead.innerHTML = '<tr>' + keys.map(k => `<th style="padding:0.4rem 0.7rem;font-size:0.68rem;text-transform:uppercase;letter-spacing:0.7px;color:#9AA3AE;background:#F8F7F3;border-bottom:1px solid #E8E6E1;">${k}</th>`).join('') + '</tr>';
+      tbody.innerHTML = preview.map(row =>
+        '<tr>' + keys.map(k => `<td style="padding:0.4rem 0.7rem;font-size:0.8rem;border-bottom:1px solid #F5F4F0;">${row[k]||''}</td>`).join('') + '</tr>'
+      ).join('');
+      previewEl.style.display = 'block';
+      const btn = document.getElementById('import-confirm-btn');
+      btn.textContent = `Import ${_importParsed.length} Records`;
+      btn.style.display = 'block';
+      document.getElementById('import-result').style.display = 'none';
+    }
+  });
+}
+
+async function confirmImport() {
+  if (!_importParsed.length) return;
+  const orgId = user.id;
+  const btn = document.getElementById('import-confirm-btn');
+  btn.disabled = true;
+  btn.textContent = 'Importing…';
+  const resultEl = document.getElementById('import-result');
+  resultEl.style.display = 'none';
+
+  try {
+    // Fetch existing patients for duplicate check
+    const existing = await db(`patients?org_id=eq.${orgId}&select=name,phone`).catch(()=>[]);
+    const existingSet = new Set(existing.map(p => `${(p.name||'').toLowerCase()}|${p.phone||''}`));
+
+    const valid = [];
+    const skipped = [];
+    const errRows = [];
+
+    for (const row of _importParsed) {
+      const name = (row.name || row.Name || row.NAME || '').trim();
+      if (!name) { skipped.push(row); continue; }
+      const phone = (row.phone || row.Phone || row.PHONE || '').trim();
+      const key = `${name.toLowerCase()}|${phone}`;
+      if (existingSet.has(key)) { skipped.push(row); continue; }
+      valid.push({
+        name,
+        age:        parseInt(row.age || row.Age || '') || null,
+        gender:     row.gender || row.Gender || null,
+        phone:      phone || null,
+        condition:  row.condition || row.Condition || null,
+        created_at: row.created_at || row['Created At'] || new Date().toISOString(),
+        org_id:     orgId,
+        status:     'Active'
+      });
+    }
+
+    // Batch insert 50 at a time
+    let inserted = 0;
+    for (let i = 0; i < valid.length; i += 50) {
+      const batch = valid.slice(i, i + 50);
+      btn.textContent = `Importing… ${Math.min(i+50, valid.length)}/${valid.length}`;
+      try {
+        await db('patients', 'POST', batch);
+        inserted += batch.length;
+      } catch(e) {
+        errRows.push(...batch.map(r => r.name));
+      }
+    }
+
+    resultEl.innerHTML = `
+      <div style="background:#f0fdf4;border:1px solid #86efac;border-radius:8px;padding:0.75rem 1rem;font-size:0.83rem;color:#166534;">
+        ✅ <strong>${inserted}</strong> records imported.
+        ${skipped.length ? `<br/>⏭ <strong>${skipped.length}</strong> skipped (empty name or duplicate).` : ''}
+        ${errRows.length ? `<br/>❌ <strong>${errRows.length}</strong> failed: ${errRows.slice(0,5).join(', ')}` : ''}
+      </div>`;
+    resultEl.style.display = 'block';
+    btn.textContent = 'Done';
+    if (inserted > 0) loadClPts();
+  } catch(e) {
+    resultEl.innerHTML = `<div style="background:#fef2f2;border:1px solid #fca5a5;border-radius:8px;padding:0.75rem 1rem;font-size:0.83rem;color:#dc2626;">Error: ${e.message}</div>`;
+    resultEl.style.display = 'block';
+    btn.disabled = false;
+    btn.textContent = `Import ${_importParsed.length} Records`;
+  }
+}
+
+// ══════════════════════════════════════════════════════
+// FEATURE 3 — MOBILE MONEY POS
+// ══════════════════════════════════════════════════════
+let _momoReferenceId = null, _momoPollTimer = null, _momoPollCount = 0;
+
+function toggleTender() {
+  const method = document.getElementById('dl-payment').value;
+  document.getElementById('pos-tender-row').style.display    = method === 'Cash' ? 'flex' : 'none';
+  document.getElementById('pos-change-row').style.display    = 'none';
+  document.getElementById('pos-momo-row').style.display      = method === 'Mobile Money' ? 'flex' : 'none';
+  document.getElementById('pos-momo-status').style.display   = 'none';
+}
+
+async function requestMomoPayment() {
+  const totalStr = document.getElementById('basket-total').textContent.replace('UGX ','').replace(/,/g,'');
+  const total = parseFloat(totalStr) || 0;
+  if (!total) { toast('No total to charge.', 'err'); return; }
+  const phone = document.getElementById('pos-momo-phone').value.trim();
+  if (!phone) { toast('Enter a phone number.', 'err'); return; }
+
+  _momoReferenceId = crypto.randomUUID();
+  _momoPollCount = 0;
+  if (_momoPollTimer) clearInterval(_momoPollTimer);
+
+  const statusEl = document.getElementById('pos-momo-status');
+  const reqBtn = document.getElementById('pos-momo-req-btn');
+  statusEl.style.display = 'flex';
+  statusEl.innerHTML = `<span style="color:#7c3aed;">⏳ Waiting for payment confirmation…</span>`;
+  reqBtn.disabled = true;
+
+  try {
+    await fetch('https://sandbox.momodeveloper.mtn.com/collection/v1_0/requesttopay', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Reference-Id': _momoReferenceId,
+        'X-Target-Environment': 'sandbox',
+        'Ocp-Apim-Subscription-Key': MOMO_KEY,
+        'Authorization': `Bearer ${MOMO_KEY}`
+      },
+      body: JSON.stringify({
+        amount: String(Math.round(total)),
+        currency: 'UGX',
+        externalId: _momoReferenceId,
+        payer: { partyIdType: 'MSISDN', partyId: phone.replace(/\D/g,'') },
+        payerMessage: 'Minza Health Payment',
+        payeeNote: 'Pharmacy dispensing'
+      })
+    });
+  } catch(e) {
+    // sandbox may fail CORS — still proceed to poll for demo purposes
+  }
+
+  _momoPollTimer = setInterval(async () => {
+    _momoPollCount++;
+    try {
+      const res = await fetch(`https://sandbox.momodeveloper.mtn.com/collection/v1_0/requesttopay/${_momoReferenceId}`, {
+        headers: {
+          'X-Target-Environment': 'sandbox',
+          'Ocp-Apim-Subscription-Key': MOMO_KEY,
+          'Authorization': `Bearer ${MOMO_KEY}`
+        }
+      });
+      const data = await res.json();
+      if (data.status === 'SUCCESSFUL') {
+        clearInterval(_momoPollTimer);
+        statusEl.innerHTML = `<span style="color:#059669;font-weight:700;">✅ Payment confirmed!</span>`;
+        reqBtn.disabled = false;
+        setTimeout(() => saveBasket(), 800);
+      } else if (data.status === 'FAILED') {
+        clearInterval(_momoPollTimer);
+        statusEl.innerHTML = `<span style="color:#dc2626;">❌ Payment failed. <button onclick="resetMomoStatus()" style="background:none;border:none;color:#0D6E6E;cursor:pointer;font-weight:700;font-family:'Syne',sans-serif;">Try Again</button></span>`;
+        reqBtn.disabled = false;
+      }
+    } catch(e) { /* network blip, keep polling */ }
+
+    if (_momoPollCount >= 10) {
+      clearInterval(_momoPollTimer);
+      statusEl.innerHTML = `<span style="color:#d97706;">⏱ Payment timed out. <button onclick="resetMomoStatus()" style="background:none;border:none;color:#0D6E6E;cursor:pointer;font-weight:700;font-family:'Syne',sans-serif;">Try Again</button></span>`;
+      reqBtn.disabled = false;
+    }
+  }, 3000);
+}
+
+function resetMomoStatus() {
+  if (_momoPollTimer) clearInterval(_momoPollTimer);
+  document.getElementById('pos-momo-status').style.display = 'none';
+  document.getElementById('pos-momo-req-btn').disabled = false;
+}
+
+// ══════════════════════════════════════════════════════
+// FEATURE 4 — STAFF MANAGEMENT
+// ══════════════════════════════════════════════════════
+async function loadStaffPage() {
+  const orgId = user.id;
+  const body = document.getElementById('staff-table-body');
+  body.innerHTML = `<tr><td colspan="5" class="loading">Loading staff…</td></tr>`;
+  try {
+    const res = await fetch(`${SURL}/functions/v1/list-staff?org_id=${orgId}`, {
+      headers: { 'Authorization': `Bearer ${session?.access_token || SKEY}`, 'apikey': SKEY }
+    });
+    if (!res.ok) throw new Error(`${res.status}`);
+    const staff = await res.json();
+    if (!staff.length) {
+      body.innerHTML = `<tr><td colspan="5" class="loading">No staff accounts yet. Invite your first staff member above.</td></tr>`;
+      return;
+    }
+    body.innerHTML = staff.map(s => `<tr>
+      <td><strong>${s.name || s.email}</strong></td>
+      <td style="font-size:0.82rem;color:#555;">${s.email}</td>
+      <td><span class="badge" style="background:#F0EFEB;color:#0B1F3A;text-transform:capitalize;">${s.department || '—'}</span></td>
+      <td>${s.active === false
+        ? '<span class="badge" style="background:#fef2f2;color:#dc2626;">Inactive</span>'
+        : '<span class="badge b-ok">Active</span>'}</td>
+      <td class="td-actions">
+        ${s.active !== false ? `<button class="btn btn-danger" onclick="deactivateStaff('${s.id}')">Deactivate</button>` : ''}
+      </td>
+    </tr>`).join('');
+  } catch(e) {
+    if (e.message.includes('404') || e.message.includes('Failed')) {
+      body.innerHTML = `<tr><td colspan="5" class="loading" style="color:#d97706;">Staff management backend not yet deployed. Invite functionality coming soon.</td></tr>`;
+    } else {
+      body.innerHTML = `<tr><td colspan="5" class="loading" style="color:#dc2626;">Error: ${e.message}</td></tr>`;
+    }
+  }
+}
+
+async function submitInviteStaff() {
+  const email = document.getElementById('invite-email').value.trim();
+  const dept  = document.getElementById('invite-dept').value;
+  const orgId = user.id;
+  const errEl = document.getElementById('invite-err');
+  const okEl  = document.getElementById('invite-ok');
+  errEl.style.display = 'none'; okEl.style.display = 'none';
+  if (!email || !dept) { errEl.textContent = 'Email and department are required.'; errEl.style.display = 'block'; return; }
+  const btn = document.getElementById('invite-submit-btn');
+  btn.disabled = true; btn.textContent = 'Inviting…';
+  try {
+    const res = await fetch(`${SURL}/functions/v1/invite-staff`, {
+      method: 'POST',
+      headers: { 'Content-Type':'application/json', 'Authorization': `Bearer ${session?.access_token || SKEY}`, 'apikey': SKEY },
+      body: JSON.stringify({ email, department: dept, org_id: orgId })
+    });
+    if (!res.ok) {
+      const d = await res.json().catch(()=>({}));
+      throw new Error(d.message || `Server error ${res.status}`);
+    }
+    okEl.textContent = `✅ Invite sent to ${email}`;
+    okEl.style.display = 'block';
+    document.getElementById('invite-email').value = '';
+    loadStaffPage();
+  } catch(e) {
+    errEl.textContent = e.message.includes('404') ? 'Staff invite backend not yet deployed.' : 'Error: ' + e.message;
+    errEl.style.display = 'block';
+  } finally {
+    btn.disabled = false; btn.textContent = 'Send Invite';
+  }
+}
+
+async function deactivateStaff(userId) {
+  if (!confirm('Deactivate this staff account?')) return;
+  try {
+    const res = await fetch(`${SURL}/functions/v1/deactivate-staff`, {
+      method: 'POST',
+      headers: { 'Content-Type':'application/json', 'Authorization': `Bearer ${session?.access_token || SKEY}`, 'apikey': SKEY },
+      body: JSON.stringify({ user_id: userId, org_id: user.id })
+    });
+    if (!res.ok) throw new Error(`Server error ${res.status}`);
+    toast('Staff member deactivated.');
+    loadStaffPage();
+  } catch(e) {
+    toast(e.message.includes('404') ? 'Deactivate backend not yet deployed.' : 'Error: ' + e.message, 'err');
+  }
+}
+
+// ══════════════════════════════════════════════════════
+// FEATURE 5 — MANAGEMENT REPORTS
+// ══════════════════════════════════════════════════════
+let _reportData = {};
+
+async function loadReportsPage() {
+  // Set default date range to current month
+  const now = new Date();
+  const y = now.getFullYear(), m = String(now.getMonth()+1).padStart(2,'0');
+  const fromDefault = `${y}-${m}-01`;
+  const toDefault   = now.toISOString().split('T')[0];
+  const fromEl = document.getElementById('report-from');
+  const toEl   = document.getElementById('report-to');
+  if (fromEl && !fromEl.value) fromEl.value = fromDefault;
+  if (toEl   && !toEl.value)   toEl.value   = toDefault;
+  await runReports();
+}
+
+async function runReports() {
+  const from = document.getElementById('report-from').value;
+  const to   = document.getElementById('report-to').value;
+  if (!from || !to) return;
+  const orgId = user.id;
+  const fromISO = from + 'T00:00:00';
+  const toISO   = to   + 'T23:59:59';
+
+  document.getElementById('report-content').innerHTML = `<div style="text-align:center;padding:2rem;color:#9AA3AE;font-size:0.85rem;">Loading reports…</div>`;
+
+  try {
+    const [queue, rxList, labReqs] = await Promise.all([
+      db(`queue_patients?org_id=eq.${orgId}&created_at=gte.${fromISO}&created_at=lte.${toISO}&order=created_at.asc`).catch(()=>[]),
+      db(`prescriptions?org_id=eq.${orgId}&created_at=gte.${fromISO}&created_at=lte.${toISO}`).catch(()=>[]),
+      db(`test_requests?org_id=eq.${orgId}&created_at=gte.${fromISO}&created_at=lte.${toISO}`).catch(()=>[]),
+    ]);
+
+    _reportData = { from, to, queue, rxList, labReqs };
+
+    // 1. Consultation volume by date
+    const byDate = {};
+    queue.forEach(q => {
+      const d = q.created_at.split('T')[0];
+      byDate[d] = (byDate[d] || 0) + 1;
+    });
+    const dateKeys = Object.keys(byDate).sort();
+    const maxVol = Math.max(...Object.values(byDate), 1);
+    const barChart = dateKeys.length
+      ? dateKeys.map(d => {
+          const h = Math.max(4, Math.round((byDate[d]/maxVol) * 60));
+          return `<div style="display:flex;flex-direction:column;align-items:center;gap:0.25rem;flex:1;">
+            <span style="font-size:0.62rem;color:#9AA3AE;">${byDate[d]}</span>
+            <div style="width:100%;height:${h}px;background:#0B1F3A;border-radius:3px 3px 0 0;min-height:4px;"></div>
+            <span style="font-size:0.6rem;color:#9AA3AE;transform:rotate(-45deg);transform-origin:top left;white-space:nowrap;">${d.slice(5)}</span>
+          </div>`;
+        }).join('')
+      : '<div style="color:#9AA3AE;font-size:0.82rem;padding:1rem 0;">No consultations in range.</div>';
+
+    // 2. Dept breakdown
+    const byDept = {};
+    queue.forEach(q => { const d = q.department || 'Unknown'; byDept[d] = (byDept[d]||0)+1; });
+    const deptMax = Math.max(...Object.values(byDept), 1);
+    const deptRows = Object.entries(byDept).sort((a,b)=>b[1]-a[1]).map(([dept, count]) => `
+      <div style="margin-bottom:0.6rem;">
+        <div style="display:flex;justify-content:space-between;font-size:0.8rem;margin-bottom:0.25rem;">
+          <span style="font-weight:600;text-transform:capitalize;">${dept}</span>
+          <span style="color:#9AA3AE;">${count}</span>
+        </div>
+        <div style="height:6px;background:#F0EFEB;border-radius:100px;overflow:hidden;">
+          <div style="height:100%;width:${Math.round((count/deptMax)*100)}%;background:#0D6E6E;border-radius:100px;"></div>
+        </div>
+      </div>`).join('') || '<div style="color:#9AA3AE;font-size:0.82rem;">No data.</div>';
+
+    // 3. Prescription volume
+    const totalRxDrugs = rxList.reduce((s,rx) => {
+      try { return s + (JSON.parse(rx.drugs||'[]').length); } catch { return s; }
+    }, 0);
+
+    // 4. Lab turnaround time
+    const withTat = labReqs.filter(r => r.dispatched_at && r.created_at);
+    const avgTat = withTat.length
+      ? Math.round(withTat.reduce((s, r) => s + (new Date(r.dispatched_at) - new Date(r.created_at)), 0) / withTat.length / 60000)
+      : null;
+
+    document.getElementById('report-content').innerHTML = `
+      <!-- Consultation Volume -->
+      <div style="background:white;border:1px solid #E8E6E1;border-radius:10px;padding:1.1rem 1.25rem;margin-bottom:1rem;">
+        <div style="font-size:0.72rem;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;color:#9AA3AE;margin-bottom:1rem;">Consultation Volume</div>
+        <div style="display:flex;align-items:flex-end;gap:4px;height:80px;overflow:hidden;">${barChart}</div>
+        <div style="margin-top:0.75rem;font-size:0.82rem;color:#555;">Total: <strong>${queue.length}</strong> consultations</div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1rem;">
+        <!-- Department Breakdown -->
+        <div style="background:white;border:1px solid #E8E6E1;border-radius:10px;padding:1.1rem 1.25rem;">
+          <div style="font-size:0.72rem;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;color:#9AA3AE;margin-bottom:1rem;">Department Breakdown</div>
+          ${deptRows}
+        </div>
+
+        <!-- Prescription + Lab metrics -->
+        <div style="display:flex;flex-direction:column;gap:1rem;">
+          <div style="background:white;border:1px solid #E8E6E1;border-radius:10px;padding:1.1rem 1.25rem;">
+            <div style="font-size:0.72rem;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;color:#9AA3AE;margin-bottom:0.5rem;">Prescription Volume</div>
+            <div style="font-size:2rem;font-weight:800;color:#0B1F3A;line-height:1;">${rxList.length}</div>
+            <div style="font-size:0.78rem;color:#9AA3AE;margin-top:0.25rem;">prescriptions · ${totalRxDrugs} drug items</div>
+          </div>
+          <div style="background:white;border:1px solid #E8E6E1;border-radius:10px;padding:1.1rem 1.25rem;">
+            <div style="font-size:0.72rem;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;color:#9AA3AE;margin-bottom:0.5rem;">Lab Turnaround Time</div>
+            <div style="font-size:2rem;font-weight:800;color:${avgTat!==null&&avgTat<=60?'#059669':'#d97706'};line-height:1;">${avgTat !== null ? avgTat + ' min' : '—'}</div>
+            <div style="font-size:0.78rem;color:#9AA3AE;margin-top:0.25rem;">avg · ${withTat.length} of ${labReqs.length} tests dispatched</div>
+          </div>
+        </div>
+      </div>`;
+
+  } catch(e) {
+    document.getElementById('report-content').innerHTML = `<div style="color:#dc2626;font-size:0.83rem;padding:1rem;">Error loading reports: ${e.message}</div>`;
+  }
+}
+
+function exportReport() {
+  const { from, to, queue, rxList, labReqs } = _reportData;
+  if (!from) { toast('Run a report first.', 'err'); return; }
+  const rows = [
+    ['Type', 'Date', 'Patient', 'Department', 'Status'],
+    ...queue.map(q => ['Consultation', q.created_at?.split('T')[0], q.name||'', q.department||'', q.status||'']),
+    ...rxList.map(r => ['Prescription', r.created_at?.split('T')[0], r.patient_name||'', '', r.status||'']),
+    ...labReqs.map(r => ['Lab Request', r.created_at?.split('T')[0], r.patient_name||'', '', r.status||'']),
+  ];
+  const csv = Papa.unparse(rows);
+  const blob = new Blob([csv], { type: 'text/csv' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = `minza-report-${from}-${to}.csv`;
+  document.body.appendChild(a); a.click();
+  document.body.removeChild(a);
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+  toast('✅ Report exported');
+}
+
 async function loadClPts() {
+  // Show import button for admins
+  const importWrap = document.getElementById('cl-import-btn-wrap');
+  if (importWrap) importWrap.style.display = (user?.user_metadata?.department === 'admin') ? 'block' : 'none';
   try {
     patients = await db('patients?order=created_at.desc');
     renderClPts(patients);
@@ -4645,7 +5930,7 @@ async function openPatientModal(id) {
     }).join('')
     : `<div style="font-size:0.82rem;color:#9AA3AE;padding:0.3rem 0;">No lab tests requested.</div>`;
 
-    // ── Prescription section (no notes here — notes live in Doctor's Notes only)
+    // ── Prescription section (no notes her
     const rxHTML = rxRows.length ? rxRows.map(rx => {
       let drugs = [];
       try { drugs = JSON.parse(rx.drugs||'[]'); } catch {}
@@ -5837,22 +7122,1008 @@ function doPrintResultReport() {
 
 // ── HOSPITAL ──
 async function loadHospHome(){
-  const m=user?.user_metadata||{};
-  document.getElementById('wb-hosp-title').textContent=`Welcome, ${m.org_name||''}`;
-  try{
-    const p=await db('patients?order=created_at.desc');patients=p;
-    const tod=new Date().toDateString();
-    document.getElementById('ho-pts').textContent=p.length;
-    document.getElementById('ho-today').textContent=p.filter(x=>new Date(x.created_at).toDateString()===tod).length;
-  }catch(e){}
-  try{
-    const d=await db('inventory?order=drug_name.asc');drugs=d;
-    const low=d.filter(x=>x.quantity<=10).length;
-    document.getElementById('ho-low').textContent=low;
-    document.getElementById('sc-ho-low').classList.toggle('is-danger',low>0);
-  }catch(e){}
+  const m = user?.user_metadata || {};
+  const now = new Date(), hr = now.getHours();
+  const orgId = user.id;
+
+  // greeting + date
+  const greetEl = document.getElementById('ho-greeting');
+  if(greetEl) greetEl.textContent = hr<12?'morning':hr<17?'afternoon':'evening';
+  const nameEl = document.getElementById('ho-facility-name');
+  if(nameEl) nameEl.textContent = m.org_name || 'Hospital';
+  const dateEl = document.getElementById('ho-date-str');
+  if(dateEl) dateEl.textContent = now.toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+
+  const tod = now.toDateString();
+
+  try {
+    const [encounters, beds] = await Promise.all([
+      db(`encounters?org_id=eq.${orgId}&order=created_at.desc`).catch(()=>[]),
+      db(`beds?org_id=eq.${orgId}`).catch(()=>[]),
+    ]);
+
+    // ── Stats ──────────────────────────────────────────────
+    const openEnc    = encounters.filter(e => e.status !== 'discharged');
+    const edToday    = encounters.filter(e => new Date(e.created_at).toDateString() === tod);
+    const admToday   = encounters.filter(e => e.status === 'admitted' && new Date(e.created_at).toDateString() === tod);
+    const dischToday = encounters.filter(e => e.status === 'discharged' && new Date(e.closed_at||e.created_at).toDateString() === tod);
+    const occupied   = beds.filter(b => b.status === 'occupied');
+    const available  = beds.filter(b => b.status === 'available');
+
+    const setEl = (id,v) => { const el=document.getElementById(id); if(el) el.textContent=v; };
+    setEl('ho-census',         occupied.length);
+    setEl('ho-ed-count',       edToday.length);
+    setEl('ho-admitted-today', admToday.length);
+    setEl('ho-discharged-today',dischToday.length);
+    setEl('ho-avail',          available.length);
+
+    document.getElementById('sc-ho-avail')?.classList.toggle('is-good', available.length > 0);
+    document.getElementById('sc-ho-census')?.classList.toggle('is-warn', occupied.length >= beds.length * 0.9 && beds.length > 0);
+
+    // ── Alerts ──────────────────────────────────────────────
+    const alerts = [];
+    const redEnc = encounters.filter(e => e.triage_category === 1 && e.status !== 'discharged');
+    if(redEnc.length) alerts.push(`${redEnc.length} RED triage patient${redEnc.length>1?'s':''} active`);
+    if(available.length === 0 && beds.length > 0) alerts.push('No beds available — hospital at capacity');
+    const longWait = edToday.filter(e => {
+      const mins = (now - new Date(e.created_at)) / 60000;
+      return e.status === 'triaged' && mins > 240;
+    });
+    if(longWait.length) alerts.push(`${longWait.length} patient${longWait.length>1?'s':''} waiting over 4 hours`);
+    const alertBar = document.getElementById('ho-alert-bar');
+    const alertTxt = document.getElementById('ho-alert-text');
+    if(alertBar && alertTxt) {
+      if(alerts.length) {
+        alertTxt.textContent = alerts.join('  ·  ');
+        alertBar.style.display = 'flex';
+      } else {
+        alertBar.style.display = 'none';
+      }
+    }
+
+    // ── ED Live Board ──────────────────────────────────────
+    const edBoard = document.getElementById('ho-ed-board');
+    if(edBoard) {
+      const edActive = encounters.filter(e => ['registered','triaged','in_assessment','observation'].includes(e.status))
+        .sort((a,b) => (a.triage_category||5) - (b.triage_category||5));
+      if(!edActive.length) {
+        edBoard.innerHTML = `<div style="color:#9AA3AE;font-size:0.82rem;text-align:center;padding:1rem 0;">No active ED patients.</div>`;
+      } else {
+        edBoard.innerHTML = edActive.slice(0,8).map(e => {
+          const mins = Math.round((now - new Date(e.created_at)) / 60000);
+          const waitStr = mins < 60 ? `${mins}m` : `${Math.floor(mins/60)}h ${mins%60}m`;
+          const tc = triageMeta(e.triage_category);
+          return `<div onclick="openEncounterModal('${e.id}')"
+                       style="display:flex;align-items:center;gap:0.6rem;
+                              padding:0.5rem 0.7rem;border-radius:8px;cursor:pointer;
+                              border:1px solid ${tc.border};background:${tc.bg};
+                              transition:opacity 0.15s;"
+                       onmouseover="this.style.opacity=0.8" onmouseout="this.style.opacity=1">
+            <span style="font-size:1rem;flex-shrink:0;">${tc.dot}</span>
+            <div style="flex:1;min-width:0;">
+              <div style="font-size:0.83rem;font-weight:700;color:#0B1F3A;
+                          white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
+                ${e.patient_name || '—'}
+              </div>
+              <div style="font-size:0.7rem;color:#9AA3AE;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
+                ${e.chief_complaint || '—'}
+              </div>
+            </div>
+            <div style="text-align:right;flex-shrink:0;">
+              <div style="font-size:0.7rem;font-weight:700;color:${tc.text};">${tc.label}</div>
+              <div style="font-size:0.68rem;color:#9AA3AE;">${waitStr}</div>
+            </div>
+          </div>`;
+        }).join('');
+      }
+    }
+
+    // ── Ward occupancy summary ──────────────────────────────
+    const wardSummary = document.getElementById('ho-ward-summary');
+    if(wardSummary) {
+      const wardGroups = {};
+      beds.forEach(b => {
+        if(!wardGroups[b.ward]) wardGroups[b.ward] = {total:0,occ:0,avail:0};
+        wardGroups[b.ward].total++;
+        if(b.status==='occupied') wardGroups[b.ward].occ++;
+        if(b.status==='available') wardGroups[b.ward].avail++;
+      });
+      if(!Object.keys(wardGroups).length) {
+        wardSummary.innerHTML = `<div style="color:#9AA3AE;font-size:0.82rem;text-align:center;padding:1rem 0;">
+          No beds configured. <button onclick="showPage('ho-beds')"
+          style="color:#0D6E6E;background:none;border:none;cursor:pointer;font-weight:700;
+                 font-family:'Syne',sans-serif;font-size:0.82rem;">Set up Bed Board →</button></div>`;
+      } else {
+        wardSummary.innerHTML = Object.entries(wardGroups).map(([ward,g]) => {
+          const pct = g.total > 0 ? Math.round((g.occ/g.total)*100) : 0;
+          const barColor = pct >= 90 ? '#dc2626' : pct >= 75 ? '#d97706' : '#059669';
+          return `<div style="margin-bottom:0.4rem;">
+            <div style="display:flex;justify-content:space-between;font-size:0.8rem;margin-bottom:0.2rem;">
+              <span style="font-weight:600;">${ward}</span>
+              <span style="color:#9AA3AE;">${g.occ}/${g.total} occupied</span>
+            </div>
+            <div style="height:5px;background:#F0EFEB;border-radius:100px;overflow:hidden;">
+              <div style="height:100%;width:${pct}%;background:${barColor};border-radius:100px;transition:width 0.4s;"></div>
+            </div>
+          </div>`;
+        }).join('');
+      }
+    }
+
+    // ── Recent encounters table ─────────────────────────────
+    renderRecentEncounters(encounters.slice(0,12));
+
+  } catch(e) { console.error('loadHospHome error:', e); }
 }
 
+function renderRecentEncounters(arr) {
+  const b = document.getElementById('ho-recent-enc-body');
+  if(!b) return;
+  if(!arr.length) {
+    b.innerHTML = `<tr><td colspan="7" class="loading">No encounters yet.</td></tr>`;
+    return;
+  }
+  b.innerHTML = arr.map(e => {
+    const tc = triageMeta(e.triage_category);
+    const bedInfo = e.bed_label || (e.ward ? `${e.ward}` : '—');
+    return `<tr style="cursor:pointer;" onclick="openEncounterModal('${e.id}')">
+      <td><strong>${e.patient_name||'—'}</strong>
+        <div style="font-size:0.7rem;color:#9AA3AE;">${e.patient_age?e.patient_age+'y':''} ${e.patient_gender||''}</div>
+      </td>
+      <td><span style="font-size:0.72rem;font-weight:700;color:#555;text-transform:capitalize;">${e.entry_point||'emergency'}</span></td>
+      <td><span style="font-size:0.78rem;font-weight:700;color:${tc.text};">${tc.dot} ${tc.short}</span></td>
+      <td class="hide-mobile" style="font-size:0.8rem;color:#555;">${bedInfo}</td>
+      <td>${encStatusBadge(e.status)}</td>
+      <td style="font-size:0.78rem;color:#9AA3AE;">${fmtDate(e.created_at)}</td>
+      <td class="td-actions" onclick="event.stopPropagation()">
+        <button class="btn btn-sm" onclick="openEncounterModal('${e.id}')">View</button>
+        <button class="btn btn-sm" onclick="openAdmissionModal('${e.id}')"
+                style="${['admitted','discharged'].includes(e.status)?'display:none':''}"
+                >Admit</button>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+// ── TRIAGE ────────────────────────────────────────────────────────────────────
+
+let _trSelectedCategory = null;
+let _trExistingPatientId = null;
+let _trSearchTimeout = null;
+
+function initTriagePage() {
+  // reset form
+  _trSelectedCategory = null;
+  _trExistingPatientId = null;
+  ['tr-name','tr-age','tr-phone','tr-complaint','tr-doctor','tr-notes',
+   'tr-bp-sys','tr-bp-dia','tr-temp','tr-pulse','tr-resp','tr-spo2','tr-weight','tr-pain'].forEach(id => {
+    const el = document.getElementById(id);
+    if(el) el.value = '';
+  });
+  document.getElementById('tr-gender').value = '';
+  document.getElementById('tr-entry').value = 'emergency';
+  document.getElementById('tr-category').value = '';
+  document.getElementById('tr-news2-display').style.display = 'none';
+  document.getElementById('tr-existing-banner').style.display = 'none';
+  // deselect triage categories
+  for(let i=1;i<=5;i++) {
+    const el = document.getElementById(`tc-${i}`);
+    if(el) el.style.outline = 'none';
+  }
+}
+
+function selectTriageCategory(num, el) {
+  _trSelectedCategory = num;
+  document.getElementById('tr-category').value = num;
+  // visual feedback — bold outline on selected
+  for(let i=1;i<=5;i++) {
+    const t = document.getElementById(`tc-${i}`);
+    if(t) t.style.outline = 'none';
+  }
+  el.style.outline = '3px solid #0B1F3A';
+  el.style.outlineOffset = '2px';
+}
+
+function searchExistingPatient() {
+  clearTimeout(_trSearchTimeout);
+  _trSearchTimeout = setTimeout(async () => {
+    const name  = (document.getElementById('tr-name')?.value||'').trim().toLowerCase();
+    const phone = (document.getElementById('tr-phone')?.value||'').trim();
+    if(!name && !phone) { _trExistingPatientId=null; document.getElementById('tr-existing-banner').style.display='none'; return; }
+    try {
+      let q = `patients?org_id=eq.${user.id}`;
+      if(phone) q += `&phone=eq.${encodeURIComponent(phone)}`;
+      else q += `&name=ilike.*${encodeURIComponent(name)}*`;
+      const res = await db(q).catch(()=>[]);
+      const banner = document.getElementById('tr-existing-banner');
+      if(res.length) {
+        _trExistingPatientId = res[0].id;
+        document.getElementById('tr-existing-text').textContent =
+          `Existing record found: ${res[0].name}${res[0].age?' · '+res[0].age+'y':''}${res[0].phone?' · '+res[0].phone:''} — will link to encounter.`;
+        banner.style.display = 'flex';
+      } else {
+        _trExistingPatientId = null;
+        banner.style.display = 'none';
+      }
+    } catch(e) {}
+  }, 400);
+}
+
+// NEWS2 computation
+function computeNEWS2() {
+  const rr   = parseInt(document.getElementById('tr-resp')?.value)||0;
+  const spo2 = parseInt(document.getElementById('tr-spo2')?.value)||0;
+  const temp = parseFloat(document.getElementById('tr-temp')?.value)||0;
+  const sys  = parseInt(document.getElementById('tr-bp-sys')?.value)||0;
+  const hr   = parseInt(document.getElementById('tr-pulse')?.value)||0;
+
+  if(!rr && !spo2 && !temp && !sys && !hr) {
+    document.getElementById('tr-news2-display').style.display = 'none';
+    return;
+  }
+
+  let score = 0;
+
+  // Respiratory rate
+  if(rr <= 8 || rr >= 25)      score += 3;
+  else if(rr >= 21)             score += 2;
+  else if(rr >= 9 && rr <= 11) score += 1;
+
+  // SpO2
+  if(spo2 <= 91)      score += 3;
+  else if(spo2 <= 93) score += 2;
+  else if(spo2 <= 95) score += 1;
+
+  // Temperature
+  if(temp <= 35.0)         score += 3;
+  else if(temp >= 39.1)    score += 2;
+  else if(temp <= 36.0 || temp >= 38.1) score += 1;
+
+  // Systolic BP
+  if(sys <= 90 || sys >= 220) score += 3;
+  else if(sys <= 100)          score += 2;
+  else if(sys <= 110)          score += 1;
+
+  // Heart rate
+  if(hr <= 40 || hr >= 131)  score += 3;
+  else if(hr >= 111)          score += 2;
+  else if(hr <= 50 || hr >= 91) score += 1;
+
+  const display = document.getElementById('tr-news2-display');
+  const scoreEl = document.getElementById('tr-news2-score');
+  const riskEl  = document.getElementById('tr-news2-risk');
+  display.style.display = 'block';
+  scoreEl.textContent = score;
+
+  let riskColor, riskBg, riskText;
+  if(score >= 7) {
+    riskColor='#dc2626'; riskBg='#fef2f2';
+    riskText='🔴 HIGH RISK — Emergency response required. Consider ICU.';
+  } else if(score >= 5) {
+    riskColor='#d97706'; riskBg='#fffbeb';
+    riskText='🟠 MEDIUM RISK — Urgent review by ward doctor required.';
+  } else {
+    riskColor='#059669'; riskBg='#f0fdf4';
+    riskText='🟢 Low risk — Routine monitoring.';
+  }
+  scoreEl.style.color = riskColor;
+  const parent = display.querySelector('div');
+  if(parent) parent.style.background = riskBg;
+  riskEl.textContent = riskText;
+  riskEl.style.color = riskColor;
+}
+
+async function saveTriageEncounter() {
+  const name      = document.getElementById('tr-name').value.trim();
+  const complaint = document.getElementById('tr-complaint').value.trim();
+  const category  = parseInt(document.getElementById('tr-category').value)||0;
+
+  if(!name)      { toast('Patient name is required.','err'); return; }
+  if(!complaint) { toast('Chief complaint is required.','err'); return; }
+  if(!category)  { toast('Select a triage category.','err'); return; }
+
+  const btn = document.getElementById('tr-save-btn');
+  btn.disabled = true; btn.textContent = 'Saving…';
+
+  const orgId = user.id;
+
+  try {
+    // 1. Create or link patient record
+    let patientId = _trExistingPatientId;
+    if(!patientId) {
+      const pt = await db('patients','POST',{
+        name,
+        age:    document.getElementById('tr-age').value    || null,
+        gender: document.getElementById('tr-gender').value || null,
+        phone:  document.getElementById('tr-phone').value.trim() || null,
+        org_id: orgId,
+        status: 'Active'
+      });
+      patientId = Array.isArray(pt) ? pt[0]?.id : pt?.id;
+    }
+
+    // 2. Collect vitals
+    const vitals = {
+      bp_systolic:   parseInt(document.getElementById('tr-bp-sys').value)   || null,
+      bp_diastolic:  parseInt(document.getElementById('tr-bp-dia').value)   || null,
+      temperature:   parseFloat(document.getElementById('tr-temp').value)   || null,
+      pulse:         parseInt(document.getElementById('tr-pulse').value)     || null,
+      resp_rate:     parseInt(document.getElementById('tr-resp').value)      || null,
+      spo2:          parseInt(document.getElementById('tr-spo2').value)      || null,
+      weight:        parseFloat(document.getElementById('tr-weight').value)  || null,
+      pain_score:    parseInt(document.getElementById('tr-pain').value)      || null,
+    };
+    // compute news2
+    const news2 = parseInt(document.getElementById('tr-news2-score')?.textContent) || null;
+    vitals.news2_score = news2;
+
+    // 3. Create encounter
+    const encPayload = {
+      org_id:           orgId,
+      patient_id:       patientId,
+      patient_name:     name,
+      patient_age:      document.getElementById('tr-age').value    || null,
+      patient_gender:   document.getElementById('tr-gender').value || null,
+      patient_phone:    document.getElementById('tr-phone').value.trim() || null,
+      entry_point:      document.getElementById('tr-entry').value,
+      triage_category:  category,
+      chief_complaint:  complaint,
+      attending_doctor: document.getElementById('tr-doctor').value.trim() || null,
+      clinical_notes:   document.getElementById('tr-notes').value.trim()  || null,
+      status:           'triaged',
+      vitals:           JSON.stringify(vitals),
+      created_at:       new Date().toISOString(),
+    };
+    const enc = await db('encounters','POST', encPayload);
+    const encId = Array.isArray(enc) ? enc[0]?.id : enc?.id;
+
+    // 4. Save vitals separately for the vital_signs table
+    if(encId) {
+      await db('vital_signs','POST',{
+        encounter_id: encId,
+        org_id:       orgId,
+        ...vitals,
+        recorded_by:  user?.user_metadata?.org_name || user.email,
+        recorded_at:  new Date().toISOString(),
+      }).catch(()=>{}); // non-fatal — vital_signs table may not exist yet
+    }
+
+    track('encounter_created', { entry_point: encPayload.entry_point, triage_category: category });
+    toast(`✅ Encounter opened — ${name}`);
+    showPage('hospital');
+
+  } catch(e) {
+    toast('Error: ' + e.message, 'err');
+  } finally {
+    btn.disabled = false; btn.textContent = 'Register & Open Encounter →';
+  }
+}
+
+// ── ENCOUNTER MODAL ────────────────────────────────────────────────────────────
+
+let _allEncounters = [];
+
+async function loadEncounters() {
+  const orgId = user.id;
+  try {
+    _allEncounters = await db(`encounters?org_id=eq.${orgId}&order=created_at.desc`);
+    renderEncounters(_allEncounters);
+  } catch(e) {
+    document.getElementById('ho-enc-body').innerHTML =
+      `<tr><td colspan="8" class="loading">Error: ${e.message}</td></tr>`;
+  }
+}
+
+function renderEncounters(arr) {
+  const b = document.getElementById('ho-enc-body');
+  if(!arr.length) {
+    b.innerHTML = `<tr><td colspan="8" class="loading">No encounters found.</td></tr>`;
+    return;
+  }
+  b.innerHTML = arr.map(e => {
+    const tc = triageMeta(e.triage_category);
+    const bedInfo = e.bed_label || (e.ward ? e.ward : '—');
+    return `<tr style="cursor:pointer;" onclick="openEncounterModal('${e.id}')">
+      <td>
+        <strong>${e.patient_name||'—'}</strong>
+        <div style="font-size:0.7rem;color:#9AA3AE;">${e.patient_age?e.patient_age+'y':''} ${e.patient_gender||''}</div>
+      </td>
+      <td><span style="font-size:0.78rem;font-weight:700;color:${tc.text};">${tc.dot} ${tc.short}</span></td>
+      <td class="hide-mobile" style="font-size:0.8rem;max-width:200px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
+        ${e.chief_complaint||'—'}
+      </td>
+      <td style="text-transform:capitalize;font-size:0.8rem;">${e.entry_point||'emergency'}</td>
+      <td class="hide-mobile" style="font-size:0.8rem;color:#555;">${bedInfo}</td>
+      <td>${encStatusBadge(e.status)}</td>
+      <td style="font-size:0.78rem;color:#9AA3AE;">${fmtDate(e.created_at)}</td>
+      <td class="td-actions" onclick="event.stopPropagation()">
+        <button class="btn btn-sm" onclick="openEncounterModal('${e.id}')">View</button>
+        ${!['admitted','discharged'].includes(e.status)?`<button class="btn btn-sm" onclick="openAdmissionModal('${e.id}')">Admit</button>`:''}
+        ${e.status==='admitted'?`<button class="btn btn-sm" onclick="openDischargeModal('${e.id}')" style="background:#fef2f2;border:1px solid #fca5a5;color:#dc2626;">Discharge</button>`:''}
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+function filterEncounters() {
+  const q      = (document.getElementById('ho-enc-search')?.value||'').toLowerCase();
+  const status = document.getElementById('ho-enc-status')?.value||'';
+  const type   = document.getElementById('ho-enc-type')?.value||'';
+  renderEncounters(_allEncounters.filter(e =>
+    (!q      || (e.patient_name||'').toLowerCase().includes(q) || (e.chief_complaint||'').toLowerCase().includes(q)) &&
+    (!status || e.status === status) &&
+    (!type   || e.entry_point === type)
+  ));
+}
+
+async function openEncounterModal(encId) {
+  // try cache first, else fetch
+  let e = _allEncounters.find(x=>x.id===encId);
+  if(!e) {
+    try { const res = await db(`encounters?id=eq.${encId}`); e = res[0]; } catch(err) { return; }
+  }
+  if(!e) return;
+
+  const tc = triageMeta(e.triage_category);
+  let vitals = {};
+  try { vitals = JSON.parse(e.vitals||'{}'); } catch(err) {}
+
+  document.getElementById('enc-modal-title').textContent = `Encounter — ${e.patient_name||'—'}`;
+
+  document.getElementById('enc-modal-body').innerHTML = `
+    <!-- Patient header -->
+    <div style="background:linear-gradient(135deg,#0B1F3A,#1a3a5c);border-radius:10px;
+                padding:1rem 1.1rem;margin-bottom:1rem;">
+      <div style="font-weight:700;font-size:1rem;color:white;">${e.patient_name||'—'}</div>
+      <div style="font-size:0.8rem;color:rgba(255,255,255,0.6);margin-top:0.2rem;">
+        ${[e.patient_age?e.patient_age+'y':null, e.patient_gender].filter(Boolean).join(' · ')}
+        ${e.patient_phone?' · '+e.patient_phone:''}
+      </div>
+      <div style="margin-top:0.6rem;display:flex;gap:0.5rem;flex-wrap:wrap;">
+        ${encStatusBadge(e.status)}
+        <span style="font-size:0.75rem;font-weight:700;padding:0.18rem 0.6rem;border-radius:100px;
+                     background:rgba(255,255,255,0.12);color:${tc.text};">
+          ${tc.dot} ${tc.label}
+        </span>
+        <span style="font-size:0.75rem;color:rgba(255,255,255,0.4);text-transform:capitalize;">
+          ${e.entry_point||'emergency'}
+        </span>
+      </div>
+    </div>
+
+    <!-- Details grid -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.5rem;margin-bottom:1rem;">
+      <div style="background:#F8F7F3;border-radius:8px;padding:0.65rem 0.85rem;">
+        <div style="font-size:0.63rem;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;color:#9AA3AE;margin-bottom:0.3rem;">Chief Complaint</div>
+        <div style="font-size:0.85rem;color:#0B1F3A;font-weight:600;">${e.chief_complaint||'—'}</div>
+      </div>
+      <div style="background:#F8F7F3;border-radius:8px;padding:0.65rem 0.85rem;">
+        <div style="font-size:0.63rem;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;color:#9AA3AE;margin-bottom:0.3rem;">Attending Clinician</div>
+        <div style="font-size:0.85rem;color:#0B1F3A;font-weight:600;">${e.attending_doctor||'—'}</div>
+      </div>
+      <div style="background:#F8F7F3;border-radius:8px;padding:0.65rem 0.85rem;">
+        <div style="font-size:0.63rem;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;color:#9AA3AE;margin-bottom:0.3rem;">Opened</div>
+        <div style="font-size:0.85rem;color:#0B1F3A;">${fmtDate(e.created_at)}</div>
+      </div>
+      <div style="background:#F8F7F3;border-radius:8px;padding:0.65rem 0.85rem;">
+        <div style="font-size:0.63rem;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;color:#9AA3AE;margin-bottom:0.3rem;">Ward / Bed</div>
+        <div style="font-size:0.85rem;color:#0B1F3A;font-weight:600;">${e.ward?`${e.ward}${e.bed_label?' — '+e.bed_label:''}`: '—'}</div>
+      </div>
+    </div>
+
+    <!-- Vitals -->
+    ${(vitals.pulse||vitals.spo2||vitals.temperature||vitals.bp_systolic||vitals.resp_rate) ? `
+    <div style="margin-bottom:1rem;">
+      <div style="font-size:0.63rem;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;
+                  color:#9AA3AE;margin-bottom:0.5rem;">Vital Signs at Triage</div>
+      <div style="display:flex;gap:0.5rem;flex-wrap:wrap;">
+        ${vitals.bp_systolic?`<span style="background:#eff6ff;border-radius:6px;padding:0.3rem 0.6rem;font-size:0.78rem;font-weight:600;color:#1d4ed8;">BP ${vitals.bp_systolic}/${vitals.bp_diastolic||'?'}</span>`:''}
+        ${vitals.pulse?`<span style="background:#f0fdf4;border-radius:6px;padding:0.3rem 0.6rem;font-size:0.78rem;font-weight:600;color:#059669;">HR ${vitals.pulse}bpm</span>`:''}
+        ${vitals.temperature?`<span style="background:#fff7ed;border-radius:6px;padding:0.3rem 0.6rem;font-size:0.78rem;font-weight:600;color:#c2410c;">Temp ${vitals.temperature}°C</span>`:''}
+        ${vitals.spo2?`<span style="background:#f5f3ff;border-radius:6px;padding:0.3rem 0.6rem;font-size:0.78rem;font-weight:600;color:#7c3aed;">SpO₂ ${vitals.spo2}%</span>`:''}
+        ${vitals.resp_rate?`<span style="background:#F8F7F3;border-radius:6px;padding:0.3rem 0.6rem;font-size:0.78rem;font-weight:600;color:#555;">RR ${vitals.resp_rate}/min</span>`:''}
+        ${vitals.news2_score!=null?`<span style="background:${vitals.news2_score>=7?'#fef2f2':vitals.news2_score>=5?'#fffbeb':'#f0fdf4'};border-radius:6px;padding:0.3rem 0.7rem;font-size:0.78rem;font-weight:700;color:${vitals.news2_score>=7?'#dc2626':vitals.news2_score>=5?'#d97706':'#059669'};">NEWS2: ${vitals.news2_score}</span>`:''}
+      </div>
+    </div>` : ''}
+
+    <!-- Clinical notes -->
+    ${e.clinical_notes?`
+    <div style="background:#F0EFEB;border-radius:8px;padding:0.85rem 1rem;font-size:0.83rem;
+                color:#555;line-height:1.65;border:1px solid #E0DFDB;margin-bottom:0.5rem;">
+      <strong style="color:#0B1F3A;">Clinical Notes</strong><br/><br/>
+      ${e.clinical_notes}
+    </div>`:''}
+
+    <!-- Diagnosis if set -->
+    ${e.diagnosis?`
+    <div style="background:#f0fdf4;border:1px solid #86efac;border-radius:8px;padding:0.7rem 0.9rem;font-size:0.83rem;color:#166534;margin-top:0.5rem;">
+      <strong>Diagnosis:</strong> ${e.diagnosis}
+    </div>`:''}
+  `;
+
+  // Action buttons in footer
+  const actionsEl = document.getElementById('enc-modal-actions');
+  const buttons = [`<button class="btn btn-sm" onclick="cm('m-encounter')">Close</button>`];
+  if(!['admitted','discharged'].includes(e.status)) {
+    buttons.push(`<button class="btn btn-primary" onclick="cm('m-encounter');openAdmissionModal('${e.id}')">Make Admission Decision</button>`);
+  }
+  if(e.status === 'admitted') {
+    buttons.push(`<button class="btn btn-primary" style="background:#dc2626;" onclick="cm('m-encounter');openDischargeModal('${e.id}')">Discharge</button>`);
+  }
+  actionsEl.innerHTML = buttons.join('');
+  document.getElementById('m-encounter').classList.add('open');
+}
+
+// ── ADMISSION DECISION ─────────────────────────────────────────────────────────
+
+async function openAdmissionModal(encId) {
+  document.getElementById('adm-enc-id').value = encId;
+  document.querySelectorAll('input[name="adm-decision"]').forEach(r => r.checked = false);
+  document.getElementById('adm-bed-section').style.display = 'none';
+  document.getElementById('adm-diagnosis').value = '';
+  document.getElementById('adm-notes').value = '';
+
+  // load available beds for dropdown
+  const orgId = user.id;
+  try {
+    const beds = await db(`beds?org_id=eq.${orgId}&status=eq.available&order=ward.asc,bed_number.asc`).catch(()=>[]);
+    const sel = document.getElementById('adm-bed-select');
+    if(!beds.length) {
+      sel.innerHTML = '<option value="">No beds available</option>';
+    } else {
+      sel.innerHTML = '<option value="">— Select bed —</option>' +
+        beds.map(b => `<option value="${b.id}" data-ward="${b.ward}" data-label="${b.bed_number}">${b.ward} — ${b.bed_number}${b.room?' ('+b.room+')':''}</option>`).join('');
+    }
+  } catch(e) {}
+
+  document.getElementById('m-admission').classList.add('open');
+}
+
+function showAdmissionFields() {
+  const decision = document.querySelector('input[name="adm-decision"]:checked')?.value;
+  document.getElementById('adm-bed-section').style.display = decision === 'admitted' ? 'block' : 'none';
+}
+
+async function saveAdmissionDecision() {
+  const encId   = document.getElementById('adm-enc-id').value;
+  const decision= document.querySelector('input[name="adm-decision"]:checked')?.value;
+  const diagn   = document.getElementById('adm-diagnosis').value.trim();
+  const notes   = document.getElementById('adm-notes').value.trim();
+  const bedSel  = document.getElementById('adm-bed-select');
+  const bedId   = bedSel?.value || null;
+  const bedOpt  = bedSel?.options[bedSel.selectedIndex];
+  const orgId   = user.id;
+
+  if(!decision) { toast('Select an admission decision.','err'); return; }
+  if(decision === 'admitted' && !bedId) { toast('Select a bed to admit the patient.','err'); return; }
+
+  try {
+    const encUpdate = { status: decision, diagnosis: diagn||null, clinical_notes: notes||null };
+
+    if(decision === 'admitted' && bedId) {
+      const ward  = bedOpt?.dataset.ward || '';
+      const label = bedOpt?.dataset.label || '';
+      encUpdate.ward      = ward;
+      encUpdate.bed_label = label;
+      encUpdate.bed_id    = bedId;
+      encUpdate.admitted_at = new Date().toISOString();
+      // mark bed as occupied
+      await db(`beds?id=eq.${bedId}`, 'PATCH', { status:'occupied', current_encounter_id: encId });
+    }
+
+    if(decision === 'discharged') {
+      encUpdate.closed_at = new Date().toISOString();
+    }
+
+    await db(`encounters?id=eq.${encId}`, 'PATCH', encUpdate);
+
+    cm('m-admission');
+    toast(`✅ ${decision === 'admitted' ? 'Patient admitted' : decision === 'discharged' ? 'Patient discharged' : 'Decision saved'}.`);
+    track('admission_decision', { decision });
+
+    // Refresh whichever page is active
+    if(document.getElementById('page-hospital').classList.contains('active')) loadHospHome();
+    if(document.getElementById('page-ho-encounters').classList.contains('active')) loadEncounters();
+    if(document.getElementById('page-ho-beds').classList.contains('active')) loadBedBoard();
+
+  } catch(e) { toast('Error: ' + e.message, 'err'); }
+}
+
+// ── DISCHARGE ─────────────────────────────────────────────────────────────────
+
+async function openDischargeModal(encId) {
+  let e = _allEncounters.find(x=>x.id===encId);
+  if(!e) {
+    try { const res = await db(`encounters?id=eq.${encId}`); e=res[0]; } catch(err) { return; }
+  }
+  document.getElementById('disch-enc-id').value = encId;
+  document.getElementById('disch-patient-info').textContent =
+    `${e.patient_name||'—'}${e.patient_age?' · '+e.patient_age+'y':''}${e.ward?' · '+e.ward:''}${e.bed_label?' bed '+e.bed_label:''}`;
+  document.getElementById('disch-diagnosis').value = e.diagnosis||'';
+  document.getElementById('disch-meds').value = '';
+  document.getElementById('disch-followup').value = '';
+  document.getElementById('disch-doctor').value = e.attending_doctor||'';
+  document.getElementById('disch-err').style.display = 'none';
+  document.getElementById('m-discharge').classList.add('open');
+}
+
+async function confirmDischarge() {
+  const encId    = document.getElementById('disch-enc-id').value;
+  const diagnosis= document.getElementById('disch-diagnosis').value.trim();
+  const meds     = document.getElementById('disch-meds').value.trim();
+  const followup = document.getElementById('disch-followup').value.trim();
+  const doctor   = document.getElementById('disch-doctor').value.trim();
+  const errEl    = document.getElementById('disch-err');
+  const btn      = document.getElementById('disch-confirm-btn');
+
+  if(!diagnosis) {
+    errEl.textContent = 'Primary diagnosis is required for the discharge summary.';
+    errEl.style.display = 'block'; return;
+  }
+
+  btn.disabled = true; btn.textContent = 'Discharging…';
+
+  try {
+    // find encounter to get bed_id
+    let e = _allEncounters.find(x=>x.id===encId);
+    if(!e) { const res = await db(`encounters?id=eq.${encId}`); e=res[0]; }
+
+    // update encounter
+    await db(`encounters?id=eq.${encId}`, 'PATCH', {
+      status:             'discharged',
+      diagnosis,
+      discharge_meds:     meds||null,
+      discharge_followup: followup||null,
+      discharging_doctor: doctor||null,
+      closed_at:          new Date().toISOString(),
+    });
+
+    // free the bed → cleaning state
+    if(e?.bed_id) {
+      await db(`beds?id=eq.${e.bed_id}`, 'PATCH', {
+        status: 'cleaning',
+        current_encounter_id: null
+      });
+    }
+
+    cm('m-discharge');
+    toast(`✅ ${e?.patient_name||'Patient'} discharged.`);
+    track('patient_discharged', {});
+
+    if(document.getElementById('page-hospital').classList.contains('active')) loadHospHome();
+    if(document.getElementById('page-ho-encounters').classList.contains('active')) loadEncounters();
+    if(document.getElementById('page-ho-beds').classList.contains('active')) loadBedBoard();
+
+  } catch(err) {
+    errEl.textContent = 'Error: ' + err.message;
+    errEl.style.display = 'block';
+  } finally {
+    btn.disabled = false; btn.textContent = 'Confirm Discharge';
+  }
+}
+
+// ── BED BOARD ─────────────────────────────────────────────────────────────────
+
+let _allBeds = [];
+let _bedEncounters = {};
+
+async function loadBedBoard() {
+  const orgId = user.id;
+  const updEl = document.getElementById('bed-board-updated');
+  if(updEl) updEl.textContent = 'Loading…';
+
+  try {
+    _allBeds = await db(`beds?org_id=eq.${orgId}&order=ward.asc,bed_number.asc`);
+
+    // fetch active encounters for occupied beds
+    const occupiedBedEncIds = _allBeds
+      .filter(b => b.status === 'occupied' && b.current_encounter_id)
+      .map(b => b.current_encounter_id);
+
+    _bedEncounters = {};
+    if(occupiedBedEncIds.length) {
+      const encs = await db(`encounters?id=in.(${occupiedBedEncIds.join(',')})&order=created_at.desc`).catch(()=>[]);
+      encs.forEach(e => { _bedEncounters[e.id] = e; });
+    }
+
+    renderBedBoard();
+    if(updEl) updEl.textContent = `Updated ${new Date().toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'})}`;
+
+  } catch(e) {
+    document.getElementById('bed-board-grid').innerHTML =
+      `<div style="text-align:center;padding:2rem;color:#dc2626;font-size:0.85rem;">Error: ${e.message}</div>`;
+  }
+}
+
+function renderBedBoard() {
+  const wardFilter   = document.getElementById('bed-ward-filter')?.value||'';
+  const statusFilter = document.getElementById('bed-status-filter')?.value||'';
+
+  let beds = _allBeds;
+  if(wardFilter)   beds = beds.filter(b => b.ward === wardFilter);
+  if(statusFilter) beds = beds.filter(b => b.status === statusFilter);
+
+  // Update summary strip counts
+  const counts = { occupied:0, available:0, cleaning:0, maintenance:0 };
+  _allBeds.forEach(b => { if(counts[b.status]!==undefined) counts[b.status]++; });
+  const bbs = (id,val,label) => { const el=document.getElementById(id); if(el) el.innerHTML=`${el.innerHTML.split('—')[0].split(' ')[0]} ${val} ${label}`; };
+  document.getElementById('bbs-occupied').innerHTML   = `🔴 ${counts.occupied} Occupied`;
+  document.getElementById('bbs-available').innerHTML  = `🟢 ${counts.available} Available`;
+  document.getElementById('bbs-cleaning').innerHTML   = `🟡 ${counts.cleaning} Cleaning`;
+  document.getElementById('bbs-maintenance').innerHTML= `⚫ ${counts.maintenance} Maintenance`;
+
+  const grid = document.getElementById('bed-board-grid');
+  if(!beds.length) {
+    grid.innerHTML = `<div style="text-align:center;padding:3rem;color:#9AA3AE;font-size:0.85rem;">
+      ${_allBeds.length ? 'No beds match the current filter.' : 'No beds configured yet.'}
+      ${!_allBeds.length ? `<br/><button onclick="openAddBedModal()"
+        style="margin-top:1rem;background:#0B1F3A;color:white;border:none;padding:0.6rem 1.2rem;
+               border-radius:8px;cursor:pointer;font-size:0.82rem;font-weight:700;
+               font-family:'Syne',sans-serif;">+ Add First Bed</button>` : ''}
+    </div>`;
+    return;
+  }
+
+  // Group by ward
+  const wards = {};
+  beds.forEach(b => {
+    if(!wards[b.ward]) wards[b.ward] = [];
+    wards[b.ward].push(b);
+  });
+
+  const now = new Date();
+
+  grid.innerHTML = Object.entries(wards).map(([ward, wardBeds]) => {
+    const occ   = wardBeds.filter(b=>b.status==='occupied').length;
+    const total = wardBeds.length;
+    const pct   = total > 0 ? Math.round((occ/total)*100) : 0;
+    const pctColor = pct>=90?'#dc2626':pct>=75?'#d97706':'#059669';
+
+    const bedCards = wardBeds.map(b => {
+      const enc = b.current_encounter_id ? _bedEncounters[b.current_encounter_id] : null;
+      const tc  = enc ? triageMeta(enc.triage_category) : null;
+
+      let bg, borderColor, statusLabel, statusColor;
+      switch(b.status) {
+        case 'occupied':
+          bg='#F8F7F3'; borderColor='#0B1F3A'; statusLabel='Occupied'; statusColor='#0B1F3A'; break;
+        case 'available':
+          bg='#f0fdf4'; borderColor='#86efac'; statusLabel='Available'; statusColor='#059669'; break;
+        case 'cleaning':
+          bg='#fffbeb'; borderColor='#fde68a'; statusLabel='Cleaning'; statusColor='#d97706'; break;
+        case 'maintenance':
+          bg='#F0EFEB'; borderColor='#E0DFDB'; statusLabel='Maintenance'; statusColor='#9AA3AE'; break;
+        default:
+          bg='#F8F7F3'; borderColor='#E8E6E1'; statusLabel=b.status; statusColor='#555';
+      }
+
+      const los = enc?.admitted_at
+        ? Math.floor((now - new Date(enc.admitted_at)) / 86400000)
+        : null;
+
+      return `<div onclick="openBedActionModal('${b.id}')"
+                   style="background:${bg};border:2px solid ${borderColor};border-radius:10px;
+                          padding:0.9rem 1rem;cursor:pointer;transition:all 0.15s;min-height:110px;
+                          display:flex;flex-direction:column;gap:0.3rem;"
+                   onmouseover="this.style.transform='translateY(-2px)';this.style.boxShadow='0 4px 12px rgba(0,0,0,0.08)'"
+                   onmouseout="this.style.transform='';this.style.boxShadow=''">
+
+        <!-- Bed number + status -->
+        <div style="display:flex;align-items:center;justify-content:space-between;">
+          <span style="font-size:0.78rem;font-weight:700;color:#0B1F3A;">${b.bed_number}</span>
+          <span style="font-size:0.63rem;font-weight:700;color:${statusColor};
+                       text-transform:uppercase;letter-spacing:0.5px;">${statusLabel}</span>
+        </div>
+
+        ${b.status==='occupied' && enc ? `
+          <!-- Patient info -->
+          <div style="font-size:0.82rem;font-weight:700;color:#0B1F3A;
+                      white-space:nowrap;overflow:hidden;text-overflow:ellipsis;"
+               title="${enc.patient_name||''}">
+            ${enc.patient_name||'—'}
+          </div>
+          <div style="font-size:0.7rem;color:#9AA3AE;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
+            ${enc.chief_complaint||''}
+          </div>
+          <div style="display:flex;align-items:center;gap:0.4rem;margin-top:auto;flex-wrap:wrap;">
+            ${tc ? `<span style="font-size:0.68rem;font-weight:700;padding:0.1rem 0.4rem;
+                                 border-radius:4px;background:rgba(0,0,0,0.06);color:${tc.text};">
+                    ${tc.dot} ${tc.short}</span>` : ''}
+            ${los !== null ? `<span style="font-size:0.68rem;color:#9AA3AE;">${los}d</span>` : ''}
+            ${enc.news2_score != null && enc.news2_score >= 5 ?
+              `<span style="font-size:0.68rem;font-weight:700;padding:0.1rem 0.4rem;
+                           border-radius:4px;background:${enc.news2_score>=7?'#fef2f2':'#fffbeb'};
+                           color:${enc.news2_score>=7?'#dc2626':'#d97706'};">NEWS2: ${enc.news2_score}</span>`
+              : ''}
+          </div>
+        ` : `
+          <div style="flex:1;display:flex;align-items:center;justify-content:center;">
+            <span style="font-size:0.75rem;color:#9AA3AE;">
+              ${b.status==='available'?'Click to admit':''}
+              ${b.status==='cleaning'?'Awaiting housekeeping':''}
+              ${b.status==='maintenance'?'Out of service':''}
+            </span>
+          </div>
+        `}
+      </div>`;
+    }).join('');
+
+    return `
+      <!-- Ward section -->
+      <div>
+        <div style="display:flex;align-items:center;justify-content:space-between;
+                    margin-bottom:0.75rem;padding-bottom:0.5rem;border-bottom:2px solid #E8E6E1;">
+          <div>
+            <span style="font-size:0.88rem;font-weight:700;color:#0B1F3A;">${ward} Ward</span>
+            <span style="font-size:0.75rem;color:#9AA3AE;margin-left:0.5rem;">${occ}/${total} beds</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:0.5rem;">
+            <div style="width:80px;height:5px;background:#F0EFEB;border-radius:100px;overflow:hidden;">
+              <div style="height:100%;width:${pct}%;background:${pctColor};border-radius:100px;"></div>
+            </div>
+            <span style="font-size:0.72rem;font-weight:700;color:${pctColor};">${pct}%</span>
+          </div>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:0.65rem;">
+          ${bedCards}
+        </div>
+      </div>`;
+  }).join('');
+}
+
+function openBedActionModal(bedId) {
+  const bed = _allBeds.find(b=>b.id===bedId);
+  if(!bed) return;
+  const enc = bed.current_encounter_id ? _bedEncounters[bed.current_encounter_id] : null;
+
+  document.getElementById('ba-bed-id').value = bedId;
+  document.getElementById('bed-action-title').textContent = `${bed.ward} — ${bed.bed_number}`;
+  document.getElementById('ba-bed-info').innerHTML =
+    `<span style="font-size:0.82rem;color:#555;">Status: <strong style="text-transform:capitalize;">${bed.status}</strong></span>
+     ${enc ? `<br/><span style="font-size:0.82rem;color:#555;">Patient: <strong>${enc.patient_name}</strong></span>` : ''}`;
+
+  const btns = [];
+
+  if(bed.status === 'available') {
+    btns.push(`<button class="btn btn-primary" onclick="cm('m-bed-action');showPage('ho-triage')"
+                style="width:100%;">+ Register New Triage (admit to this bed)</button>`);
+  }
+  if(bed.status === 'occupied' && enc) {
+    btns.push(`<button class="btn btn-sm" onclick="cm('m-bed-action');openEncounterModal('${enc.id}')"
+                style="width:100%;justify-content:center;display:flex;">👁 View Encounter</button>`);
+    btns.push(`<button class="btn btn-sm" onclick="cm('m-bed-action');openDischargeModal('${enc.id}')"
+                style="width:100%;justify-content:center;display:flex;background:#fef2f2;
+                       border:1px solid #fca5a5;color:#dc2626;">🚪 Discharge Patient</button>`);
+  }
+  if(bed.status === 'cleaning') {
+    btns.push(`<button class="btn btn-primary" onclick="markBedAvailable('${bedId}')"
+                style="width:100%;">✅ Mark Cleaned — Set Available</button>`);
+  }
+  if(bed.status === 'available' || bed.status === 'maintenance') {
+    btns.push(`<button class="btn btn-sm" onclick="setBedStatus('${bedId}','maintenance')"
+                style="width:100%;justify-content:center;display:flex;">🔧 Mark Maintenance</button>`);
+  }
+  if(bed.status === 'maintenance') {
+    btns.push(`<button class="btn btn-sm" onclick="setBedStatus('${bedId}','available')"
+                style="width:100%;justify-content:center;display:flex;">✅ Clear Maintenance</button>`);
+  }
+  btns.push(`<button class="btn btn-sm" onclick="openEditBedModal('${bedId}')"
+              style="width:100%;justify-content:center;display:flex;">✏️ Edit Bed</button>`);
+  btns.push(`<button class="btn btn-danger" onclick="deleteBed('${bedId}')"
+              style="width:100%;justify-content:center;display:flex;">Delete Bed</button>`);
+
+  document.getElementById('ba-buttons').innerHTML = btns.join('');
+  document.getElementById('m-bed-action').classList.add('open');
+}
+
+async function markBedAvailable(bedId) {
+  try {
+    await db(`beds?id=eq.${bedId}`, 'PATCH', { status:'available' });
+    cm('m-bed-action');
+    toast('✅ Bed marked available.');
+    loadBedBoard();
+  } catch(e) { toast('Error: '+e.message,'err'); }
+}
+
+async function setBedStatus(bedId, status) {
+  try {
+    await db(`beds?id=eq.${bedId}`, 'PATCH', { status });
+    cm('m-bed-action');
+    toast(`Bed set to ${status}.`);
+    loadBedBoard();
+  } catch(e) { toast('Error: '+e.message,'err'); }
+}
+
+async function deleteBed(bedId) {
+  const bed = _allBeds.find(b=>b.id===bedId);
+  if(bed?.status==='occupied') { toast('Cannot delete an occupied bed.','err'); return; }
+  if(!confirm('Delete this bed?')) return;
+  try {
+    await db(`beds?id=eq.${bedId}`, 'DELETE');
+    cm('m-bed-action');
+    toast('Bed deleted.');
+    loadBedBoard();
+  } catch(e) { toast('Error: '+e.message,'err'); }
+}
+
+function openAddBedModal() {
+  document.getElementById('add-bed-title').textContent = 'Add Bed';
+  document.getElementById('bed-edit-id').value = '';
+  document.getElementById('bed-ward').value = 'General';
+  document.getElementById('bed-room').value = '';
+  document.getElementById('bed-number').value = '';
+  document.getElementById('bed-status').value = 'available';
+  document.getElementById('m-add-bed').classList.add('open');
+}
+
+function openEditBedModal(bedId) {
+  const bed = _allBeds.find(b=>b.id===bedId);
+  if(!bed) return;
+  cm('m-bed-action');
+  document.getElementById('add-bed-title').textContent = 'Edit Bed';
+  document.getElementById('bed-edit-id').value = bedId;
+  document.getElementById('bed-ward').value = bed.ward||'General';
+  document.getElementById('bed-room').value = bed.room||'';
+  document.getElementById('bed-number').value = bed.bed_number||'';
+  document.getElementById('bed-status').value = bed.status||'available';
+  document.getElementById('m-add-bed').classList.add('open');
+}
+
+async function saveBed() {
+  const ward   = document.getElementById('bed-ward').value;
+  const room   = document.getElementById('bed-room').value.trim()||null;
+  const number = document.getElementById('bed-number').value.trim();
+  const status = document.getElementById('bed-status').value;
+  const editId = document.getElementById('bed-edit-id').value;
+  const orgId  = user.id;
+
+  if(!number) { toast('Bed number is required.','err'); return; }
+
+  const payload = { ward, room, bed_number: number, status, org_id: orgId };
+  try {
+    if(editId) {
+      await db(`beds?id=eq.${editId}`, 'PATCH', payload);
+      toast('✅ Bed updated.');
+    } else {
+      await db('beds', 'POST', payload);
+      toast('✅ Bed added.');
+    }
+    cm('m-add-bed');
+    loadBedBoard();
+  } catch(e) { toast('Error: '+e.message,'err'); }
+}
+
+// ── HELPERS ────────────────────────────────────────────────────────────────────
+
+function triageMeta(cat) {
+  const map = {
+    1: { dot:'🔴', short:'Cat 1', label:'1 — Resuscitation', text:'#dc2626', bg:'#fef2f2', border:'#fecaca' },
+    2: { dot:'🟠', short:'Cat 2', label:'2 — Emergency',     text:'#c2410c', bg:'#fff7ed', border:'#fed7aa' },
+    3: { dot:'🟡', short:'Cat 3', label:'3 — Urgent',        text:'#d97706', bg:'#fffbeb', border:'#fde68a' },
+    4: { dot:'🟢', short:'Cat 4', label:'4 — Semi-urgent',   text:'#059669', bg:'#f0fdf4', border:'#86efac' },
+    5: { dot:'🔵', short:'Cat 5', label:'5 — Non-urgent',    text:'#1d4ed8', bg:'#eff6ff', border:'#bfdbfe' },
+  };
+  return map[cat] || { dot:'⚪', short:'—', label:'Unknown', text:'#9AA3AE', bg:'#F8F7F3', border:'#E8E6E1' };
+}
+
+function encStatusBadge(s) {
+  const map = {
+    'registered':    'background:#F0EFEB;color:#555;',
+    'triaged':       'background:#fffbeb;color:#d97706;',
+    'in_assessment': 'background:#eff6ff;color:#1d4ed8;',
+    'admitted':      'background:#f0fdf4;color:#059669;',
+    'observation':   'background:#f5f3ff;color:#7c3aed;',
+    'discharged':    'background:#F0EFEB;color:#9AA3AE;',
+  };
+  const style = map[s] || map['registered'];
+  const labels = {
+    'registered':'Registered','triaged':'Triaged','in_assessment':'In Assessment',
+    'admitted':'Admitted','observation':'Observation','discharged':'Discharged'
+  };
+  return `<span class="badge" style="${style}">${labels[s]||s}</span>`;
+}
+
+// ── Legacy patients page ──────────────────────────────────────────────────────
 async function loadHoPts(){
   try{patients=await db('patients?order=created_at.desc');renderHoPts(patients);}
   catch(e){document.getElementById('hp-body').innerHTML=`<tr><td colspan="7" class="loading">Error: ${e.message}</td></tr>`;}
@@ -5873,17 +8144,6 @@ function renderHoPts(arr){
 function filterHoPts(){
   const q=document.getElementById('hp-search').value.toLowerCase();
   renderHoPts(patients.filter(p=>p.name.toLowerCase().includes(q)||(p.phone||'').includes(q)||(p.condition||'').toLowerCase().includes(q)));
-}
-
-async function addHospPatient(){
-  const name=document.getElementById('hp-name').value.trim();
-  if(!name){toast('Patient name required.','err');return;}
-  try{
-    await db('patients','POST',{name,age:document.getElementById('hp-age').value||null,gender:document.getElementById('hp-gender').value||null,phone:document.getElementById('hp-phone').value.trim()||null,condition:document.getElementById('hp-cond').value.trim()||null,notes:document.getElementById('hp-notes').value.trim()||null,org_id:user.id});
-    toast('✅ Patient registered!');
-    ['hp-name','hp-age','hp-phone','hp-cond','hp-notes'].forEach(id=>document.getElementById(id).value='');
-    document.getElementById('hp-gender').value='';loadHoPts();
-  }catch(e){toast('Error: '+e.message,'err');}
 }
 
 async function loadHoDrugs(){
