@@ -6632,7 +6632,7 @@ async function addTestRequest() {
       org_id:            user.id
     });
 
-    toast('✅ Test request submitted!');
+    toast(' Test request submitted!');
     ['lr-patient','lr-age','lr-phone','lr-requester','lr-notes','lr-test-custom']
       .forEach(id => { const el = document.getElementById(id); if(el) el.value = ''; });
     document.getElementById('lr-gender').value   = '';
