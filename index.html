@@ -8698,7 +8698,7 @@ function getRxDestination() {
   return el ? el.value : 'internal';
 }
 
-async function saveConsultation(){
+async function saveConsultation(){h
   if(!currentConsultId){ toast('No patient selected.','err'); return; }
   const diagnosis = document.getElementById('cons-diagnosis').value.trim();
   if(!diagnosis){ toast('Diagnosis required.','err'); return; }
@@ -8710,19 +8710,20 @@ async function saveConsultation(){
   try {
     // 1. Save to patients table (full record)
     await db('patients','POST',{
-      name:           patient?.name,
-      age:            patient?.age || null,
-      gender:         patient?.gender || null,
-      phone:          patient?.phone || null,
-      condition:      diagnosis,
-      notes:          document.getElementById('cons-notes').value.trim() || null,
+      name:             patient?.name,
+      age:              patient?.age || null,
+      gender:           patient?.gender || null,
+      phone:            patient?.phone || null,
+      condition:        diagnosis,
+      notes:            document.getElementById('cons-notes').value.trim() || null,
       status,
-      referral_to:    referral,
-      blood_pressure: document.getElementById('cons-bp').value.trim() || null,
-      temperature:    document.getElementById('cons-temp').value || null,
-      weight:         document.getElementById('cons-weight').value || null,
-      pulse:          document.getElementById('cons-pulse').value || null,
-      org_id:         user.id
+      referral_to:      referral,
+      blood_pressure:   document.getElementById('cons-bp').value.trim() || null,
+      temperature:      document.getElementById('cons-temp').value || null,
+      weight:           document.getElementById('cons-weight').value || null,
+      pulse:            document.getElementById('cons-pulse').value || null,
+      queue_patient_id: currentConsultId,
+      org_id:           user.id
     });
 
     // 2. Save prescription if drugs were added
