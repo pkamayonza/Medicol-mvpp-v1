@@ -1286,7 +1286,7 @@
       <span class="role-pill" id="role-label">—</span>
     </div>
     <div class="nav-tabs" id="nav-tabs"></div>
-    <span id="conn-pill" class="conn-pill synced">● Online</span>
+    <span id="conn-pill" class="conn-pill synced"><span style="display:inline-flex;align-items:center;gap:4px;"><svg style="vertical-align:middle;" xmlns="http://www.w3.org/2000/svg" width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4" fill="currentColor" stroke="currentColor"/></svg>Online</span></span>
     <button class="btn-logout" onclick="doLogout()">Sign Out</button>
   </nav>
 
@@ -1751,7 +1751,7 @@
 
         <!-- Empty state -->
         <div class="pos-basket-empty" id="basket-empty">
-          <div style="font-size:2.5rem;opacity:0.2;margin-bottom:0.75rem;">🧾</div>
+          <div style="margin-bottom:0.75rem;opacity:0.15;"><svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#0B1F3A" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 2v20l2-1 2 1 2-1 2 1 2-1 2 1 2-1 2 1V2l-2 1-2-1-2 1-2-1-2 1-2-1-2 1-2-1z"/><line x1="8" y1="10" x2="16" y2="10"/><line x1="8" y1="14" x2="14" y2="14"/></svg></div>
           <div style="font-size:0.85rem;color:#9AA3AE;line-height:1.7;">Search for a drug on the left<br/>to start a new sale</div>
         </div>
 
@@ -1865,7 +1865,7 @@
       <div id="txn-detail-body"></div>
       <div class="ma">
         <button class="btn btn-sm" onclick="cm('m-txn-detail')">Close</button>
-        <button class="btn btn-primary" onclick="reprintTxn()">🖨 Reprint</button>
+        <button class="btn btn-primary" onclick="reprintTxn()"><svg style="vertical-align:middle;margin-right:4px;" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="14" height="14"/></svg>Reprint</button>
       </div>
     </div>
   </div>
@@ -2415,7 +2415,7 @@
                 padding:1rem 1.5rem;margin:-1rem -1.5rem 1.1rem;
                 border-bottom:1px solid #E8E6E1;z-index:10;">
       <h3 style="margin:0;">Enter Results</h3>
-      <button class="btn btn-sm" onclick="cm('m-enter-result')">✕</button>
+      <button class="btn btn-sm" onclick="cm('m-enter-result')"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
     </div>
     <input type="hidden" id="er-request-id"/>
 
@@ -2453,7 +2453,7 @@
 
     <div class="ma" style="margin-top:1.25rem;">
       <button class="btn btn-sm" onclick="cm('m-enter-result')">Cancel</button>
-      <button class="btn btn-primary" onclick="saveResult()">✅ Save All Results & Mark Ready</button>
+      <button class="btn btn-primary" onclick="saveResult()">Save All Results & Mark Ready</button>
     </div>
   </div>
 </div>
@@ -2472,7 +2472,7 @@
     </p>
     <div class="ma">
       <button class="btn btn-sm" onclick="cm('m-dispatch-confirm')">Cancel</button>
-      <button class="btn btn-primary" onclick="confirmDispatch()">📤 Confirm Dispatch</button>
+      <button class="btn btn-primary" onclick="confirmDispatch()">Confirm Dispatch</button>
     </div>
   </div>
 </div>
@@ -2529,13 +2529,13 @@
                 style="background:#dc2626;color:white;border:none;padding:0.5rem 1.1rem;
                        border-radius:8px;cursor:pointer;font-size:0.82rem;font-weight:700;
                        font-family:'Syne',sans-serif;display:flex;align-items:center;gap:0.4rem;">
-          🚨 New Triage
+          <svg style="vertical-align:middle;margin-right:5px;" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>New Triage
         </button>
         <button onclick="showPage('ho-beds')"
                 style="background:#0B1F3A;color:white;border:none;padding:0.5rem 1.1rem;
                        border-radius:8px;cursor:pointer;font-size:0.82rem;font-weight:700;
                        font-family:'Syne',sans-serif;">
-          🛏 Bed Board
+          <svg style="vertical-align:middle;margin-right:5px;" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2 4v16"/><path d="M2 8h18a2 2 0 0 1 2 2v10"/><path d="M2 17h20"/><path d="M6 8v9"/></svg>Bed Board
         </button>
       </div>
     </div>
@@ -2545,7 +2545,7 @@
          style="display:none;background:#fef2f2;border:1px solid #fecaca;border-radius:10px;
                 padding:0.65rem 1rem;margin-bottom:1rem;font-size:0.82rem;color:#991b1b;
                 align-items:center;gap:0.75rem;">
-      <span>⚠</span><span id="ho-alert-text"></span>
+      <span style="flex-shrink:0;"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#991b1b" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></span><span id="ho-alert-text"></span>
     </div>
 
     <!-- Stats row -->
@@ -2553,7 +2553,7 @@
       <div class="stat-card" id="sc-ho-census">
         <div class="stat-card-top">
           <span class="stat-label">Inpatient Census</span>
-          <div class="stat-icon" style="background:#eff6ff;">🛏</div>
+          <div class="stat-icon" style="background:#eff6ff;"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2 4v16"/><path d="M2 8h18a2 2 0 0 1 2 2v10"/><path d="M2 17h20"/><path d="M6 8v9"/></svg></div>
         </div>
         <div class="stat-num" id="ho-census">—</div>
         <div class="stat-sub">beds occupied</div>
@@ -2561,7 +2561,7 @@
       <div class="stat-card" id="sc-ho-ed">
         <div class="stat-card-top">
           <span class="stat-label">ED Today</span>
-          <div class="stat-icon" style="background:#fef2f2;">🚨</div>
+          <div class="stat-icon" style="background:#fef2f2;"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></div>
         </div>
         <div class="stat-num" id="ho-ed-count">—</div>
         <div class="stat-sub">encounters open</div>
@@ -2569,7 +2569,7 @@
       <div class="stat-card">
         <div class="stat-card-top">
           <span class="stat-label">Admitted Today</span>
-          <div class="stat-icon" style="background:#f0fdf4;">✅</div>
+          <div class="stat-icon" style="background:#f0fdf4;"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg></div>
         </div>
         <div class="stat-num" id="ho-admitted-today">—</div>
         <div class="stat-sub">new admissions</div>
@@ -2577,7 +2577,7 @@
       <div class="stat-card">
         <div class="stat-card-top">
           <span class="stat-label">Discharged Today</span>
-          <div class="stat-icon" style="background:#f5f3ff;">🚪</div>
+          <div class="stat-icon" style="background:#f5f3ff;"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M13 4h3a2 2 0 0 1 2 2v14"/><path d="M2 20h3"/><path d="M13 20h9"/><path d="M10 12v.01"/><path d="M13 4l-6 16H2"/></svg></div>
         </div>
         <div class="stat-num" id="ho-discharged-today">—</div>
         <div class="stat-sub">closed today</div>
@@ -2585,7 +2585,7 @@
       <div class="stat-card" id="sc-ho-avail">
         <div class="stat-card-top">
           <span class="stat-label">Beds Available</span>
-          <div class="stat-icon" style="background:#ecfdf5;">🟢</div>
+          <div class="stat-icon" style="background:#ecfdf5;"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg></div>
         </div>
         <div class="stat-num" id="ho-avail">—</div>
         <div class="stat-sub">ready now</div>
@@ -2598,7 +2598,7 @@
       <!-- ED Board -->
       <div class="card" style="margin:0;">
         <h2 style="justify-content:space-between;">
-          <span>🚨 Emergency Department</span>
+          <span style="display:flex;align-items:center;gap:6px;"><svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#dc2626" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>Emergency Department</span>
           <button onclick="showPage('ho-triage')"
                   style="font-size:0.72rem;color:#dc2626;background:none;border:none;
                          cursor:pointer;font-family:'Syne',sans-serif;font-weight:700;">
@@ -2613,7 +2613,7 @@
       <!-- Bed occupancy by ward -->
       <div class="card" style="margin:0;">
         <h2 style="justify-content:space-between;">
-          <span>🛏 Ward Occupancy</span>
+          <span style="display:flex;align-items:center;gap:6px;"><svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#0D6E6E" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2 4v16"/><path d="M2 8h18a2 2 0 0 1 2 2v10"/><path d="M2 17h20"/><path d="M6 8v9"/></svg>Ward Occupancy</span>
           <button onclick="showPage('ho-beds')"
                   style="font-size:0.72rem;color:#0D6E6E;background:none;border:none;
                          cursor:pointer;font-family:'Syne',sans-serif;font-weight:700;">
@@ -2679,45 +2679,50 @@
       <div class="card" style="border:2px solid #E8E6E1;margin-bottom:1rem;">
         <h2>1. Triage Category</h2>
         <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:0.6rem;">
-          <label id="tc-1" style="display:flex;flex-direction:column;align-items:center;gap:0.4rem;
-                                   padding:0.85rem 0.5rem;border-radius:10px;border:2px solid #fecaca;
+          <label id="tc-1" style="display:flex;flex-direction:column;align-items:center;gap:0.5rem;
+                                   padding:1rem 0.5rem;border-radius:10px;border:2px solid #fecaca;
                                    background:#fef2f2;cursor:pointer;transition:all 0.15s;"
                  onclick="selectTriageCategory(1,this)">
-            <span style="font-size:1.4rem;">🔴</span>
-            <span style="font-size:0.72rem;font-weight:700;color:#dc2626;text-align:center;">1 — Resuscitation</span>
-            <span style="font-size:0.65rem;color:#9AA3AE;text-align:center;">Immediate</span>
+            <span style="display:block;width:18px;height:18px;border-radius:50%;background:#dc2626;
+                          border:3px solid rgba(220,38,38,0.3);"></span>
+            <span style="font-size:0.72rem;font-weight:700;color:#dc2626;text-align:center;line-height:1.3;">1 — Resuscitation</span>
+            <span style="font-size:0.63rem;color:#9AA3AE;text-align:center;">Immediate</span>
           </label>
-          <label id="tc-2" style="display:flex;flex-direction:column;align-items:center;gap:0.4rem;
-                                   padding:0.85rem 0.5rem;border-radius:10px;border:2px solid #fed7aa;
+          <label id="tc-2" style="display:flex;flex-direction:column;align-items:center;gap:0.5rem;
+                                   padding:1rem 0.5rem;border-radius:10px;border:2px solid #fed7aa;
                                    background:#fff7ed;cursor:pointer;transition:all 0.15s;"
                  onclick="selectTriageCategory(2,this)">
-            <span style="font-size:1.4rem;">🟠</span>
-            <span style="font-size:0.72rem;font-weight:700;color:#c2410c;text-align:center;">2 — Emergency</span>
-            <span style="font-size:0.65rem;color:#9AA3AE;text-align:center;">10 min</span>
+            <span style="display:block;width:18px;height:18px;border-radius:50%;background:#c2410c;
+                          border:3px solid rgba(194,65,12,0.3);"></span>
+            <span style="font-size:0.72rem;font-weight:700;color:#c2410c;text-align:center;line-height:1.3;">2 — Emergency</span>
+            <span style="font-size:0.63rem;color:#9AA3AE;text-align:center;">10 min</span>
           </label>
-          <label id="tc-3" style="display:flex;flex-direction:column;align-items:center;gap:0.4rem;
-                                   padding:0.85rem 0.5rem;border-radius:10px;border:2px solid #fde68a;
+          <label id="tc-3" style="display:flex;flex-direction:column;align-items:center;gap:0.5rem;
+                                   padding:1rem 0.5rem;border-radius:10px;border:2px solid #fde68a;
                                    background:#fffbeb;cursor:pointer;transition:all 0.15s;"
                  onclick="selectTriageCategory(3,this)">
-            <span style="font-size:1.4rem;">🟡</span>
-            <span style="font-size:0.72rem;font-weight:700;color:#d97706;text-align:center;">3 — Urgent</span>
-            <span style="font-size:0.65rem;color:#9AA3AE;text-align:center;">30 min</span>
+            <span style="display:block;width:18px;height:18px;border-radius:50%;background:#d97706;
+                          border:3px solid rgba(217,119,6,0.3);"></span>
+            <span style="font-size:0.72rem;font-weight:700;color:#d97706;text-align:center;line-height:1.3;">3 — Urgent</span>
+            <span style="font-size:0.63rem;color:#9AA3AE;text-align:center;">30 min</span>
           </label>
-          <label id="tc-4" style="display:flex;flex-direction:column;align-items:center;gap:0.4rem;
-                                   padding:0.85rem 0.5rem;border-radius:10px;border:2px solid #bbf7d0;
+          <label id="tc-4" style="display:flex;flex-direction:column;align-items:center;gap:0.5rem;
+                                   padding:1rem 0.5rem;border-radius:10px;border:2px solid #bbf7d0;
                                    background:#f0fdf4;cursor:pointer;transition:all 0.15s;"
                  onclick="selectTriageCategory(4,this)">
-            <span style="font-size:1.4rem;">🟢</span>
-            <span style="font-size:0.72rem;font-weight:700;color:#059669;text-align:center;">4 — Semi-urgent</span>
-            <span style="font-size:0.65rem;color:#9AA3AE;text-align:center;">60 min</span>
+            <span style="display:block;width:18px;height:18px;border-radius:50%;background:#059669;
+                          border:3px solid rgba(5,150,105,0.3);"></span>
+            <span style="font-size:0.72rem;font-weight:700;color:#059669;text-align:center;line-height:1.3;">4 — Semi-urgent</span>
+            <span style="font-size:0.63rem;color:#9AA3AE;text-align:center;">60 min</span>
           </label>
-          <label id="tc-5" style="display:flex;flex-direction:column;align-items:center;gap:0.4rem;
-                                   padding:0.85rem 0.5rem;border-radius:10px;border:2px solid #bfdbfe;
+          <label id="tc-5" style="display:flex;flex-direction:column;align-items:center;gap:0.5rem;
+                                   padding:1rem 0.5rem;border-radius:10px;border:2px solid #bfdbfe;
                                    background:#eff6ff;cursor:pointer;transition:all 0.15s;"
                  onclick="selectTriageCategory(5,this)">
-            <span style="font-size:1.4rem;">🔵</span>
-            <span style="font-size:0.72rem;font-weight:700;color:#1d4ed8;text-align:center;">5 — Non-urgent</span>
-            <span style="font-size:0.65rem;color:#9AA3AE;text-align:center;">120 min</span>
+            <span style="display:block;width:18px;height:18px;border-radius:50%;background:#1d4ed8;
+                          border:3px solid rgba(29,78,216,0.3);"></span>
+            <span style="font-size:0.72rem;font-weight:700;color:#1d4ed8;text-align:center;line-height:1.3;">5 — Non-urgent</span>
+            <span style="font-size:0.63rem;color:#9AA3AE;text-align:center;">120 min</span>
           </label>
         </div>
         <input type="hidden" id="tr-category" value=""/>
@@ -2753,7 +2758,7 @@
         <div id="tr-existing-banner" style="display:none;margin-top:0.75rem;padding:0.65rem 1rem;
              background:#f0fdf4;border:1px solid #86efac;border-radius:8px;font-size:0.82rem;
              color:#166534;display:none;align-items:center;gap:0.5rem;">
-          <span>✅</span>
+          <span style="flex-shrink:0;display:flex;align-items:center;"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg></span>
           <span id="tr-existing-text">Existing patient record found — will link to encounter.</span>
         </div>
       </div>
@@ -2903,22 +2908,22 @@
         <div id="bbs-occupied"
              style="background:#0B1F3A;color:white;border-radius:8px;padding:0.5rem 1rem;
                     font-size:0.82rem;font-weight:700;">
-          🔴 — Occupied
+          <span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,0.4);vertical-align:middle;margin-right:6px;"></span>Occupied
         </div>
         <div id="bbs-available"
              style="background:#f0fdf4;border:1px solid #86efac;color:#166534;border-radius:8px;
                     padding:0.5rem 1rem;font-size:0.82rem;font-weight:700;">
-          🟢 — Available
+          <span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#059669;vertical-align:middle;margin-right:6px;"></span>Available
         </div>
         <div id="bbs-cleaning"
              style="background:#fffbeb;border:1px solid #fde68a;color:#92400e;border-radius:8px;
                     padding:0.5rem 1rem;font-size:0.82rem;font-weight:700;">
-          🟡 — Cleaning
+          <span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#d97706;vertical-align:middle;margin-right:6px;"></span>Cleaning
         </div>
         <div id="bbs-maintenance"
              style="background:#F0EFEB;border:1px solid #E0DFDB;color:#555;border-radius:8px;
                     padding:0.5rem 1rem;font-size:0.82rem;font-weight:700;">
-          ⚫ — Maintenance
+          <span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#9AA3AE;vertical-align:middle;margin-right:6px;"></span>Maintenance
         </div>
       </div>
 
@@ -3060,17 +3065,17 @@
 
     <div class="stats-5" style="grid-template-columns:repeat(3,1fr);">
       <div class="stat-card">
-        <div class="stat-card-top"><span class="stat-label">Registered Today</span><div class="stat-icon" style="background:#eff6ff;">📋</div></div>
+        <div class="stat-card-top"><span class="stat-label">Registered Today</span><div class="stat-icon" style="background:#eff6ff;"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#1d4ed8" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="16" height="16" rx="1" ry="1"/></svg></div></div>
         <div class="stat-num" id="rec-today">—</div>
         <div class="stat-sub">patients today</div>
       </div>
       <div class="stat-card" id="sc-rec-queue">
-        <div class="stat-card-top"><span class="stat-label">In Queue</span><div class="stat-icon" style="background:#fffbeb;">⏳</div></div>
+        <div class="stat-card-top"><span class="stat-label">In Queue</span><div class="stat-icon" style="background:#fffbeb;"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#d97706" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div></div>
         <div class="stat-num" id="rec-queue">—</div>
         <div class="stat-sub">waiting to see doctor</div>
       </div>
       <div class="stat-card">
-        <div class="stat-card-top"><span class="stat-label">Seen Today</span><div class="stat-icon" style="background:#f0fdf4;">✅</div></div>
+        <div class="stat-card-top"><span class="stat-label">Seen Today</span><div class="stat-icon" style="background:#f0fdf4;"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg></div></div>
         <div class="stat-num" id="rec-seen">—</div>
         <div class="stat-sub">consultations done</div>
       </div>
@@ -3127,17 +3132,17 @@
 
     <div class="stats-5" style="grid-template-columns:repeat(3,1fr);">
       <div class="stat-card" id="sc-doc-waiting">
-        <div class="stat-card-top"><span class="stat-label">Waiting</span><div class="stat-icon" style="background:#fffbeb;">⏳</div></div>
+        <div class="stat-card-top"><span class="stat-label">Waiting</span><div class="stat-icon" style="background:#fffbeb;"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#d97706" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div></div>
         <div class="stat-num" id="doc-waiting">—</div>
         <div class="stat-sub">patients in queue</div>
       </div>
       <div class="stat-card">
-        <div class="stat-card-top"><span class="stat-label">Seen Today</span><div class="stat-icon" style="background:#f0fdf4;">✅</div></div>
+        <div class="stat-card-top"><span class="stat-label">Seen Today</span><div class="stat-icon" style="background:#f0fdf4;"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg></div></div>
         <div class="stat-num" id="doc-seen">—</div>
         <div class="stat-sub">consultations done</div>
       </div>
       <div class="stat-card">
-        <div class="stat-card-top"><span class="stat-label">Prescriptions</span><div class="stat-icon" style="background:#eff6ff;">💊</div></div>
+        <div class="stat-card-top"><span class="stat-label">Prescriptions</span><div class="stat-icon" style="background:#eff6ff;"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#1d4ed8" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M10.5 3.5a5 5 0 0 1 7.07 7.07l-7.07 7.07a5 5 0 0 1-7.07-7.07l7.07-7.07z"/><line x1="9" y1="15" x2="15" y2="9"/></svg></div></div>
         <div class="stat-num" id="doc-rx-count">—</div>
         <div class="stat-sub">written today</div>
       </div>
@@ -3288,7 +3293,7 @@
           <div id="diagnosis-lock"
                style="background:#F0EFEB;border-radius:8px;padding:1.1rem;
                       text-align:center;border:1px dashed #D1D5DB;">
-            <div style="font-size:1.3rem;margin-bottom:0.35rem;">🔒</div>
+            <div style="margin-bottom:0.35rem;"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#6B7280" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="24" height="24" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></div>
             <div style="font-size:0.82rem;color:#6B7280;font-weight:600;line-height:1.5;">
               Send a lab request or click<br>"Skip — No Lab Needed" to unlock.
             </div>
@@ -3380,7 +3385,7 @@
                 <input type="radio" name="rx-destination" value="internal" checked
                        onchange="toggleRxDestination(this.value)">
                 Internal Pharmacy
-                <span style="margin-left:auto;font-size:0.68rem;color:#059669;font-weight:700;">● Connected</span>
+                <span style="margin-left:auto;font-size:0.68rem;color:#059669;font-weight:700;"><span style="display:inline-flex;align-items:center;gap:4px;"><svg style="vertical-align:middle;" xmlns="http://www.w3.org/2000/svg" width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4" fill="currentColor" stroke="#059669"/></svg>Connected</span></span>
               </label>
               <label style="display:flex;align-items:center;gap:0.5rem;cursor:pointer;
                             padding:0.45rem 0.75rem;border-radius:8px;border:1px solid #E0DFDB;
@@ -3401,7 +3406,7 @@
             <div id="rx-external-note"
                  style="display:none;margin-top:0.5rem;font-size:0.78rem;color:#92400e;
                         background:#fffbeb;border-radius:6px;padding:0.4rem 0.7rem;">
-              ⚠ Prescription will be printed for the patient to take to an external pharmacy.
+              <svg style="vertical-align:middle;margin-right:4px;" xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#d97706" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>Prescription will be printed for the patient to take to an external pharmacy.
             </div>
           </div>
 
@@ -3436,12 +3441,12 @@
         <div class="stat-sub">prescriptions to fill</div>
       </div>
       <div class="stat-card">
-        <div class="stat-card-top"><span class="stat-label">Dispensed Today</span><div class="stat-icon" style="background:#f0fdf4;">✅</div></div>
+        <div class="stat-card-top"><span class="stat-label">Dispensed Today</span><div class="stat-icon" style="background:#f0fdf4;"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg></div></div>
         <div class="stat-num" id="dph-dispensed">—</div>
         <div class="stat-sub">prescriptions filled</div>
       </div>
       <div class="stat-card">
-        <div class="stat-card-top"><span class="stat-label">Total Today</span><div class="stat-icon" style="background:#eff6ff;">📋</div></div>
+        <div class="stat-card-top"><span class="stat-label">Total Today</span><div class="stat-icon" style="background:#eff6ff;"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/></svg></div></div>
         <div class="stat-num" id="dph-total">—</div>
         <div class="stat-sub">prescriptions received</div>
       </div>
@@ -3480,7 +3485,7 @@
       <div id="rx-detail-body"></div>
       <div class="ma">
         <button class="btn btn-sm" onclick="cm('m-rx-detail')">Close</button>
-        <button class="btn btn-primary" id="rx-dispense-btn" onclick="dispenseRx()">✅ Mark as Dispensed</button>
+        <button class="btn btn-primary" id="rx-dispense-btn" onclick="dispenseRx()">Mark as Dispensed</button>
       </div>
     </div>
   </div>
@@ -3682,25 +3687,25 @@
                       border-radius:8px;border:1px solid #E0DFDB;cursor:pointer;background:white;
                       font-size:0.85rem;font-weight:600;">
           <input type="radio" name="adm-decision" value="admitted" onchange="showAdmissionFields()"/>
-          🛏 Admit to Ward
+          <svg style="vertical-align:middle;margin-right:6px;" xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#0B1F3A" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2 4v16"/><path d="M2 8h18a2 2 0 0 1 2 2v10"/><path d="M2 17h20"/><path d="M6 8v9"/></svg>Admit to Ward
         </label>
         <label style="display:flex;align-items:center;gap:0.75rem;padding:0.7rem 1rem;
                       border-radius:8px;border:1px solid #E0DFDB;cursor:pointer;background:white;
                       font-size:0.85rem;font-weight:600;">
           <input type="radio" name="adm-decision" value="observation" onchange="showAdmissionFields()"/>
-          🔎 Observation (awaiting results)
+          <svg style="vertical-align:middle;margin-right:6px;" xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#0B1F3A" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>Observation (awaiting results)
         </label>
         <label style="display:flex;align-items:center;gap:0.75rem;padding:0.7rem 1rem;
                       border-radius:8px;border:1px solid #E0DFDB;cursor:pointer;background:white;
                       font-size:0.85rem;font-weight:600;">
           <input type="radio" name="adm-decision" value="discharged" onchange="showAdmissionFields()"/>
-          🚪 Discharge (not admitted)
+          <svg style="vertical-align:middle;margin-right:6px;" xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#0B1F3A" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M13 4h3a2 2 0 0 1 2 2v14"/><path d="M2 20h3"/><path d="M13 20h9"/><path d="M10 12v.01"/><path d="M13 4l-6 16H2"/></svg>Discharge (not admitted)
         </label>
         <label style="display:flex;align-items:center;gap:0.75rem;padding:0.7rem 1rem;
                       border-radius:8px;border:1px solid #E0DFDB;cursor:pointer;background:white;
                       font-size:0.85rem;font-weight:600;">
           <input type="radio" name="adm-decision" value="referred" onchange="showAdmissionFields()"/>
-          ➡ Refer to another facility
+          <svg style="vertical-align:middle;margin-right:6px;" xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#0B1F3A" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>Refer to another facility
         </label>
       </div>
     </div>
@@ -3933,9 +3938,9 @@ function _setConn(state) {
   const pill = document.getElementById('conn-pill');
   if (!pill) return;
   pill.className = `conn-pill ${state}`;
-  pill.textContent = state === 'synced'  ? '● Online'
-                   : state === 'offline' ? '● Offline'
-                   : '↻ Syncing';
+  pill.textContent = state === 'synced'  ? '<span style="display:inline-flex;align-items:center;gap:4px;"><svg style="vertical-align:middle;" xmlns="http://www.w3.org/2000/svg" width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4" fill="currentColor" stroke="currentColor"/></svg>Online</span>'
+                   : state === 'offline' ? '<span style="display:inline-flex;align-items:center;gap:4px;"><svg style="vertical-align:middle;" xmlns="http://www.w3.org/2000/svg" width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4" fill="currentColor" stroke="currentColor"/></svg>Offline</span>'
+                   : 'Syncing…';
 }
 
 // ── SYNC ENGINE ───────────────────────────────────────────────────────────────
@@ -4102,7 +4107,7 @@ async function doSignup(){
     const dept = document.getElementById('s-dept')?.value || null;
     if(role==='Staff' && !dept){showEl('signup-err','Please select your department.');return;}
     await authPost('signup',{email,password:pass,data:{org_name:org,org_type:role,department:dept}});
-    showEl('signup-ok','✅ Account created! Check your email to confirm, then sign in.',true);
+    showEl('signup-ok','Account created! Check your email to confirm, then sign in.',true);
     document.getElementById('signup-ok').style.display='block';
     ['s-org','s-email','s-pass'].forEach(id=>document.getElementById(id).value='');
     document.getElementById('s-role').value='';
@@ -4651,7 +4656,7 @@ async function bulkDeleteDrugs(){
     for(const id of invSelected){
       await db(`inventory?id=eq.${id}`,'DELETE');
     }
-    toast(`✅ Deleted ${invSelected.size} drug(s).`);
+    toast(`Deleted ${invSelected.size} drug(s)`);
     invSelected.clear(); updateBulkBar();
     loadDrugs();
   }catch(e){toast('Error: '+e.message,'err');}
@@ -4708,7 +4713,7 @@ async function saveDrug(){
   try{
     if(id) await db(`inventory?id=eq.${id}`,'PATCH',payload);
     else await db('inventory','POST',payload);
-    toast(id?'✅ Drug updated!':'✅ Drug added!');
+    toast(id?'Drug updated':'Drug added');
     cm('m-drug'); loadDrugs();
   }catch(e){toast('Error: '+e.message,'err');}
 }
@@ -4730,7 +4735,7 @@ function openDrugDetail(id){
         ['Buying Price', d.buying_price?'UGX '+Number(d.buying_price).toLocaleString():'—'],
         ['Selling Price', d.price?'UGX '+Number(d.price).toLocaleString():'—'],
         ['Stock Value', val>0?'UGX '+val.toLocaleString():'—'],
-        ['Expiry', d.expiry_date?(new Date(d.expiry_date).toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'}))+(isExpired?' ⚠️ Expired':''):'—'],
+        ['Expiry', d.expiry_date?(new Date(d.expiry_date).toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'}))+(isExpired?' — Expired':''):'—'],
         ['Batch Number', d.batch_number||'—'],
         ['Supplier', d.supplier||'—'],
       ].map(([k,v])=>`
@@ -4882,7 +4887,7 @@ function addToBasket(){
   document.getElementById('pos-no-stock-warn').style.display='none';
   currentPosItem=null;
   document.getElementById('pos-drug-input').focus();
-  toast('✅ Added to sale');
+  toast('Added to sale');
 }
 
 function removeFromBasket(idx){ basket.splice(idx,1); renderBasket(); }
@@ -4901,7 +4906,7 @@ function renderBasket(){
         <div class="pos-basket-item-meta">${item.qty} ${item.unit} × UGX ${Number(item.unit_price).toLocaleString()}</div>
       </div>
       <div class="pos-basket-item-price">UGX ${Number(item.line_total).toLocaleString()}</div>
-      <button class="pos-basket-item-del" onclick="removeFromBasket(${i})">✕</button>
+      <button class="pos-basket-item-del" onclick="removeFromBasket(${i})"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
     </div>`).join('');
   recalcBasket();
 }
@@ -4975,7 +4980,7 @@ async function saveBasket(){
       });
     }
     track('sale_saved',{drug_count:basket.length,grand_total:grandTotal,payment_method:payment});
-    toast(`✅ Sale saved — UGX ${grandTotal.toLocaleString()}`);
+    toast(`Sale saved — UGX ${grandTotal.toLocaleString()}`);
     lastReceipt={sessionId,basket:[...basket],customer,payment,notes,subtotal,discAmt,grandTotal,time:new Date()};
     showReceipt(lastReceipt);
     clearBasket();
@@ -5098,7 +5103,7 @@ async function delTxnSession(sessionId){
   const items=dispLog.filter(x=>(x.session_id||x.id)===sessionId);
   try{
     for(const x of items) await db(`dispensing_log?id=eq.${x.id}`,'DELETE');
-    toast('Deleted.'); loadDispensing();
+    toast('Deleted'); loadDispensing();
   }catch(e){toast('Error: '+e.message,'err');}
 }
 
@@ -5337,7 +5342,7 @@ function renderClRecent(arr) {
 async function exportClinicData() {
   const btn = document.getElementById('cl-export-btn');
   const orgId = user.id;
-  btn.textContent = '⏳ Exporting…';
+  btn.textContent = 'Exporting…';
   btn.disabled = true;
   try {
     // 1. Patients
@@ -5371,7 +5376,7 @@ async function exportClinicData() {
     dlCsv(pts,        'minza-patients.csv');
     setTimeout(() => dlCsv(rxs, 'minza-prescriptions.csv'), 400);
     setTimeout(() => dlCsv(labResults, 'minza-lab-results.csv'), 800);
-    setTimeout(() => toast(`✅ Exported ${pts.length} patients, ${rxs.length} prescriptions, ${labResults.length} lab results`), 900);
+    setTimeout(() => toast(`Exported ${pts.length} patients, ${rxs.length} prescriptions, ${labResults.length} lab results`), 900);
   } catch(e) {
     toast('Export failed: ' + e.message, 'err');
   } finally {
@@ -5472,9 +5477,9 @@ async function confirmImport() {
 
     resultEl.innerHTML = `
       <div style="background:#f0fdf4;border:1px solid #86efac;border-radius:8px;padding:0.75rem 1rem;font-size:0.83rem;color:#166534;">
-        ✅ <strong>${inserted}</strong> records imported.
-        ${skipped.length ? `<br/>⏭ <strong>${skipped.length}</strong> skipped (empty name or duplicate).` : ''}
-        ${errRows.length ? `<br/>❌ <strong>${errRows.length}</strong> failed: ${errRows.slice(0,5).join(', ')}` : ''}
+        <svg style="vertical-align:middle;margin-right:4px;" xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#166534" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg><strong>${inserted}</strong> records imported.
+        ${skipped.length ? `<br/><span style="color:#d97706;"><svg style="vertical-align:middle;margin-right:3px;" xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#d97706" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg></span><strong>${skipped.length}</strong> skipped (empty name or duplicate).` : ''}
+        ${errRows.length ? `<br/><span style="color:#dc2626;"><svg style="vertical-align:middle;margin-right:3px;" xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#dc2626" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></span><strong>${errRows.length}</strong> failed: ${errRows.slice(0,5).join(', ')}` : ''}
       </div>`;
     resultEl.style.display = 'block';
     btn.textContent = 'Done';
@@ -5514,7 +5519,7 @@ async function requestMomoPayment() {
   const statusEl = document.getElementById('pos-momo-status');
   const reqBtn = document.getElementById('pos-momo-req-btn');
   statusEl.style.display = 'flex';
-  statusEl.innerHTML = `<span style="color:#7c3aed;">⏳ Waiting for payment confirmation…</span>`;
+  statusEl.innerHTML = `<span style="color:#7c3aed;display:flex;align-items:center;gap:6px;"><svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Waiting for payment confirmation…</span>`;
   reqBtn.disabled = true;
 
   try {
@@ -5553,19 +5558,19 @@ async function requestMomoPayment() {
       const data = await res.json();
       if (data.status === 'SUCCESSFUL') {
         clearInterval(_momoPollTimer);
-        statusEl.innerHTML = `<span style="color:#059669;font-weight:700;">✅ Payment confirmed!</span>`;
+        statusEl.innerHTML = `<span style="color:#059669;font-weight:700;display:flex;align-items:center;gap:6px;"><svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg> Payment confirmed</span>`;
         reqBtn.disabled = false;
         setTimeout(() => saveBasket(), 800);
       } else if (data.status === 'FAILED') {
         clearInterval(_momoPollTimer);
-        statusEl.innerHTML = `<span style="color:#dc2626;">❌ Payment failed. <button onclick="resetMomoStatus()" style="background:none;border:none;color:#0D6E6E;cursor:pointer;font-weight:700;font-family:'Syne',sans-serif;">Try Again</button></span>`;
+        statusEl.innerHTML = `<span style="color:#dc2626;display:flex;align-items:center;gap:6px;"><svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#dc2626" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg> Payment failed. <button onclick="resetMomoStatus()" style="background:none;border:none;color:#0D6E6E;cursor:pointer;font-weight:700;font-family:'Syne',sans-serif;">Try Again</button></span>`;
         reqBtn.disabled = false;
       }
     } catch(e) { /* network blip, keep polling */ }
 
     if (_momoPollCount >= 10) {
       clearInterval(_momoPollTimer);
-      statusEl.innerHTML = `<span style="color:#d97706;">⏱ Payment timed out. <button onclick="resetMomoStatus()" style="background:none;border:none;color:#0D6E6E;cursor:pointer;font-weight:700;font-family:'Syne',sans-serif;">Try Again</button></span>`;
+      statusEl.innerHTML = `<span style="color:#d97706;display:flex;align-items:center;gap:6px;"><svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#d97706" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Payment timed out. <button onclick="resetMomoStatus()" style="background:none;border:none;color:#0D6E6E;cursor:pointer;font-weight:700;font-family:'Syne',sans-serif;">Try Again</button></span>`;
       reqBtn.disabled = false;
     }
   }, 3000);
@@ -5634,7 +5639,7 @@ async function submitInviteStaff() {
       const d = await res.json().catch(()=>({}));
       throw new Error(d.message || `Server error ${res.status}`);
     }
-    okEl.textContent = `✅ Invite sent to ${email}`;
+    okEl.textContent = `Invite sent to ${email}`;
     okEl.style.display = 'block';
     document.getElementById('invite-email').value = '';
     loadStaffPage();
@@ -5796,7 +5801,7 @@ function exportReport() {
   document.body.appendChild(a); a.click();
   document.body.removeChild(a);
   setTimeout(() => URL.revokeObjectURL(url), 1000);
-  toast('✅ Report exported');
+  toast('Report exported');
 }
 
 async function loadClPts() {
@@ -6133,7 +6138,7 @@ async function addClinicPatient() {
 
     patientRow.fhir_r5 = buildFHIRPatient(patientRow);
     await db('patients', 'POST', patientRow);
-    toast('✅ Patient registered!');
+    toast('Patient registered!');
     ['cp-name','cp-age','cp-phone','cp-cond','cp-notes','cp-bp','cp-temp','cp-weight','cp-pulse'].forEach(id => {
       const el = document.getElementById(id); if(el) el.value='';
     });
@@ -6381,7 +6386,7 @@ function renderSelectedTests() {
       `<span style="background:#0B1F3A;color:white;padding:0.2rem 0.65rem;border-radius:100px;
                     font-size:0.75rem;font-weight:600;display:inline-flex;align-items:center;gap:0.3rem;">
         ${t}
-        <span onclick="toggleTest('${t}')" style="cursor:pointer;opacity:0.6;font-size:0.8rem;">✕</span>
+        <span onclick="toggleTest('${t}')" style="cursor:pointer;opacity:0.6;font-size:0.8rem;"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></span>
       </span>`
     ).join('');
 }
@@ -6591,7 +6596,7 @@ function renderClinicRequests(arr) {
                 onclick="openEnterResult('${r.id}')">Enter Result</button>
         ${r.status === 'Result Ready'
           ? `<button class="btn btn-sm" style="background:#0B1F3A;color:white;border-color:#0B1F3A;"
-                     onclick="openDispatch('${r.id}','${(r.patient_name||'').replace(/'/g,"\\'")}','${tests.replace(/'/g,"\\'")}')">📤 Dispatch</button>`
+                     onclick="openDispatch('${r.id}','${(r.patient_name||'').replace(/'/g,"\\'")}','${tests.replace(/'/g,"\\'")}')"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg> Dispatch</button>`
           : ''}
       </td>
     </tr>`;
@@ -6683,7 +6688,7 @@ function renderDispatched(arr) {
       <td>${priorityBadge(r.priority)}</td>
       <td style="font-size:0.78rem;">
         ${isClinic
-          ? '<span style="background:#eff6ff;color:#1d4ed8;border-radius:100px;padding:0.15rem 0.55rem;font-size:0.72rem;font-weight:700;">🏥 Clinic</span>'
+          ? '<span style="background:#eff6ff;color:#1d4ed8;border-radius:100px;padding:0.15rem 0.55rem;font-size:0.72rem;font-weight:700;">Clinic</span>'
           : (r.requesting_doctor||'Walk-in')}
       </td>
       <td style="font-size:0.78rem;color:#9AA3AE;">${r.dispatched_at ? fmtDate(r.dispatched_at) : fmtDate(r.created_at)}</td>
@@ -6738,7 +6743,7 @@ async function saveTestStatus() {
   if (status === 'Dispatched')   extra.dispatched_at   = new Date().toISOString();
   try {
     await db(`test_requests?id=eq.${id}`,'PATCH', {status, ...extra});
-    toast('✅ Status updated!');
+    toast('Status updated');
     cm('m-update-status');
     loadWorklist();
   } catch(e) { toast('Error: '+e.message,'err'); }
@@ -6760,7 +6765,7 @@ async function openEnterResult(requestId) {
     `<strong>${req.patient_name}</strong>
      ${req.patient_age  ? `<span style="color:#9AA3AE;font-size:0.8rem;"> · ${req.patient_age}y</span>` : ''}
      ${req.patient_gender ? `<span style="color:#9AA3AE;font-size:0.8rem;"> · ${req.patient_gender}</span>` : ''}
-     ${isClinic ? `<span style="background:#eff6ff;color:#1d4ed8;border-radius:100px;padding:0.1rem 0.5rem;font-size:0.72rem;font-weight:700;margin-left:0.4rem;">🏥 Clinic</span>` : ''}
+     ${isClinic ? `<span style="background:#eff6ff;color:#1d4ed8;border-radius:100px;padding:0.1rem 0.5rem;font-size:0.72rem;font-weight:700;margin-left:0.4rem;">Clinic</span>` : ''}
      <br/>
      <span style="color:#9AA3AE;font-size:0.8rem;">Tests: ${testList.join(', ')}</span>
      ${req.requesting_doctor ? `<br/><span style="color:#9AA3AE;font-size:0.78rem;">Requested by: ${req.requesting_doctor}</span>` : ''}
@@ -6930,7 +6935,7 @@ async function saveResult() {
       sample_type:     sampleType   // saves back to request so dispatch has the info
     });
 
-    toast(`✅ ${resultRows.length} result${resultRows.length>1?'s':''} saved — status → Result Ready`);
+    toast(`${resultRows.length} result${resultRows.length>1?'s':''} saved — status → Result Ready`);
     cm('m-enter-result');
 
     currentResultReport = { req: {...req, sample_type: sampleType}, resultRows, techNotes, savedAt: new Date() };
@@ -7029,7 +7034,7 @@ async function confirmDispatch() {
       status:        'Dispatched',
       dispatched_at: new Date().toISOString()
     });
-    toast('📤 Results dispatched to the doctor.');
+    toast('Results dispatched to the doctor.');
     cm('m-dispatch-confirm');
     cm('m-result-detail');
     await loadWorklist();
@@ -7398,13 +7403,13 @@ function computeNEWS2() {
   let riskColor, riskBg, riskText;
   if(score >= 7) {
     riskColor='#dc2626'; riskBg='#fef2f2';
-    riskText='🔴 HIGH RISK — Emergency response required. Consider ICU.';
+    riskText='HIGH RISK — Emergency response required. Consider ICU.';
   } else if(score >= 5) {
     riskColor='#d97706'; riskBg='#fffbeb';
-    riskText='🟠 MEDIUM RISK — Urgent review by ward doctor required.';
+    riskText='MEDIUM RISK — Urgent review by ward doctor required.';
   } else {
     riskColor='#059669'; riskBg='#f0fdf4';
-    riskText='🟢 Low risk — Routine monitoring.';
+    riskText='Low risk — Routine monitoring.';
   }
   scoreEl.style.color = riskColor;
   const parent = display.querySelector('div');
@@ -7489,7 +7494,7 @@ async function saveTriageEncounter() {
     }
 
     track('encounter_created', { entry_point: encPayload.entry_point, triage_category: category });
-    toast(`✅ Encounter opened — ${name}`);
+    toast(`Encounter opened — ${name}`);
     showPage('hospital');
 
   } catch(e) {
@@ -7718,7 +7723,7 @@ async function saveAdmissionDecision() {
     await db(`encounters?id=eq.${encId}`, 'PATCH', encUpdate);
 
     cm('m-admission');
-    toast(`✅ ${decision === 'admitted' ? 'Patient admitted' : decision === 'discharged' ? 'Patient discharged' : 'Decision saved'}.`);
+    toast(`${decision === 'admitted' ? 'Patient admitted' : decision === 'discharged' ? 'Patient discharged' : 'Decision saved'}.`);
     track('admission_decision', { decision });
 
     // Refresh whichever page is active
@@ -7787,7 +7792,7 @@ async function confirmDischarge() {
     }
 
     cm('m-discharge');
-    toast(`✅ ${e?.patient_name||'Patient'} discharged.`);
+    toast(`${e?.patient_name||'Patient'} discharged.`);
     track('patient_discharged', {});
 
     if(document.getElementById('page-hospital').classList.contains('active')) loadHospHome();
@@ -7847,10 +7852,10 @@ function renderBedBoard() {
   const counts = { occupied:0, available:0, cleaning:0, maintenance:0 };
   _allBeds.forEach(b => { if(counts[b.status]!==undefined) counts[b.status]++; });
   const bbs = (id,val,label) => { const el=document.getElementById(id); if(el) el.innerHTML=`${el.innerHTML.split('—')[0].split(' ')[0]} ${val} ${label}`; };
-  document.getElementById('bbs-occupied').innerHTML   = `🔴 ${counts.occupied} Occupied`;
-  document.getElementById('bbs-available').innerHTML  = `🟢 ${counts.available} Available`;
-  document.getElementById('bbs-cleaning').innerHTML   = `🟡 ${counts.cleaning} Cleaning`;
-  document.getElementById('bbs-maintenance').innerHTML= `⚫ ${counts.maintenance} Maintenance`;
+  document.getElementById('bbs-occupied').innerHTML   = `<span style="display:inline-block;width:9px;height:9px;border-radius:50%;background:#dc2626;vertical-align:middle;margin-right:4px;"></span>${counts.occupied} Occupied`;
+  document.getElementById('bbs-available').innerHTML  = `<span style="display:inline-block;width:9px;height:9px;border-radius:50%;background:#059669;vertical-align:middle;margin-right:4px;"></span>${counts.available} Available`;
+  document.getElementById('bbs-cleaning').innerHTML   = `<span style="display:inline-block;width:9px;height:9px;border-radius:50%;background:#d97706;vertical-align:middle;margin-right:4px;"></span>${counts.cleaning} Cleaning`;
+  document.getElementById('bbs-maintenance').innerHTML= `<span style="display:inline-block;width:9px;height:9px;border-radius:50%;background:#9AA3AE;vertical-align:middle;margin-right:4px;"></span>${counts.maintenance} Maintenance`;
 
   const grid = document.getElementById('bed-board-grid');
   if(!beds.length) {
@@ -7990,25 +7995,25 @@ function openBedActionModal(bedId) {
   }
   if(bed.status === 'occupied' && enc) {
     btns.push(`<button class="btn btn-sm" onclick="cm('m-bed-action');openEncounterModal('${enc.id}')"
-                style="width:100%;justify-content:center;display:flex;">👁 View Encounter</button>`);
+                style="width:100%;justify-content:center;display:flex;"><svg style="vertical-align:middle;margin-right:4px;" xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>View Encounter</button>`);
     btns.push(`<button class="btn btn-sm" onclick="cm('m-bed-action');openDischargeModal('${enc.id}')"
                 style="width:100%;justify-content:center;display:flex;background:#fef2f2;
-                       border:1px solid #fca5a5;color:#dc2626;">🚪 Discharge Patient</button>`);
+                       border:1px solid #fca5a5;color:#dc2626;"><svg style="vertical-align:middle;margin-right:4px;" xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#dc2626" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M13 4h3a2 2 0 0 1 2 2v14"/><path d="M2 20h3"/><path d="M13 20h9"/><path d="M10 12v.01"/><path d="M13 4l-6 16H2"/></svg>Discharge Patient</button>`);
   }
   if(bed.status === 'cleaning') {
     btns.push(`<button class="btn btn-primary" onclick="markBedAvailable('${bedId}')"
-                style="width:100%;">✅ Mark Cleaned — Set Available</button>`);
+                style="width:100%;"><svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg> Mark Cleaned — Set Available</button>`);
   }
   if(bed.status === 'available' || bed.status === 'maintenance') {
     btns.push(`<button class="btn btn-sm" onclick="setBedStatus('${bedId}','maintenance')"
-                style="width:100%;justify-content:center;display:flex;">🔧 Mark Maintenance</button>`);
+                style="width:100%;justify-content:center;display:flex;"><svg style="vertical-align:middle;margin-right:4px;" xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>Mark Maintenance</button>`);
   }
   if(bed.status === 'maintenance') {
     btns.push(`<button class="btn btn-sm" onclick="setBedStatus('${bedId}','available')"
-                style="width:100%;justify-content:center;display:flex;">✅ Clear Maintenance</button>`);
+                style="width:100%;justify-content:center;display:flex;"><svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg> Clear Maintenance</button>`);
   }
   btns.push(`<button class="btn btn-sm" onclick="openEditBedModal('${bedId}')"
-              style="width:100%;justify-content:center;display:flex;">✏️ Edit Bed</button>`);
+              style="width:100%;justify-content:center;display:flex;"><svg style="vertical-align:middle;margin-right:4px;" xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>Edit Bed</button>`);
   btns.push(`<button class="btn btn-danger" onclick="deleteBed('${bedId}')"
               style="width:100%;justify-content:center;display:flex;">Delete Bed</button>`);
 
@@ -8020,7 +8025,7 @@ async function markBedAvailable(bedId) {
   try {
     await db(`beds?id=eq.${bedId}`, 'PATCH', { status:'available' });
     cm('m-bed-action');
-    toast('✅ Bed marked available.');
+    toast('Bed marked available.');
     loadBedBoard();
   } catch(e) { toast('Error: '+e.message,'err'); }
 }
@@ -8083,10 +8088,10 @@ async function saveBed() {
   try {
     if(editId) {
       await db(`beds?id=eq.${editId}`, 'PATCH', payload);
-      toast('✅ Bed updated.');
+      toast('Bed updated.');
     } else {
       await db('beds', 'POST', payload);
-      toast('✅ Bed added.');
+      toast('Bed added');
     }
     cm('m-add-bed');
     loadBedBoard();
@@ -8097,13 +8102,13 @@ async function saveBed() {
 
 function triageMeta(cat) {
   const map = {
-    1: { dot:'🔴', short:'Cat 1', label:'1 — Resuscitation', text:'#dc2626', bg:'#fef2f2', border:'#fecaca' },
-    2: { dot:'🟠', short:'Cat 2', label:'2 — Emergency',     text:'#c2410c', bg:'#fff7ed', border:'#fed7aa' },
-    3: { dot:'🟡', short:'Cat 3', label:'3 — Urgent',        text:'#d97706', bg:'#fffbeb', border:'#fde68a' },
-    4: { dot:'🟢', short:'Cat 4', label:'4 — Semi-urgent',   text:'#059669', bg:'#f0fdf4', border:'#86efac' },
-    5: { dot:'🔵', short:'Cat 5', label:'5 — Non-urgent',    text:'#1d4ed8', bg:'#eff6ff', border:'#bfdbfe' },
+    1: { dot:'<span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#dc2626;vertical-align:middle;"></span>', short:'Cat 1', label:'1 — Resuscitation', text:'#dc2626', bg:'#fef2f2', border:'#fecaca' },
+    2: { dot:'<span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#c2410c;vertical-align:middle;"></span>', short:'Cat 2', label:'2 — Emergency',     text:'#c2410c', bg:'#fff7ed', border:'#fed7aa' },
+    3: { dot:'<span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#d97706;vertical-align:middle;"></span>', short:'Cat 3', label:'3 — Urgent',        text:'#d97706', bg:'#fffbeb', border:'#fde68a' },
+    4: { dot:'<span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#059669;vertical-align:middle;"></span>', short:'Cat 4', label:'4 — Semi-urgent',   text:'#059669', bg:'#f0fdf4', border:'#86efac' },
+    5: { dot:'<span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#1d4ed8;vertical-align:middle;"></span>', short:'Cat 5', label:'5 — Non-urgent',    text:'#1d4ed8', bg:'#eff6ff', border:'#bfdbfe' },
   };
-  return map[cat] || { dot:'⚪', short:'—', label:'Unknown', text:'#9AA3AE', bg:'#F8F7F3', border:'#E8E6E1' };
+  return map[cat] || { dot:'<span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#9AA3AE;vertical-align:middle;"></span>', short:'—', label:'Unknown', text:'#9AA3AE', bg:'#F8F7F3', border:'#E8E6E1' };
 }
 
 function encStatusBadge(s) {
@@ -8173,7 +8178,7 @@ async function addHospDrug(){
   if(!name||isNaN(qty)){toast('Name and quantity required.','err');return;}
   try{
     await db('inventory','POST',{drug_name:name,quantity:qty,unit:document.getElementById('hi-unit').value,expiry_date:document.getElementById('hi-exp').value||null,supplier:document.getElementById('hi-sup').value.trim()||null,org_id:user.id});
-    toast('✅ Item added!');
+    toast('Item added!');
     ['hi-name','hi-qty','hi-exp','hi-sup'].forEach(id=>document.getElementById(id).value='');
     loadHoDrugs();
   }catch(e){toast('Error: '+e.message,'err');}
@@ -8207,14 +8212,14 @@ async function saveQty(){
   if(isNaN(qty)){toast('Enter a valid quantity.','err');return;}
   try{
     await db(`${table}?id=eq.${id}`,'PATCH',{quantity:qty});
-    toast('✅ Updated!');cm('m-drug-edit');
+    toast('Updated');cm('m-drug-edit');
     if(table==='inventory'){if(orgRole==='hospital')loadHoDrugs();else loadDrugs();}
   }catch(e){toast('Error: '+e.message,'err');}
 }
 
 async function delItem(table,id,reloadFn){
   if(!confirm('Delete this record?'))return;
-  try{await db(`${table}?id=eq.${id}`,'DELETE');toast('Deleted.');reloadFn();}
+  try{await db(`${table}?id=eq.${id}`,'DELETE');toast('Deleted');reloadFn();}
   catch(e){toast('Error: '+e.message,'err');}
 }
 
@@ -8276,7 +8281,7 @@ async function registerAndQueue(){
       status:    'Waiting',
       org_id:    user.id
     });
-    toast('✅ Patient registered and added to queue!');
+    toast('Patient registered and added to queue!');
     ['rec-name','rec-age','rec-phone','rec-complaint'].forEach(id => {
       const el = document.getElementById(id); if(el) el.value='';
     });
@@ -8304,7 +8309,7 @@ function renderQueueTable(arr, bodyId, view){
                  onclick="startConsult('${p.id}')">Consult</button>` :
        view==='doctor' && p.status==='Results Received' ?
         `<button class="btn btn-primary" style="font-size:0.75rem;padding:0.35rem 0.8rem;background:#059669;border-color:#059669;"
-                 onclick="resumeConsult('${p.id}')">🔬 View Results</button>` :
+                 onclick="resumeConsult('${p.id}')"><svg style="vertical-align:middle;margin-right:4px;" xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 18h8"/><path d="M3 22h18"/><path d="M14 22a7 7 0 1 0 0-14h-1"/><path d="M9 14h2"/><path d="M9 12a2 2 0 0 1-2-2V6h6v4a2 2 0 0 1-2 2Z"/><path d="M12 6V3a1 1 0 0 0-1-1H9a1 1 0 0 0-1 1v3"/></svg>View Results</button>` :
        view==='doctor' && p.status==='In Consult' ?
         `<button class="btn btn-sm" onclick="resumeConsult('${p.id}')">Resume</button>` :
         `<button class="btn btn-sm" onclick="markQueueStatus('${p.id}','${p.status==='Waiting'?'Seen':'Waiting'}')">${p.status==='Waiting'?'Mark Seen':'Reset'}</button>`
@@ -8525,7 +8530,7 @@ function addRxItem(){
     document.getElementById(id).value='';
   });
   renderRxItems();
-  toast(`✅ ${drug} added to prescription.`);
+  toast(`${drug} added to prescription.`);
 }
 
 function removeRxItem(i){
@@ -8547,7 +8552,7 @@ function renderRxItems(){
         </div>
       </div>
       <button onclick="removeRxItem(${i})"
-              style="background:none;border:none;color:#dc2626;cursor:pointer;font-size:0.9rem;">✕</button>
+              style="background:none;border:none;color:#dc2626;cursor:pointer;font-size:0.9rem;"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
     </div>`).join('');
 }
 
@@ -8592,7 +8597,7 @@ function renderConsultSelectedTests() {
                   display:inline-flex;align-items:center;gap:0.3rem;">
       ${t}
       <span onclick="toggleConsultTest('${t}')"
-            style="cursor:pointer;opacity:0.6;">✕</span>
+            style="cursor:pointer;opacity:0.6;"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></span>
     </span>`
   ).join('');
 }
@@ -8621,7 +8626,7 @@ async function sendConsultLabRequest() {
     consultSelectedTests = [];
     renderConsultSelectedTests();
     buildConsultTestPicker();
-    toast('✅ Lab request sent — diagnosis unlocks when results are back.');
+    toast('Lab request sent — results pending.');
     // Start polling for results
     startLabResultPolling(currentConsultId);
   } catch(e) { toast('Error: ' + e.message, 'err'); }
@@ -8666,7 +8671,7 @@ function startLabResultPolling(queuePatientId) {
       const badge = document.getElementById('consult-lab-result-badge');
       if (badge) badge.style.display = 'inline-flex';
       unlockDiagnosis();
-      toast('🔬 Lab results are back — diagnosis unlocked.');
+      toast('Lab results in — diagnosis unlocked.');
     } catch(e) { /* keep polling silently */ }
   }, 20000);
 }
@@ -8698,7 +8703,7 @@ function getRxDestination() {
   return el ? el.value : 'internal';
 }
 
-async function saveConsultation(){h
+async function saveConsultation(){
   if(!currentConsultId){ toast('No patient selected.','err'); return; }
   const diagnosis = document.getElementById('cons-diagnosis').value.trim();
   if(!diagnosis){ toast('Diagnosis required.','err'); return; }
@@ -8710,20 +8715,19 @@ async function saveConsultation(){h
   try {
     // 1. Save to patients table (full record)
     await db('patients','POST',{
-      name:             patient?.name,
-      age:              patient?.age || null,
-      gender:           patient?.gender || null,
-      phone:            patient?.phone || null,
-      condition:        diagnosis,
-      notes:            document.getElementById('cons-notes').value.trim() || null,
+      name:           patient?.name,
+      age:            patient?.age || null,
+      gender:         patient?.gender || null,
+      phone:          patient?.phone || null,
+      condition:      diagnosis,
+      notes:          document.getElementById('cons-notes').value.trim() || null,
       status,
-      referral_to:      referral,
-      blood_pressure:   document.getElementById('cons-bp').value.trim() || null,
-      temperature:      document.getElementById('cons-temp').value || null,
-      weight:           document.getElementById('cons-weight').value || null,
-      pulse:            document.getElementById('cons-pulse').value || null,
-      queue_patient_id: currentConsultId,
-      org_id:           user.id
+      referral_to:    referral,
+      blood_pressure: document.getElementById('cons-bp').value.trim() || null,
+      temperature:    document.getElementById('cons-temp').value || null,
+      weight:         document.getElementById('cons-weight').value || null,
+      pulse:          document.getElementById('cons-pulse').value || null,
+      org_id:         user.id
     });
 
     // 2. Save prescription if drugs were added
@@ -8742,7 +8746,7 @@ async function saveConsultation(){h
     // 3. Mark queue patient as Seen
     await db(`queue_patients?id=eq.${currentConsultId}`,'PATCH',{status:'Seen'});
 
-    toast('✅ Consultation saved!' + (rxItems.length ? ' Prescription sent to pharmacy.' : ''));
+    toast('Consultation saved!' + (rxItems.length ? ' Prescription sent to pharmacy.' : ''));
     currentConsultId = null;
     rxItems = [];
     if (_labPollInterval) clearInterval(_labPollInterval);
@@ -8866,7 +8870,7 @@ async function dispenseRx(){
       dispensed_by: user?.email,
       dispensed_at: new Date().toISOString()
     });
-    toast(' Prescription dispensed!');
+    toast('Prescription dispensed!');
     cm('m-rx-detail');
     loadDeptPharmacy();
   } catch(e){ toast('Error: '+e.message,'err'); }
@@ -8880,7 +8884,7 @@ async function quickDispense(id){
       dispensed_by: user?.email,
       dispensed_at: new Date().toISOString()
     });
-    toast(' Dispensed!');
+    toast('Dispensed!');
     loadDeptPharmacy();
   } catch(e){ toast('Error: '+e.message,'err'); }
 }
