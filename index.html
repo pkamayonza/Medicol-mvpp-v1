@@ -4168,8 +4168,8 @@ async function loadPharmacyHome(){
 
   // load both in parallel
   const [inv, dl] = await Promise.all([
-    db('inventory?order=drug_name.asc').catch(()=>[]),
-    db('dispensing_log?select=*&order=created_at.desc').catch(()=>[])
+    db(`inventory?org_id=eq.${user.id}&order=drug_name.asc`).catch(()=>[]),
+    db(`dispensing_log?org_id=eq.${user.id}&select=*&order=created_at.desc`).catch(()=>[])
   ]);
   drugs=inv; phAllDispLog=dl;
 
