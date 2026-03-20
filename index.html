@@ -5709,7 +5709,7 @@ async function loadClPts() {
   const importWrap = document.getElementById('cl-import-btn-wrap');
   if (importWrap) importWrap.style.display = (user?.user_metadata?.department === 'admin') ? 'block' : 'none';
   try {
-    patients = await db('patients?order=created_at.desc');
+    patients = await db(`patients?org_id=eq.${user.id}&order=created_at.desc`);
     renderClPts(patients);
   } catch(e) {
     document.getElementById('cp-body').innerHTML = `<tr><td colspan="8" class="loading">Error: ${e.message}</td></tr>`;
