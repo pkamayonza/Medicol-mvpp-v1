@@ -6855,8 +6855,8 @@ async function loadLabResults() {
   try {
     // Fetch both so TAT calculation works regardless of navigation order
     [labResults, testRequests] = await Promise.all([
-      db('test_results?select=*&order=created_at.desc'),
-      db('test_requests?select=*&order=created_at.desc')
+      db(`test_results?org_id=eq.${user.id}&select=*&order=created_at.desc`),
+      db(`test_requests?org_id=eq.${user.id}&select=*&order=created_at.desc`)
     ]);
     renderResults(labResults);
   } catch(e) {
