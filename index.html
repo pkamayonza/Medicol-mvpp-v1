@@ -3934,13 +3934,13 @@ const OQ = (() => {
 // ── CONNECTIVITY INDICATOR ────────────────────────────────────────────────────
 
 function _setConn(state) {
-  // states: 'synced' | 'offline' | 'syncing'
   const pill = document.getElementById('conn-pill');
   if (!pill) return;
   pill.className = `conn-pill ${state}`;
-  pill.textContent = state === 'synced'  ? '<span style="display:inline-flex;align-items:center;gap:4px;"><svg style="vertical-align:middle;" xmlns="http://www.w3.org/2000/svg" width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4" fill="currentColor" stroke="currentColor"/></svg>Online</span>'
-                   : state === 'offline' ? '<span style="display:inline-flex;align-items:center;gap:4px;"><svg style="vertical-align:middle;" xmlns="http://www.w3.org/2000/svg" width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4" fill="currentColor" stroke="currentColor"/></svg>Offline</span>'
-                   : 'Syncing…';
+  const dot = '<span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:currentColor;vertical-align:middle;margin-right:4px;"></span>';
+  pill.innerHTML = state === 'synced'  ? dot + 'Online'
+                 : state === 'offline' ? dot + 'Offline'
+                 : dot + 'Syncing…';
 }
 
 // ── SYNC ENGINE ───────────────────────────────────────────────────────────────
