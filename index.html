@@ -8240,32 +8240,6 @@ async function loadReception(){
   } catch(e) { console.error(e); }
 }
 
-async function registerAndQueue(){
-  const name = document.getElementById('rec-name').value.trim();
-  const complaint = document.getElementById('rec-complaint').value.trim();
-  if(!name){ toast('Patient name required.','err'); return; }
-  if(!complaint){ toast('Chief complaint required.','err'); return; }
-  try {
-    await db('queue_patients','POST',{
-      name,
-      age:       document.getElementById('rec-age').value || null,
-      gender:    document.getElementById('rec-gender').value || null,
-      phone:     document.getElementById('rec-phone').value.trim() || null,
-      complaint,
-      priority:  document.getElementById('rec-priority').value,
-      status:    'Waiting',
-      org_id:    user.id
-    });
-    toast('Patient registered and added to queue!');
-    ['rec-name','rec-age','rec-phone','rec-complaint'].forEach(id => {
-      const el = document.getElementById(id); if(el) el.value='';
-    });
-    document.getElementById('rec-gender').value = '';
-    document.getElementById('rec-priority').value = 'Normal';
-    loadReception();
-  } catch(e){ toast('Error: '+e.message,'err'); }
-}
-
 function renderQueueTable(arr, bodyId, view){
   const b = document.getElementById(bodyId);
   if(!b) return;
