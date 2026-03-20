@@ -8642,7 +8642,7 @@ async function loadDeptPharmacy(){
   if(de) de.textContent = now.toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
 
   try {
-    const rxData = await db('prescriptions?order=created_at.desc');
+    const rxData = await db(`prescriptions?org_id=eq.${user.id}&order=created_at.desc`);
     rxQueue = rxData;
     const todayStr = now.toDateString();
     const todayRx  = rxData.filter(x => new Date(x.created_at).toDateString() === todayStr);
