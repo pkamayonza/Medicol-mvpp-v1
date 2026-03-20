@@ -4364,7 +4364,7 @@ let invFilter='all', invSort={field:'drug_name',dir:'asc'}, invSelected=new Set(
 
 async function loadDrugs(){
   try{
-    drugs=await db('inventory?order=drug_name.asc');
+    drugs=await db(`inventory?org_id=eq.${user.id}&order=drug_name.asc`);
     updateInvIntel(drugs);
     applyInvView();
   }catch(e){
