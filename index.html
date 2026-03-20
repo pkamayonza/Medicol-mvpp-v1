@@ -5052,11 +5052,11 @@ async function loadClinicHome() {
   // Fetch all data in parallel
   try {
     const [pts, queue, labReqs, rxList, inv] = await Promise.all([
-      db('patients?order=created_at.desc').catch(()=>[]),
-      db('queue_patients?order=created_at.desc').catch(()=>[]),
-      db('test_requests?order=created_at.desc').catch(()=>[]),
-      db('prescriptions?order=created_at.desc').catch(()=>[]),
-      db('inventory?order=drug_name.asc').catch(()=>[]),
+      db(`patients?org_id=eq.${user.id}&order=created_at.desc`).catch(()=>[]),
+      db(`queue_patients?org_id=eq.${user.id}&order=created_at.desc`).catch(()=>[]),
+      db(`test_requests?org_id=eq.${user.id}&order=created_at.desc`).catch(()=>[]),
+      db(`prescriptions?org_id=eq.${user.id}&order=created_at.desc`).catch(()=>[]),
+      db(`inventory?org_id=eq.${user.id}&order=drug_name.asc`).catch(()=>[]),
     ]);
     patients = pts;
 
