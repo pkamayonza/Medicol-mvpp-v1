@@ -4655,9 +4655,9 @@ let dispLog=[], basket=[], posSuggFocus=-1, currentPosItem=null, lastReceipt=nul
 
 async function loadDispensing(){
   // ensure drugs loaded for search
-  if(!drugs.length){ try{ drugs=await db('inventory?order=drug_name.asc'); }catch(e){} }
+  if(!drugs.length){ try{ drugs=await db(`inventory?org_id=eq.${user.id}&order=drug_name.asc`); }catch(e){} }
   try{
-    dispLog=await db('dispensing_log?select=*&order=created_at.desc');
+    dispLog=await db(`dispensing_log?org_id=eq.${user.id}&select=*&order=created_at.desc`);
     renderPosStats(dispLog);
     renderDl(dispLog);
   }catch(e){
