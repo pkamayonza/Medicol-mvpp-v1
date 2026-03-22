@@ -4353,6 +4353,146 @@ function launchApp(){
   document.getElementById('dash-date-str').textContent=now.toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
 }
 
+function checkTrialStatus() {
+  const m = user?.user_metadata || {};
+  const trialStart  = m.trial_start ? new Date(m.trial_start) : null;
+  const trialDays   = m.trial_days  || 14;
+  const paid        = m.paid        || false;
+  const monthlyCost = m.monthly_cost || 0;
+
+  if (paid) return; // active subscriber — do nothing
+  if (!trialStart) return; // old account without trial tracking — grace
+
+  const now       = new Date();
+  const msElapsed = now - trialStart;
+  const daysUsed  = Math.floor(msElapsed / 86400000);
+  const daysLeft  = trialDays - daysUsed;
+
+  const banner    = document.getElementById('trial-banner');
+  const bannerMsg = document.getElementById('trial-banner-msg');
+  const overlay   = document.getElementById('readonly-overlay');
+  const roPrice   = document.getElementById('ro-price');
+
+  if (roPrice) roPrice.textContent = Number(monthlyCost).toLocaleString();
+
+  if (daysLeft > 0) {
+    // Still in trial — show countdown banner
+    bannerMsg.textContent = `Free trial: ${daysLeft} day${daysLeft !== 1 ? 's' : ''} remaining. After that, Minza becomes read-only until you subscribe.`;
+    banner.classList.add('show');
+    overlay.classList.remove('show');
+    enableAllInputs();
+  } else {
+    // Trial expired — lock the app
+    bannerMsg.textContent = 'Your free trial has ended. Minza is now read-only.';
+    banner.classList.add('show');
+    overlay.classList.add('show');
+    disableAllInputs();
+  }
+}
+
+function disableAllInputs() {
+  document.querySelectorAll(
+    '#app-screen input, #app-screen textarea, #app-screen select, #app-screen button:not(.tb-pay):not(#pay-submit-btn)'
+  ).forEach(el => {
+    el.disabled = true;
+    el.style.pointerEvents = 'none';
+  });
+}
+
+function enableAllInputs() {
+  document.querySelectorAll('#app-screen input, #app-screen textarea, #app-screen select, #app-screen button').forEach(el => {
+    el.disabled = false;
+    el.style.pointerEvents = '';
+  });
+}
+
+function openPayModal() {
+  const m = user?.user_metadata || {};
+  const depts = (m.departments || []);
+  const allDepts = [...(DEPT_CONFIG[m.org_type] || [])];
+  const chosen = allDepts.filter(d => depts.includes(d.id));
+  const total  = m.monthly_cost || chosen.reduce((s,d) => s + d.price, 0);
+
+  document.getElementById('pay-dept-summary').textContent =
+    chosen.length ? chosen.map(d => d.label).join(', ') : m.org_type || '—';
+  document.getElementById('pay-amount-display').textContent = fmtUGX(total) + ' / month';
+  document.getElementById('pay-phone').value = '';
+  document.getElementById('pay-status').style.display = 'none';
+  document.getElementById('m-pay').classList.add('open');
+}
+
+async function submitPayment() {
+  const phone = document.getElementById('pay-phone').value.trim();
+  const m     = user?.user_metadata || {};
+  const total = m.monthly_cost || 0;
+  const btn   = document.getElementById('pay-submit-btn');
+  const statusEl = document.getElementById('pay-status');
+
+  if (!phone || phone.length < 10) {
+    statusEl.textContent = 'Please enter a valid MTN MoMo number.';
+    statusEl.style.cssText = 'display:block;background:#fef2f2;color:#dc2626;padding:0.65rem 0.9rem;border-radius:8px;';
+    return;
+  }
+
+  btn.disabled = true; btn.textContent = 'Sending prompt…';
+  statusEl.textContent = 'Payment prompt sent. Check your phone and enter your PIN.';
+  statusEl.style.cssText = 'display:block;background:#eff6ff;color:#1d4ed8;padding:0.65rem 0.9rem;border-radius:8px;';
+
+  try {
+    // MoMo API call — reuse the pattern from your existing POS integration
+    const momoRes = await fetch(`https://sandbox.momodeveloper.mtn.com/collection/v1_0/requesttopay`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${MOMO_KEY}`,
+        'X-Reference-Id': crypto.randomUUID(),
+        'X-Target-Environment': 'sandbox',
+        'Content-Type': 'application/json',
+        'Ocp-Apim-Subscription-Key': MOMO_KEY,
+      },
+      body: JSON.stringify({
+        amount: String(total),
+        currency: 'UGX',
+        externalId: user.id,
+        payer: { partyIdType: 'MSISDN', partyId: phone.replace(/^0/, '256') },
+        payerMessage: 'Minza Health subscription',
+        payeeNote: `Subscription for ${m.org_name || 'clinic'}`,
+      })
+    });
+
+    if (momoRes.status === 202) {
+      // Poll for confirmation (simplified — reuse your existing poll pattern)
+      let attempts = 0;
+      const poll = setInterval(async () => {
+        attempts++;
+        if (attempts > 10) {
+          clearInterval(poll);
+          statusEl.textContent = 'Payment timed out. Try again or contact support.';
+          statusEl.style.cssText = 'display:block;background:#fef2f2;color:#dc2626;padding:0.65rem 0.9rem;border-radius:8px;';
+          btn.disabled = false; btn.textContent = 'Send Payment Prompt';
+          return;
+        }
+        // On confirmed payment: update user metadata to mark as paid
+        // You need a Supabase Edge Function or admin API call for this
+        // Placeholder confirmation path:
+        const confirmed = false; // replace with actual poll check
+        if (confirmed) {
+          clearInterval(poll);
+          statusEl.textContent = 'Payment confirmed! Activating your account…';
+          statusEl.style.cssText = 'display:block;background:#f0fdf4;color:#059669;padding:0.65rem 0.9rem;border-radius:8px;';
+          cm('m-pay');
+          document.getElementById('readonly-overlay').classList.remove('show');
+          document.getElementById('trial-banner').classList.remove('show');
+          enableAllInputs();
+        }
+      }, 3000);
+    }
+  } catch(e) {
+    statusEl.textContent = 'Error: ' + e.message;
+    statusEl.style.cssText = 'display:block;background:#fef2f2;color:#dc2626;padding:0.65rem 0.9rem;border-radius:8px;';
+    btn.disabled = false; btn.textContent = 'Send Payment Prompt';
+  }
+}
+
 const NAV_CONFIG={
   pharmacy:    [{id:'pharmacy',label:'Home'},{id:'ph-inventory',label:'Inventory'},{id:'ph-patients',label:'Dispensing Log'}],
   hospital:    [{id:'hospital',label:'Dashboard'},{id:'ho-triage',label:'Triage'},{id:'ho-beds',label:'Bed Board'},{id:'ho-encounters',label:'Encounters'},{id:'ho-patients',label:'Patients'},{id:'ho-inventory',label:'Supplies'}],
