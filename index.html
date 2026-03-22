@@ -4266,24 +4266,59 @@ async function doLogin(){
   }catch(e){showEl('login-err',e.message);}
 }
 
-async function doSignup(){
-  const org=document.getElementById('s-org').value.trim();
-  const email=document.getElementById('s-email').value.trim();
-  const pass=document.getElementById('s-pass').value;
-  const role=document.getElementById('s-role').value;
-  if(!org||!email||!pass||!role){showEl('signup-err','All fields required. Please select an organisation type.');return;}
-  if(pass.length<6){showEl('signup-err','Password must be at least 6 characters.');return;}
-  try{
-    const dept = document.getElementById('s-dept')?.value || null;
-    if(role==='Staff' && !dept){showEl('signup-err','Please select your department.');return;}
-    await authPost('signup',{email,password:pass,data:{org_name:org,org_type:role,department:dept}});
-    showEl('signup-ok','Account created! Check your email to confirm, then sign in.',true);
-    document.getElementById('signup-ok').style.display='block';
-    ['s-org','s-email','s-pass'].forEach(id=>document.getElementById(id).value='');
-    document.getElementById('s-role').value='';
-    document.querySelectorAll('.role-card').forEach(c=>c.classList.remove('selected'));
-    posthog.capture('user_signed_up',{org_type:role,facility:org});
-  }catch(e){showEl('signup-err',e.message);}
+async function doSignup() {
+  const org   = document.getElementById('s-org').value.trim();
+  const email = document.getElementById('s-email').value.trim();
+  const pass  = document.getElementById('s-pass').value;
+  const role  = document.getElementById('s-role').value;
+
+  if (!org || !email || !pass || !role) {
+    showEl('signup-err', 'All fields required. Please select an organisation type.');
+    return;
+  }
+  if (pass.length < 6) {
+    showEl('signup-err', 'Password must be at least 6 characters.');
+    return;
+  }
+  if (DEPT_CONFIG[role] && selectedDepts.size === 0) {
+    showEl('signup-err', 'Please select at least one department.');
+    return;
+  }
+
+  const deptsArray    = [...selectedDepts];
+  const depts         = DEPT_CONFIG[role] || [];
+  const chosenDepts   = depts.filter(d => selectedDepts.has(d.id));
+  const monthlyTotal  = chosenDepts.reduce((s, d) => s + d.price, 0);
+  const trialStart    = new Date().toISOString();
+
+  try {
+    await authPost('signup', {
+      email,
+      password: pass,
+      data: {
+        org_name:      org,
+        org_type:      role,
+        department:    'admin',
+        departments:   deptsArray,          // e.g. ["reception","doctor","lab"]
+        monthly_cost:  monthlyTotal,
+        trial_start:   trialStart,
+        trial_days:    14,
+      }
+    });
+
+    showEl('signup-ok', 'Account created! Check your email to confirm, then sign in.', true);
+    document.getElementById('signup-ok').style.display = 'block';
+    ['s-org','s-email','s-pass'].forEach(id => document.getElementById(id).value = '');
+    document.getElementById('s-role').value = '';
+    selectedDepts.clear();
+    document.querySelectorAll('.role-card').forEach(c => c.classList.remove('selected'));
+    document.querySelectorAll('.dept-chip').forEach(c => c.classList.remove('selected'));
+    document.getElementById('dept-picker').style.display = 'none';
+    document.getElementById('dept-price-row').style.display = 'none';
+    posthog.capture('user_signed_up', { org_type: role, facility: org, depts: deptsArray, monthly_cost: monthlyTotal });
+  } catch(e) {
+    showEl('signup-err', e.message);
+  }
 }
 
 async function doLogout(){
