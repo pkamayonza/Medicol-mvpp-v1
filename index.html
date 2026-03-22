@@ -1356,7 +1356,7 @@
       </div>
     </div>
   </div>
-  
+
   <nav>
     <div class="nav-left">
       <h1>Min<span>za</span></h1>
@@ -3664,6 +3664,35 @@
     <div class="ma">
       <button class="btn btn-sm" onclick="cm('m-drug-edit')">Cancel</button>
       <button class="btn btn-primary" onclick="saveQty()">Update</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ PAYMENT MODAL ══ -->
+<div class="mo" id="m-pay">
+  <div class="mb" style="max-width:420px;">
+    <h3>Activate Your Subscription</h3>
+    <div style="background:#F8F7F3;border-radius:10px;padding:0.9rem 1rem;margin-bottom:1.2rem;">
+      <div style="font-size:0.72rem;font-weight:700;text-transform:uppercase;letter-spacing:0.7px;color:#9AA3AE;margin-bottom:0.3rem;">You're paying for</div>
+      <div id="pay-dept-summary" style="font-size:0.85rem;color:#0B1F3A;font-weight:600;"></div>
+      <div style="margin-top:0.4rem;font-size:0.92rem;font-weight:700;color:#0D6E6E;" id="pay-amount-display"></div>
+    </div>
+    <div class="form-group" style="margin-bottom:1.2rem;">
+      <label>MTN Mobile Money Number</label>
+      <input type="tel" id="pay-phone" placeholder="e.g. 0771234567"
+             style="border:1px solid #E0DFDB;border-radius:8px;padding:0.7rem 1rem;
+                    font-size:0.95rem;font-family:'Syne',sans-serif;outline:none;width:100%;"/>
+      <div style="font-size:0.72rem;color:#9AA3AE;margin-top:0.35rem;">
+        You will receive a prompt on this number to enter your PIN.
+      </div>
+    </div>
+    <div id="pay-status" style="display:none;margin-bottom:0.9rem;padding:0.65rem 0.9rem;
+         border-radius:8px;font-size:0.83rem;font-weight:600;"></div>
+    <div class="ma">
+      <button class="btn btn-sm" onclick="cm('m-pay')">Cancel</button>
+      <button class="btn btn-primary" id="pay-submit-btn" onclick="submitPayment()">
+        Send Payment Prompt
+      </button>
     </div>
   </div>
 </div>
