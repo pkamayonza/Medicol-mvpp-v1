@@ -109,6 +109,57 @@
 
   .role-card:hover{ border-color:#0D6E6E; background:#f0fdf9; }
   .role-card.selected{ border-color:#0D6E6E; background:#f0fdf9; }
+
+  /* ── department picker ── */
+  .dept-grid{ display:grid; grid-template-columns:1fr 1fr; gap:0.6rem; margin-top:0.5rem; }
+  .dept-chip{
+    display:flex; align-items:center; gap:0.5rem;
+    border:2px solid #E0DFDB; border-radius:9px;
+    padding:0.65rem 0.85rem; cursor:pointer;
+    transition:all 0.18s; background:white; text-align:left;
+  }
+  .dept-chip:hover{ border-color:#0D6E6E; background:#f0fdf9; }
+  .dept-chip.selected{ border-color:#0D6E6E; background:#f0fdf9; }
+  .dept-chip .dc-name{ font-size:0.8rem; font-weight:700; color:#0B1F3A; display:block; }
+  .dept-chip .dc-price{ font-size:0.7rem; color:#0D6E6E; display:block; margin-top:0.05rem; }
+  .dept-price-total{
+    margin-top:0.75rem; padding:0.65rem 0.9rem;
+    background:#F0EFEB; border-radius:8px;
+    font-size:0.85rem; font-weight:700; color:#0B1F3A;
+    display:flex; justify-content:space-between; align-items:center;
+  }
+  .dept-price-total span{ color:#0D6E6E; font-size:0.95rem; }
+
+  /* ── trial / read-only banner ── */
+  #trial-banner{
+    position:sticky; top:56px; z-index:49;
+    background:#fef2f2; border-bottom:2px solid #fecaca;
+    padding:0.55rem 1.5rem;
+    display:none; align-items:center; justify-content:space-between;
+    gap:0.75rem; flex-wrap:wrap;
+  }
+  #trial-banner.show{ display:flex; }
+  #trial-banner .tb-msg{ font-size:0.82rem; color:#991b1b; font-weight:600; }
+  #trial-banner .tb-pay{ 
+    background:#dc2626; color:white; border:none;
+    padding:0.4rem 1rem; border-radius:7px;
+    font-size:0.78rem; font-weight:700;
+    cursor:pointer; font-family:'Syne',sans-serif;
+  }
+
+  /* ── read-only overlay ── */
+  #readonly-overlay{
+    display:none; position:fixed; inset:0; z-index:200;
+    background:rgba(11,31,58,0.55); align-items:center; justify-content:center;
+  }
+  #readonly-overlay.show{ display:flex; }
+  #readonly-overlay .ro-box{
+    background:white; border-radius:16px; padding:2rem 2.5rem;
+    max-width:420px; width:90%; text-align:center; box-shadow:0 20px 60px rgba(0,0,0,0.2);
+  }
+  #readonly-overlay .ro-box h3{ color:#0B1F3A; margin-bottom:0.5rem; }
+  #readonly-overlay .ro-box p{ color:#555; font-size:0.88rem; line-height:1.6; margin-bottom:1.25rem; }
+  
   .role-card .ri{ font-size:1.6rem; display:block; margin-bottom:0.3rem; }
   .role-card .rn{ font-size:0.82rem; font-weight:700; color:#0B1F3A; }
 
