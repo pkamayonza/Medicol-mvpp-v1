@@ -1336,6 +1336,27 @@
 
 <!-- APP -->
 <div id="app-screen">
+
+  <!-- Trial / expired banner (sticky below nav) -->
+  <div id="trial-banner">
+    <span class="tb-msg" id="trial-banner-msg">Your 14-day free trial ends in — days.</span>
+    <button class="tb-pay" onclick="openPayModal()">Pay Now via Mobile Money</button>
+  </div>
+
+  <!-- Read-only hard paywall overlay -->
+  <div id="readonly-overlay">
+    <div class="ro-box">
+      <h3>Your trial has ended</h3>
+      <p>Your data is safe and you can still view everything. To add new patients, records, or transactions, activate your subscription via Mobile Money.</p>
+      <button class="btn btn-primary" style="width:100%;" onclick="openPayModal()">
+        Activate — Pay via Mobile Money
+      </button>
+      <div style="margin-top:0.75rem;font-size:0.75rem;color:#9AA3AE;">
+        UGX <span id="ro-price">—</span> / month · Cancel anytime
+      </div>
+    </div>
+  </div>
+  
   <nav>
     <div class="nav-left">
       <h1>Min<span>za</span></h1>
