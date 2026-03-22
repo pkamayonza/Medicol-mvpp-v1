@@ -4369,19 +4369,39 @@ const CLINIC_NAV = [
   {id:'cl-staff',      label:'Staff',    adminOnly: true},
 ];
 
-function buildNav(){
+function buildNav() {
+  const m    = user?.user_metadata || {};
+  const dept = m.department;
+  const purchasedDepts = m.departments || null; // null = old account, show all
+
   const isClinicRole = ['clinic','reception','doctor','dept-pharmacy'].includes(orgRole);
-  if(isClinicRole){
-    const dept = user?.user_metadata?.department;
+  if (isClinicRole) {
     const isAdmin = dept === 'admin';
-    const tabs = CLINIC_NAV.filter(t => !t.adminOnly || isAdmin);
-    document.getElementById('nav-tabs').innerHTML = tabs.map(t=>
+    let tabs = CLINIC_NAV.filter(t => !t.adminOnly || isAdmin);
+
+    // Filter to only purchased departments (for new accounts)
+    if (purchasedDepts && isAdmin) {
+      const deptToNav = {
+        'reception':     'reception',
+        'doctor':        'doctor',
+        'lab':           'lab-worklist',
+        'dept-pharmacy': 'dept-pharmacy',
+      };
+      tabs = tabs.filter(t => {
+        // Always show Overview, Reports, Staff for admin
+        if (['clinic','cl-reports','cl-staff'].includes(t.id)) return true;
+        const requiredDept = Object.keys(deptToNav).find(k => deptToNav[k] === t.id);
+        return !requiredDept || purchasedDepts.includes(requiredDept);
+      });
+    }
+
+    document.getElementById('nav-tabs').innerHTML = tabs.map(t =>
       `<button class="tab-btn" id="ntab-${t.id}" onclick="showPage('${t.id}')">${t.label}</button>`
     ).join('');
     return;
   }
   const tabs = NAV_CONFIG[orgRole] || NAV_CONFIG.diagnosticlab;
-  document.getElementById('nav-tabs').innerHTML = tabs.map(t=>
+  document.getElementById('nav-tabs').innerHTML = tabs.map(t =>
     `<button class="tab-btn" id="ntab-${t.id}" onclick="showPage('${t.id}')">${t.label}</button>`
   ).join('');
 }
