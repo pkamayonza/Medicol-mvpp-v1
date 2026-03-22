@@ -3006,16 +3006,81 @@
       </div>
     </div>
 
+    <!-- Register patient -->
+    <div class="card" style="margin-bottom:1rem;">
+      <h2 style="justify-content:space-between;">
+        Register Patient
+        <button onclick="toggleRecForm()"
+                id="rec-form-toggle"
+                style="font-size:0.75rem;font-weight:700;background:#F0EFEB;
+                       border:1px solid #E0DFDB;color:#0B1F3A;padding:0.35rem 0.85rem;
+                       border-radius:6px;cursor:pointer;font-family:'Syne',sans-serif;">
+          + New Patient
+        </button>
+      </h2>
+
+      <div id="rec-form" style="display:none;">
+        <div class="form-grid" style="grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:0.9rem;margin-bottom:1rem;">
+          <div class="form-group">
+            <label>Full Name *</label>
+            <input type="text" id="rec-name" placeholder="e.g. Grace Nakato"
+                   style="border:1px solid #E0DFDB;border-radius:8px;padding:0.62rem 0.9rem;
+                          font-size:0.88rem;font-family:'Syne',sans-serif;outline:none;width:100%;"/>
+          </div>
+          <div class="form-group">
+            <label>Age</label>
+            <input type="number" id="rec-age" placeholder="34" min="0"
+                   style="border:1px solid #E0DFDB;border-radius:8px;padding:0.62rem 0.9rem;
+                          font-size:0.88rem;font-family:'Syne',sans-serif;outline:none;width:100%;"/>
+          </div>
+          <div class="form-group">
+            <label>Gender</label>
+            <select id="rec-gender"
+                    style="border:1px solid #E0DFDB;border-radius:8px;padding:0.62rem 0.9rem;
+                           font-size:0.88rem;font-family:'Syne',sans-serif;outline:none;
+                           width:100%;background:white;color:#0B1F3A;">
+              <option value="">Select</option>
+              <option>Female</option>
+              <option>Male</option>
+              <option>Other</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Phone</label>
+            <input type="tel" id="rec-phone" placeholder="0701234567"
+                   style="border:1px solid #E0DFDB;border-radius:8px;padding:0.62rem 0.9rem;
+                          font-size:0.88rem;font-family:'Syne',sans-serif;outline:none;width:100%;"/>
+          </div>
+          <div class="form-group" style="grid-column:span 2;">
+            <label>Chief Complaint *</label>
+            <input type="text" id="rec-complaint"
+                   placeholder="e.g. Fever and headache for 3 days"
+                   style="border:1px solid #E0DFDB;border-radius:8px;padding:0.62rem 0.9rem;
+                          font-size:0.88rem;font-family:'Syne',sans-serif;outline:none;width:100%;"/>
+          </div>
+          <div class="form-group">
+            <label>Priority</label>
+            <select id="rec-priority"
+                    style="border:1px solid #E0DFDB;border-radius:8px;padding:0.62rem 0.9rem;
+                           font-size:0.88rem;font-family:'Syne',sans-serif;outline:none;
+                           width:100%;background:white;color:#0B1F3A;">
+              <option value="Normal">Normal</option>
+              <option value="Urgent">Urgent</option>
+            </select>
+          </div>
+        </div>
+        <div style="display:flex;gap:0.6rem;justify-content:flex-end;">
+          <button onclick="toggleRecForm()" class="btn btn-sm">Cancel</button>
+          <button onclick="registerAndQueue()" class="btn btn-primary" id="rec-submit-btn">
+            Add to Queue
+          </button>
+        </div>
+      </div>
+    </div>
+
     <!-- Today's queue -->
     <div class="card">
       <h2>Today's Queue</h2>
-      <div class="table-wrap">
-        <table>
-          <thead><tr><th>#</th><th>Name</th><th class="hide-mobile">Age</th><th class="hide-mobile">Gender</th><th>Complaint</th><th>Priority</th><th>Status</th><th>Actions</th></tr></thead>
-          <tbody id="rec-queue-body"><tr><td colspan="8" class="loading">Loading...</td></tr></tbody>
-        </table>
-      </div>
-    </div>
   </div>
 
   <!-- ══════════════════════════════════
@@ -8207,6 +8272,56 @@ async function markQueueStatus(id, newStatus){
     await db(`queue_patients?id=eq.${id}`,'PATCH',{status:newStatus});
     loadReception();
   } catch(e){ toast('Error: '+e.message,'err'); }
+}
+
+function toggleRecForm() {
+  const form   = document.getElementById('rec-form');
+  const toggle = document.getElementById('rec-form-toggle');
+  const open   = form.style.display === 'none';
+  form.style.display   = open ? 'block' : 'none';
+  toggle.textContent   = open ? '✕ Cancel' : '+ New Patient';
+  if (open) setTimeout(() => document.getElementById('rec-name').focus(), 50);
+}
+
+async function registerAndQueue() {
+  const name      = document.getElementById('rec-name').value.trim();
+  const complaint = document.getElementById('rec-complaint').value.trim();
+  if (!name)      { toast('Patient name is required.', 'err'); return; }
+  if (!complaint) { toast('Chief complaint is required.', 'err'); return; }
+
+  const btn = document.getElementById('rec-submit-btn');
+  btn.disabled = true; btn.textContent = 'Adding…';
+
+  try {
+    await db('queue_patients', 'POST', {
+      name,
+      age:       document.getElementById('rec-age').value       || null,
+      gender:    document.getElementById('rec-gender').value    || null,
+      phone:     document.getElementById('rec-phone').value.trim() || null,
+      complaint,
+      priority:  document.getElementById('rec-priority').value,
+      status:    'Waiting',
+      org_id:    user.id
+    });
+
+    toast('Patient added to queue.');
+
+    // clear fields
+    ['rec-name','rec-age','rec-phone','rec-complaint']
+      .forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
+    document.getElementById('rec-gender').value   = '';
+    document.getElementById('rec-priority').value = 'Normal';
+
+    // collapse the form
+    document.getElementById('rec-form').style.display = 'none';
+    document.getElementById('rec-form-toggle').textContent = '+ New Patient';
+
+    loadReception();
+  } catch(e) {
+    toast('Error: ' + e.message, 'err');
+  } finally {
+    btn.disabled = false; btn.textContent = 'Add to Queue';
+  }
 }
 
 // ── DOCTOR QUEUE ─────────────────────────────────────
