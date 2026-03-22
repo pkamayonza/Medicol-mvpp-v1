@@ -8295,6 +8295,20 @@ function queueStatusBadge(s){
   return `<span class="badge" style="${map[s]||map['Waiting']}">${s||'Waiting'}</span>`;
 }
 
+function filterQueueTable() {
+  const q  = (document.getElementById('rec-search')?.value || '').toLowerCase();
+  const st = document.getElementById('rec-status-filter')?.value || '';
+  const todayStr = new Date().toDateString();
+  const todayQ   = queuePatients.filter(x =>
+    new Date(x.created_at).toDateString() === todayStr
+  );
+  const filtered = todayQ.filter(p =>
+    (!q  || (p.name||'').toLowerCase().includes(q) || (p.complaint||'').toLowerCase().includes(q)) &&
+    (!st || p.status === st)
+  );
+  renderQueueTable(filtered, 'rec-queue-body', 'reception');
+}
+
 async function markQueueStatus(id, newStatus){
   try {
     await db(`queue_patients?id=eq.${id}`,'PATCH',{status:newStatus});
