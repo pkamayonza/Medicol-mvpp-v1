@@ -94,5 +94,5 @@ MTN MoMo and M-Pesa penetration, smartphone usability thresholds, and WHO pressu
 
 ## Contact
 
-**Patience Amanya** — Founder  
+**Patience Amanya (amanyapatience334@gmail.com)** — Founder  
 [minzahealth.netlify.app](https://minzahealth.netlify.app) · Kampala, Uganda
