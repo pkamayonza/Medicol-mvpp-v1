@@ -3080,8 +3080,36 @@
 
     <!-- Today's queue -->
     <div class="card">
-      <h2>Today's Queue</h2>
-  </div>
+      <h2 style="font-size:0.83rem;margin-bottom:0.9rem;">Today's Queue</h2>
+      <div style="display:flex;gap:0.75rem;margin-bottom:1rem;flex-wrap:wrap;">
+        <div class="search-bar" style="flex:1;margin:0;">
+          <input type="text" id="rec-search" placeholder="Search patient or complaint..."
+                 oninput="filterQueueTable()" style="margin:0;"/>
+        </div>
+        <select id="rec-status-filter" onchange="filterQueueTable()"
+                style="border:1px solid #E0DFDB;border-radius:8px;padding:0.6rem 0.9rem;
+                       font-size:0.85rem;font-family:'Syne',sans-serif;color:#0B1F3A;
+                       background:#F0EFEB;outline:none;cursor:pointer;min-width:160px;">
+          <option value="">All Statuses</option>
+          <option value="Waiting">Waiting</option>
+          <option value="In Consult">In Consult</option>
+          <option value="Results Received">Results Received</option>
+          <option value="Seen">Seen</option>
+        </select>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>#</th><th>Name</th><th class="hide-mobile">Age</th>
+              <th class="hide-mobile">Gender</th><th>Complaint</th>
+              <th>Priority</th><th>Status</th><th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="rec-queue-body"><tr><td colspan="8" class="loading">Loading...</td></tr></tbody>
+        </table>
+      </div>
+    </div>
 
   <!-- ══════════════════════════════════
        CLINIC: DOCTOR QUEUE
