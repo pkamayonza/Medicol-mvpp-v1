@@ -159,7 +159,7 @@
   }
   #readonly-overlay .ro-box h3{ color:#0B1F3A; margin-bottom:0.5rem; }
   #readonly-overlay .ro-box p{ color:#555; font-size:0.88rem; line-height:1.6; margin-bottom:1.25rem; }
-  
+
   .role-card .ri{ font-size:1.6rem; display:block; margin-bottom:0.3rem; }
   .role-card .rn{ font-size:0.82rem; font-weight:700; color:#0B1F3A; }
 
@@ -1312,14 +1312,20 @@
             </div>
           </div>
           <input type="hidden" id="s-role" value=""/>
-          <div class="fg" id="dept-selector" style="display:none;">
-            <label>Your Department</label>
-            <select id="s-dept" style="border:1px solid #E0DFDB;border-radius:8px;padding:0.7rem 1rem;font-size:0.9rem;font-family:'Syne',sans-serif;color:#0B1F3A;outline:none;">
-              <option value="">Select department</option>
-              <option value="reception">Reception</option>
-              <option value="doctor">Doctor / Clinician</option>
-              <option value="pharmacy">Clinic Pharmacy</option>
-            </select>
+
+          <!-- Department + pricing picker (clinic + hospital only) -->
+          <div id="dept-picker" style="display:none;">
+            <label style="font-size:0.82rem;font-weight:700;color:#0B1F3A;display:block;margin-bottom:0.5rem;">
+              Which departments does your facility have?
+            </label>
+            <p style="font-size:0.75rem;color:#9AA3AE;margin:0 0 0.65rem;">Select all that apply. You only get what you choose.</p>
+            <div class="dept-grid" id="dept-chip-grid">
+              <!-- chips injected by JS based on role -->
+            </div>
+            <div class="dept-price-total" id="dept-price-row" style="display:none;">
+              <span id="dept-selected-labels" style="color:#555;font-size:0.78rem;font-weight:400;"></span>
+              <span id="dept-price-total-val">UGX 0 / mo</span>
+            </div>
           </div>
         </div>
         <button class="btn-auth" onclick="doSignup()">Create Account →</button>
