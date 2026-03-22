@@ -4198,11 +4198,58 @@ const DEPT_CONFIG = {
 
 function fmtUGX(n){ return 'UGX ' + Number(n).toLocaleString(); }
 
-function selectRole(role,el){
-  selectedRole=role;
-  document.getElementById('s-role').value=role;
-  document.querySelectorAll('.role-card').forEach(c=>c.classList.remove('selected'));
+function selectRole(role, el) {
+  selectedRole = role;
+  document.getElementById('s-role').value = role;
+  document.querySelectorAll('.role-card').forEach(c => c.classList.remove('selected'));
   el.classList.add('selected');
+  selectedDepts.clear();
+
+  const picker = document.getElementById('dept-picker');
+  const grid   = document.getElementById('dept-chip-grid');
+
+  if (DEPT_CONFIG[role]) {
+    const depts = DEPT_CONFIG[role];
+    grid.innerHTML = depts.map(d => `
+      <div class="dept-chip" id="dc-${d.id}" onclick="toggleDept('${d.id}','${d.label}',${d.price},this)">
+        <div>
+          <span class="dc-name">${d.label}</span>
+          <span class="dc-price">${fmtUGX(d.price)} / mo</span>
+        </div>
+      </div>`).join('');
+    picker.style.display = 'block';
+    updateDeptTotal();
+  } else {
+    picker.style.display = 'none';
+  }
+}
+
+function toggleDept(id, label, price, el) {
+  if (selectedDepts.has(id)) {
+    selectedDepts.delete(id);
+    el.classList.remove('selected');
+  } else {
+    selectedDepts.add(id);
+    el.classList.add('selected');
+  }
+  updateDeptTotal();
+}
+
+function updateDeptTotal() {
+  const depts  = DEPT_CONFIG[selectedRole] || [];
+  const chosen = depts.filter(d => selectedDepts.has(d.id));
+  const total  = chosen.reduce((s, d) => s + d.price, 0);
+  const row    = document.getElementById('dept-price-row');
+  const labels = document.getElementById('dept-selected-labels');
+  const val    = document.getElementById('dept-price-total-val');
+
+  if (chosen.length > 0) {
+    labels.textContent = chosen.map(d => d.label).join(', ');
+    val.textContent    = fmtUGX(total) + ' / mo';
+    row.style.display  = 'flex';
+  } else {
+    row.style.display  = 'none';
+  }
 }
 
 async function doLogin(){
