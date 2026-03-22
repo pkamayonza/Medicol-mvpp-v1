@@ -4346,6 +4346,7 @@ function launchApp(){
   rl.className=`role-pill ${orgRole==='diagnosticlab'?'lab':orgRole}`;
   buildNav();
   routeHome();
+  checkTrialStatus();
 
   // date & greeting
   const now=new Date(), hr=now.getHours();
