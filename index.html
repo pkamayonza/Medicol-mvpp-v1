@@ -4176,7 +4176,28 @@ function switchTab(tab){
   document.getElementById('tab-signup-btn').classList.toggle('active',tab==='signup');
 }
 
-let selectedRole='';
+let selectedRole = '';
+let selectedDepts = new Set();
+
+const DEPT_CONFIG = {
+  Clinic: [
+    { id:'reception',    label:'Reception',         price:75000 },
+    { id:'doctor',       label:'Doctor / Clinician', price:75000 },
+    { id:'lab',          label:'Laboratory',         price:100000 },
+    { id:'dept-pharmacy',label:'Pharmacy',           price:75000 },
+  ],
+  Hospital: [
+    { id:'reception',    label:'Reception',          price:75000 },
+    { id:'doctor',       label:'Doctor / Clinician', price:95000 },
+    { id:'lab',          label:'Laboratory',         price:100000 },
+    { id:'dept-pharmacy',label:'Pharmacy',           price:95000 },
+    { id:'hospital',     label:'Inpatient / Ward',   price:150000 },
+    { id:'theatre',      label:'Theatre',            price:150000 },
+  ],
+};
+
+function fmtUGX(n){ return 'UGX ' + Number(n).toLocaleString(); }
+
 function selectRole(role,el){
   selectedRole=role;
   document.getElementById('s-role').value=role;
