@@ -4567,6 +4567,7 @@ function launchApp(){
   buildNav();
   routeHome();
   checkTrialStatus();
+  if (orgRole === 'hospital') showStaffCredentials();
 
   // date & greeting
   const now=new Date(), hr=now.getHours();
