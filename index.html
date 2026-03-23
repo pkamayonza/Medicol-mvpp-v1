@@ -9537,6 +9537,356 @@ async function quickDispense(id){
   }catch(e){}
   localStorage.removeItem('mc_s');
 })();
+
+// ── WARD NOTES ─────────────────────────────────────────────────────────────────
+
+function openWardNoteModal(encId) {
+  document.getElementById('wn-enc-id').value = encId;
+  document.getElementById('wn-text').value = '';
+  document.getElementById('wn-author').value = user?.user_metadata?.full_name || user?.email || '';
+  document.getElementById('wn-err').style.display = 'none';
+  const hr = new Date().getHours();
+  const shift = hr >= 7 && hr < 15 ? 'morning' : hr >= 15 && hr < 22 ? 'afternoon' : 'night';
+  document.getElementById('wn-shift').value = shift;
+  document.getElementById('m-ward-note').classList.add('open');
+}
+
+async function saveWardNote() {
+  const encId  = document.getElementById('wn-enc-id').value;
+  const text   = document.getElementById('wn-text').value.trim();
+  const author = document.getElementById('wn-author').value.trim();
+  const errEl  = document.getElementById('wn-err');
+
+  if (!text)   { errEl.textContent = 'Note text is required.'; errEl.style.display='block'; return; }
+  if (!author) { errEl.textContent = 'Author name is required.'; errEl.style.display='block'; return; }
+
+  try {
+    await db('ward_notes', 'POST', {
+      encounter_id: encId,
+      org_id:       user.id,
+      note_text:    text,
+      note_type:    document.getElementById('wn-type').value,
+      shift:        document.getElementById('wn-shift').value,
+      author_name:  author,
+      author_email: user?.email,
+      author_role:  user?.user_metadata?.department || null,
+    });
+    toast('Note saved.');
+    cm('m-ward-note');
+    if (document.getElementById('m-encounter').classList.contains('open')) {
+      loadEncounterNotes(encId);
+    }
+  } catch(e) { errEl.textContent = 'Error: ' + e.message; errEl.style.display='block'; }
+}
+
+async function loadEncounterNotes(encId) {
+  const container = document.getElementById('enc-notes-timeline');
+  if (!container) return;
+  container.innerHTML = '<div class="loading" style="padding:1rem;">Loading notes…</div>';
+  try {
+    const notes = await db(`ward_notes?encounter_id=eq.${encId}&order=created_at.asc`);
+    if (!notes.length) {
+      container.innerHTML = '<div style="color:#9AA3AE;font-size:0.83rem;padding:0.5rem 0;">No notes yet. Add the first note for this patient.</div>';
+      return;
+    }
+    const typeColors = {
+      progress:   ['#eff6ff','#1d4ed8'],
+      nursing:    ['#f0fdf4','#059669'],
+      specialist: ['#fdf4ff','#7c3aed'],
+      procedure:  ['#fff7ed','#c2410c'],
+      handover:   ['#F8F7F3','#0B1F3A'],
+    };
+    container.innerHTML = notes.map(n => {
+      const [bg, col] = typeColors[n.note_type] || ['#F8F7F3','#0B1F3A'];
+      const ts = new Date(n.created_at).toLocaleString('en-GB', {
+        day:'2-digit', month:'short', year:'numeric', hour:'2-digit', minute:'2-digit'
+      });
+      return `
+        <div style="border-left:3px solid ${col};padding:0.75rem 0.9rem 0.75rem 1rem;
+                    margin-bottom:0.75rem;background:${bg};border-radius:0 8px 8px 0;">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:0.5rem;margin-bottom:0.5rem;">
+            <div>
+              <span style="font-size:0.72rem;font-weight:700;text-transform:capitalize;
+                           color:${col};border-radius:100px;
+                           padding:0.15rem 0.6rem;background:rgba(0,0,0,0.06);">${n.note_type.replace('_',' ')}</span>
+              ${n.shift ? `<span style="font-size:0.7rem;color:#9AA3AE;margin-left:0.4rem;text-transform:capitalize;">${n.shift} shift</span>` : ''}
+            </div>
+            <div style="font-size:0.72rem;color:#9AA3AE;white-space:nowrap;">${ts}</div>
+          </div>
+          <div style="font-size:0.83rem;color:#0B1F3A;line-height:1.65;white-space:pre-wrap;">${n.note_text}</div>
+          <div style="font-size:0.72rem;color:#9AA3AE;margin-top:0.5rem;font-weight:600;">
+            — ${n.author_name}${n.author_role ? ' · ' + n.author_role : ''}
+          </div>
+        </div>`;
+    }).join('');
+  } catch(e) {
+    container.innerHTML = `<div style="color:#dc2626;font-size:0.82rem;">Error: ${e.message}</div>`;
+  }
+}
+
+// ── DISCHARGE (HMIS) ───────────────────────────────────────────────────────────
+
+async function confirmDischarge() {
+  const encId      = document.getElementById('disch-enc-id').value;
+  const diagnosis  = document.getElementById('disch-diagnosis').value.trim();
+  const secDx      = document.getElementById('disch-secondary-dx').value.trim();
+  const procedures = document.getElementById('disch-procedures').value.trim();
+  const condition  = document.getElementById('disch-condition').value;
+  const meds       = document.getElementById('disch-meds').value.trim();
+  const followup   = document.getElementById('disch-followup').value.trim();
+  const doctor     = document.getElementById('disch-doctor').value.trim();
+  const dischDate  = document.getElementById('disch-date').value || new Date().toISOString();
+  const errEl      = document.getElementById('disch-err');
+  const btn        = document.getElementById('disch-confirm-btn');
+
+  if (!diagnosis) { errEl.textContent='Primary diagnosis is required.'; errEl.style.display='block'; return; }
+  if (!doctor)    { errEl.textContent='Discharging doctor name is required.'; errEl.style.display='block'; return; }
+
+  btn.disabled = true; btn.textContent = 'Discharging…';
+
+  try {
+    let e = _allEncounters.find(x=>x.id===encId);
+    if (!e) { const res = await db(`encounters?id=eq.${encId}`); e = res[0]; }
+
+    await db(`encounters?id=eq.${encId}`, 'PATCH', {
+      status:             'discharged',
+      diagnosis,
+      discharge_meds:     meds||null,
+      discharge_followup: followup||null,
+      discharging_doctor: doctor||null,
+      closed_at:          new Date(dischDate).toISOString(),
+      clinical_notes: JSON.stringify({
+        secondary_diagnosis: secDx||null,
+        procedures: procedures||null,
+        condition_at_discharge: condition,
+        existing_notes: e?.clinical_notes || null
+      })
+    });
+
+    if (e?.bed_id) {
+      await db(`beds?id=eq.${e.bed_id}`, 'PATCH', {
+        status: 'cleaning', current_encounter_id: null
+      });
+    }
+
+    cm('m-discharge');
+    toast(`${e?.patient_name||'Patient'} discharged.`);
+    track('patient_discharged', { condition });
+
+    await openDischargeInvoice(encId, e);
+
+    if(document.getElementById('page-hospital').classList.contains('active')) loadHospHome();
+    if(document.getElementById('page-ho-encounters').classList.contains('active')) loadEncounters();
+    if(document.getElementById('page-ho-beds').classList.contains('active')) loadBedBoard();
+
+  } catch(err) {
+    errEl.textContent = 'Error: ' + err.message;
+    errEl.style.display = 'block';
+  } finally {
+    btn.disabled = false; btn.textContent = 'Confirm Discharge & Generate Summary';
+  }
+}
+
+// ── BILLING & INVOICE ──────────────────────────────────────────────────────────
+
+async function openDischargeInvoice(encId, encounter) {
+  const orgName = user?.user_metadata?.org_name || 'Hospital';
+  let charges = [];
+  try { charges = await db(`service_charges?encounter_id=eq.${encId}&order=created_at.asc`); } catch(e) {}
+
+  if (encounter?.admitted_at && encounter?.closed_at) {
+    const days = Math.ceil(
+      (new Date(encounter.closed_at) - new Date(encounter.admitted_at)) / (1000*60*60*24)
+    ) || 1;
+    charges = [{ service_name: `Bed charge — ${encounter.ward||'General Ward'}`, quantity: days, unit_price: 50000, total_price: days * 50000, department: 'Ward' }, ...charges];
+  }
+
+  const total = charges.reduce((s, c) => s + (c.total_price || 0), 0);
+  const invDate = new Date().toLocaleDateString('en-GB', { day:'2-digit', month:'long', year:'numeric' });
+  const invNo = 'INV-' + Date.now().toString(36).toUpperCase();
+
+  const rowsHTML = charges.length ? charges.map(c => `
+    <tr>
+      <td>${c.service_name}</td>
+      <td style="text-align:center;">${c.quantity||1}</td>
+      <td style="text-align:right;">UGX ${(c.unit_price||0).toLocaleString()}</td>
+      <td style="text-align:right;font-weight:700;">UGX ${(c.total_price||0).toLocaleString()}</td>
+    </tr>`).join('') :
+    `<tr><td colspan="4" style="color:#9AA3AE;text-align:center;padding:1rem;">
+      No itemised charges recorded. Add charges from the encounter to generate a detailed invoice.
+    </td></tr>`;
+
+  document.getElementById('invoice-body').innerHTML = `
+    <div id="printable-invoice">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:1.5rem;">
+        <div>
+          <div style="font-size:1.4rem;font-weight:700;color:#0B1F3A;">${orgName}</div>
+          <div style="font-size:0.78rem;color:#9AA3AE;">Powered by Minza Health</div>
+        </div>
+        <div style="text-align:right;">
+          <div style="font-size:0.72rem;font-weight:700;text-transform:uppercase;color:#9AA3AE;">Invoice No.</div>
+          <div style="font-weight:700;color:#0D6E6E;">${invNo}</div>
+          <div style="font-size:0.78rem;color:#9AA3AE;margin-top:0.2rem;">${invDate}</div>
+        </div>
+      </div>
+      <div style="background:#F8F7F3;border-radius:8px;padding:0.85rem 1rem;margin-bottom:1rem;">
+        <div style="font-size:0.65rem;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;color:#9AA3AE;margin-bottom:0.4rem;">Billed To</div>
+        <div style="font-weight:700;">${encounter?.patient_name||'—'}</div>
+        <div style="font-size:0.82rem;color:#555;">
+          ${[encounter?.patient_age?encounter.patient_age+'y':null, encounter?.patient_gender, encounter?.patient_phone].filter(Boolean).join(' · ')}
+        </div>
+      </div>
+      <div class="table-wrap" style="margin-bottom:1rem;">
+        <table>
+          <thead><tr><th>Service</th><th style="text-align:center;">Qty</th><th style="text-align:right;">Unit Price</th><th style="text-align:right;">Total</th></tr></thead>
+          <tbody>${rowsHTML}</tbody>
+        </table>
+      </div>
+      <div style="background:#0B1F3A;border-radius:10px;padding:0.9rem 1.2rem;
+                  display:flex;justify-content:space-between;align-items:center;">
+        <div style="font-weight:700;color:white;">Total Due</div>
+        <div style="font-size:1.4rem;font-weight:700;color:#4ECDB4;">UGX ${total.toLocaleString()}</div>
+      </div>
+    </div>`;
+
+  document.getElementById('m-invoice').classList.add('open');
+}
+
+function printInvoice() {
+  const content = document.getElementById('printable-invoice').innerHTML;
+  const w = window.open('', '_blank');
+  w.document.write(`<html><head><title>Invoice</title>
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700&display=swap" rel="stylesheet"/>
+    <style>body{font-family:'Syne',sans-serif;padding:2rem;color:#0B1F3A;max-width:700px;margin:0 auto;}
+    table{width:100%;border-collapse:collapse;}th,td{padding:0.5rem 0.75rem;border-bottom:1px solid #eee;text-align:left;font-size:0.9rem;}
+    th{font-weight:700;color:#9AA3AE;font-size:0.75rem;text-transform:uppercase;}
+    @media print{button{display:none;}}</style></head>
+    <body>${content}<br/><button onclick="window.print()">Print</button></body></html>`);
+  w.document.close();
+}
+
+// ── SUPPLIES ───────────────────────────────────────────────────────────────────
+let _supplies = [];
+
+async function loadSupplies() {
+  try {
+    _supplies = await db(`supplies?org_id=eq.${user.id}&order=item_name.asc`);
+    renderSupplies(_supplies);
+  } catch(e) {
+    document.getElementById('sup-body').innerHTML =
+      `<tr><td colspan="8" class="loading">Error: ${e.message}</td></tr>`;
+  }
+}
+
+function filterSupplies() {
+  const q    = document.getElementById('sup-search').value.toLowerCase();
+  const dept = document.getElementById('sup-dept-filter').value;
+  const cat  = document.getElementById('sup-cat-filter').value;
+  renderSupplies(_supplies.filter(s =>
+    (!q    || s.item_name.toLowerCase().includes(q)) &&
+    (!dept || s.department === dept) &&
+    (!cat  || s.category === cat)
+  ));
+}
+
+function renderSupplies(arr) {
+  const b = document.getElementById('sup-body');
+  if (!arr.length) { b.innerHTML = `<tr><td colspan="8" class="loading">No items found.</td></tr>`; return; }
+  b.innerHTML = arr.map(s => {
+    const isLow = s.quantity <= (s.reorder_level || 10);
+    const isOut = s.quantity <= 0;
+    const badge = isOut ? `<span class="badge b-low">Out of Stock</span>`
+                : isLow ? `<span class="badge b-warn">Low Stock</span>`
+                : `<span class="badge b-ok">OK</span>`;
+    return `<tr>
+      <td><strong>${s.item_name}</strong></td>
+      <td style="font-size:0.82rem;color:#555;">${s.department||'—'}</td>
+      <td style="font-size:0.82rem;text-transform:capitalize;color:#555;">${s.category||'—'}</td>
+      <td style="font-weight:700;color:${isOut?'#dc2626':isLow?'#d97706':'#0B1F3A'};">${s.quantity}</td>
+      <td style="font-size:0.82rem;color:#555;">${s.unit||'—'}</td>
+      <td style="font-size:0.82rem;color:#9AA3AE;">${s.reorder_level||'—'}</td>
+      <td>${badge}</td>
+      <td class="td-actions">
+        <button class="btn btn-sm" onclick="openSupplyModal('${s.id}')">Edit</button>
+        <button class="btn btn-danger" onclick="deleteSupply('${s.id}')">Del</button>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+function openSupplyModal(id) {
+  if (id) {
+    const s = _supplies.find(x => x.id === id);
+    if (!s) return;
+    document.getElementById('sup-modal-title').textContent = 'Edit Item';
+    document.getElementById('sup-id').value      = s.id;
+    document.getElementById('sup-name').value    = s.item_name || '';
+    document.getElementById('sup-cat').value     = s.category || 'consumable';
+    document.getElementById('sup-dept').value    = s.department || '';
+    document.getElementById('sup-qty').value     = s.quantity || '';
+    document.getElementById('sup-unit').value    = s.unit || '';
+    document.getElementById('sup-reorder').value = s.reorder_level || '';
+    document.getElementById('sup-cost').value    = s.unit_cost || '';
+    document.getElementById('sup-supplier').value= s.supplier || '';
+  } else {
+    document.getElementById('sup-modal-title').textContent = 'Add Supply Item';
+    document.getElementById('sup-id').value = '';
+    ['sup-name','sup-qty','sup-unit','sup-reorder','sup-cost','sup-supplier']
+      .forEach(id => { document.getElementById(id).value = ''; });
+    document.getElementById('sup-cat').value  = 'consumable';
+    document.getElementById('sup-dept').value = '';
+  }
+  document.getElementById('m-supply').classList.add('open');
+}
+
+async function saveSupply() {
+  const name = document.getElementById('sup-name').value.trim();
+  const qty  = document.getElementById('sup-qty').value;
+  if (!name || qty === '') { toast('Name and quantity required.', 'err'); return; }
+  const payload = {
+    org_id:        user.id,
+    item_name:     name,
+    category:      document.getElementById('sup-cat').value || null,
+    department:    document.getElementById('sup-dept').value || null,
+    quantity:      parseInt(qty),
+    unit:          document.getElementById('sup-unit').value.trim() || null,
+    reorder_level: document.getElementById('sup-reorder').value ? parseInt(document.getElementById('sup-reorder').value) : null,
+    unit_cost:     document.getElementById('sup-cost').value ? parseInt(document.getElementById('sup-cost').value) : null,
+    supplier:      document.getElementById('sup-supplier').value.trim() || null,
+  };
+  const id = document.getElementById('sup-id').value;
+  try {
+    if (id) await db(`supplies?id=eq.${id}`, 'PATCH', payload);
+    else    await db('supplies', 'POST', payload);
+    toast(id ? 'Item updated.' : 'Item added.');
+    cm('m-supply');
+    loadSupplies();
+  } catch(e) { toast('Error: ' + e.message, 'err'); }
+}
+
+async function deleteSupply(id) {
+  if (!confirm('Delete this item?')) return;
+  try { await db(`supplies?id=eq.${id}`, 'DELETE'); toast('Deleted.'); loadSupplies(); }
+  catch(e) { toast('Error: ' + e.message, 'err'); }
+}
+
+// ── AUTO STAFF CREDENTIALS (shown once after hospital signup) ──────────────────
+
+function showStaffCredentials() {
+  const creds = user?.user_metadata?.staff_credentials;
+  if (!creds || !creds.length) return;
+  if (localStorage.getItem('creds_shown_' + user.id)) return;
+  const rows = creds.map(c => `
+    <tr>
+      <td style="text-transform:capitalize;font-weight:600;">${c.department}</td>
+      <td style="font-size:0.82rem;font-family:monospace;">${c.email}</td>
+      <td style="font-size:0.82rem;font-family:monospace;font-weight:700;color:#0D6E6E;">${c.password}</td>
+    </tr>`).join('');
+  document.getElementById('staff-creds-body').innerHTML = rows;
+  document.getElementById('m-staff-creds').classList.add('open');
+  localStorage.setItem('creds_shown_' + user.id, '1');
+}
+
 </script>
 
 </body>
