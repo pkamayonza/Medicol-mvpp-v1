@@ -2518,21 +2518,24 @@
   <div class="page" id="page-hospital">
 
     <!-- Header -->
-    <div class="dash-header">
-      <div>
-        <div class="dash-greeting">Good <em id="ho-greeting">morning</em>, <span id="ho-facility-name">Hospital</span></div>
-        <div class="dash-date" id="ho-date-str"></div>
+    <div style="display:flex;align-items:center;justify-content:space-between;
+                gap:1rem;flex-wrap:wrap;margin-bottom:1rem;">
+      <div style="display:flex;align-items:center;gap:1.25rem;">
+        <div>
+          <div style="font-size:1rem;font-weight:700;color:#0B1F3A;" id="ho-facility-name">Hospital</div>
+          <div class="dash-date" id="ho-date-str"></div>
+        </div>
       </div>
       <div style="display:flex;gap:0.6rem;align-items:center;flex-wrap:wrap;">
         <button onclick="showPage('ho-triage')"
                 style="background:#dc2626;color:white;border:none;padding:0.5rem 1.1rem;
-                       border-radius:8px;cursor:pointer;font-size:0.82rem;font-weight:700;
+                       border-radius:6px;cursor:pointer;font-size:0.82rem;font-weight:600;
                        font-family:'Inter',sans-serif;display:flex;align-items:center;gap:0.4rem;">
           <svg style="vertical-align:middle;margin-right:5px;" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>New Triage
         </button>
         <button onclick="showPage('ho-beds')"
                 style="background:#0B1F3A;color:white;border:none;padding:0.5rem 1.1rem;
-                       border-radius:8px;cursor:pointer;font-size:0.82rem;font-weight:700;
+                       border-radius:6px;cursor:pointer;font-size:0.82rem;font-weight:600;
                        font-family:'Inter',sans-serif;">
           <svg style="vertical-align:middle;margin-right:5px;" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2 4v16"/><path d="M2 8h18a2 2 0 0 1 2 2v10"/><path d="M2 17h20"/><path d="M6 8v9"/></svg>Bed Board
         </button>
