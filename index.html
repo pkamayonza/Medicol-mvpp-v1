@@ -3934,6 +3934,63 @@
       <button class="btn btn-primary" onclick="saveBed()">Save Bed</button>
     </div>
   </div>
+
+  <!-- Supply Item Modal -->
+<div class="mo" id="m-supply">
+  <div class="mb" style="max-width:520px;">
+    <h3 id="sup-modal-title">Add Supply Item</h3>
+    <input type="hidden" id="sup-id"/>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.75rem;">
+      <div class="form-group" style="margin:0;grid-column:span 2;">
+        <label>Item Name *</label>
+        <input type="text" id="sup-name" placeholder="e.g. Disposable Syringe 5ml"/>
+      </div>
+      <div class="form-group" style="margin:0;">
+        <label>Category</label>
+        <select id="sup-cat">
+          <option value="consumable">Consumable</option>
+          <option value="reagent">Reagent</option>
+          <option value="equipment">Equipment</option>
+          <option value="linen">Linen</option>
+        </select>
+      </div>
+      <div class="form-group" style="margin:0;">
+        <label>Department</label>
+        <select id="sup-dept">
+          <option value="">All / General</option>
+          <option>Emergency</option><option>ICU</option><option>Theatre</option>
+          <option>Ward</option><option>Maternity</option><option>Radiology</option>
+          <option>Pathology</option><option>Pharmacy</option>
+        </select>
+      </div>
+      <div class="form-group" style="margin:0;">
+        <label>Quantity *</label>
+        <input type="number" id="sup-qty" min="0" placeholder="0"/>
+      </div>
+      <div class="form-group" style="margin:0;">
+        <label>Unit</label>
+        <input type="text" id="sup-unit" placeholder="e.g. pieces, boxes, packs"/>
+      </div>
+      <div class="form-group" style="margin:0;">
+        <label>Reorder Level</label>
+        <input type="number" id="sup-reorder" min="0" placeholder="10"/>
+      </div>
+      <div class="form-group" style="margin:0;">
+        <label>Unit Cost (UGX)</label>
+        <input type="number" id="sup-cost" min="0" placeholder="0"/>
+      </div>
+      <div class="form-group" style="margin:0;grid-column:span 2;">
+        <label>Supplier</label>
+        <input type="text" id="sup-supplier" placeholder="e.g. Cipla Quality Chemical"/>
+      </div>
+    </div>
+    <div class="ma" style="margin-top:1rem;">
+      <button class="btn btn-sm" onclick="cm('m-supply')">Cancel</button>
+      <button class="btn btn-primary" onclick="saveSupply()">Save Item</button>
+    </div>
+  </div>
+</div>
+
 </div>
 
 <!-- ══ HOSPITAL: DISCHARGE MODAL ══ -->
