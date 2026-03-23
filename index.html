@@ -7722,8 +7722,6 @@ async function loadHospHome(){
   const orgId = user.id;
 
   // greeting + date
-  const greetEl = document.getElementById('ho-greeting');
-  if(greetEl) greetEl.textContent = hr<12?'morning':hr<17?'afternoon':'evening';
   const nameEl = document.getElementById('ho-facility-name');
   if(nameEl) nameEl.textContent = m.org_name || 'Hospital';
   const dateEl = document.getElementById('ho-date-str');
