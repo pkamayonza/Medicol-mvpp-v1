@@ -3995,43 +3995,65 @@
 
 <!-- ══ HOSPITAL: DISCHARGE MODAL ══ -->
 <div class="mo" id="m-discharge">
-  <div class="mb" style="max-width:560px;">
-    <h3>Discharge Patient</h3>
+  <div class="mb" style="max-width:580px;">
+    <h3>Discharge Summary</h3>
     <input type="hidden" id="disch-enc-id"/>
-    <div id="disch-patient-info"
-         style="background:#F8F7F3;border-radius:8px;padding:0.75rem 1rem;
-                margin-bottom:1rem;font-size:0.85rem;color:#555;"></div>
-    <div class="form-grid" style="grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1rem;">
-      <div class="form-group" style="grid-column:span 2;">
+    <div style="background:#0B1F3A;border-radius:10px;padding:0.75rem 1rem;margin-bottom:1rem;">
+      <div style="font-size:0.72rem;color:rgba(255,255,255,0.5);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:0.2rem;">Patient</div>
+      <div style="font-weight:700;color:white;" id="disch-patient-info">—</div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.75rem;margin-bottom:0.75rem;">
+      <div class="form-group" style="margin:0;grid-column:span 2;">
         <label>Primary Diagnosis (ICD-10 if known) *</label>
-        <input type="text" id="disch-diagnosis"
-               placeholder="e.g. Severe malaria — B50.8"/>
+        <input type="text" id="disch-diagnosis" placeholder="e.g. J18.9 — Community-acquired pneumonia"/>
       </div>
-      <div class="form-group" style="grid-column:span 2;">
-        <label>Discharge Medications & Instructions</label>
-        <textarea id="disch-meds"
-                  placeholder="e.g. Coartem 20/120mg — 3 tablets BD x 3 days. Paracetamol 1g TDS PRN pain."
-                  style="min-height:80px;"></textarea>
+      <div class="form-group" style="margin:0;grid-column:span 2;">
+        <label>Secondary / Other Diagnoses</label>
+        <input type="text" id="disch-secondary-dx" placeholder="e.g. Type 2 Diabetes (existing)"/>
       </div>
-      <div class="form-group" style="grid-column:span 2;">
-        <label>Follow-up Plan</label>
-        <input type="text" id="disch-followup"
-               placeholder="e.g. Review in OPD in 1 week"/>
+      <div class="form-group" style="margin:0;">
+        <label>Procedures Performed</label>
+        <input type="text" id="disch-procedures" placeholder="e.g. IV cannulation, chest X-ray"/>
       </div>
-      <div class="form-group" style="grid-column:span 2;">
-        <label>Discharging Doctor</label>
-        <input type="text" id="disch-doctor" placeholder="Dr. name"/>
+      <div class="form-group" style="margin:0;">
+        <label>Condition at Discharge</label>
+        <select id="disch-condition">
+          <option value="improved">Improved</option>
+          <option value="stable">Stable / Unchanged</option>
+          <option value="transferred">Transferred</option>
+          <option value="absconded">Absconded / Left Against Advice</option>
+          <option value="deceased">Deceased</option>
+        </select>
+      </div>
+      <div class="form-group" style="margin:0;grid-column:span 2;">
+        <label>Discharge Medications</label>
+        <textarea id="disch-meds" rows="2"
+                  placeholder="e.g. Amoxicillin 500mg TDS x 5 days, Paracetamol 1g TDS PRN"
+                  style="resize:vertical;width:100%;border:1px solid #E0DFDB;border-radius:8px;
+                         padding:0.7rem 1rem;font-size:0.88rem;font-family:'Syne',sans-serif;
+                         color:#0B1F3A;outline:none;"></textarea>
+      </div>
+      <div class="form-group" style="margin:0;grid-column:span 2;">
+        <label>Follow-up Instructions</label>
+        <textarea id="disch-followup" rows="2"
+                  placeholder="e.g. Return for wound review in 7 days, review U/E in 2 weeks"
+                  style="resize:vertical;width:100%;border:1px solid #E0DFDB;border-radius:8px;
+                         padding:0.7rem 1rem;font-size:0.88rem;font-family:'Syne',sans-serif;
+                         color:#0B1F3A;outline:none;"></textarea>
+      </div>
+      <div class="form-group" style="margin:0;">
+        <label>Discharging Doctor *</label>
+        <input type="text" id="disch-doctor" placeholder="e.g. Dr. Ochieng"/>
+      </div>
+      <div class="form-group" style="margin:0;">
+        <label>Discharge Date</label>
+        <input type="date" id="disch-date"/>
       </div>
     </div>
-    <div id="disch-err"
-         style="display:none;background:#fef2f2;border:1px solid #fca5a5;color:#dc2626;
-                padding:0.6rem 0.9rem;border-radius:8px;font-size:0.82rem;margin-bottom:0.75rem;">
-    </div>
+    <div id="disch-err" class="a-err" style="margin-bottom:0.75rem;"></div>
     <div class="ma">
       <button class="btn btn-sm" onclick="cm('m-discharge')">Cancel</button>
-      <button class="btn btn-primary" onclick="confirmDischarge()" id="disch-confirm-btn">
-        Confirm Discharge
-      </button>
+      <button class="btn btn-primary" id="disch-confirm-btn" onclick="confirmDischarge()">Confirm Discharge & Generate Summary</button>
     </div>
   </div>
 </div>
