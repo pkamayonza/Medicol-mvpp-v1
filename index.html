@@ -4184,13 +4184,16 @@ const DEPT_CONFIG = {
     { id:'dept-pharmacy',label:'Pharmacy',           price:75000 },
   ],
   Hospital: [
-    { id:'reception',    label:'Reception',          price:75000 },
-    { id:'doctor',       label:'Doctor / Clinician', price:95000 },
-    { id:'lab',          label:'Laboratory',         price:100000 },
-    { id:'dept-pharmacy',label:'Pharmacy',           price:95000 },
-    { id:'hospital',     label:'Inpatient / Ward',   price:150000 },
-    { id:'theatre',      label:'Theatre',            price:150000 },
-  ],
+  { id:'emergency',   label:'Emergency / A&E',     price:150000 },
+  { id:'icu',         label:'ICU / HDU',            price:200000 },
+  { id:'theatre',     label:'Operating Theatre',    price:200000 },
+  { id:'ward',        label:'General Ward',         price:150000 },
+  { id:'maternity',   label:'Maternity / Obs',      price:150000 },
+  { id:'radiology',   label:'Radiology',            price:150000 },
+  { id:'pathology',   label:'Pathology / Lab',      price:150000 },
+  { id:'pharmacy',    label:'Hospital Pharmacy',    price:100000 },
+  { id:'outpatient',  label:'OPD / Outpatient',     price:100000 },
+  ]
 };
 
 function fmtUGX(n){ return 'UGX ' + Number(n).toLocaleString(); }
