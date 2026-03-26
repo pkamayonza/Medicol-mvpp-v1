@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Sign In — Minza Health</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="../styles/main.css"/>
+</head>
+<body class="auth-body">
+ 
+  <div class="auth-screen">
+    <div class="auth-card">
+ 
+      <div class="auth-logo">
+        <h1>Min<span>za</span></h1>
+        <p>Health infrastructure for Africa</p>
+      </div>
+ 
+      <!-- Error / Success banners -->
+      <div class="form-error" id="login-error" style="display:none;"></div>
+ 
+      <form id="login-form" novalidate>
+        <div class="form-group">
+          <label for="email">Email</label>
+          <input
+            type="email"
+            id="email"
+            name="email"
+            placeholder="you@clinic.com"
+            autocomplete="email"
+            required
+          />
+        </div>
+ 
+        <div class="form-group">
+          <label for="password">Password</label>
+          <input
+            type="password"
+            id="password"
+            name="password"
+            placeholder="••••••••"
+            autocomplete="current-password"
+            required
+          />
+        </div>
+ 
+        <button type="submit" class="btn btn--primary btn--full" id="login-btn">
+          Sign In →
+        </button>
+      </form>
+ 
+    </div>
+  </div>
+ 
+  <script type="module">
+    import { login, redirectIfLoggedIn }  from '../js/modules/auth.js';
+    import { showToast }                  from '../js/utils/ui.js';
+ 
+    // Redirect if already logged in
+    redirectIfLoggedIn();
+ 
+    const form    = document.getElementById('login-form');
+    const btn     = document.getElementById('login-btn');
+    const errEl   = document.getElementById('login-error');
+ 
+    form.addEventListener('submit', async e => {
+      e.preventDefault();
+      errEl.style.display = 'none';
+      btn.disabled    = true;
+      btn.textContent = 'Signing in…';
+ 
+      const email    = form.email.value.trim();
+      const password = form.password.value;
+ 
+      try {
+        const data    = await login(email, password);
+        const orgType = data.user?.user_metadata?.org_type?.toLowerCase() || 'clinic';
+        window.location.href = orgType === 'pharmacy'
+          ? '../pages/pharmacy.html'
+          : '../pages/dashboard.html';
+      } catch (err) {
+        errEl.textContent   = err.message;
+        errEl.style.display = 'block';
+        btn.disabled        = false;
+        btn.textContent     = 'Sign In →';
+      }
+    });
+  </script>
+ 
+</body>
+</html>
