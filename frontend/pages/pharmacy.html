@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Pharmacy — Minza Health</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="../styles/main.css"/>
+</head>
+<body>
+ 
+  <nav class="nav">
+    <div class="nav__left">
+      <span class="nav__logo">Min<span>za</span></span>
+      <span class="nav__org" id="nav-org">—</span>
+    </div>
+    <div class="nav__center">
+      <a href="dashboard.html" class="nav__tab" id="dashboard-link">Dashboard</a>
+      <a href="patients.html"  class="nav__tab" id="patients-link">Patients</a>
+      <a href="pharmacy.html"  class="nav__tab nav__tab--active">Pharmacy</a>
+      <a href="payments.html"  class="nav__tab">Payments</a>
+    </div>
+    <div class="nav__right">
+      <span id="conn-pill" class="conn-pill"></span>
+      <button class="btn btn--ghost btn--sm" id="logout-btn">Sign Out</button>
+    </div>
+  </nav>
+ 
+  <main class="page">
+ 
+    <div class="page-header">
+      <h1 class="page-title">Pharmacy</h1>
+      <div class="filter-tabs" id="status-tabs">
+        <button class="filter-tab filter-tab--active" data-status="">All</button>
+        <button class="filter-tab" data-status="sent">Incoming</button>
+        <button class="filter-tab" data-status="accepted">Accepted</button>
+        <button class="filter-tab" data-status="dispensed">Dispensed</button>
+      </div>
+    </div>
+ 
+    <!-- Stats strip -->
+    <div class="stats-strip" id="pharm-stats">
+      <div class="stat-strip-item">
+        <div class="stat-strip-num" id="stat-incoming">—</div>
+        <div class="stat-strip-label">Incoming</div>
+      </div>
+      <div class="stat-strip-sep"></div>
+      <div class="stat-strip-item">
+        <div class="stat-strip-num" id="stat-accepted">—</div>
+        <div class="stat-strip-label">Accepted</div>
+      </div>
+      <div class="stat-strip-sep"></div>
+      <div class="stat-strip-item">
+        <div class="stat-strip-num" id="stat-dispensed-today">—</div>
+        <div class="stat-strip-label">Dispensed Today</div>
+      </div>
+    </div>
+ 
+    <!-- Order Table -->
+    <div class="card">
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Patient</th>
+              <th>Drugs</th>
+              <th>Type</th>
+              <th>Status</th>
+              <th>Received</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="order-body">
+            <tr><td colspan="6" class="loading">Loading orders…</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+ 
+  </main>
+ 
+  <!-- Order Detail Modal -->
+  <div class="modal" id="modal-order">
+    <div class="modal__card modal__card--wide">
+      <div class="modal__header">
+        <h3>Order Details</h3>
+        <button class="modal__close" data-close="modal-order">✕</button>
+      </div>
+      <div id="order-detail-body"></div>
+      <div class="modal__actions" id="order-detail-actions"></div>
+    </div>
+  </div>
+ 
+  <div id="toast" class="toast"></div>
+ 
+  <script type="module">
+    import { protectRoute, logout, getOrgType }           from '../js/modules/auth.js';
+    import { fetchIncomingOrders, updateOrderStatus,
+             renderOrderList, ORDER_STATUS }               from '../js/modules/pharmacy.js';
+    import { initConnPill, showToast, openModal, closeModal } from '../js/utils/ui.js';
+    import { escapeHtml, fmtDate, fmtUGX }                from '../js/utils/format.js';
+ 
+    // ── Boot ───────────────────────────────────────────────────────────────────
+    const user    = await protectRoute();
+    const orgType = getOrgType();
+ 
+    document.getElementById('nav-org').textContent = user.user_metadata?.org_name || user.email;
+    document.getElementById('logout-btn').addEventListener('click', logout);
+    initConnPill('conn-pill');
+ 
+    // Hide clinic links if pure pharmacy account
+    if (orgType === 'pharmacy') {
+      document.getElementById('dashboard-link').style.display = 'none';
+      document.getElementById('patients-link').style.display  = 'none';
+    }
+ 
+    // ── State ──────────────────────────────────────────────────────────────────
+    let _currentFilter = '';
+    let _allOrders     = [];
+ 
+    // ── Load Orders ────────────────────────────────────────────────────────────
+    async function loadOrders(statusFilter = '') {
+      const body = document.getElementById('order-body');
+      body.innerHTML = `<tr><td colspan="6" class="loading">Loading…</td></tr>`;
+ 
+      try {
+        _allOrders = await fetchIncomingOrders(statusFilter || null);
+ 
+        // Stats
+        const today    = new Date().toDateString();
+        const incoming = _allOrders.filter(o => o.status === 'sent').length;
+        const accepted = _allOrders.filter(o => o.status === 'accepted').length;
+        const dispensed = _allOrders.filter(o =>
+          o.status === 'dispensed' &&
+          new Date(o.created_at).toDateString() === today
+        ).length;
+ 
+        document.getElementById('stat-incoming').textContent      = incoming;
+        document.getElementById('stat-accepted').textContent      = accepted;
+        document.getElementById('stat-dispensed-today').textContent = dispensed;
+ 
+        renderOrderList(body, _allOrders, {
+          onView:     openOrderDetail,
+          onAccept:   async id => { showToast('Order accepted.'); await loadOrders(_currentFilter); },
+          onReject:   async id => { showToast('Order rejected.'); await loadOrders(_currentFilter); },
+          onDispense: async id => { showToast('Dispensed.'); await loadOrders(_currentFilter); },
+        }, true /* isPharmacyView */);
+ 
+      } catch (err) {
+        showToast(err.message, 'error');
+        body.innerHTML = `<tr><td colspan="6" class="loading">${err.message}</td></tr>`;
+      }
+    }
+ 
+    await loadOrders();
+ 
+    // ── Filter Tabs ────────────────────────────────────────────────────────────
+    document.getElementById('status-tabs').addEventListener('click', e => {
+      const tab = e.target.closest('.filter-tab');
+      if (!tab) return;
+ 
+      document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('filter-tab--active'));
+      tab.classList.add('filter-tab--active');
+ 
+      _currentFilter = tab.dataset.status;
+      loadOrders(_currentFilter);
+    });
+ 
+    // ── Order Detail Modal ─────────────────────────────────────────────────────
+    function openOrderDetail(orderId) {
+      const order  = _allOrders.find(o => o.id === orderId);
+      if (!order) return;
+ 
+      const presc   = order.prescriptions || {};
+      const items   = presc.prescription_items || [];
+      const visit   = presc.visits || {};
+      const patient = visit.patients || {};
+      const total   = items.reduce((s, i) => s + ((i.price || 0) * (i.quantity || 1)), 0);
+ 
+      document.getElementById('order-detail-body').innerHTML = `
+        <div class="detail-section">
+          <div class="detail-section__label">Patient</div>
+          <div class="detail-section__value">${escapeHtml(patient.full_name || '—')}</div>
+          <div class="text-muted text-sm">${patient.phone || '—'}</div>
+        </div>
+ 
+        <div class="detail-section">
+          <div class="detail-section__label">Drugs Prescribed</div>
+          ${items.map(i => `
+            <div class="rx-item">
+              <div class="rx-item__info">
+                <div class="rx-item__name">${escapeHtml(i.drug_name)}</div>
+                <div class="rx-item__meta">
+                  ${i.dosage ? escapeHtml(i.dosage) + ' · ' : ''}Qty: ${i.quantity || 1}
+                  ${i.price ? ' · ' + fmtUGX(i.price * (i.quantity || 1)) : ''}
+                </div>
+              </div>
+            </div>
+          `).join('')}
+          ${total > 0 ? `<div class="rx-total-row"><span>Total</span><strong>${fmtUGX(total)}</strong></div>` : ''}
+        </div>
+ 
+        <div class="detail-section">
+          <div class="detail-section__label">Order Info</div>
+          <div class="text-sm">Type: <strong>${order.order_type}</strong></div>
+          <div class="text-sm">Status: <strong>${order.status}</strong></div>
+          <div class="text-sm text-muted">Received: ${fmtDate(order.created_at)}</div>
+        </div>`;
+ 
+      // Action buttons based on status
+      const actionsEl = document.getElementById('order-detail-actions');
+      actionsEl.innerHTML = '';
+ 
+      const closeBtn = document.createElement('button');
+      closeBtn.className   = 'btn btn--outline';
+      closeBtn.textContent = 'Close';
+      closeBtn.addEventListener('click', () => closeModal('modal-order'));
+      actionsEl.appendChild(closeBtn);
+ 
+      if (order.status === ORDER_STATUS.SENT) {
+        const acceptBtn = document.createElement('button');
+        acceptBtn.className   = 'btn btn--primary';
+        acceptBtn.textContent = 'Accept Order';
+        acceptBtn.addEventListener('click', async () => {
+          acceptBtn.disabled = true;
+          try {
+            await updateOrderStatus(orderId, ORDER_STATUS.ACCEPTED);
+            showToast('Order accepted.');
+            closeModal('modal-order');
+            loadOrders(_currentFilter);
+          } catch (err) { showToast(err.message, 'error'); }
+        });
+        actionsEl.appendChild(acceptBtn);
+ 
+        const rejectBtn = document.createElement('button');
+        rejectBtn.className   = 'btn btn--danger';
+        rejectBtn.textContent = 'Reject';
+        rejectBtn.addEventListener('click', async () => {
+          rejectBtn.disabled = true;
+          try {
+            await updateOrderStatus(orderId, ORDER_STATUS.REJECTED);
+            showToast('Order rejected.');
+            closeModal('modal-order');
+            loadOrders(_currentFilter);
+          } catch (err) { showToast(err.message, 'error'); }
+        });
+        actionsEl.appendChild(rejectBtn);
+      }
+ 
+      if (order.status === ORDER_STATUS.ACCEPTED) {
+        const dispenseBtn = document.createElement('button');
+        dispenseBtn.className   = 'btn btn--success';
+        dispenseBtn.textContent = 'Mark Dispensed';
+        dispenseBtn.addEventListener('click', async () => {
+          dispenseBtn.disabled = true;
+          try {
+            await updateOrderStatus(orderId, ORDER_STATUS.DISPENSED);
+            showToast('Dispensed successfully.');
+            closeModal('modal-order');
+            loadOrders(_currentFilter);
+          } catch (err) { showToast(err.message, 'error'); }
+        });
+        actionsEl.appendChild(dispenseBtn);
+      }
+ 
+      openModal('modal-order');
+    }
+ 
+    // Close modal button
+    document.querySelectorAll('[data-close]').forEach(btn => {
+      btn.addEventListener('click', () => closeModal(btn.dataset.close));
+    });
+ 
+    // Auto-refresh every 60 seconds
+    setInterval(() => loadOrders(_currentFilter), 60_000);
+  </script>
+ 
+</body>
+</html>
