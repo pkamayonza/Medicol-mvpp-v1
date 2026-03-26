@@ -1,146 +1,164 @@
 /**
- * auth.js — Minza Health Auth Module
+ * patients.js — Minza Health Patients Module
  *
- * Responsibilities (ONE):
- *  - Login / logout
- *  - Session persistence
- *  - Route protection (redirect to login if no session)
- *  - Expose current user to other modules
+ * Responsibility (ONE): Everything to do with the patients table.
+ *  - Fetch patients for current org
+ *  - Create patient
+ *  - Search patients (name + phone)
+ *  - Render patient list to a given container
+ *  - Bind form submission
  */
 
-import { authRequest, apiRequest, setSession, clearSession, getSession } from '../services/api.js';
+import { apiRequest } from '../services/api.js';
+import { getOrgId }   from './auth.js';
+import { fmtDate, fmtAge, escapeHtml } from '../utils/format.js';
+import { showToast }  from '../utils/ui.js';
 
-// ─── CURRENT USER STATE ────────────────────────────────────────────────────────
-let _currentUser   = null;
-let _currentSession = null;
+// ─── DATA ──────────────────────────────────────────────────────────────────────
+let _patients = [];
 
-function getCurrentUser()    { return _currentUser; }
-function getCurrentSession() { return _currentSession; }
+function getCached() { return _patients; }
 
-function getOrgId() {
-  return _currentUser?.user_metadata?.org_id
-      || _currentUser?.id
-      || null;
+// ─── FETCH ─────────────────────────────────────────────────────────────────────
+async function fetchPatients(searchTerm = '') {
+  const orgId = getOrgId();
+  let endpoint = `/patients?org_id=eq.${orgId}&order=created_at.desc`;
+
+  if (searchTerm.trim()) {
+    const q = encodeURIComponent(searchTerm.trim());
+    // PostgREST OR filter: name ilike OR phone ilike
+    endpoint = `/patients?org_id=eq.${orgId}&or=(full_name.ilike.*${q}*,phone.ilike.*${q}*)&order=created_at.desc`;
+  }
+
+  const data = await apiRequest(endpoint);
+  _patients = data || [];
+  return _patients;
 }
 
-function getOrgType() {
-  return (_currentUser?.user_metadata?.org_type || 'clinic').toLowerCase();
+// ─── CREATE ────────────────────────────────────────────────────────────────────
+async function createPatient({ full_name, phone, gender, dob }) {
+  if (!full_name?.trim()) throw new Error('Patient name is required.');
+
+  const orgId = getOrgId();
+  const result = await apiRequest('/patients', 'POST', {
+    org_id:    orgId,
+    full_name: full_name.trim(),
+    phone:     phone?.trim()  || null,
+    gender:    gender         || null,
+    dob:       dob            || null,
+  });
+
+  if (result) {
+    const created = Array.isArray(result) ? result[0] : result;
+    _patients.unshift(created);
+    return created;
+  }
+  return null; // queued offline
 }
 
-function getRole() {
-  return _currentUser?.user_metadata?.role || 'admin';
+// ─── SEARCH ────────────────────────────────────────────────────────────────────
+async function searchPatients(term) {
+  return fetchPatients(term);
 }
 
-// ─── LOGIN ─────────────────────────────────────────────────────────────────────
-async function login(email, password) {
-  const data = await authRequest('token?grant_type=password', { email, password });
-  _currentSession = data;
-  _currentUser    = data.user;
-  setSession(data);
-  return data;
+// ─── RENDER ────────────────────────────────────────────────────────────────────
+/**
+ * renderPatientList — injects patient rows into a <tbody> or container element.
+ * @param {HTMLElement} container
+ * @param {Array} patients
+ * @param {Function} onSelect - called with patient object when row is clicked
+ */
+function renderPatientList(container, patients, onSelect) {
+  if (!container) return;
+
+  if (!patients.length) {
+    container.innerHTML = `
+      <tr>
+        <td colspan="5" class="empty-state">No patients found.</td>
+      </tr>`;
+    return;
+  }
+
+  container.innerHTML = patients.map(p => `
+    <tr class="table-row--clickable" data-id="${p.id}">
+      <td>
+        <div class="patient-name">${escapeHtml(p.full_name)}</div>
+        <div class="text-muted text-sm">${p.phone || '—'}</div>
+      </td>
+      <td>${p.gender || '—'}</td>
+      <td>${fmtAge(p.dob)}</td>
+      <td class="text-muted text-sm">${fmtDate(p.created_at)}</td>
+      <td>
+        <button class="btn btn-sm btn--outline" data-patient-id="${p.id}">
+          View
+        </button>
+      </td>
+    </tr>
+  `).join('');
+
+  // Bind click events
+  container.querySelectorAll('[data-patient-id]').forEach(btn => {
+    btn.addEventListener('click', e => {
+      e.stopPropagation();
+      const id = btn.dataset.patientId;
+      const patient = _patients.find(p => p.id === id);
+      if (patient && onSelect) onSelect(patient);
+    });
+  });
+
+  container.querySelectorAll('.table-row--clickable').forEach(row => {
+    row.addEventListener('click', () => {
+      const id = row.dataset.id;
+      const patient = _patients.find(p => p.id === id);
+      if (patient && onSelect) onSelect(patient);
+    });
+  });
 }
 
-// ─── LOGOUT ────────────────────────────────────────────────────────────────────
-async function logout() {
-  const session = getSession();
-  if (session?.access_token) {
-    // Best-effort server logout — don't block on failure
+// ─── FORM BINDING ──────────────────────────────────────────────────────────────
+/**
+ * bindCreateForm — attaches submit handler to the new patient form.
+ * @param {HTMLFormElement} form
+ * @param {Function} onSuccess - called with created patient
+ */
+function bindCreateForm(form, onSuccess) {
+  if (!form) return;
+
+  form.addEventListener('submit', async e => {
+    e.preventDefault();
+    const btn = form.querySelector('[type="submit"]');
+    const errEl = form.querySelector('.form-error');
+
+    const payload = {
+      full_name: form.querySelector('[name="full_name"]')?.value,
+      phone:     form.querySelector('[name="phone"]')?.value,
+      gender:    form.querySelector('[name="gender"]')?.value,
+      dob:       form.querySelector('[name="dob"]')?.value,
+    };
+
+    if (btn) { btn.disabled = true; btn.textContent = 'Saving…'; }
+    if (errEl) errEl.textContent = '';
+
     try {
-      await fetch('https://qflqwmfdwalvmndaojzl.supabase.co/auth/v1/logout', {
-        method: 'POST',
-        headers: {
-          'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFmbHF3bWZkd2Fsdm1uZGFvanpsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE2MjcxMTcsImV4cCI6MjA4NzIwMzExN30.Ewpo8PoGq6PGcHnN85aYCUdPtSv7RXoGh9qthBJHezA',
-          'Authorization': `Bearer ${session.access_token}`,
-        },
-      });
-    } catch (_) { /* ignore */ }
-  }
-  _currentUser    = null;
-  _currentSession = null;
-  clearSession();
-  window.location.href = '/pages/login.html';
-}
-
-// ─── RESTORE SESSION ───────────────────────────────────────────────────────────
-/**
- * Attempts to restore a persisted session using the refresh token.
- * Call this at the top of every protected page.
- * Returns the user object or null.
- */
-async function restoreSession() {
-  const stored = getSession();
-  if (!stored?.refresh_token) return null;
-
-  try {
-    const res = await fetch(
-      'https://qflqwmfdwalvmndaojzl.supabase.co/auth/v1/token?grant_type=refresh_token',
-      {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFmbHF3bWZkd2Fsdm1uZGFvanpsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE2MjcxMTcsImV4cCI6MjA4NzIwMzExN30.Ewpo8PoGq6PGcHnN85aYCUdPtSv7RXoGh9qthBJHezA',
-        },
-        body: JSON.stringify({ refresh_token: stored.refresh_token }),
-      }
-    );
-
-    if (!res.ok) {
-      clearSession();
-      return null;
+      const patient = await createPatient(payload);
+      form.reset();
+      showToast(patient ? 'Patient registered.' : 'Saved offline — will sync when back online.');
+      if (onSuccess) onSuccess(patient);
+    } catch (err) {
+      if (errEl) { errEl.textContent = err.message; errEl.style.display = 'block'; }
+      else showToast(err.message, 'error');
+    } finally {
+      if (btn) { btn.disabled = false; btn.textContent = 'Register Patient'; }
     }
-
-    const data = await res.json();
-    _currentSession = data;
-    _currentUser    = data.user;
-    setSession(data);
-    return data.user;
-  } catch (_) {
-    clearSession();
-    return null;
-  }
-}
-
-// ─── ROUTE PROTECTION ──────────────────────────────────────────────────────────
-/**
- * protectRoute — call at top of every protected page.
- * Restores session, redirects to login if none.
- * Returns user object on success.
- */
-async function protectRoute() {
-  const user = await restoreSession();
-  if (!user) {
-    window.location.href = '/pages/login.html';
-    return null;
-  }
-  return user;
-}
-
-/**
- * redirectIfLoggedIn — call on login.html.
- * If already logged in, skip to dashboard.
- */
-async function redirectIfLoggedIn() {
-  const stored = getSession();
-  if (!stored?.refresh_token) return;
-  const user = await restoreSession();
-  if (user) {
-    const orgType = getOrgType();
-    window.location.href = orgType === 'pharmacy'
-      ? '/pages/pharmacy.html'
-      : '/pages/dashboard.html';
-  }
+  });
 }
 
 // ─── EXPORTS ───────────────────────────────────────────────────────────────────
 export {
-  login,
-  logout,
-  restoreSession,
-  protectRoute,
-  redirectIfLoggedIn,
-  getCurrentUser,
-  getCurrentSession,
-  getOrgId,
-  getOrgType,
-  getRole,
+  fetchPatients,
+  createPatient,
+  searchPatients,
+  renderPatientList,
+  bindCreateForm,
+  getCached,
 };
