@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Patients — Minza Health</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="../styles/main.css"/>
+</head>
+<body>
+ 
+  <nav class="nav">
+    <div class="nav__left">
+      <span class="nav__logo">Min<span>za</span></span>
+      <span class="nav__org" id="nav-org">—</span>
+    </div>
+    <div class="nav__center">
+      <a href="dashboard.html"  class="nav__tab">Dashboard</a>
+      <a href="patients.html"   class="nav__tab nav__tab--active">Patients</a>
+      <a href="pharmacy.html"   class="nav__tab">Pharmacy</a>
+      <a href="payments.html"   class="nav__tab">Payments</a>
+    </div>
+    <div class="nav__right">
+      <span id="conn-pill" class="conn-pill"></span>
+      <button class="btn btn--ghost btn--sm" id="logout-btn">Sign Out</button>
+    </div>
+  </nav>
+ 
+  <main class="page">
+ 
+    <div class="page-header">
+      <h1 class="page-title">Patients</h1>
+      <button class="btn btn--primary" id="open-register-btn">+ Register Patient</button>
+    </div>
+ 
+    <!-- Search -->
+    <div class="search-row">
+      <div class="search-input-wrap">
+        <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input
+          type="text"
+          id="patient-search"
+          class="search-input"
+          placeholder="Search by name or phone…"
+          autocomplete="off"
+        />
+      </div>
+    </div>
+ 
+    <!-- Patient Table -->
+    <div class="card">
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Patient</th>
+              <th>Gender</th>
+              <th>Age</th>
+              <th>Registered</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="patient-body">
+            <tr><td colspan="5" class="loading">Loading patients…</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+ 
+  </main>
+ 
+  <!-- Register Patient Modal -->
+  <div class="modal" id="modal-register">
+    <div class="modal__card">
+      <div class="modal__header">
+        <h3>Register New Patient</h3>
+        <button class="modal__close" data-close="modal-register">✕</button>
+      </div>
+ 
+      <form id="register-form" novalidate>
+        <div class="form-group">
+          <label for="full_name">Full Name *</label>
+          <input type="text" id="full_name" name="full_name" placeholder="e.g. Grace Nakato" required/>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="phone">Phone</label>
+            <input type="tel" id="phone" name="phone" placeholder="0701234567"/>
+          </div>
+          <div class="form-group">
+            <label for="gender">Gender</label>
+            <select id="gender" name="gender">
+              <option value="">Select</option>
+              <option value="female">Female</option>
+              <option value="male">Male</option>
+              <option value="other">Other</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="dob">Date of Birth</label>
+          <input type="date" id="dob" name="dob"/>
+        </div>
+ 
+        <div class="form-error" id="register-error" style="display:none;"></div>
+ 
+        <div class="form-actions">
+          <button type="button" class="btn btn--outline" data-close="modal-register">Cancel</button>
+          <button type="submit" class="btn btn--primary">Register Patient</button>
+        </div>
+      </form>
+    </div>
+  </div>
+ 
+  <!-- Start Visit Modal -->
+  <div class="modal" id="modal-start-visit">
+    <div class="modal__card">
+      <div class="modal__header">
+        <h3>Start Visit</h3>
+        <button class="modal__close" data-close="modal-start-visit">✕</button>
+      </div>
+      <div id="visit-patient-info" class="patient-banner"></div>
+      <div class="form-error" id="visit-error" style="display:none;"></div>
+      <div class="form-actions">
+        <button type="button" class="btn btn--outline" data-close="modal-start-visit">Cancel</button>
+        <button class="btn btn--primary" id="confirm-visit-btn">Start Visit →</button>
+      </div>
+    </div>
+  </div>
+ 
+  <div id="toast" class="toast"></div>
+ 
+  <script type="module">
+    import { protectRoute, logout }                    from '../js/modules/auth.js';
+    import { fetchPatients, createPatient, searchPatients, renderPatientList, bindCreateForm } from '../js/modules/patients.js';
+    import { createVisit }                             from '../js/modules/visits.js';
+    import { initConnPill, showToast, openModal, closeModal } from '../js/utils/ui.js';
+    import { escapeHtml, fmtAge }                      from '../js/utils/format.js';
+ 
+    // ── Boot ───────────────────────────────────────────────────────────────────
+    const user = await protectRoute();
+    document.getElementById('nav-org').textContent = user.user_metadata?.org_name || user.email;
+    document.getElementById('logout-btn').addEventListener('click', logout);
+    initConnPill('conn-pill');
+ 
+    // ── Load Patients ──────────────────────────────────────────────────────────
+    const patientBody = document.getElementById('patient-body');
+    let _selectedPatient = null;
+ 
+    async function loadPatients(term = '') {
+      try {
+        const patients = term
+          ? await searchPatients(term)
+          : await fetchPatients();
+        renderPatientList(patientBody, patients, openVisitModal);
+      } catch (err) {
+        showToast(err.message, 'error');
+      }
+    }
+ 
+    await loadPatients();
+ 
+    // ── Search ─────────────────────────────────────────────────────────────────
+    let _searchTimer;
+    document.getElementById('patient-search').addEventListener('input', e => {
+      clearTimeout(_searchTimer);
+      _searchTimer = setTimeout(() => loadPatients(e.target.value), 350);
+    });
+ 
+    // ── Register Modal ─────────────────────────────────────────────────────────
+    document.getElementById('open-register-btn').addEventListener('click', () => {
+      openModal('modal-register');
+    });
+ 
+    // Auto-open if ?action=new in URL
+    if (new URLSearchParams(window.location.search).get('action') === 'new') {
+      openModal('modal-register');
+    }
+ 
+    // Close buttons
+    document.querySelectorAll('[data-close]').forEach(btn => {
+      btn.addEventListener('click', () => closeModal(btn.dataset.close));
+    });
+ 
+    // Bind register form
+    bindCreateForm(document.getElementById('register-form'), patient => {
+      closeModal('modal-register');
+      loadPatients();
+      if (patient) openVisitModal(patient);
+    });
+ 
+    // ── Start Visit ────────────────────────────────────────────────────────────
+    function openVisitModal(patient) {
+      _selectedPatient = patient;
+      const info = document.getElementById('visit-patient-info');
+      info.innerHTML = `
+        <div class="patient-banner__name">${escapeHtml(patient.full_name)}</div>
+        <div class="patient-banner__meta">
+          ${patient.phone || '—'} · ${patient.gender || '—'} · ${fmtAge(patient.dob)}
+        </div>`;
+      document.getElementById('visit-error').style.display = 'none';
+      openModal('modal-start-visit');
+    }
+ 
+    document.getElementById('confirm-visit-btn').addEventListener('click', async btn => {
+      if (!_selectedPatient) return;
+      const errEl   = document.getElementById('visit-error');
+      const confirmBtn = document.getElementById('confirm-visit-btn');
+      confirmBtn.disabled    = true;
+      confirmBtn.textContent = 'Starting…';
+      errEl.style.display    = 'none';
+ 
+      try {
+        const visit = await createVisit(_selectedPatient.id);
+        if (visit) {
+          window.location.href = `visit.html?id=${visit.id}`;
+        } else {
+          showToast('Visit queued offline — will sync when back online.');
+          closeModal('modal-start-visit');
+        }
+      } catch (err) {
+        errEl.textContent    = err.message;
+        errEl.style.display  = 'block';
+      } finally {
+        confirmBtn.disabled    = false;
+        confirmBtn.textContent = 'Start Visit →';
+      }
+    });
+  </script>
+ 
+</body>
+</html>
+ 
