@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Patient — Minza Health</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="../styles/main.css"/>
+</head>
+<body>
+
+  <nav class="nav">
+    <div class="nav__left">
+      <span class="nav__logo">Min<span>za</span></span>
+      <a href="patients.html" class="nav__back">← Patients</a>
+    </div>
+    <div class="nav__right">
+      <span id="conn-pill" class="conn-pill"></span>
+      <button class="btn btn--ghost btn--sm" id="logout-btn">Sign Out</button>
+    </div>
+  </nav>
+
+  <main class="page">
+
+    <!-- Patient Header -->
+    <div class="patient-banner patient-banner--full" id="patient-header">
+      <div class="patient-banner__avatar" id="patient-avatar">—</div>
+      <div class="patient-banner__info">
+        <div class="patient-banner__name" id="patient-name">Loading…</div>
+        <div class="patient-banner__meta" id="patient-meta">—</div>
+      </div>
+      <button class="btn btn--primary" id="new-visit-btn">
+        + New Visit
+      </button>
+    </div>
+
+    <!-- Two-column profile layout -->
+    <div class="profile-grid">
+
+      <!-- Left: Demographics -->
+      <div>
+        <div class="card">
+          <div class="card__header">
+            <h2 class="card__title">Demographics</h2>
+            <button class="btn btn--sm btn--outline" id="edit-patient-btn">Edit</button>
+          </div>
+          <div id="demographics-body"></div>
+        </div>
+      </div>
+
+      <!-- Right: Visit History -->
+      <div>
+        <div class="card">
+          <div class="card__header">
+            <h2 class="card__title">Visit History</h2>
+            <span class="text-muted text-sm" id="visit-count">0 visits</span>
+          </div>
+          <div id="visit-history-body">
+            <div class="loading">Loading visits…</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+  </main>
+
+  <!-- Edit Patient Modal -->
+  <div class="modal" id="modal-edit">
+    <div class="modal__card">
+      <div class="modal__header">
+        <h3>Edit Patient</h3>
+        <button class="modal__close" data-close="modal-edit">✕</button>
+      </div>
+      <form id="edit-form" novalidate>
+        <div class="form-group">
+          <label for="edit-name">Full Name *</label>
+          <input type="text" id="edit-name" name="full_name" required/>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="edit-phone">Phone</label>
+            <input type="tel" id="edit-phone" name="phone"/>
+          </div>
+          <div class="form-group">
+            <label for="edit-gender">Gender</label>
+            <select id="edit-gender" name="gender">
+              <option value="">Select</option>
+              <option value="female">Female</option>
+              <option value="male">Male</option>
+              <option value="other">Other</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="edit-dob">Date of Birth</label>
+          <input type="date" id="edit-dob" name="dob"/>
+        </div>
+        <div class="form-error" id="edit-error" style="display:none;"></div>
+        <div class="form-actions">
+          <button type="button" class="btn btn--outline" data-close="modal-edit">Cancel</button>
+          <button type="submit" class="btn btn--primary">Save Changes</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div id="toast" class="toast"></div>
+
+  <script type="module">
+    import { protectRoute, logout, getOrgId }              from '../js/modules/auth.js';
+    import { apiRequest }                                  from '../js/services/api.js';
+    import { createVisit }                                 from '../js/modules/visits.js';
+    import { initConnPill, showToast, openModal, closeModal } from '../js/utils/ui.js';
+    import { fmtDate, fmtAge, fmtDateTime, escapeHtml }   from '../js/utils/format.js';
+
+    // ── Boot ───────────────────────────────────────────────────────────────────
+    const user = await protectRoute();
+    document.getElementById('logout-btn').addEventListener('click', logout);
+    initConnPill('conn-pill');
+
+    const params    = new URLSearchParams(window.location.search);
+    const patientId = params.get('id');
+    if (!patientId) { window.location.href = 'patients.html'; }
+
+    // ── Load Patient ───────────────────────────────────────────────────────────
+    let _patient = null;
+
+    async function loadPatient() {
+      try {
+        const data = await apiRequest(`/patients?id=eq.${patientId}&limit=1`);
+        _patient = data?.[0];
+        if (!_patient) { showToast('Patient not found.', 'error'); return; }
+        renderHeader(_patient);
+        renderDemographics(_patient);
+        prefillEditForm(_patient);
+      } catch (err) {
+        showToast(err.message, 'error');
+      }
+    }
+
+    function renderHeader(p) {
+      const initials = (p.full_name || '?').trim().split(/\s+/)
+        .slice(0, 2).map(w => w[0].toUpperCase()).join('');
+      document.getElementById('patient-avatar').textContent = initials;
+      document.getElementById('patient-name').textContent   = p.full_name;
+      document.getElementById('patient-meta').textContent   =
+        [p.phone, p.gender, p.dob ? fmtAge(p.dob) : null, p.dob ? `DOB: ${fmtDate(p.dob)}` : null]
+          .filter(Boolean).join(' · ');
+    }
+
+    function renderDemographics(p) {
+      const fields = [
+        ['Full Name',   escapeHtml(p.full_name || '—')],
+        ['Phone',       escapeHtml(p.phone     || '—')],
+        ['Gender',      escapeHtml(p.gender    || '—')],
+        ['Date of Birth', p.dob ? fmtDate(p.dob) : '—'],
+        ['Age',         p.dob ? fmtAge(p.dob) : '—'],
+        ['Registered',  fmtDate(p.created_at)],
+      ];
+
+      document.getElementById('demographics-body').innerHTML = `
+        <div class="detail-grid">
+          ${fields.map(([label, value]) => `
+            <div class="detail-item">
+              <div class="detail-label">${label}</div>
+              <div class="detail-value">${value}</div>
+            </div>
+          `).join('')}
+        </div>`;
+    }
+
+    // ── Load Visit History ─────────────────────────────────────────────────────
+    async function loadVisitHistory() {
+      const container = document.getElementById('visit-history-body');
+      try {
+        const visits = await apiRequest(
+          `/visits?patient_id=eq.${patientId}&order=created_at.desc` +
+          `&select=*,consultations(diagnosis,symptoms),prescriptions(id,status,prescription_items(drug_name))`
+        );
+
+        document.getElementById('visit-count').textContent =
+          `${visits.length} visit${visits.length !== 1 ? 's' : ''}`;
+
+        if (!visits.length) {
+          container.innerHTML = `<div class="empty-state">No visits recorded yet.</div>`;
+          return;
+        }
+
+        const statusBadge = s => {
+          const map = {
+            waiting:    { cls: 'badge--warn',    label: 'Waiting' },
+            in_consult: { cls: 'badge--info',    label: 'In Consult' },
+            completed:  { cls: 'badge--success', label: 'Completed' },
+          };
+          const { cls, label } = map[s] || { cls: 'badge--neutral', label: s };
+          return `<span class="badge ${cls}">${label}</span>`;
+        };
+
+        container.innerHTML = visits.map(v => {
+          const consult  = v.consultations?.[0] || null;
+          const presc    = v.prescriptions?.[0] || null;
+          const drugs    = presc?.prescription_items?.map(i => i.drug_name).join(', ') || null;
+          const diagText = consult?.diagnosis || 'No diagnosis recorded';
+
+          return `
+            <div class="visit-history-item" data-visit-id="${v.id}">
+              <div class="visit-history-item__date">${fmtDate(v.created_at)}</div>
+              <div class="visit-history-item__info">
+                <div class="visit-history-item__diag">${escapeHtml(diagText)}</div>
+                ${drugs ? `<div class="visit-history-item__sub">Rx: ${escapeHtml(drugs)}</div>` : ''}
+                ${consult?.symptoms ? `<div class="visit-history-item__sub text-muted">${escapeHtml(consult.symptoms)}</div>` : ''}
+              </div>
+              ${statusBadge(v.status)}
+            </div>`;
+        }).join('');
+
+        // Click to open visit
+        container.querySelectorAll('.visit-history-item').forEach(el => {
+          el.addEventListener('click', () => {
+            window.location.href = `visit.html?id=${el.dataset.visitId}`;
+          });
+        });
+
+      } catch (err) {
+        container.innerHTML = `<div class="empty-state">${err.message}</div>`;
+      }
+    }
+
+    // ── New Visit ──────────────────────────────────────────────────────────────
+    document.getElementById('new-visit-btn').addEventListener('click', async () => {
+      const btn = document.getElementById('new-visit-btn');
+      btn.disabled    = true;
+      btn.textContent = 'Starting…';
+      try {
+        const visit = await createVisit(patientId);
+        if (visit) {
+          window.location.href = `visit.html?id=${visit.id}`;
+        } else {
+          showToast('Visit queued offline.');
+          btn.disabled    = false;
+          btn.textContent = '+ New Visit';
+        }
+      } catch (err) {
+        showToast(err.message, 'error');
+        btn.disabled    = false;
+        btn.textContent = '+ New Visit';
+      }
+    });
+
+    // ── Edit Patient ───────────────────────────────────────────────────────────
+    function prefillEditForm(p) {
+      document.getElementById('edit-name').value   = p.full_name || '';
+      document.getElementById('edit-phone').value  = p.phone     || '';
+      document.getElementById('edit-gender').value = p.gender    || '';
+      document.getElementById('edit-dob').value    = p.dob       || '';
+    }
+
+    document.getElementById('edit-patient-btn').addEventListener('click', () => {
+      openModal('modal-edit');
+    });
+
+    document.getElementById('edit-form').addEventListener('submit', async e => {
+      e.preventDefault();
+      const btn   = e.target.querySelector('[type="submit"]');
+      const errEl = document.getElementById('edit-error');
+      errEl.style.display = 'none';
+      btn.disabled    = true;
+      btn.textContent = 'Saving…';
+
+      try {
+        const payload = {
+          full_name: document.getElementById('edit-name').value.trim(),
+          phone:     document.getElementById('edit-phone').value.trim()  || null,
+          gender:    document.getElementById('edit-gender').value        || null,
+          dob:       document.getElementById('edit-dob').value           || null,
+        };
+
+        if (!payload.full_name) throw new Error('Name is required.');
+
+        await apiRequest(`/patients?id=eq.${patientId}`, 'PATCH', payload);
+
+        _patient = { ..._patient, ...payload };
+        renderHeader(_patient);
+        renderDemographics(_patient);
+        closeModal('modal-edit');
+        showToast('Patient updated.');
+      } catch (err) {
+        errEl.textContent   = err.message;
+        errEl.style.display = 'block';
+      } finally {
+        btn.disabled    = false;
+        btn.textContent = 'Save Changes';
+      }
+    });
+
+    // ── Modal close buttons ────────────────────────────────────────────────────
+    document.querySelectorAll('[data-close]').forEach(btn => {
+      btn.addEventListener('click', () => closeModal(btn.dataset.close));
+    });
+
+    // ── Initial Load ───────────────────────────────────────────────────────────
+    await Promise.all([loadPatient(), loadVisitHistory()]);
+  </script>
+
+</body>
+</html>
