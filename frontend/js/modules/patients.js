@@ -85,32 +85,41 @@ function renderPatientList(container, patients, onSelect) {
         <div class="patient-name">${escapeHtml(p.full_name)}</div>
         <div class="text-muted text-sm">${p.phone || '—'}</div>
       </td>
-      <td>${p.gender || '—'}</td>
+      <td style="text-transform:capitalize;">${p.gender || '—'}</td>
       <td>${fmtAge(p.dob)}</td>
       <td class="text-muted text-sm">${fmtDate(p.created_at)}</td>
-      <td>
-        <button class="btn btn-sm btn--outline" data-patient-id="${p.id}">
-          View
+      <td class="td-actions">
+        <button class="btn btn--sm btn--outline js-view-profile" data-patient-id="${p.id}">
+          Profile
+        </button>
+        <button class="btn btn--sm btn--primary js-start-visit" data-patient-id="${p.id}">
+          Visit
         </button>
       </td>
     </tr>
   `).join('');
 
-  // Bind click events
-  container.querySelectorAll('[data-patient-id]').forEach(btn => {
+  // Profile → patient-profile.html
+  container.querySelectorAll('.js-view-profile').forEach(btn => {
     btn.addEventListener('click', e => {
       e.stopPropagation();
-      const id = btn.dataset.patientId;
-      const patient = _patients.find(p => p.id === id);
+      window.location.href = `patient-profile.html?id=${btn.dataset.patientId}`;
+    });
+  });
+
+  // Visit → call onSelect (opens start-visit modal)
+  container.querySelectorAll('.js-start-visit').forEach(btn => {
+    btn.addEventListener('click', e => {
+      e.stopPropagation();
+      const patient = _patients.find(p => p.id === btn.dataset.patientId);
       if (patient && onSelect) onSelect(patient);
     });
   });
 
+  // Row click → profile
   container.querySelectorAll('.table-row--clickable').forEach(row => {
     row.addEventListener('click', () => {
-      const id = row.dataset.id;
-      const patient = _patients.find(p => p.id === id);
-      if (patient && onSelect) onSelect(patient);
+      window.location.href = `patient-profile.html?id=${row.dataset.id}`;
     });
   });
 }
