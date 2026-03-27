@@ -1,5 +1,5 @@
 /**
- * prescriptions.js — Minza Health Prescriptions Module
+ * prescriptions.js is Minza Health Prescriptions Module
  *
  * Responsibility (ONE): Everything to do with prescriptions and prescription_items.
  *  - Create prescription for a visit
@@ -13,7 +13,7 @@ import { apiRequest }  from '../services/api.js';
 import { fmtUGX, escapeHtml } from '../utils/format.js';
 import { showToast }   from '../utils/ui.js';
 
-// ─── IN-MEMORY ITEM STATE ──────────────────────────────────────────────────────
+// IN-MEMORY ITEM STATE
 // Each page that uses the prescription builder manages its own items array.
 // We expose factory functions so multiple pages can use them independently.
 
@@ -48,7 +48,7 @@ function createItemsStore() {
   return { add, remove, getAll, clear, getTotal };
 }
 
-// ─── FETCH ─────────────────────────────────────────────────────────────────────
+//FETCH
 async function fetchPrescriptionByVisit(visitId) {
   const data = await apiRequest(
     `/prescriptions?visit_id=eq.${visitId}&select=*,prescription_items(*)&order=created_at.desc&limit=1`
@@ -63,7 +63,7 @@ async function fetchPrescriptionById(prescriptionId) {
   return data?.[0] || null;
 }
 
-// ─── CREATE ────────────────────────────────────────────────────────────────────
+// CREATE
 /**
  * createPrescription — creates a prescription and all its items in sequence.
  * @param {string} visitId
@@ -103,7 +103,7 @@ async function createPrescription(visitId, items) {
   return prescription;
 }
 
-// ─── RENDER BUILDER ────────────────────────────────────────────────────────────
+//RENDER BUILDER
 /**
  * renderItems — renders the drug list in the prescription builder.
  * @param {HTMLElement} container
@@ -151,7 +151,7 @@ function renderItems(container, items, onRemove) {
 }
 
 /**
- * renderPrescriptionCard — read-only display of a saved prescription.
+ * renderPrescriptionCard is read-only display of a saved prescription.
  */
 function renderPrescriptionCard(container, prescription) {
   if (!container) return;
@@ -192,7 +192,7 @@ function renderPrescriptionCard(container, prescription) {
     </div>`;
 }
 
-// ─── EXPORTS ───────────────────────────────────────────────────────────────────
+// EXPORTS
 export {
   createItemsStore,
   fetchPrescriptionByVisit,
@@ -200,4 +200,4 @@ export {
   createPrescription,
   renderItems,
   renderPrescriptionCard,
-};
+}

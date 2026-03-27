@@ -1,5 +1,5 @@
 /**
- * auth.js — Minza Health Auth Module
+ * auth.js is Minza Health's Auth Module
  *
  * Responsibilities (ONE):
  *  - Login / logout
@@ -10,7 +10,7 @@
 
 import { authRequest, apiRequest, setSession, clearSession, getSession } from '../services/api.js';
 
-// ─── CURRENT USER STATE ────────────────────────────────────────────────────────
+//CURRENT USER STATE
 let _currentUser   = null;
 let _currentSession = null;
 
@@ -31,7 +31,7 @@ function getRole() {
   return _currentUser?.user_metadata?.role || 'admin';
 }
 
-// ─── LOGIN ─────────────────────────────────────────────────────────────────────
+//LOGIN
 async function login(email, password) {
   const data = await authRequest('token?grant_type=password', { email, password });
   _currentSession = data;
@@ -40,7 +40,7 @@ async function login(email, password) {
   return data;
 }
 
-// ─── LOGOUT ────────────────────────────────────────────────────────────────────
+// LOGOUT
 async function logout() {
   const session = getSession();
   if (session?.access_token) {
@@ -61,7 +61,7 @@ async function logout() {
   window.location.href = '/pages/login.html';
 }
 
-// ─── RESTORE SESSION ───────────────────────────────────────────────────────────
+// RESTORE SESSION
 /**
  * Attempts to restore a persisted session using the refresh token.
  * Call this at the top of every protected page.
@@ -100,9 +100,9 @@ async function restoreSession() {
   }
 }
 
-// ─── ROUTE PROTECTION ──────────────────────────────────────────────────────────
+// ROUTE PROTECTION
 /**
- * protectRoute — call at top of every protected page.
+ * protectRoute calls at top of every protected page.
  * Restores session, redirects to login if none.
  * Returns user object on success.
  */
@@ -116,7 +116,7 @@ async function protectRoute() {
 }
 
 /**
- * redirectIfLoggedIn — call on login.html.
+ * redirectIfLoggedIn calls on login.html.
  * If already logged in, skip to dashboard.
  */
 async function redirectIfLoggedIn() {
@@ -131,7 +131,7 @@ async function redirectIfLoggedIn() {
   }
 }
 
-// ─── EXPORTS ───────────────────────────────────────────────────────────────────
+// EXPORTS
 export {
   login,
   logout,

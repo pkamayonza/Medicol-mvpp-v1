@@ -1,5 +1,5 @@
 /**
- * consultations.js — Minza Health Consultations Module
+ * consultations.js is Minza Health's Consultations Module
  *
  * Responsibility (ONE): Everything to do with the consultations table.
  *  - Create a consultation record for a visit
@@ -12,7 +12,7 @@ import { updateVisitStatus, VISIT_STATUS } from './visits.js';
 import { showToast }                      from '../utils/ui.js';
 import { escapeHtml }                     from '../utils/format.js';
 
-// ─── FETCH ─────────────────────────────────────────────────────────────────────
+// FETCH
 async function fetchConsultationByVisit(visitId) {
   const data = await apiRequest(
     `/consultations?visit_id=eq.${visitId}&order=created_at.desc&limit=1`
@@ -20,9 +20,9 @@ async function fetchConsultationByVisit(visitId) {
   return data?.[0] || null;
 }
 
-// ─── CREATE ────────────────────────────────────────────────────────────────────
+// CREATE
 /**
- * createConsultation — saves a consultation record.
+ * createConsultation saves a consultation record.
  * Also marks the visit as completed.
  *
  * @param {string} visitId
@@ -49,9 +49,9 @@ async function createConsultation(visitId, { symptoms, diagnosis, notes }) {
   return null;
 }
 
-// ─── RENDER ────────────────────────────────────────────────────────────────────
+// RENDER
 /**
- * renderConsultationCard — displays a consultation record in a container element.
+ * renderConsultationCard displays a consultation record in a container element.
  */
 function renderConsultationCard(container, consult) {
   if (!container) return;
@@ -79,9 +79,9 @@ function renderConsultationCard(container, consult) {
     </div>`;
 }
 
-// ─── FORM BINDING ──────────────────────────────────────────────────────────────
+// FORM BINDING
 /**
- * bindConsultationForm — attaches submit logic to the consultation form.
+ * bindConsultationForm attaches submit logic to the consultation form.
  * @param {HTMLFormElement} form
  * @param {string} visitId
  * @param {Function} onSuccess - called with created consultation
@@ -116,7 +116,7 @@ function bindConsultationForm(form, visitId, onSuccess) {
   });
 }
 
-// ─── EXPORTS ───────────────────────────────────────────────────────────────────
+// EXPORTS
 export {
   fetchConsultationByVisit,
   createConsultation,
