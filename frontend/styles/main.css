@@ -11,7 +11,7 @@
    - Muted text #64748B
    ============================================================ */
 
-/* ── RESET ─────────────────────────────────────────────────── */
+/* RESET */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 html { font-size: 16px; -webkit-text-size-adjust: 100%; }
@@ -29,7 +29,7 @@ button { font-family: inherit; cursor: pointer; }
 input, select, textarea { font-family: inherit; }
 img { display: block; max-width: 100%; }
 
-/* ── TYPOGRAPHY HELPERS ─────────────────────────────────────── */
+/* TYPOGRAPHY HELPERS */
 .text-sm   { font-size: 0.8125rem; }
 .text-xs   { font-size: 0.75rem; }
 .text-muted { color: #64748B; }
@@ -37,7 +37,7 @@ img { display: block; max-width: 100%; }
 .text-danger  { color: #DC2626; }
 .text-warn    { color: #D97706; }
 
-/* ── AUTH LAYOUT ────────────────────────────────────────────── */
+/* AUTH LAYOUT */
 .auth-body {
   background: linear-gradient(135deg, #0B1F3A 0%, #0D3333 100%);
   min-height: 100vh;
@@ -83,7 +83,7 @@ img { display: block; max-width: 100%; }
   margin-top: 0.25rem;
 }
 
-/* ── NAVIGATION ─────────────────────────────────────────────── */
+/* NAVIGATION */
 .nav {
   background: #0B1F3A;
   color: white;
@@ -145,7 +145,7 @@ img { display: block; max-width: 100%; }
 }
 .nav__back:hover { color: white; }
 
-/* ── CONNECTIVITY PILL ──────────────────────────────────────── */
+/* CONNECTIVITY PILL */
 .conn-pill {
   display: inline-flex;
   align-items: center;
@@ -181,7 +181,7 @@ img { display: block; max-width: 100%; }
   50%       { opacity: 0.5; }
 }
 
-/* ── PAGE LAYOUT ────────────────────────────────────────────── */
+/* PAGE LAYOUT */
 .page {
   max-width: 1100px;
   margin: 0 auto;
@@ -212,7 +212,7 @@ img { display: block; max-width: 100%; }
   margin-top: 0.2rem;
 }
 
-/* ── ALERT BAR ──────────────────────────────────────────────── */
+/* ALERT BAR */
 .alert-bar {
   display: flex;
   align-items: center;
@@ -229,7 +229,7 @@ img { display: block; max-width: 100%; }
 .alert-bar--error { background: #FEF2F2; border-color: #FCA5A5; color: #991B1B; }
 .alert-bar--info  { background: #EFF6FF; border-color: #BFDBFE; color: #1E40AF; }
 
-/* ── STATS GRID ─────────────────────────────────────────────── */
+/* STATS GRID */
 .stats-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -292,7 +292,7 @@ img { display: block; max-width: 100%; }
 .stat-strip-label { font-size: 0.68rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.8px; color: #94A3B8; }
 .stat-strip-sep   { width: 1px; align-self: stretch; background: #E2E8F0; margin: 0; }
 
-/* ── CARD ───────────────────────────────────────────────────── */
+/* CARD */
 .card {
   background: white;
   border: 1px solid #E2E8F0;
@@ -322,7 +322,7 @@ img { display: block; max-width: 100%; }
   flex: 1;
 }
 
-/* ── STEP BADGE ─────────────────────────────────────────────── */
+/* STEP BADGE */
 .step-badge {
   width: 24px;
   height: 24px;
@@ -337,7 +337,7 @@ img { display: block; max-width: 100%; }
   flex-shrink: 0;
 }
 
-/* ── SECTION LABEL ──────────────────────────────────────────── */
+/* SECTION LABEL */
 .section-label {
   font-size: 0.72rem;
   font-weight: 700;
@@ -347,7 +347,7 @@ img { display: block; max-width: 100%; }
   margin-bottom: 0.75rem;
 }
 
-/* ── TABLE ──────────────────────────────────────────────────── */
+/* TABLE */
 .table-wrap { overflow-x: auto; }
 
 table {
@@ -403,7 +403,7 @@ tr:hover td { background: #F8FAFC; }
   flex-wrap: wrap;
 }
 
-/* ── BADGES ─────────────────────────────────────────────────── */
+/* BADGES */
 .badge {
   display: inline-block;
   padding: 0.2rem 0.6rem;
@@ -420,7 +420,7 @@ tr:hover td { background: #F8FAFC; }
 .badge--neutral { background: #F1F5F9; color: #475569; }
 .badge--teal    { background: #F0FDFA; color: #0D9488; }
 
-/* ── BUTTONS ────────────────────────────────────────────────── */
+/* BUTTONS */
 .btn {
   display: inline-flex;
   align-items: center;
@@ -465,7 +465,7 @@ tr:hover td { background: #F8FAFC; }
 .btn--sm { padding: 0.35rem 0.75rem; font-size: 0.8rem; }
 .btn--full { width: 100%; }
 
-/* ── FORMS ──────────────────────────────────────────────────── */
+/* FORMS */
 .form-group {
   display: flex;
   flex-direction: column;
@@ -533,7 +533,7 @@ tr:hover td { background: #F8FAFC; }
   margin-top: 0.5rem;
 }
 
-/* ── SEARCH ─────────────────────────────────────────────────── */
+/* SEARCH */
 .search-row {
   margin-bottom: 1.1rem;
 }
@@ -567,7 +567,7 @@ tr:hover td { background: #F8FAFC; }
 .search-input:focus { border-color: #0D6E6E; }
 .search-input::placeholder { color: #94A3B8; }
 
-/* ── PATIENT COMPONENTS ─────────────────────────────────────── */
+/* PATIENT COMPONENTS */
 .patient-name { font-weight: 600; color: #0B1F3A; }
 
 .patient-banner {
@@ -612,7 +612,7 @@ tr:hover td { background: #F8FAFC; }
 .patient-banner__meta { font-size: 0.8125rem; color: #64748B; margin-top: 0.15rem; }
 .patient-banner__status { flex-shrink: 0; }
 
-/* ── VISIT GRID ─────────────────────────────────────────────── */
+/* VISIT GRID */
 .visit-grid {
   display: grid;
   grid-template-columns: 1fr;
@@ -626,7 +626,7 @@ tr:hover td { background: #F8FAFC; }
 .visit-left  { display: flex; flex-direction: column; gap: 1.1rem; }
 .visit-right { display: flex; flex-direction: column; gap: 1.1rem; }
 
-/* ── PRESCRIPTION ───────────────────────────────────────────── */
+/* PRESCRIPTION */
 .drug-entry {
   background: #F8FAFC;
   border: 1px solid #E2E8F0;
@@ -689,7 +689,7 @@ tr:hover td { background: #F8FAFC; }
   padding-top: 0.65rem;
 }
 
-/* ── BILLING ────────────────────────────────────────────────── */
+/* BILLING */
 .bill-summary {
   display: flex;
   flex-direction: column;
@@ -733,7 +733,7 @@ tr:hover td { background: #F8FAFC; }
 .payment-row__method { font-weight: 600; text-transform: capitalize; }
 .payment-row__amount { font-weight: 700; color: #059669; margin-left: auto; }
 
-/* ── DETAIL GRID ────────────────────────────────────────────── */
+/* DETAIL GRID */
 .detail-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -766,7 +766,7 @@ tr:hover td { background: #F8FAFC; }
 }
 .detail-section__value { font-size: 0.95rem; font-weight: 700; color: #0B1F3A; }
 
-/* ── FILTER TABS ────────────────────────────────────────────── */
+/* FILTER TABS */
 .filter-tabs {
   display: flex;
   gap: 0.3rem;
@@ -788,7 +788,7 @@ tr:hover td { background: #F8FAFC; }
 .filter-tab:hover { border-color: #0D6E6E; color: #0D6E6E; }
 .filter-tab--active { background: #0B1F3A; border-color: #0B1F3A; color: white; }
 
-/* ── MODAL ──────────────────────────────────────────────────── */
+/* MODAL */
 .modal {
   display: none;
   position: fixed;
@@ -849,7 +849,7 @@ tr:hover td { background: #F8FAFC; }
   flex-wrap: wrap;
 }
 
-/* ── TOAST ──────────────────────────────────────────────────── */
+/* TOAST */
 .toast {
   position: fixed;
   bottom: 1.5rem;
@@ -873,7 +873,7 @@ tr:hover td { background: #F8FAFC; }
 .toast--error   { background: #DC2626; }
 .toast--success { background: #059669; }
 
-/* ── PROFILE / PATIENT HISTORY ──────────────────────────────── */
+/* PROFILE / PATIENT HISTORY  */
 .profile-grid {
   display: grid;
   grid-template-columns: 1fr;
@@ -908,7 +908,7 @@ tr:hover td { background: #F8FAFC; }
 .visit-history-item__diag { font-size: 0.875rem; font-weight: 600; color: #0B1F3A; }
 .visit-history-item__sub  { font-size: 0.78rem; color: #64748B; margin-top: 0.1rem; }
 
-/* ── PAYMENT HISTORY PAGE ───────────────────────────────────── */
+/* PAYMENT HISTORY PAGE  */
 .payment-stat-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
@@ -920,7 +920,7 @@ tr:hover td { background: #F8FAFC; }
   .payment-stat-grid { grid-template-columns: repeat(4, 1fr); }
 }
 
-/* ── RESPONSIVE ─────────────────────────────────────────────── */
+/* RESPONSIVENESS */
 @media (max-width: 768px) {
   .nav { padding: 0 1rem; }
   .nav__center { overflow-x: auto; -webkit-overflow-scrolling: touch; }
