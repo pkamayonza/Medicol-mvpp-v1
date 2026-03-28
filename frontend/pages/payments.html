@@ -42,38 +42,46 @@
 
     <!-- Summary Stats -->
     <div class="payment-stat-grid">
+
       <div class="stat-card">
         <div class="stat-card__label">Total Collected</div>
         <div class="stat-card__num" id="stat-total-collected">—</div>
         <div class="stat-card__sub">in period</div>
       </div>
+
       <div class="stat-card">
         <div class="stat-card__label">Cash</div>
         <div class="stat-card__num" id="stat-cash">—</div>
-        <div class="stat-card__sub">payments</div>
+        <div class="stat-card__sub">today</div>
       </div>
+
       <div class="stat-card">
         <div class="stat-card__label">Mobile Money</div>
         <div class="stat-card__num" id="stat-momo">—</div>
-        <div class="stat-card__sub">payments</div>
+        <div class="stat-card__sub">today</div>
       </div>
+
       <div class="stat-card" id="stat-outstanding-card">
         <div class="stat-card__label">Outstanding</div>
         <div class="stat-card__num" id="stat-outstanding">—</div>
         <div class="stat-card__sub">unpaid bills</div>
       </div>
+
     </div>
 
     <!-- Payments Table -->
     <div class="card">
       <div class="card__header">
         <h2 class="card__title">Payment Records</h2>
+
         <div class="filter-tabs" id="method-tabs">
           <button class="filter-tab filter-tab--active" data-method="">All</button>
           <button class="filter-tab" data-method="cash">Cash</button>
           <button class="filter-tab" data-method="momo">MoMo</button>
         </div>
+
       </div>
+      
       <div class="table-wrap">
         <table>
           <thead>
