@@ -136,7 +136,6 @@
 
   <script type="module">
     import { protectRoute, logout, getOrgId }     from '../js/modules/auth.js';
-    import { apiRequest }                          from '../js/services/api.js';
     import { initConnPill, showToast, openModal, closeModal } from '../js/utils/ui.js';
     import { fmtDate, fmtUGX, escapeHtml }         from '../js/utils/format.js';
 
@@ -164,7 +163,7 @@
     let _selectedBillId = null;
 
 // ── Load Payments ──────────────────────────────────────────────────────────
-async function loadPayments() {a
+async function loadPayments() {
   const from = document.getElementById('from-date').value;
   const to   = document.getElementById('to-date').value;
   const fromISO = from + 'T00:00:00';
