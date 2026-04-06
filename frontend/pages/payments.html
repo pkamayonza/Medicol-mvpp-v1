@@ -173,14 +173,14 @@ async function loadPayments() {
   body.innerHTML = `<tr><td colspan="7" class="loading">Loading…</td></tr>`;
 
   try {
-    // PostgREST: use !inner to filter on nested relation org_id
+    // PostgREST:
     const payments = await apiRequest(
       `/payments?created_at=gte.${fromISO}&created_at=lte.${toISO}&order=created_at.desc` +
       `&select=*,bills!inner(id,total_amount,status,visits!inner(id,org_id,patients(full_name,phone)))` +
       `&bills.visits.org_id=eq.${orgId}`
     );
 
-    // Also fetch all unpaid/partial bills for this org to calculate true outstanding
+    // Also fetch all unpaid/partial bills to calculate true outstanding
     const unpaidBills = await apiRequest(
       `/bills?status=in.(unpaid,partial)&select=id,total_amount,status,payments(amount,status)` +
       `&visits.org_id=eq.${orgId}`
@@ -198,15 +198,13 @@ async function loadPayments() {
   }
 }
 
-// ── Render Stats ───────────────────────────────────────────────────────────
+//Render Stats 
 function renderStats() {
   const successful = _allPayments.filter(p => p.status === 'success');
   const total = successful.reduce((s, p) => s + Number(p.amount), 0);
   const cash  = successful.filter(p => p.method === 'cash').reduce((s, p) => s + Number(p.amount), 0);
   const momo  = successful.filter(p => p.method === 'momo').reduce((s, p) => s + Number(p.amount), 0);
 
-  // FIX: calculate outstanding from unique bills, not from payment rows
-  // (a bill with 3 payments would be counted 3x using the old approach)
   const seenBillIds = new Set();
   let outstanding = 0;
   for (const p of _allPayments) {
@@ -230,7 +228,7 @@ function renderStats() {
     .classList.toggle('stat-card--warn', outstanding > 0);
 }
 
-    // ── Render Payments ────────────────────────────────────────────────────────
+    // Render Payments 
     function renderPayments(methodFilter = '') {
       const body = document.getElementById('payment-body');
       const list = methodFilter
@@ -287,15 +285,14 @@ function renderStats() {
       });
     }
 
-    // ── Render Stats ───────────────────────────────────────────────────────────
+    // Render Stats 
     function renderStats() {
       const successful = _allPayments.filter(p => p.status === 'success');
       const total      = successful.reduce((s, p) => s + Number(p.amount), 0);
       const cash       = successful.filter(p => p.method === 'cash').reduce((s, p) => s + Number(p.amount), 0);
       const momo       = successful.filter(p => p.method === 'momo').reduce((s, p) => s + Number(p.amount), 0);
 
-      // Outstanding: sum of unpaid + partial bills in this org
-      // We approximate from the payments we loaded
+      // Outstanding: sum of unpaid + partial bills, approximated from the payments we loaded
       const billIds  = new Set(_allPayments.map(p => p.bills?.id).filter(Boolean));
       let outstanding = 0;
       _allPayments.forEach(p => {
@@ -316,7 +313,7 @@ function renderStats() {
         .classList.toggle('stat-card--warn', outstanding > 0);
     }
 
-    // ── Bill Detail Modal ──────────────────────────────────────────────────────
+    //Bill Detail Modal 
     async function openBillDetail(billId, visitId) {
       if (!billId) return;
       const detailBody = document.getElementById('bill-detail-body');
