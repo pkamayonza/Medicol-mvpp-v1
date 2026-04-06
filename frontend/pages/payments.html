@@ -396,7 +396,7 @@ function renderStats() {
       }
     }
 
-    // ── Filter Tabs ────────────────────────────────────────────────────────────
+    //Filter Tabs
     document.getElementById('method-tabs').addEventListener('click', e => {
       const tab = e.target.closest('.filter-tab');
       if (!tab) return;
@@ -406,7 +406,7 @@ function renderStats() {
       renderPayments(_methodFilter);
     });
 
-    // ── Date Filter ────────────────────────────────────────────────────────────
+    // Date Filter 
     document.getElementById('apply-filter').addEventListener('click', loadPayments);
 
     // Close modals
@@ -414,7 +414,7 @@ function renderStats() {
       btn.addEventListener('click', () => closeModal(btn.dataset.close));
     });
 
-    // ── Initial Load ───────────────────────────────────────────────────────────
+    //Initial Load
     await loadPayments();
   </script>
 
