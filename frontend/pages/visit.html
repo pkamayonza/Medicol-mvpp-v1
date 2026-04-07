@@ -24,7 +24,7 @@
   <main class="page page--visit">
  
     <!-- Patient Banner -->
-    <div class="patient-banner patient-banner--full" id="patient-banner">
+    <div class="patient-banner patient-banner--full">
       <div class="patient-banner__avatar" id="patient-avatar">—</div>
       <div class="patient-banner__info">
         <div class="patient-banner__name" id="patient-name">Loading…</div>
@@ -35,23 +35,18 @@
       </div>
     </div>
  
-    <!-- Two-column layout on desktop -->
     <div class="visit-grid">
  
       <!-- LEFT: Consultation + Prescription -->
       <div class="visit-left">
  
         <!-- Step 1: Consultation -->
-        <div class="card" id="section-consult">
+        <div class="card">
           <div class="card__header">
             <div class="step-badge">1</div>
             <h2 class="card__title">Consultation</h2>
           </div>
- 
-          <!-- Existing consultation (read-only) -->
           <div id="consult-view" style="display:none;"></div>
- 
-          <!-- Consultation form (write) -->
           <form id="consult-form" style="display:none;" novalidate>
             <div class="form-group">
               <label for="symptoms">Symptoms / Presenting Complaint</label>
@@ -75,20 +70,17 @@
           </form>
         </div>
  
-        <!-- Step 2: Prescription Builder -->
-        <div class="card" id="section-rx">
+        <!-- Step 2: Prescription -->
+        <div class="card">
           <div class="card__header">
             <div class="step-badge">2</div>
             <h2 class="card__title">Prescription</h2>
           </div>
  
-          <!-- Existing prescription (read-only) -->
           <div id="rx-view" style="display:none;"></div>
  
-          <!-- Builder -->
           <div id="rx-builder" style="display:none;">
- 
-            <!-- Drug entry row -->
+            <!-- Drug entry -->
             <div class="drug-entry">
               <div class="form-row">
                 <div class="form-group form-group--grow">
@@ -117,17 +109,15 @@
               </div>
             </div>
  
-            <!-- Drug list -->
             <div id="rx-items" class="rx-items"></div>
  
-            <!-- Total -->
             <div class="rx-total-row">
               <span>Total</span>
               <strong id="rx-total">UGX 0</strong>
             </div>
  
             <!-- Pharmacy selector -->
-            <div class="card card--inset" id="pharmacy-section">
+            <div class="card card--inset">
               <h3 class="section-label">Send to Pharmacy</h3>
               <div class="form-group">
                 <label for="pharmacy-select">Select Pharmacy *</label>
@@ -149,9 +139,7 @@
  
       <!-- RIGHT: Billing -->
       <div class="visit-right">
- 
-        <!-- Step 3: Bill & Payment -->
-        <div class="card" id="section-billing">
+        <div class="card">
           <div class="card__header">
             <div class="step-badge">3</div>
             <h2 class="card__title">Bill & Payment</h2>
@@ -186,9 +174,7 @@
               </div>
             </form>
           </div>
- 
         </div>
- 
       </div><!-- /visit-right -->
  
     </div><!-- /visit-grid -->
@@ -200,61 +186,64 @@
   <script type="module">
     import { protectRoute, logout }                               from '../js/modules/auth.js';
     import { fetchVisitById, updateVisitStatus, VISIT_STATUS }    from '../js/modules/visits.js';
-    import { fetchConsultationByVisit, createConsultation,
-             renderConsultationCard, bindConsultationForm }       from '../js/modules/consultations.js';
+    import { fetchConsultationByVisit, bindConsultationForm,
+             renderConsultationCard }                             from '../js/modules/consultations.js';
     import { createItemsStore, fetchPrescriptionByVisit,
              createPrescription, renderItems,
              renderPrescriptionCard }                             from '../js/modules/prescriptions.js';
     import { fetchLinkedPharmacies, sendToPharmacy,
              renderPharmacySelector }                             from '../js/modules/pharmacy.js';
-    import { fetchBillByVisit, createBill, recordPayment,
+    import { fetchBillByVisit, createBill,
              renderBillSummary, bindPaymentForm }                 from '../js/modules/payments.js';
-    import { initConnPill, showToast, openModal, closeModal }     from '../js/utils/ui.js';
+    import { initConnPill, showToast }                            from '../js/utils/ui.js';
     import { escapeHtml, fmtAge }                                 from '../js/utils/format.js';
  
-    // ── Boot ───────────────────────────────────────────────────────────────────
+    // Boot 
     const user = await protectRoute();
+    if (!user) throw new Error('No session');
+ 
     document.getElementById('logout-btn').addEventListener('click', logout);
     initConnPill('conn-pill');
  
     const params  = new URLSearchParams(window.location.search);
     const visitId = params.get('id');
-    if (!visitId) { window.location.href = 'dashboard.html'; }
+    if (!visitId) { window.location.href = 'dashboard.html'; throw new Error(); }
  
-    // ── Item Store ─────────────────────────────────────────────────────────────
+    // Item store (one per page load) 
     const store = createItemsStore();
  
-    // ── Load Visit ─────────────────────────────────────────────────────────────
+    // Load visit 
     const visit = await fetchVisitById(visitId);
     if (!visit) {
       showToast('Visit not found.', 'error');
       window.location.href = 'dashboard.html';
+      throw new Error();
     }
  
     const patient = visit.patients || {};
  
     // Patient banner
-    const initials = (patient.full_name || '?').trim().split(/\s+/).slice(0, 2)
-      .map(w => w[0].toUpperCase()).join('');
+    const initials = (patient.full_name || '?').trim().split(/\s+/)
+      .slice(0, 2).map(w => w[0].toUpperCase()).join('');
     document.getElementById('patient-avatar').textContent = initials;
     document.getElementById('patient-name').textContent   = patient.full_name || '—';
     document.getElementById('patient-meta').textContent   =
       [patient.phone, patient.gender, patient.dob ? fmtAge(patient.dob) : null]
         .filter(Boolean).join(' · ');
  
+    // Visit status badge
     const statusMap = {
-      waiting:    { cls: 'badge--warn',    label: 'Waiting' },
+      waiting:    { cls: 'badge--warn',    label: 'Waiting'    },
       in_consult: { cls: 'badge--info',    label: 'In Consult' },
-      completed:  { cls: 'badge--success', label: 'Completed' },
+      completed:  { cls: 'badge--success', label: 'Completed'  },
     };
     const { cls, label } = statusMap[visit.status] || { cls: 'badge--neutral', label: visit.status };
     const badge = document.getElementById('visit-status-badge');
     badge.textContent = label;
     badge.className   = `badge ${cls}`;
  
-    // ── Consultation ───────────────────────────────────────────────────────────
+    // Consultation 
     let consultation = await fetchConsultationByVisit(visitId);
- 
     const consultView = document.getElementById('consult-view');
     const consultForm = document.getElementById('consult-form');
  
@@ -262,9 +251,7 @@
       renderConsultationCard(consultView, consultation);
       consultView.style.display = 'block';
       consultForm.style.display = 'none';
-      showRxBuilder();
     } else {
-      consultView.style.display = 'none';
       consultForm.style.display = 'block';
     }
  
@@ -273,11 +260,14 @@
       renderConsultationCard(consultView, saved);
       consultView.style.display = 'block';
       consultForm.style.display = 'none';
-      showRxBuilder();
+      initRxBuilder();
     });
  
-    // ── Prescription Builder ───────────────────────────────────────────────────
-    async function showRxBuilder() {
+    // Prescription Builder 
+    // Guard: only initialise event listeners once even if called multiple times
+    let _rxBuilderInitialised = false;
+ 
+    async function initRxBuilder() {
       const rxView    = document.getElementById('rx-view');
       const rxBuilder = document.getElementById('rx-builder');
  
@@ -287,38 +277,48 @@
         renderPrescriptionCard(rxView, existing);
         rxView.style.display    = 'block';
         rxBuilder.style.display = 'none';
-        showBilling(existing.id);
+        await initBilling();
         return;
       }
  
-      // Show builder
       rxBuilder.style.display = 'block';
  
-      // Load pharmacies for selector
+      // Only wire up event listeners once
+      if (_rxBuilderInitialised) return;
+      _rxBuilderInitialised = true;
+ 
+      // Load pharmacies
       const pharmacies = await fetchLinkedPharmacies();
       renderPharmacySelector(
         document.getElementById('pharmacy-select'),
         pharmacies,
-        user.id // internal = this org's own pharmacy
+        user.id // user.id = clinic org identifier
       );
  
-      // Add drug
-      document.getElementById('add-drug-btn').addEventListener('click', () => {
+      // Add drug helper — extracted so Enter key can reuse it
+      function addDrug() {
         const nameEl   = document.getElementById('drug-name');
         const dosageEl = document.getElementById('drug-dosage');
         const qtyEl    = document.getElementById('drug-qty');
         const priceEl  = document.getElementById('drug-price');
  
+        if (!nameEl.value.trim()) {
+          nameEl.focus();
+          showToast('Enter a drug name.', 'warn');
+          return;
+        }
+ 
         try {
-          const items = store.add({
+          const items  = store.add({
             drug_name: nameEl.value,
             dosage:    dosageEl.value,
             quantity:  qtyEl.value,
             price:     priceEl.value,
           });
-          renderItems(document.getElementById('rx-items'), items, key => {
+          const rxItems = document.getElementById('rx-items');
+          renderItems(rxItems, items, key => {
             store.remove(key);
-            renderItems(document.getElementById('rx-items'), store.getAll(), () => {});
+            renderItems(rxItems, store.getAll(), null);
           });
           nameEl.value = dosageEl.value = priceEl.value = '';
           qtyEl.value  = '1';
@@ -326,21 +326,18 @@
         } catch (err) {
           showToast(err.message, 'error');
         }
-      });
+      }
  
-      // Also allow Enter on drug name to add
+      document.getElementById('add-drug-btn').addEventListener('click', addDrug);
       document.getElementById('drug-name').addEventListener('keydown', e => {
-        if (e.key === 'Enter') {
-          e.preventDefault();
-          document.getElementById('add-drug-btn').click();
-        }
+        if (e.key === 'Enter') { e.preventDefault(); addDrug(); }
       });
  
       // Send prescription
       document.getElementById('send-rx-btn').addEventListener('click', async () => {
-        const errEl     = document.getElementById('rx-error');
-        const sendBtn   = document.getElementById('send-rx-btn');
-        const selectEl  = document.getElementById('pharmacy-select');
+        const errEl      = document.getElementById('rx-error');
+        const sendBtn    = document.getElementById('send-rx-btn');
+        const selectEl   = document.getElementById('pharmacy-select');
         const pharmacyId = selectEl.value;
         const orderType  = selectEl.options[selectEl.selectedIndex]?.dataset?.type || 'internal';
  
@@ -351,28 +348,25 @@
         try {
           const items = store.getAll();
           if (!items.length) throw new Error('Add at least one drug.');
-          if (!pharmacyId)   throw new Error('Select a pharmacy.');
+          if (!pharmacyId)   throw new Error('Select a pharmacy first.');
  
-          // 1. Create prescription
           const prescription = await createPrescription(visitId, items);
           if (!prescription) {
-            showToast('Queued offline — will send when back online.');
+            showToast('Queued offline — will send when back online.', 'warn');
             return;
           }
  
-          // 2. Send to pharmacy
           await sendToPharmacy(prescription.id, pharmacyId, orderType);
  
-          // 3. Show read-only view
           const saved = await fetchPrescriptionByVisit(visitId);
           renderPrescriptionCard(rxView, saved);
           rxView.style.display    = 'block';
           rxBuilder.style.display = 'none';
           showToast('Prescription sent to pharmacy.');
  
-          // 4. Unlock billing
-          showBilling(prescription.id, store.getTotal());
+          const total = store.getTotal();
           store.clear();
+          await initBilling(total);
  
         } catch (err) {
           errEl.textContent   = err.message;
@@ -384,16 +378,16 @@
       });
     }
  
-    // ── Billing ────────────────────────────────────────────────────────────────
-    let _billId = null;
+    // Billing 
+    // Guard: only bind payment form listeners once
+    let _billId           = null;
+    let _paymentFormBound = false;
  
-    async function showBilling(prescriptionId, total = null) {
-      const billSection  = document.getElementById('bill-view');
-      const paySection   = document.getElementById('payment-form-section');
+    async function initBilling(total = null) {
+      const billSection = document.getElementById('bill-view');
+      const paySection  = document.getElementById('payment-form-section');
  
-      // Load or create bill
       let bill = await fetchBillByVisit(visitId);
- 
       if (!bill && total && total > 0) {
         bill = await createBill(visitId, total);
       }
@@ -406,46 +400,60 @@
       _billId = bill.id;
       renderBillSummary(billSection, bill);
  
-      if (bill.status !== 'paid') {
-        paySection.style.display = 'block';
+      if (bill.status === 'paid') {
+        paySection.style.display = 'none';
+        return;
+      }
  
-        // Pre-fill amount with outstanding
-        const paid = (bill.payments || [])
-          .filter(p => p.status === 'success')
-          .reduce((s, p) => s + Number(p.amount), 0);
-        const outstanding = Math.max(0, Number(bill.total_amount) - paid);
-        document.getElementById('pay-amount').value = outstanding || '';
+      paySection.style.display = 'block';
  
-        // MoMo reference toggle
+      // Pre-fill outstanding amount
+      const paid = (bill.payments || [])
+        .filter(p => p.status === 'success')
+        .reduce((s, p) => s + Number(p.amount), 0);
+      document.getElementById('pay-amount').value =
+        Math.max(0, Number(bill.total_amount) - paid) || '';
+ 
+      if (!_paymentFormBound) {
+        _paymentFormBound = true;
+ 
+        // MoMo reference field toggle
         document.getElementById('pay-method').addEventListener('change', e => {
           document.getElementById('momo-ref-group').style.display =
             e.target.value === 'momo' ? 'block' : 'none';
         });
  
-        // Bind payment form
+        // bindPaymentForm uses form._paymentBound guard internally — safe to call once
         bindPaymentForm(document.getElementById('payment-form'), _billId, async () => {
-          // Reload bill after payment
           const updated = await fetchBillByVisit(visitId);
           renderBillSummary(billSection, updated);
+ 
           if (updated?.status === 'paid') {
             paySection.style.display = 'none';
             showToast('Bill fully paid. ✓');
+          } else {
+            // Update outstanding amount field after partial payment
+            const newPaid = (updated?.payments || [])
+              .filter(p => p.status === 'success')
+              .reduce((s, p) => s + Number(p.amount), 0);
+            document.getElementById('pay-amount').value =
+              Math.max(0, Number(updated?.total_amount) - newPaid) || '';
           }
         });
-      } else {
-        paySection.style.display = 'none';
       }
     }
  
-    // If consultation already exists on load, also check for existing prescription/bill
+    // On load: restore existing state 
     if (consultation) {
       const existing = await fetchPrescriptionByVisit(visitId);
       if (existing) {
         const rxView = document.getElementById('rx-view');
         renderPrescriptionCard(rxView, existing);
-        rxView.style.display = 'block';
+        rxView.style.display                           = 'block';
         document.getElementById('rx-builder').style.display = 'none';
-        await showBilling(existing.id);
+        await initBilling();
+      } else {
+        await initRxBuilder();
       }
     }
   </script>
