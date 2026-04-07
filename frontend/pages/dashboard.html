@@ -10,17 +10,16 @@
 </head>
 <body>
  
-  <!-- NAV -->
   <nav class="nav">
     <div class="nav__left">
       <span class="nav__logo">Min<span>za</span></span>
       <span class="nav__org" id="nav-org">—</span>
     </div>
     <div class="nav__center">
-      <a href="dashboard.html"  class="nav__tab nav__tab--active">Dashboard</a>
-      <a href="patients.html"   class="nav__tab">Patients</a>
-      <a href="pharmacy.html"   class="nav__tab">Pharmacy</a>
-      <a href="payments.html"   class="nav__tab">Payments</a>
+      <a href="dashboard.html" class="nav__tab nav__tab--active">Dashboard</a>
+      <a href="patients.html"  class="nav__tab">Patients</a>
+      <a href="pharmacy.html"  class="nav__tab">Pharmacy</a>
+      <a href="payments.html"  class="nav__tab">Payments</a>
     </div>
     <div class="nav__right">
       <span id="conn-pill" class="conn-pill"></span>
@@ -28,21 +27,17 @@
     </div>
   </nav>
  
-  <!-- MAIN -->
   <main class="page">
  
-    <!-- Header -->
     <div class="page-header">
       <div>
         <div class="page-title" id="facility-name">—</div>
         <div class="page-subtitle" id="today-date">—</div>
       </div>
-      <button class="btn btn--primary" id="new-patient-btn">
-        + New Patient
-      </button>
+      <button class="btn btn--primary" id="new-patient-btn">+ New Patient</button>
     </div>
  
-    <!-- Alert bar (low stock, pending etc) -->
+    <!-- Alert bar: waiting patients, low stock, etc. -->
     <div class="alert-bar alert-bar--warn" id="alert-bar" style="display:none;">
       <span id="alert-text"></span>
     </div>
@@ -81,7 +76,7 @@
       </div>
     </div>
  
-    <!-- Today's Queue -->
+    <!-- Queue -->
     <div class="card">
       <div class="card__header">
         <h2 class="card__title">Today's Queue</h2>
@@ -107,78 +102,92 @@
  
   </main>
  
-  <!-- Toast -->
   <div id="toast" class="toast"></div>
  
   <script type="module">
-    import { protectRoute, logout, getCurrentUser, getOrgType } from '../js/modules/auth.js';
-    import { fetchDashboardData, renderStats }                  from '../js/modules/dashboard.js';
-    import { fetchTodaysVisits, renderQueue, VISIT_STATUS }     from '../js/modules/visits.js';
-    import { initConnPill, showToast }                          from '../js/utils/ui.js';
-    import { fmtDate }                                          from '../js/utils/format.js';
+    import { protectRoute, logout, getOrgType, getOrgName } from '../js/modules/auth.js';
+    import { fetchDashboardData, renderStats }              from '../js/modules/dashboard.js';
+    import { fetchTodaysVisits, renderQueue }               from '../js/modules/visits.js';
+    import { initConnPill, showToast }                      from '../js/utils/ui.js';
  
-    // ── Boot ─────────────────────────────────────────────────────────────────
+    // Boot 
     const user = await protectRoute();
-    if (!user) throw new Error('No session');  // protectRoute redirects
+    if (!user) throw new Error('No session'); // protectRoute already redirected
  
-    // Guard: pharmacy users go to their own page
+    // Redirect pharmacy accounts away from the clinic dashboard
     if (getOrgType() === 'pharmacy') {
       window.location.href = 'pharmacy.html';
     }
  
-    // ── UI Bootstrap ─────────────────────────────────────────────────────────
     initConnPill('conn-pill');
  
-    const meta = user.user_metadata || {};
-    document.getElementById('nav-org').textContent      = meta.org_name || user.email;
-    document.getElementById('facility-name').textContent = meta.org_name || 'Clinic';
-    document.getElementById('today-date').textContent   =
-      new Date().toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+    const orgName = getOrgName();
+    document.getElementById('nav-org').textContent       = orgName;
+    document.getElementById('facility-name').textContent = orgName;
+    document.getElementById('today-date').textContent    =
+      new Date().toLocaleDateString('en-GB', {
+        weekday: 'long', day: 'numeric', month: 'long', year: 'numeric'
+      });
  
     document.getElementById('logout-btn').addEventListener('click', logout);
- 
-    // ── New Patient → patients.html ───────────────────────────────────────────
     document.getElementById('new-patient-btn').addEventListener('click', () => {
       window.location.href = 'patients.html?action=new';
     });
  
-    // ── Load Data ─────────────────────────────────────────────────────────────
+    // Load 
     async function loadDashboard() {
+      // Skeleton loading state
+      document.querySelectorAll('.stat-card').forEach(c => c.classList.add('stat-card--loading'));
+ 
       try {
         const [stats, visits] = await Promise.all([
           fetchDashboardData(),
           fetchTodaysVisits(),
         ]);
  
+        document.querySelectorAll('.stat-card').forEach(c => c.classList.remove('stat-card--loading'));
         renderStats(stats);
  
         // Highlight stat cards on alert conditions
-        document.getElementById('stat-waiting')?.classList
-          .toggle('stat-card--warn', stats.waitingCount > 5);
-        document.getElementById('stat-pending-rx')?.classList
-          .toggle('stat-card--warn', stats.pendingRxCount > 0);
+        document.getElementById('stat-waiting')
+          ?.classList.toggle('stat-card--warn', stats.waitingCount > 5);
+        document.getElementById('stat-pending-rx')
+          ?.classList.toggle('stat-card--warn', stats.pendingRxCount > 0);
  
-        const queueBody = document.getElementById('queue-body');
-        renderQueue(queueBody, visits, {
-          onConsult: (visitId) => {
-            window.location.href = `visit.html?id=${visitId}`;
-          },
-          onView: (visitId) => {
-            window.location.href = `visit.html?id=${visitId}`;
-          },
+        // Alert bar for patients waiting > 10 minutes
+        const longWait = visits.filter(v => {
+          if (v.status !== 'waiting') return false;
+          return (Date.now() - new Date(v.created_at).getTime()) > 10 * 60 * 1000;
         });
+        const alertBar  = document.getElementById('alert-bar');
+        const alertText = document.getElementById('alert-text');
+        if (longWait.length) {
+          alertText.textContent =
+            `${longWait.length} patient${longWait.length > 1 ? 's have' : ' has'} been waiting over 10 minutes.`;
+          alertBar.style.display = 'flex';
+        } else {
+          alertBar.style.display = 'none';
+        }
+ 
+        renderQueue(document.getElementById('queue-body'), visits, {
+          onConsult: visitId => { window.location.href = `visit.html?id=${visitId}`; },
+          onView:    visitId => { window.location.href = `visit.html?id=${visitId}`; },
+        });
+ 
       } catch (err) {
-        showToast(err.message, 'error');
+        document.querySelectorAll('.stat-card').forEach(c => c.classList.remove('stat-card--loading'));
+        showToast(err.message || 'Failed to load dashboard.', 'error');
+        document.getElementById('queue-body').innerHTML =
+          `<tr><td colspan="5" class="empty-state">Could not load queue. Check your connection.</td></tr>`;
       }
     }
  
     await loadDashboard();
  
     document.getElementById('refresh-queue').addEventListener('click', loadDashboard);
- 
-    // Auto-refresh every 60 seconds
     setInterval(loadDashboard, 60_000);
   </script>
  
 </body>
 </html>
+ 
