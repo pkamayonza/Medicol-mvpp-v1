@@ -1,12 +1,3 @@
-/**
- * consultations.js is Minza Health's Consultations Module
- *
- * Responsibility (ONE): Everything to do with the consultations table.
- *  - Create a consultation record for a visit
- *  - Fetch consultation for a visit
- *  - Bind the consultation form
- */
-
 import { apiRequest }                    from '../services/api.js';
 import { updateVisitStatus, VISIT_STATUS } from './visits.js';
 import { showToast }                      from '../utils/ui.js';
