@@ -21,12 +21,23 @@ export const PAYMENT_STATUS = {
 };
 
 // FETCH 
-async function fetchBillByVisit(visitId) {
-  if (!visitId) return null;
-  const data = await apiRequest(
-    `/bills?visit_id=eq.${visitId}&select=*,payments(*)&limit=1`
-  );
-  return data?.[0] || null;
+async function _recalculateBillStatus(billId) {
+  if (!billId) return;
+  const billData = await apiRequest(`/bills?id=eq.${billId}&select=*,payments(*)`);
+  if (!billData?.[0]) return;
+
+  const b           = billData[0];
+  const paidTotal   = (b.payments || [])
+    .filter(p => p.status === PAYMENT_STATUS.SUCCESS)
+    .reduce((s, p) => s + Number(p.amount), 0);
+  const total       = Number(b.total_amount);
+  const newStatus   = paidTotal >= total ? BILL_STATUS.PAID
+                    : paidTotal > 0      ? BILL_STATUS.PARTIAL
+                    :                      BILL_STATUS.UNPAID;
+
+  if (newStatus !== b.status) {
+    await apiRequest(`/bills?id=eq.${billId}`, 'PATCH', { status: newStatus });
+  }
 }
 
 async function fetchPaymentsByBill(billId) {
