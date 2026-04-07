@@ -1,31 +1,28 @@
 import { authRequest, setSession, clearSession, getSession } from '../services/api.js';
- 
-// STATE
+
 let _currentUser    = null;
 let _currentSession = null;
- 
-// GETTERS
+
 function getCurrentUser()    { return _currentUser; }
 function getCurrentSession() { return _currentSession; }
- 
+
 function getOrgId() {
-  // Supabase user.id IS the org identifier for single-user orgs
   return _currentUser?.user_metadata?.org_id || _currentUser?.id || null;
 }
- 
+
 function getOrgType() {
   return (_currentUser?.user_metadata?.org_type || 'clinic').toLowerCase().trim();
 }
- 
+
 function getOrgName() {
   return _currentUser?.user_metadata?.org_name || _currentUser?.email || '—';
 }
- 
+
 function getRole() {
   return _currentUser?.user_metadata?.role || 'admin';
 }
- 
-// LOGIN
+
+// LOGIN 
 async function login(email, password) {
   const data = await authRequest('token?grant_type=password', { email, password });
   _currentSession = data;
@@ -33,8 +30,23 @@ async function login(email, password) {
   setSession(data);
   return data;
 }
- 
-// LOGOUT
+
+// SIGNUP 
+async function signup(email, password, orgName, orgType) {
+  const data = await authRequest('signup', {
+    email,
+    password,
+    data: {
+      org_name:    orgName,
+      org_type:    orgType,
+      trial_start: new Date().toISOString(),
+      trial_days:  14,
+    },
+  });
+  return data;
+}
+
+// LOGOUT 
 async function logout() {
   const session = getSession();
   if (session?.access_token) {
@@ -46,24 +58,19 @@ async function logout() {
           'Authorization': `Bearer ${session.access_token}`,
         },
       });
-    } catch (_) { /* ignore — best-effort */ }
+    } catch (_) { /* best-effort */ }
   }
   _currentUser    = null;
   _currentSession = null;
   clearSession();
-  // Use relative path — works regardless of deploy base
-  window.location.href = 'login.html';
+  window.location.href = 'login.html'; // ← relative, not /pages/login.html
 }
- 
-// RESTORE SESSION
-/**
- * Attempts to restore a session using the stored refresh token.
- * Returns the user object on success, null on failure.
- */
+
+// RESTORE SESSION 
 async function restoreSession() {
   const stored = getSession();
   if (!stored?.refresh_token) return null;
- 
+
   try {
     const res = await fetch(
       'https://qflqwmfdwalvmndaojzl.supabase.co/auth/v1/token?grant_type=refresh_token',
@@ -76,9 +83,9 @@ async function restoreSession() {
         body: JSON.stringify({ refresh_token: stored.refresh_token }),
       }
     );
- 
+
     if (!res.ok) { clearSession(); return null; }
- 
+
     const data = await res.json();
     _currentSession = data;
     _currentUser    = data.user;
@@ -89,40 +96,31 @@ async function restoreSession() {
     return null;
   }
 }
- 
-// ROUTE PRESCRIPTION
-/**
- * protectRoute — call at the top of every protected page (await it).
- * Restores session silently; redirects to login if none found.
- * Returns the user object on success.
- */
+
+// ROUTE PROTECTION 
 async function protectRoute() {
   const user = await restoreSession();
   if (!user) {
-    window.location.href = 'login.html';
+    window.location.href = 'login.html'; // ← relative
     return null;
   }
   return user;
 }
- 
-/**
- * redirectIfLoggedIn — call on login.html.
- * Skips the login screen if session is still valid.
- */
+
 async function redirectIfLoggedIn() {
   const stored = getSession();
   if (!stored?.refresh_token) return;
   const user = await restoreSession();
   if (user) {
     window.location.href = getOrgType() === 'pharmacy'
-      ? 'pharmacy.html'
-      : 'dashboard.html';
+      ? 'pharmacy.html'   // ← relative
+      : 'dashboard.html'; // ← relative
   }
 }
- 
-// EXPORTS
+
 export {
   login,
+  signup,
   logout,
   restoreSession,
   protectRoute,
@@ -134,4 +132,3 @@ export {
   getOrgName,
   getRole,
 };
- 
