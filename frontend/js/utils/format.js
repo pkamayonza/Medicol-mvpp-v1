@@ -1,10 +1,3 @@
-/**
- * format.js — Minza Health Format Utilities
- *
- * Pure formatting functions. No side effects. No DOM.
- */
-
-// ─── DATE ──────────────────────────────────────────────────────────────────────
 function fmtDate(isoString) {
   if (!isoString) return '—';
   return new Date(isoString).toLocaleDateString('en-GB', {
@@ -44,13 +37,13 @@ function fmtRelative(isoString) {
   return fmtDate(isoString);
 }
 
-// ─── CURRENCY ──────────────────────────────────────────────────────────────────
+// CURRENCY
 function fmtUGX(amount) {
   if (amount === null || amount === undefined) return '—';
   return 'UGX ' + Number(amount).toLocaleString('en-UG');
 }
 
-// ─── AGE ───────────────────────────────────────────────────────────────────────
+// AGE
 function fmtAge(dob) {
   if (!dob) return '—';
   const birth = new Date(dob);
@@ -61,7 +54,7 @@ function fmtAge(dob) {
   return `${age}y`;
 }
 
-// ─── SECURITY ─────────────────────────────────────────────────────────────────
+// SECURITY
 function escapeHtml(str) {
   if (!str) return '';
   return String(str)
@@ -72,5 +65,5 @@ function escapeHtml(str) {
     .replace(/'/g, '&#39;');
 }
 
-// ─── EXPORTS ───────────────────────────────────────────────────────────────────
+// EXPORTS 
 export { fmtDate, fmtDateTime, fmtTime, fmtRelative, fmtUGX, fmtAge, escapeHtml };
