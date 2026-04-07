@@ -1,28 +1,16 @@
-/**
- * api.js — Minza Health API Service Layer
- * ALL HTTP requests go through this file. Nothing else touches fetch().
- *
- * Responsibilities:
- *  - Base URL management
- *  - JWT token injection
- *  - Centralised error handling
- *  - Offline detection + queue (IndexedDB)
- *  - Retry on reconnect
- */
-
-// ─── CONFIG ────────────────────────────────────────────────────────────────────
-const API_BASE = 'https://qflqwmfdwalvmndaojzl.supabase.co/rest/v1';
+// CONFIG 
+const API_BASE  = 'https://qflqwmfdwalvmndaojzl.supabase.co/rest/v1';
 const AUTH_BASE = 'https://qflqwmfdwalvmndaojzl.supabase.co/auth/v1';
-const ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFmbHF3bWZkd2Fsdm1uZGFvanpsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE2MjcxMTcsImV4cCI6MjA4NzIwMzExN30.Ewpo8PoGq6PGcHnN85aYCUdPtSv7RXoGh9qthBJHezA';
-
-// ─── OFFLINE QUEUE (IndexedDB) ─────────────────────────────────────────────────
+const ANON_KEY  = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFmbHF3bWZkd2Fsdm1uZGFvanpsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE2MjcxMTcsImV4cCI6MjA4NzIwMzExN30.Ewpo8PoGq6PGcHnN85aYCUdPtSv7RXoGh9qthBJHezA';
+ 
+// OFFLINE QUEUE (IndexedDB) 
 const OfflineQueue = (() => {
   const DB_NAME = 'minza_queue';
   const DB_VER  = 1;
   const STORE   = 'mutations';
   const MAX_ATT = 3;
   let _db = null;
-
+ 
   function open() {
     if (_db) return Promise.resolve(_db);
     return new Promise((resolve, reject) => {
@@ -30,150 +18,141 @@ const OfflineQueue = (() => {
       req.onupgradeneeded = e => {
         const db = e.target.result;
         if (!db.objectStoreNames.contains(STORE)) {
-          const store = db.createObjectStore(STORE, { keyPath: 'id' });
-          store.createIndex('queuedAt', 'queuedAt', { unique: false });
+          const s = db.createObjectStore(STORE, { keyPath: 'id' });
+          s.createIndex('queuedAt', 'queuedAt', { unique: false });
         }
       };
-      req.onsuccess  = e => { _db = e.target.result; resolve(_db); };
-      req.onerror    = e => reject(e.target.error);
-    });
-  }
-
-  async function push(entry) {
-    const db = await open();
-    return new Promise((resolve, reject) => {
-      const tx = db.transaction(STORE, 'readwrite');
-      tx.objectStore(STORE).add(entry);
-      tx.oncomplete = resolve;
-      tx.onerror    = e => reject(e.target.error);
-    });
-  }
-
-  async function all() {
-    const db = await open();
-    return new Promise((resolve, reject) => {
-      const tx  = db.transaction(STORE, 'readonly');
-      const req = tx.objectStore(STORE).index('queuedAt').getAll();
-      req.onsuccess = e => resolve(e.target.result);
+      req.onsuccess = e => { _db = e.target.result; resolve(_db); };
       req.onerror   = e => reject(e.target.error);
     });
   }
-
-  async function remove(id) {
+ 
+  const tx = async (mode, fn) => {
     const db = await open();
     return new Promise((resolve, reject) => {
-      const tx = db.transaction(STORE, 'readwrite');
-      tx.objectStore(STORE).delete(id);
-      tx.oncomplete = resolve;
-      tx.onerror    = e => reject(e.target.error);
+      const t = db.transaction(STORE, mode);
+      const r = fn(t.objectStore(STORE));
+      if (r) { r.onsuccess = e => resolve(e.target.result); r.onerror = e => reject(e.target.error); }
+      t.oncomplete = () => resolve();
+      t.onerror    = e => reject(e.target.error);
     });
-  }
-
-  async function update(entry) {
-    const db = await open();
-    return new Promise((resolve, reject) => {
-      const tx = db.transaction(STORE, 'readwrite');
-      tx.objectStore(STORE).put(entry);
-      tx.oncomplete = resolve;
-      tx.onerror    = e => reject(e.target.error);
-    });
-  }
-
-  return { push, all, remove, update, MAX_ATT };
+  };
+ 
+  return {
+    push:   e  => tx('readwrite', s => s.add(e)),
+    remove: id => tx('readwrite', s => s.delete(id)),
+    update: e  => tx('readwrite', s => s.put(e)),
+    all:    () => new Promise(async (resolve, reject) => {
+      const db = await open();
+      const t  = db.transaction(STORE, 'readonly');
+      const r  = t.objectStore(STORE).index('queuedAt').getAll();
+      r.onsuccess = e => resolve(e.target.result);
+      r.onerror   = e => reject(e.target.error);
+    }),
+    MAX_ATT,
+  };
 })();
-
-// ─── CONNECTIVITY STATE ────────────────────────────────────────────────────────
-let _isOnline = navigator.onLine;
-let _syncInProgress = false;
-
-function getConnState() { return _isOnline; }
-
-window.addEventListener('online',  () => { _isOnline = true;  _emitConnChange('online');  drainQueue(); });
-window.addEventListener('offline', () => { _isOnline = false; _emitConnChange('offline'); });
-
-// Listeners can subscribe to connectivity changes
+ 
+// CONNECTIVITY 
+let _isOnline        = navigator.onLine;
+let _syncInProgress  = false;
 const _connListeners = [];
+ 
+function getConnState() { return _isOnline; }
 function onConnChange(fn) { _connListeners.push(fn); }
-function _emitConnChange(state) { _connListeners.forEach(fn => fn(state)); }
-
-// ─── TOKEN HELPERS ─────────────────────────────────────────────────────────────
+function _emit(state)   { _connListeners.forEach(fn => fn(state)); }
+ 
+window.addEventListener('online',  () => { _isOnline = true;  _emit('online');  drainQueue(); });
+window.addEventListener('offline', () => { _isOnline = false; _emit('offline'); });
+ 
+// SESSION HELPERS 
 function getToken() {
-  const raw = localStorage.getItem('minza_session');
-  if (!raw) return null;
-  try { return JSON.parse(raw)?.access_token || null; }
+  try { return JSON.parse(localStorage.getItem('minza_session'))?.access_token || null; }
   catch { return null; }
 }
-
+ 
 function getSession() {
-  const raw = localStorage.getItem('minza_session');
-  if (!raw) return null;
-  try { return JSON.parse(raw); }
+  try { return JSON.parse(localStorage.getItem('minza_session')); }
   catch { return null; }
 }
-
+ 
 function setSession(data) {
   localStorage.setItem('minza_session', JSON.stringify(data));
 }
-
+ 
 function clearSession() {
   localStorage.removeItem('minza_session');
 }
-
-// ─── CORE REQUEST ──────────────────────────────────────────────────────────────
+ 
+// CORE REQUEST
 /**
- * apiRequest — the single function all modules use for data operations.
+ * apiRequest — single entry point for all data operations.
  *
- * @param {string} endpoint   - PostgREST path e.g. '/patients?org_id=eq.xxx'
- * @param {string} method     - GET | POST | PATCH | DELETE
- * @param {object|null} body  - request body for mutations
- * @param {object} opts       - { preferRepresentation: bool, count: bool }
- * @returns {Promise<any>}
+ * @param {string}      endpoint - PostgREST path e.g. '/patients?org_id=eq.xxx'
+ * @param {string}      method   - GET | POST | PATCH | DELETE
+ * @param {object|null} body     - mutation body
+ * @param {object}      opts     - { count: bool, preferRepresentation: bool }
  */
 async function apiRequest(endpoint, method = 'GET', body = null, opts = {}) {
   const token = getToken();
-
+ 
   const headers = {
     'Content-Type': 'application/json',
-    'apikey': ANON_KEY,
-    'Prefer': opts.preferRepresentation !== false ? 'return=representation' : 'return=minimal',
+    'apikey':        ANON_KEY,
+    'Prefer':        opts.preferRepresentation !== false ? 'return=representation' : 'return=minimal',
   };
-
   if (token) headers['Authorization'] = `Bearer ${token}`;
   if (opts.count) headers['Prefer'] += ',count=exact';
-
+ 
   const config = { method, headers };
   if (body && method !== 'GET') config.body = JSON.stringify(body);
-
-  // GETs: always live, throw if offline
+ 
+  // GET: return [] when offline instead of throwing 
+  // This keeps pages alive on flaky 3G — they show empty state rather than crash.
   if (method === 'GET') {
-    if (!_isOnline) throw new Error('You are offline. Showing cached data where available.');
-    const res = await fetch(`${API_BASE}${endpoint}`, config);
-    if (res.status === 204) return null;
-    const data = await res.json();
-    if (!res.ok) throw new Error(data.message || data.hint || data.error || 'Request failed');
-    return data;
+    if (!_isOnline) {
+      console.warn('[Minza] GET skipped — offline:', endpoint);
+      return opts.returnNull ? null : [];
+    }
+    try {
+      const res = await fetch(`${API_BASE}${endpoint}`, config);
+      if (res.status === 204) return null;
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message || data.hint || data.error || `Request failed (${res.status})`);
+      return data;
+    } catch (err) {
+      if (err.name === 'TypeError') {
+        // Network dropped while request was in flight
+        _isOnline = false;
+        _emit('offline');
+        return opts.returnNull ? null : [];
+      }
+      throw err;
+    }
   }
-
-  // Mutations: try live first, queue on failure
+ 
+  // MUTATIONS: try live, queue on network failure
   if (_isOnline) {
     try {
       const res = await fetch(`${API_BASE}${endpoint}`, config);
       if (res.status === 204) return null;
       const data = await res.json();
-      if (!res.ok) throw new Error(data.message || data.hint || data.error || 'Request failed');
+      if (!res.ok) throw new Error(data.message || data.hint || data.error || `Request failed (${res.status})`);
       return data;
     } catch (err) {
-      // Only queue on network errors, not server errors (4xx)
       if (err.name === 'TypeError') {
-        // Network down despite navigator.onLine — fall through to queue
+        // Network dropped — fall through to queue
+        _isOnline = false;
+        _emit('offline');
       } else {
-        throw err; // Server rejected it — surface to caller
+        // Server rejected (4xx/5xx) — surface to caller, do not queue
+        throw err;
       }
     }
   }
-
-  // Offline or flaky network — queue the mutation
-  const queued = {
+ 
+  // OFFLINE QUEUE
+  const entry = {
     id:       crypto.randomUUID(),
     endpoint,
     method,
@@ -182,79 +161,80 @@ async function apiRequest(endpoint, method = 'GET', body = null, opts = {}) {
     queuedAt: Date.now(),
     attempts: 0,
   };
-  await OfflineQueue.push(queued);
-  console.log('[Minza] Queued offline mutation:', endpoint);
-  return null; // Caller must handle null gracefully
+  await OfflineQueue.push(entry);
+  console.log('[Minza] Queued offline:', method, endpoint);
+  return null; // caller must handle null gracefully
 }
-
-// ─── AUTH REQUESTS (separate base URL) ────────────────────────────────────────
+ 
+// AUTH REQUESTS
 async function authRequest(path, body) {
   const res = await fetch(`${AUTH_BASE}/${path}`, {
-    method: 'POST',
+    method:  'POST',
     headers: { 'Content-Type': 'application/json', 'apikey': ANON_KEY },
-    body: JSON.stringify(body),
+    body:    JSON.stringify(body),
   });
   const data = await res.json();
   if (!res.ok) throw new Error(data.error_description || data.msg || 'Auth failed');
   return data;
 }
-
-// ─── OFFLINE DRAIN ─────────────────────────────────────────────────────────────
+ 
+// DRAIN QUEUE
 async function drainQueue() {
   if (_syncInProgress || !_isOnline) return;
   const items = await OfflineQueue.all();
   if (!items.length) return;
-
+ 
   _syncInProgress = true;
-  _emitConnChange('syncing');
-
+  _emit('syncing');
+ 
   for (const item of items) {
     try {
       const headers = {
-        'Content-Type': 'application/json',
-        'apikey': ANON_KEY,
-        'Prefer': 'return=representation',
-        'Authorization': `Bearer ${item.token || getToken() || ANON_KEY}`,
+        'Content-Type':  'application/json',
+        'apikey':        ANON_KEY,
+        'Prefer':        'return=representation',
+        'Authorization': `Bearer ${item.token || getToken() || ''}`,
       };
-      const opts = { method: item.method, headers };
-      if (item.body) opts.body = JSON.stringify(item.body);
-
-      const res = await fetch(`${API_BASE}${item.endpoint}`, opts);
-
+      const req = { method: item.method, headers };
+      if (item.body) req.body = JSON.stringify(item.body);
+ 
+      const res = await fetch(`${API_BASE}${item.endpoint}`, req);
+ 
       if (res.ok || res.status === 204) {
         await OfflineQueue.remove(item.id);
-        console.log('[Minza] Drained queued mutation:', item.endpoint);
+        console.log('[Minza] Drained:', item.endpoint);
       } else if (res.status >= 400 && res.status < 500) {
-        // Server permanently rejected — remove to avoid loop
+        // Server permanently rejected — discard to avoid infinite loop
         await OfflineQueue.remove(item.id);
-        console.warn('[Minza] Queue item rejected by server:', item.endpoint, res.status);
+        console.warn('[Minza] Queue item rejected by server:', res.status, item.endpoint);
       } else {
         item.attempts = (item.attempts || 0) + 1;
         if (item.attempts >= OfflineQueue.MAX_ATT) {
           await OfflineQueue.remove(item.id);
-          console.error('[Minza] Queue item failed after max attempts:', item.endpoint);
+          console.error('[Minza] Queue item exceeded max attempts:', item.endpoint);
         } else {
           await OfflineQueue.update(item);
         }
       }
-    } catch (err) {
+    } catch (_) {
+      // Network dropped again during drain
       _isOnline = false;
       _syncInProgress = false;
-      _emitConnChange('offline');
+      _emit('offline');
       return;
     }
   }
-
+ 
   _syncInProgress = false;
   const remaining = await OfflineQueue.all();
-  _emitConnChange(remaining.length ? 'offline' : 'online');
+  _emit(remaining.length ? 'offline' : 'online');
 }
-
-// Drain on load if online, and every 60 seconds
+ 
+// Drain on load if online; retry every 60 s
 if (_isOnline) drainQueue();
 setInterval(() => { if (_isOnline) drainQueue(); }, 60_000);
-
-// ─── EXPORTS ───────────────────────────────────────────────────────────────────
+ 
+// EXPORTS
 export {
   apiRequest,
   authRequest,
