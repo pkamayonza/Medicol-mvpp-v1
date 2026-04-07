@@ -30,7 +30,7 @@
   <main class="page">
  
     <div class="page-header">
-      <h1 class="page-title">Pharmacy</h1>
+      <h1 class="page-title" id="page-title">Pharmacy</h1>
       <div class="filter-tabs" id="status-tabs">
         <button class="filter-tab filter-tab--active" data-status="">All</button>
         <button class="filter-tab" data-status="sent">Incoming</button>
@@ -40,7 +40,7 @@
     </div>
  
     <!-- Stats strip -->
-    <div class="stats-strip" id="pharm-stats">
+    <div class="stats-strip">
       <div class="stat-strip-item">
         <div class="stat-strip-num" id="stat-incoming">—</div>
         <div class="stat-strip-label">Incoming</div>
@@ -57,7 +57,6 @@
       </div>
     </div>
  
-    <!-- Order Table -->
     <div class="card">
       <div class="table-wrap">
         <table>
@@ -95,81 +94,87 @@
   <div id="toast" class="toast"></div>
  
   <script type="module">
-    import { protectRoute, logout, getOrgType }           from '../js/modules/auth.js';
-    import { fetchIncomingOrders, updateOrderStatus,
-             renderOrderList, ORDER_STATUS }               from '../js/modules/pharmacy.js';
-    import { initConnPill, showToast, openModal, closeModal } from '../js/utils/ui.js';
-    import { escapeHtml, fmtDate, fmtUGX }                from '../js/utils/format.js';
+    import { protectRoute, logout, getOrgType, getOrgName }      from '../js/modules/auth.js';
+    import { fetchIncomingOrders, fetchSentOrders,
+             updateOrderStatus, renderOrderList,
+             ORDER_STATUS }                                       from '../js/modules/pharmacy.js';
+    import { initConnPill, showToast, openModal, closeModal }     from '../js/utils/ui.js';
+    import { escapeHtml, fmtDate, fmtUGX }                       from '../js/utils/format.js';
  
-    // ── Boot ───────────────────────────────────────────────────────────────────
+    // Boot
     const user    = await protectRoute();
     const orgType = getOrgType();
  
-    document.getElementById('nav-org').textContent = user.user_metadata?.org_name || user.email;
+    document.getElementById('nav-org').textContent = getOrgName();
     document.getElementById('logout-btn').addEventListener('click', logout);
     initConnPill('conn-pill');
  
-    // Hide clinic links if pure pharmacy account
-    if (orgType === 'pharmacy') {
+    // Pharmacy accounts don't need clinic nav links
+    const isPharmacyAccount = orgType === 'pharmacy';
+    if (isPharmacyAccount) {
       document.getElementById('dashboard-link').style.display = 'none';
       document.getElementById('patients-link').style.display  = 'none';
+      document.getElementById('page-title').textContent       = 'Pharmacy Queue';
+    } else {
+      document.getElementById('page-title').textContent = 'Prescription Orders';
     }
  
-    // ── State ──────────────────────────────────────────────────────────────────
+    // State 
     let _currentFilter = '';
     let _allOrders     = [];
  
-    // ── Load Orders ────────────────────────────────────────────────────────────
+    // Load Orders 
     async function loadOrders(statusFilter = '') {
       const body = document.getElementById('order-body');
       body.innerHTML = `<tr><td colspan="6" class="loading">Loading…</td></tr>`;
  
       try {
-        _allOrders = await fetchIncomingOrders(statusFilter || null);
+        // Pharmacy accounts see orders sent TO them
+        // Clinic accounts see orders they have sent OUT
+        _allOrders = isPharmacyAccount
+          ? await fetchIncomingOrders(statusFilter || null)
+          : await fetchSentOrders(statusFilter || null);
  
-        // Stats
-        const today    = new Date().toDateString();
-        const incoming = _allOrders.filter(o => o.status === 'sent').length;
-        const accepted = _allOrders.filter(o => o.status === 'accepted').length;
+        // Stats (computed from unfiltered data when no filter is active)
+        const today     = new Date().toDateString();
+        const incoming  = _allOrders.filter(o => o.status === 'sent').length;
+        const accepted  = _allOrders.filter(o => o.status === 'accepted').length;
         const dispensed = _allOrders.filter(o =>
-          o.status === 'dispensed' &&
-          new Date(o.created_at).toDateString() === today
+          o.status === 'dispensed' && new Date(o.created_at).toDateString() === today
         ).length;
  
-        document.getElementById('stat-incoming').textContent      = incoming;
-        document.getElementById('stat-accepted').textContent      = accepted;
+        document.getElementById('stat-incoming').textContent       = incoming;
+        document.getElementById('stat-accepted').textContent       = accepted;
         document.getElementById('stat-dispensed-today').textContent = dispensed;
  
         renderOrderList(body, _allOrders, {
           onView:     openOrderDetail,
-          onAccept:   async id => { showToast('Order accepted.'); await loadOrders(_currentFilter); },
-          onReject:   async id => { showToast('Order rejected.'); await loadOrders(_currentFilter); },
-          onDispense: async id => { showToast('Dispensed.'); await loadOrders(_currentFilter); },
-        }, true /* isPharmacyView */);
+          onAccept:   async () => { showToast('Order accepted.');  await loadOrders(_currentFilter); },
+          onReject:   async () => { showToast('Order rejected.');  await loadOrders(_currentFilter); },
+          onDispense: async () => { showToast('Dispensed.');       await loadOrders(_currentFilter); },
+        }, isPharmacyAccount);
  
       } catch (err) {
         showToast(err.message, 'error');
-        body.innerHTML = `<tr><td colspan="6" class="loading">${err.message}</td></tr>`;
+        body.innerHTML = `<tr><td colspan="6" class="empty-state">${escapeHtml(err.message)}</td></tr>`;
       }
     }
  
     await loadOrders();
  
-    // ── Filter Tabs ────────────────────────────────────────────────────────────
+    // Filter Tabs 
     document.getElementById('status-tabs').addEventListener('click', e => {
       const tab = e.target.closest('.filter-tab');
       if (!tab) return;
- 
       document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('filter-tab--active'));
       tab.classList.add('filter-tab--active');
- 
       _currentFilter = tab.dataset.status;
       loadOrders(_currentFilter);
     });
  
-    // ── Order Detail Modal ─────────────────────────────────────────────────────
+    // Order Detail Modal 
     function openOrderDetail(orderId) {
-      const order  = _allOrders.find(o => o.id === orderId);
+      const order = _allOrders.find(o => o.id === orderId);
       if (!order) return;
  
       const presc   = order.prescriptions || {};
@@ -184,7 +189,6 @@
           <div class="detail-section__value">${escapeHtml(patient.full_name || '—')}</div>
           <div class="text-muted text-sm">${patient.phone || '—'}</div>
         </div>
- 
         <div class="detail-section">
           <div class="detail-section__label">Drugs Prescribed</div>
           ${items.map(i => `
@@ -196,11 +200,9 @@
                   ${i.price ? ' · ' + fmtUGX(i.price * (i.quantity || 1)) : ''}
                 </div>
               </div>
-            </div>
-          `).join('')}
+            </div>`).join('')}
           ${total > 0 ? `<div class="rx-total-row"><span>Total</span><strong>${fmtUGX(total)}</strong></div>` : ''}
         </div>
- 
         <div class="detail-section">
           <div class="detail-section__label">Order Info</div>
           <div class="text-sm">Type: <strong>${order.order_type}</strong></div>
@@ -208,7 +210,6 @@
           <div class="text-sm text-muted">Received: ${fmtDate(order.created_at)}</div>
         </div>`;
  
-      // Action buttons based on status
       const actionsEl = document.getElementById('order-detail-actions');
       actionsEl.innerHTML = '';
  
@@ -218,7 +219,7 @@
       closeBtn.addEventListener('click', () => closeModal('modal-order'));
       actionsEl.appendChild(closeBtn);
  
-      if (order.status === ORDER_STATUS.SENT) {
+      if (isPharmacyAccount && order.status === ORDER_STATUS.SENT) {
         const acceptBtn = document.createElement('button');
         acceptBtn.className   = 'btn btn--primary';
         acceptBtn.textContent = 'Accept Order';
@@ -229,7 +230,7 @@
             showToast('Order accepted.');
             closeModal('modal-order');
             loadOrders(_currentFilter);
-          } catch (err) { showToast(err.message, 'error'); }
+          } catch (err) { showToast(err.message, 'error'); acceptBtn.disabled = false; }
         });
         actionsEl.appendChild(acceptBtn);
  
@@ -243,12 +244,12 @@
             showToast('Order rejected.');
             closeModal('modal-order');
             loadOrders(_currentFilter);
-          } catch (err) { showToast(err.message, 'error'); }
+          } catch (err) { showToast(err.message, 'error'); rejectBtn.disabled = false; }
         });
         actionsEl.appendChild(rejectBtn);
       }
  
-      if (order.status === ORDER_STATUS.ACCEPTED) {
+      if (isPharmacyAccount && order.status === ORDER_STATUS.ACCEPTED) {
         const dispenseBtn = document.createElement('button');
         dispenseBtn.className   = 'btn btn--success';
         dispenseBtn.textContent = 'Mark Dispensed';
@@ -259,7 +260,7 @@
             showToast('Dispensed successfully.');
             closeModal('modal-order');
             loadOrders(_currentFilter);
-          } catch (err) { showToast(err.message, 'error'); }
+          } catch (err) { showToast(err.message, 'error'); dispenseBtn.disabled = false; }
         });
         actionsEl.appendChild(dispenseBtn);
       }
@@ -267,7 +268,7 @@
       openModal('modal-order');
     }
  
-    // Close modal button
+    // Close buttons
     document.querySelectorAll('[data-close]').forEach(btn => {
       btn.addEventListener('click', () => closeModal(btn.dataset.close));
     });
