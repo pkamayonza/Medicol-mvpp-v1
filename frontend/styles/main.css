@@ -952,3 +952,33 @@ tr:hover td { background: #F8FAFC; }
   th, td { padding: 0.5rem 0.6rem; font-size: 0.8rem; }
   .btn--sm { padding: 0.28rem 0.55rem; font-size: 0.75rem; }
 }
+/* ── ADDITIONS v1 ──────────────────────────────────────────────────────────── */
+ 
+/* Toast variants */
+.toast--warn { background: #D97706; }
+.toast--info { background: #1D4ED8; }
+ 
+/* Prevent action button wrapping in narrow table cells */
+.td-actions { white-space: nowrap; flex-wrap: nowrap; }
+.td-actions .btn--full { width: auto; }
+ 
+/* Skeleton loading animation for stat cards */
+.stat-card--loading .stat-card__num {
+  background: #E2E8F0;
+  color: transparent;
+  border-radius: 4px;
+  animation: shimmer 1.2s ease-in-out infinite;
+  user-select: none;
+}
+ 
+@keyframes shimmer {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.35; }
+}
+ 
+/* Consultation form focus tint */
+#consult-form textarea:focus,
+#consult-form input[type="text"]:focus { background: #FAFFFE; }
+ 
+/* Patients.html — remove stale file */
+ 
