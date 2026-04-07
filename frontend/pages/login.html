@@ -3,77 +3,232 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Sign In — Minza Health</title>
+  <title>Minza Health</title>
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
   <link rel="stylesheet" href="../styles/main.css"/>
+  <style>
+    .auth-tabs {
+      display: flex;
+      background: #F4F6F8;
+      border-radius: 8px;
+      padding: 0.25rem;
+      gap: 0.25rem;
+      margin-bottom: 1.5rem;
+    }
+    .auth-tab {
+      flex: 1;
+      padding: 0.55rem;
+      text-align: center;
+      cursor: pointer;
+      font-size: 0.875rem;
+      font-weight: 600;
+      background: transparent;
+      border: none;
+      color: #94A3B8;
+      border-radius: 6px;
+      transition: all 0.2s;
+      font-family: 'Inter', sans-serif;
+    }
+    .auth-tab.active {
+      background: #0B1F3A;
+      color: white;
+    }
+    .auth-pane { display: none; }
+    .auth-pane.active { display: block; }
+    .form-success {
+      background: #F0FDF4;
+      border: 1px solid #86EFAC;
+      color: #166534;
+      padding: 0.7rem 1rem;
+      border-radius: 8px;
+      font-size: 0.83rem;
+      margin-bottom: 0.75rem;
+    }
+  </style>
 </head>
 <body class="auth-body">
- 
+
   <div class="auth-screen">
     <div class="auth-card">
- 
+
       <div class="auth-logo">
         <h1>Min<span>za</span></h1>
         <p>Health infrastructure for Africa</p>
       </div>
- 
-      <div class="form-error" id="login-error" style="display:none;"></div>
- 
-      <form id="login-form" novalidate>
-        <div class="form-group">
-          <label for="email">Email</label>
-          <input type="email" id="email" name="email"
-            placeholder="you@clinic.com"
-            autocomplete="email" required/>
-        </div>
-        <div class="form-group">
-          <label for="password">Password</label>
-          <input type="password" id="password" name="password"
-            placeholder="••••••••"
-            autocomplete="current-password" required/>
-        </div>
-        <button type="submit" class="btn btn--primary btn--full" id="login-btn">
-          Sign In →
-        </button>
-      </form>
- 
+
+      <!-- Tabs -->
+      <div class="auth-tabs">
+        <button class="auth-tab active" id="tab-login"  onclick="switchTab('login')">Sign In</button>
+        <button class="auth-tab"        id="tab-signup" onclick="switchTab('signup')">Register</button>
+      </div>
+
+      <!-- ── SIGN IN PANE ── -->
+      <div class="auth-pane active" id="pane-login">
+        <div class="form-error" id="login-error" style="display:none;"></div>
+        <form id="login-form" novalidate>
+          <div class="form-group">
+            <label for="login-email">Email</label>
+            <input type="email" id="login-email" name="email"
+                   placeholder="you@clinic.com"
+                   autocomplete="email" required/>
+          </div>
+          <div class="form-group">
+            <label for="login-password">Password</label>
+            <input type="password" id="login-password" name="password"
+                   placeholder="••••••••"
+                   autocomplete="current-password" required/>
+          </div>
+          <button type="submit" class="btn btn--primary btn--full" id="login-btn">
+            Sign In →
+          </button>
+        </form>
+      </div>
+
+      <!-- ── SIGN UP PANE ── -->
+      <div class="auth-pane" id="pane-signup">
+        <div class="form-error"   id="signup-error"   style="display:none;"></div>
+        <div class="form-success" id="signup-success" style="display:none;"></div>
+        <form id="signup-form" novalidate>
+          <div class="form-group">
+            <label for="signup-org">Facility / Organisation Name *</label>
+            <input type="text" id="signup-org" name="org_name"
+                   placeholder="e.g. Nakato Medical Centre" required/>
+          </div>
+          <div class="form-group">
+            <label for="signup-type">Facility Type *</label>
+            <select id="signup-type" name="org_type" required>
+              <option value="">Select type</option>
+              <option value="clinic">Clinic</option>
+              <option value="pharmacy">Pharmacy</option>
+              <option value="hospital">Hospital</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="signup-email">Email *</label>
+            <input type="email" id="signup-email" name="email"
+                   placeholder="you@clinic.com"
+                   autocomplete="email" required/>
+          </div>
+          <div class="form-group">
+            <label for="signup-password">Password *</label>
+            <input type="password" id="signup-password" name="password"
+                   placeholder="Min 6 characters"
+                   autocomplete="new-password" required/>
+          </div>
+          <button type="submit" class="btn btn--primary btn--full" id="signup-btn">
+            Create Account →
+          </button>
+        </form>
+        <p style="font-size:0.78rem;color:#94A3B8;text-align:center;margin-top:0.75rem;">
+          14-day free trial. No credit card required.
+        </p>
+      </div>
+
     </div>
   </div>
- 
+
   <script type="module">
-    import { login, redirectIfLoggedIn } from '../js/modules/auth.js';
- 
-    // Skip login screen if session is still valid
+    import { login, signup, redirectIfLoggedIn } from '../js/modules/auth.js';
+
+    // Skip login if already authenticated
     await redirectIfLoggedIn();
- 
-    const form  = document.getElementById('login-form');
-    const btn   = document.getElementById('login-btn');
-    const errEl = document.getElementById('login-error');
- 
-    form.addEventListener('submit', async e => {
+
+    // ── Tab switcher ─────────────────────────────────────────────────────────
+    window.switchTab = function(tab) {
+      document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.auth-pane').forEach(p => p.classList.remove('active'));
+      document.getElementById(`tab-${tab}`).classList.add('active');
+      document.getElementById(`pane-${tab}`).classList.add('active');
+      // Clear errors when switching tabs
+      document.getElementById('login-error').style.display  = 'none';
+      document.getElementById('signup-error').style.display = 'none';
+    };
+
+    // ── Sign In ───────────────────────────────────────────────────────────────
+    const loginForm = document.getElementById('login-form');
+    const loginBtn  = document.getElementById('login-btn');
+    const loginErr  = document.getElementById('login-error');
+
+    loginForm.addEventListener('submit', async e => {
       e.preventDefault();
-      errEl.style.display = 'none';
-      btn.disabled    = true;
-      btn.textContent = 'Signing in…';
- 
+      loginErr.style.display = 'none';
+      loginBtn.disabled    = true;
+      loginBtn.textContent = 'Signing in…';
+
       try {
-        const data    = await login(form.email.value.trim(), form.password.value);
+        const data    = await login(
+          loginForm.email.value.trim(),
+          loginForm.password.value
+        );
         const orgType = data.user?.user_metadata?.org_type?.toLowerCase() || 'clinic';
-        // Same-directory relative paths — work on any deploy base
+        // Relative paths — work regardless of how the server is configured
         window.location.href = orgType === 'pharmacy' ? 'pharmacy.html' : 'dashboard.html';
       } catch (err) {
-        errEl.textContent   = err.message;
-        errEl.style.display = 'block';
-        btn.disabled        = false;
-        btn.textContent     = 'Sign In →';
+        loginErr.textContent   = err.message;
+        loginErr.style.display = 'block';
+        loginBtn.disabled      = false;
+        loginBtn.textContent   = 'Sign In →';
+      }
+    });
+
+    // ── Sign Up ───────────────────────────────────────────────────────────────
+    const signupForm    = document.getElementById('signup-form');
+    const signupBtn     = document.getElementById('signup-btn');
+    const signupErr     = document.getElementById('signup-error');
+    const signupSuccess = document.getElementById('signup-success');
+
+    signupForm.addEventListener('submit', async e => {
+      e.preventDefault();
+      signupErr.style.display     = 'none';
+      signupSuccess.style.display = 'none';
+
+      const orgName = document.getElementById('signup-org').value.trim();
+      const orgType = document.getElementById('signup-type').value;
+      const email   = document.getElementById('signup-email').value.trim();
+      const password = document.getElementById('signup-password').value;
+
+      // Client-side validation
+      if (!orgName) {
+        signupErr.textContent   = 'Facility name is required.';
+        signupErr.style.display = 'block';
+        return;
+      }
+      if (!orgType) {
+        signupErr.textContent   = 'Select a facility type.';
+        signupErr.style.display = 'block';
+        return;
+      }
+      if (!email) {
+        signupErr.textContent   = 'Email is required.';
+        signupErr.style.display = 'block';
+        return;
+      }
+      if (password.length < 6) {
+        signupErr.textContent   = 'Password must be at least 6 characters.';
+        signupErr.style.display = 'block';
+        return;
+      }
+
+      signupBtn.disabled    = true;
+      signupBtn.textContent = 'Creating account…';
+
+      try {
+        await signup(email, password, orgName, orgType);
+        signupForm.reset();
+        signupSuccess.textContent   = 'Account created! Check your email to confirm, then sign in.';
+        signupSuccess.style.display = 'block';
+        // Switch to sign-in tab after 2 seconds
+        setTimeout(() => switchTab('login'), 2000);
+      } catch (err) {
+        signupErr.textContent   = err.message;
+        signupErr.style.display = 'block';
+      } finally {
+        signupBtn.disabled    = false;
+        signupBtn.textContent = 'Create Account →';
       }
     });
   </script>
 
-  <script src="js/modules/app.js"></script>
-  <script src="js/modules/auth.js"></script>
- 
 </body>
 </html>
- 
