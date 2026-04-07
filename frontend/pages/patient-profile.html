@@ -115,7 +115,7 @@
     import { initConnPill, showToast, openModal, closeModal } from '../js/utils/ui.js';
     import { fmtDate, fmtAge, fmtDateTime, escapeHtml }   from '../js/utils/format.js';
 
-    // ── Boot ───────────────────────────────────────────────────────────────────
+    // Boot 
     const user = await protectRoute();
     document.getElementById('logout-btn').addEventListener('click', logout);
     initConnPill('conn-pill');
@@ -124,7 +124,7 @@
     const patientId = params.get('id');
     if (!patientId) { window.location.href = 'patients.html'; }
 
-    // ── Load Patient ───────────────────────────────────────────────────────────
+    // Load Patient 
     let _patient = null;
 
     async function loadPatient() {
@@ -171,7 +171,7 @@
         </div>`;
     }
 
-    // ── Load Visit History ─────────────────────────────────────────────────────
+    // Load Visit History 
     async function loadVisitHistory() {
       const container = document.getElementById('visit-history-body');
       try {
@@ -228,7 +228,7 @@
       }
     }
 
-    // ── New Visit ──────────────────────────────────────────────────────────────
+    // New Visit 
     document.getElementById('new-visit-btn').addEventListener('click', async () => {
       const btn = document.getElementById('new-visit-btn');
       btn.disabled    = true;
@@ -249,7 +249,7 @@
       }
     });
 
-    // ── Edit Patient ───────────────────────────────────────────────────────────
+    // Edit Patient 
     function prefillEditForm(p) {
       document.getElementById('edit-name').value   = p.full_name || '';
       document.getElementById('edit-phone').value  = p.phone     || '';
@@ -295,12 +295,12 @@
       }
     });
 
-    // ── Modal close buttons ────────────────────────────────────────────────────
+    // Modal close buttons 
     document.querySelectorAll('[data-close]').forEach(btn => {
       btn.addEventListener('click', () => closeModal(btn.dataset.close));
     });
 
-    // ── Initial Load ───────────────────────────────────────────────────────────
+    // Initial Load 
     await Promise.all([loadPatient(), loadVisitHistory()]);
   </script>
 
