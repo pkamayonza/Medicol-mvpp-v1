@@ -1,17 +1,6 @@
-/**
- * ui.js — Minza Health UI Utilities
- *
- * Reusable DOM helpers. No business logic here.
- *  - Toast notifications
- *  - Modal open/close
- *  - Connectivity pill
- *  - Loading states
- *  - Form helpers
- */
-
 import { onConnChange, getConnState } from '../services/api.js';
 
-// ─── TOAST ─────────────────────────────────────────────────────────────────────
+// TOAST 
 let _toastTimer = null;
 
 function showToast(message, type = 'success') {
@@ -31,7 +20,7 @@ function showToast(message, type = 'success') {
   }, 3500);
 }
 
-// ─── MODAL ─────────────────────────────────────────────────────────────────────
+// MODAL 
 function openModal(id) {
   const el = document.getElementById(id);
   if (el) el.classList.add('modal--open');
@@ -56,7 +45,7 @@ document.addEventListener('keydown', e => {
   }
 });
 
-// ─── CONNECTIVITY PILL ─────────────────────────────────────────────────────────
+// CONNECTIVITY PILL 
 function initConnPill(pillId = 'conn-pill') {
   const pill = document.getElementById(pillId);
   if (!pill) return;
@@ -81,7 +70,7 @@ function initConnPill(pillId = 'conn-pill') {
   onConnChange(update);
 }
 
-// ─── LOADING ───────────────────────────────────────────────────────────────────
+// LOADING 
 function setLoading(container, isLoading, message = 'Loading…') {
   if (!container) return;
   if (isLoading) {
@@ -100,7 +89,7 @@ function setButtonLoading(btn, isLoading, loadingText = 'Loading…', defaultTex
   }
 }
 
-// ─── FORM HELPERS ──────────────────────────────────────────────────────────────
+// FORM HELPERS 
 function clearFormErrors(form) {
   if (!form) return;
   form.querySelectorAll('.form-error').forEach(el => {
@@ -129,14 +118,14 @@ function getFormData(form) {
   return data;
 }
 
-// ─── PAGE TITLE ────────────────────────────────────────────────────────────────
+// PAGE TITLE 
 function setPageTitle(title) {
   document.title = `${title} — Minza Health`;
   const h1 = document.querySelector('.page-title');
   if (h1) h1.textContent = title;
 }
 
-// ─── EXPORTS ───────────────────────────────────────────────────────────────────
+// EXPORTS 
 export {
   showToast,
   openModal,
