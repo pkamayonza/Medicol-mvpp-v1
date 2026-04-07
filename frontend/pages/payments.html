@@ -126,10 +126,10 @@
   <div id="toast" class="toast"></div>
  
   <script type="module">
-    import { protectRoute, logout, getOrgId, getOrgName } from '../js/modules/auth.js';
-    import { apiRequest }                                  from '../js/services/api.js';
+    import { protectRoute, logout, getOrgId }              from '../js/modules/auth.js';
+    import { apiRequest }                                   from '../js/services/api.js';
     import { initConnPill, showToast, openModal, closeModal } from '../js/utils/ui.js';
-    import { fmtDate, fmtUGX, escapeHtml }                from '../js/utils/format.js';
+    import { fmtDate, fmtUGX, escapeHtml }                 from '../js/utils/format.js';
  
     // Boot 
     const user = await protectRoute();
