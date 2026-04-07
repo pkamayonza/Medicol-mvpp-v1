@@ -3,10 +3,23 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Pharmacy — Minza Health</title>
+  <title>Payments — Minza Health</title>
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
   <link rel="stylesheet" href="../styles/main.css"/>
+  <style>
+    .date-input {
+      border: 1px solid #D1D9E0;
+      border-radius: 6px;
+      padding: 0.4rem 0.75rem;
+      font-size: 0.875rem;
+      font-family: inherit;
+      color: #0B1F3A;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    .date-input:focus { border-color: #0D6E6E; }
+  </style>
 </head>
 <body>
  
@@ -16,10 +29,10 @@
       <span class="nav__org" id="nav-org">—</span>
     </div>
     <div class="nav__center">
-      <a href="dashboard.html" class="nav__tab" id="dashboard-link">Dashboard</a>
-      <a href="patients.html"  class="nav__tab" id="patients-link">Patients</a>
-      <a href="pharmacy.html"  class="nav__tab nav__tab--active">Pharmacy</a>
-      <a href="payments.html"  class="nav__tab">Payments</a>
+      <a href="dashboard.html" class="nav__tab">Dashboard</a>
+      <a href="patients.html"  class="nav__tab">Patients</a>
+      <a href="pharmacy.html"  class="nav__tab">Pharmacy</a>
+      <a href="payments.html"  class="nav__tab nav__tab--active">Payments</a>
     </div>
     <div class="nav__right">
       <span id="conn-pill" class="conn-pill"></span>
@@ -30,48 +43,64 @@
   <main class="page">
  
     <div class="page-header">
-      <h1 class="page-title" id="page-title">Pharmacy</h1>
-      <div class="filter-tabs" id="status-tabs">
-        <button class="filter-tab filter-tab--active" data-status="">All</button>
-        <button class="filter-tab" data-status="sent">Incoming</button>
-        <button class="filter-tab" data-status="accepted">Accepted</button>
-        <button class="filter-tab" data-status="dispensed">Dispensed</button>
+      <h1 class="page-title">Payments</h1>
+      <div style="display:flex;gap:0.5rem;align-items:center;flex-wrap:wrap;">
+        <input type="date" id="from-date" class="date-input"/>
+        <span style="color:#94A3B8;font-size:0.875rem;">to</span>
+        <input type="date" id="to-date" class="date-input"/>
+        <button class="btn btn--outline btn--sm" id="apply-filter">Apply</button>
       </div>
     </div>
  
-    <!-- Stats strip -->
-    <div class="stats-strip">
-      <div class="stat-strip-item">
-        <div class="stat-strip-num" id="stat-incoming">—</div>
-        <div class="stat-strip-label">Incoming</div>
+    <!-- Stats -->
+    <div class="payment-stat-grid">
+      <div class="stat-card">
+        <div class="stat-card__label">Total Collected</div>
+        <div class="stat-card__num" id="stat-total-collected">—</div>
+        <div class="stat-card__sub">in period</div>
       </div>
-      <div class="stat-strip-sep"></div>
-      <div class="stat-strip-item">
-        <div class="stat-strip-num" id="stat-accepted">—</div>
-        <div class="stat-strip-label">Accepted</div>
+      <div class="stat-card">
+        <div class="stat-card__label">Cash</div>
+        <div class="stat-card__num" id="stat-cash">—</div>
+        <div class="stat-card__sub">payments</div>
       </div>
-      <div class="stat-strip-sep"></div>
-      <div class="stat-strip-item">
-        <div class="stat-strip-num" id="stat-dispensed-today">—</div>
-        <div class="stat-strip-label">Dispensed Today</div>
+      <div class="stat-card">
+        <div class="stat-card__label">Mobile Money</div>
+        <div class="stat-card__num" id="stat-momo">—</div>
+        <div class="stat-card__sub">payments</div>
+      </div>
+      <div class="stat-card" id="stat-outstanding-card">
+        <div class="stat-card__label">Outstanding</div>
+        <div class="stat-card__num" id="stat-outstanding">—</div>
+        <div class="stat-card__sub">unpaid bills</div>
       </div>
     </div>
  
+    <!-- Table -->
     <div class="card">
+      <div class="card__header">
+        <h2 class="card__title">Payment Records</h2>
+        <div class="filter-tabs" id="method-tabs">
+          <button class="filter-tab filter-tab--active" data-method="">All</button>
+          <button class="filter-tab" data-method="cash">Cash</button>
+          <button class="filter-tab" data-method="momo">MoMo</button>
+        </div>
+      </div>
       <div class="table-wrap">
         <table>
           <thead>
             <tr>
               <th>Patient</th>
-              <th>Drugs</th>
-              <th>Type</th>
+              <th>Amount</th>
+              <th>Method</th>
+              <th>Reference</th>
               <th>Status</th>
-              <th>Received</th>
+              <th>Date</th>
               <th>Actions</th>
             </tr>
           </thead>
-          <tbody id="order-body">
-            <tr><td colspan="6" class="loading">Loading orders…</td></tr>
+          <tbody id="payment-body">
+            <tr><td colspan="7" class="loading">Loading payments…</td></tr>
           </tbody>
         </table>
       </div>
@@ -79,202 +108,256 @@
  
   </main>
  
-  <!-- Order Detail Modal -->
-  <div class="modal" id="modal-order">
-    <div class="modal__card modal__card--wide">
+  <!-- Bill Detail Modal -->
+  <div class="modal" id="modal-bill">
+    <div class="modal__card">
       <div class="modal__header">
-        <h3>Order Details</h3>
-        <button class="modal__close" data-close="modal-order">✕</button>
+        <h3>Bill Details</h3>
+        <button class="modal__close" data-close="modal-bill">✕</button>
       </div>
-      <div id="order-detail-body"></div>
-      <div class="modal__actions" id="order-detail-actions"></div>
+      <div id="bill-detail-body"></div>
+      <div class="modal__actions">
+        <button class="btn btn--outline" data-close="modal-bill">Close</button>
+        <button class="btn btn--primary" id="go-to-visit-btn" style="display:none;">Open Visit →</button>
+      </div>
     </div>
   </div>
  
   <div id="toast" class="toast"></div>
  
   <script type="module">
-    import { protectRoute, logout, getOrgType, getOrgName }      from '../js/modules/auth.js';
-    import { fetchIncomingOrders, fetchSentOrders,
-             updateOrderStatus, renderOrderList,
-             ORDER_STATUS }                                       from '../js/modules/pharmacy.js';
-    import { initConnPill, showToast, openModal, closeModal }     from '../js/utils/ui.js';
-    import { escapeHtml, fmtDate, fmtUGX }                       from '../js/utils/format.js';
+    import { protectRoute, logout, getOrgId, getOrgName } from '../js/modules/auth.js';
+    import { apiRequest }                                  from '../js/services/api.js';
+    import { initConnPill, showToast, openModal, closeModal } from '../js/utils/ui.js';
+    import { fmtDate, fmtUGX, escapeHtml }                from '../js/utils/format.js';
  
     // Boot 
-    const user    = await protectRoute();
-    const orgType = getOrgType();
- 
+    const user = await protectRoute();
     document.getElementById('nav-org').textContent = getOrgName();
     document.getElementById('logout-btn').addEventListener('click', logout);
     initConnPill('conn-pill');
  
-    // Pharmacy accounts don't need clinic nav links
-    const isPharmacyAccount = orgType === 'pharmacy';
-    if (isPharmacyAccount) {
-      document.getElementById('dashboard-link').style.display = 'none';
-      document.getElementById('patients-link').style.display  = 'none';
-      document.getElementById('page-title').textContent       = 'Pharmacy Queue';
-    } else {
-      document.getElementById('page-title').textContent = 'Prescription Orders';
-    }
+    const orgId = getOrgId();
+ 
+    // Default date range: current month 
+    const now        = new Date();
+    const monthStart = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-01`;
+    const today      = now.toISOString().split('T')[0];
+    document.getElementById('from-date').value = monthStart;
+    document.getElementById('to-date').value   = today;
  
     // State 
-    let _currentFilter = '';
-    let _allOrders     = [];
+    let _allPayments  = [];
+    let _unpaidBills  = [];
+    let _methodFilter = '';
  
-    // Load Orders 
-    async function loadOrders(statusFilter = '') {
-      const body = document.getElementById('order-body');
-      body.innerHTML = `<tr><td colspan="6" class="loading">Loading…</td></tr>`;
+    // Load Payments 
+    async function loadPayments() {
+      const from    = document.getElementById('from-date').value;
+      const to      = document.getElementById('to-date').value;
+      const fromISO = from + 'T00:00:00';
+      const toISO   = to   + 'T23:59:59';
+ 
+      document.getElementById('payment-body').innerHTML =
+        `<tr><td colspan="7" class="loading">Loading…</td></tr>`;
  
       try {
-        // Pharmacy accounts see orders sent TO them
-        // Clinic accounts see orders they have sent OUT
-        _allOrders = isPharmacyAccount
-          ? await fetchIncomingOrders(statusFilter || null)
-          : await fetchSentOrders(statusFilter || null);
+        // Payments joined through bills → visits to filter by org
+        const payments = await apiRequest(
+          `/payments?created_at=gte.${fromISO}&created_at=lte.${toISO}&order=created_at.desc` +
+          `&select=*,bills!inner(id,total_amount,status,visits!inner(id,org_id,patients(full_name,phone)))` +
+          `&bills.visits.org_id=eq.${orgId}`
+        );
  
-        // Stats (computed from unfiltered data when no filter is active)
-        const today     = new Date().toDateString();
-        const incoming  = _allOrders.filter(o => o.status === 'sent').length;
-        const accepted  = _allOrders.filter(o => o.status === 'accepted').length;
-        const dispensed = _allOrders.filter(o =>
-          o.status === 'dispensed' && new Date(o.created_at).toDateString() === today
-        ).length;
+        // All unpaid/partial bills for this org to calculate true outstanding
+        const unpaid = await apiRequest(
+          `/bills?status=in.(unpaid,partial)` +
+          `&select=id,total_amount,status,payments(amount,status),visits!inner(org_id)` +
+          `&visits.org_id=eq.${orgId}`
+        ).catch(() => []);
  
-        document.getElementById('stat-incoming').textContent       = incoming;
-        document.getElementById('stat-accepted').textContent       = accepted;
-        document.getElementById('stat-dispensed-today').textContent = dispensed;
+        _allPayments = payments || [];
+        _unpaidBills = unpaid   || [];
  
-        renderOrderList(body, _allOrders, {
-          onView:     openOrderDetail,
-          onAccept:   async () => { showToast('Order accepted.');  await loadOrders(_currentFilter); },
-          onReject:   async () => { showToast('Order rejected.');  await loadOrders(_currentFilter); },
-          onDispense: async () => { showToast('Dispensed.');       await loadOrders(_currentFilter); },
-        }, isPharmacyAccount);
+        renderPayments(_methodFilter);
+        renderPaymentStats();
  
       } catch (err) {
+        document.getElementById('payment-body').innerHTML =
+          `<tr><td colspan="7" class="loading">${escapeHtml(err.message)}</td></tr>`;
         showToast(err.message, 'error');
-        body.innerHTML = `<tr><td colspan="6" class="empty-state">${escapeHtml(err.message)}</td></tr>`;
       }
     }
  
-    await loadOrders();
+    // Render Table 
+    function renderPayments(methodFilter = '') {
+      const body = document.getElementById('payment-body');
+      const list = methodFilter
+        ? _allPayments.filter(p => p.method === methodFilter)
+        : _allPayments;
  
-    // Filter Tabs
-    document.getElementById('status-tabs').addEventListener('click', e => {
+      if (!list.length) {
+        body.innerHTML = `<tr><td colspan="7" class="empty-state">No payments found.</td></tr>`;
+        return;
+      }
+ 
+      const statusBadge = s => {
+        const map = {
+          success: { cls: 'badge--success', label: 'Success' },
+          pending: { cls: 'badge--warn',    label: 'Pending' },
+          failed:  { cls: 'badge--danger',  label: 'Failed'  },
+        };
+        const { cls, label } = map[s] || { cls: 'badge--neutral', label: s };
+        return `<span class="badge ${cls}">${label}</span>`;
+      };
+ 
+      body.innerHTML = list.map(p => {
+        const bill    = p.bills   || {};
+        const visit   = bill.visits || {};
+        const patient = visit.patients || {};
+ 
+        return `<tr>
+          <td>
+            <div class="patient-name">${escapeHtml(patient.full_name || '—')}</div>
+            <div class="text-muted text-sm">${patient.phone || '—'}</div>
+          </td>
+          <td style="font-weight:700;">${fmtUGX(p.amount)}</td>
+          <td style="text-transform:capitalize;">${p.method}</td>
+          <td class="text-muted text-sm">${p.reference || '—'}</td>
+          <td>${statusBadge(p.status)}</td>
+          <td class="text-muted text-sm">${fmtDate(p.created_at)}</td>
+          <td class="td-actions">
+            <button class="btn btn--sm btn--outline js-view-bill"
+                    data-bill-id="${bill.id}"
+                    data-visit-id="${visit.id || ''}">View</button>
+          </td>
+        </tr>`;
+      }).join('');
+ 
+      body.querySelectorAll('.js-view-bill').forEach(btn => {
+        btn.addEventListener('click', () =>
+          openBillDetail(btn.dataset.billId, btn.dataset.visitId)
+        );
+      });
+    }
+ 
+    // Render Stats 
+    function renderPaymentStats() {
+      const successful = _allPayments.filter(p => p.status === 'success');
+      const total  = successful.reduce((s, p) => s + Number(p.amount), 0);
+      const cash   = successful.filter(p => p.method === 'cash').reduce((s, p) => s + Number(p.amount), 0);
+      const momo   = successful.filter(p => p.method === 'momo').reduce((s, p) => s + Number(p.amount), 0);
+ 
+      // Accurate outstanding: sum over _unpaidBills, deducting successful payments
+      let outstanding = 0;
+      for (const bill of _unpaidBills) {
+        const billPaid = (bill.payments || [])
+          .filter(p => p.status === 'success')
+          .reduce((s, p) => s + Number(p.amount), 0);
+        outstanding += Math.max(0, Number(bill.total_amount) - billPaid);
+      }
+ 
+      document.getElementById('stat-total-collected').textContent = fmtUGX(total);
+      document.getElementById('stat-cash').textContent             = fmtUGX(cash);
+      document.getElementById('stat-momo').textContent             = fmtUGX(momo);
+      document.getElementById('stat-outstanding').textContent      = fmtUGX(outstanding);
+      document.getElementById('stat-outstanding-card')
+        .classList.toggle('stat-card--warn', outstanding > 0);
+    }
+ 
+    // Bill Detail Modal 
+    async function openBillDetail(billId, visitId) {
+      if (!billId) return;
+      const detailBody = document.getElementById('bill-detail-body');
+      detailBody.innerHTML = `<div class="loading">Loading…</div>`;
+      openModal('modal-bill');
+ 
+      try {
+        const bills = await apiRequest(
+          `/bills?id=eq.${billId}&select=*,payments(*),visits(id,patients(full_name,phone))`
+        );
+        const bill = bills?.[0];
+        if (!bill) {
+          detailBody.innerHTML = `<div class="empty-state">Bill not found.</div>`;
+          return;
+        }
+ 
+        const patient   = bill.visits?.patients || {};
+        const payments  = bill.payments || [];
+        const totalPaid = payments
+          .filter(p => p.status === 'success')
+          .reduce((s, p) => s + Number(p.amount), 0);
+        const outstanding = Math.max(0, Number(bill.total_amount) - totalPaid);
+ 
+        const statusCls = { unpaid: 'badge--danger', partial: 'badge--warn', paid: 'badge--success' };
+ 
+        detailBody.innerHTML = `
+          <div class="detail-section">
+            <div class="detail-section__label">Patient</div>
+            <div class="detail-section__value">${escapeHtml(patient.full_name || '—')}</div>
+            <div class="text-muted text-sm">${patient.phone || '—'}</div>
+          </div>
+          <div class="bill-summary">
+            <div class="bill-summary__row">
+              <span>Total Amount</span>
+              <strong>${fmtUGX(bill.total_amount)}</strong>
+            </div>
+            <div class="bill-summary__row">
+              <span>Paid</span>
+              <strong class="text-success">${fmtUGX(totalPaid)}</strong>
+            </div>
+            <div class="bill-summary__row bill-summary__row--outstanding">
+              <span>Outstanding</span>
+              <strong class="${outstanding > 0 ? 'text-danger' : 'text-success'}">${fmtUGX(outstanding)}</strong>
+            </div>
+            <div class="bill-summary__row">
+              <span>Status</span>
+              <span class="badge ${statusCls[bill.status] || 'badge--neutral'}">${bill.status}</span>
+            </div>
+          </div>
+          ${payments.length ? `
+            <div class="payment-history">
+              <div class="section-label">Payment History</div>
+              ${payments.map(p => `
+                <div class="payment-row">
+                  <span class="payment-row__method">${p.method}</span>
+                  <span class="payment-row__amount">${fmtUGX(p.amount)}</span>
+                  ${p.reference ? `<span class="text-muted text-sm">${escapeHtml(p.reference)}</span>` : ''}
+                  <span class="badge ${p.status === 'success' ? 'badge--success' : 'badge--warn'}">${p.status}</span>
+                  <span class="text-muted text-sm">${fmtDate(p.created_at)}</span>
+                </div>`).join('')}
+            </div>` : ''}`;
+ 
+        const visitBtn = document.getElementById('go-to-visit-btn');
+        if (visitId) {
+          visitBtn.style.display = 'inline-flex';
+          visitBtn.onclick       = () => { window.location.href = `visit.html?id=${visitId}`; };
+        } else {
+          visitBtn.style.display = 'none';
+        }
+ 
+      } catch (err) {
+        detailBody.innerHTML = `<div class="empty-state">${escapeHtml(err.message)}</div>`;
+      }
+    }
+ 
+    // Filter Tabs 
+    document.getElementById('method-tabs').addEventListener('click', e => {
       const tab = e.target.closest('.filter-tab');
       if (!tab) return;
       document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('filter-tab--active'));
       tab.classList.add('filter-tab--active');
-      _currentFilter = tab.dataset.status;
-      loadOrders(_currentFilter);
+      _methodFilter = tab.dataset.method;
+      renderPayments(_methodFilter);
     });
  
-    // Order Detail Modal 
-    function openOrderDetail(orderId) {
-      const order = _allOrders.find(o => o.id === orderId);
-      if (!order) return;
+    document.getElementById('apply-filter').addEventListener('click', loadPayments);
  
-      const presc   = order.prescriptions || {};
-      const items   = presc.prescription_items || [];
-      const visit   = presc.visits || {};
-      const patient = visit.patients || {};
-      const total   = items.reduce((s, i) => s + ((i.price || 0) * (i.quantity || 1)), 0);
- 
-      document.getElementById('order-detail-body').innerHTML = `
-        <div class="detail-section">
-          <div class="detail-section__label">Patient</div>
-          <div class="detail-section__value">${escapeHtml(patient.full_name || '—')}</div>
-          <div class="text-muted text-sm">${patient.phone || '—'}</div>
-        </div>
-        <div class="detail-section">
-          <div class="detail-section__label">Drugs Prescribed</div>
-          ${items.map(i => `
-            <div class="rx-item">
-              <div class="rx-item__info">
-                <div class="rx-item__name">${escapeHtml(i.drug_name)}</div>
-                <div class="rx-item__meta">
-                  ${i.dosage ? escapeHtml(i.dosage) + ' · ' : ''}Qty: ${i.quantity || 1}
-                  ${i.price ? ' · ' + fmtUGX(i.price * (i.quantity || 1)) : ''}
-                </div>
-              </div>
-            </div>`).join('')}
-          ${total > 0 ? `<div class="rx-total-row"><span>Total</span><strong>${fmtUGX(total)}</strong></div>` : ''}
-        </div>
-        <div class="detail-section">
-          <div class="detail-section__label">Order Info</div>
-          <div class="text-sm">Type: <strong>${order.order_type}</strong></div>
-          <div class="text-sm">Status: <strong>${order.status}</strong></div>
-          <div class="text-sm text-muted">Received: ${fmtDate(order.created_at)}</div>
-        </div>`;
- 
-      const actionsEl = document.getElementById('order-detail-actions');
-      actionsEl.innerHTML = '';
- 
-      const closeBtn = document.createElement('button');
-      closeBtn.className   = 'btn btn--outline';
-      closeBtn.textContent = 'Close';
-      closeBtn.addEventListener('click', () => closeModal('modal-order'));
-      actionsEl.appendChild(closeBtn);
- 
-      if (isPharmacyAccount && order.status === ORDER_STATUS.SENT) {
-        const acceptBtn = document.createElement('button');
-        acceptBtn.className   = 'btn btn--primary';
-        acceptBtn.textContent = 'Accept Order';
-        acceptBtn.addEventListener('click', async () => {
-          acceptBtn.disabled = true;
-          try {
-            await updateOrderStatus(orderId, ORDER_STATUS.ACCEPTED);
-            showToast('Order accepted.');
-            closeModal('modal-order');
-            loadOrders(_currentFilter);
-          } catch (err) { showToast(err.message, 'error'); acceptBtn.disabled = false; }
-        });
-        actionsEl.appendChild(acceptBtn);
- 
-        const rejectBtn = document.createElement('button');
-        rejectBtn.className   = 'btn btn--danger';
-        rejectBtn.textContent = 'Reject';
-        rejectBtn.addEventListener('click', async () => {
-          rejectBtn.disabled = true;
-          try {
-            await updateOrderStatus(orderId, ORDER_STATUS.REJECTED);
-            showToast('Order rejected.');
-            closeModal('modal-order');
-            loadOrders(_currentFilter);
-          } catch (err) { showToast(err.message, 'error'); rejectBtn.disabled = false; }
-        });
-        actionsEl.appendChild(rejectBtn);
-      }
- 
-      if (isPharmacyAccount && order.status === ORDER_STATUS.ACCEPTED) {
-        const dispenseBtn = document.createElement('button');
-        dispenseBtn.className   = 'btn btn--success';
-        dispenseBtn.textContent = 'Mark Dispensed';
-        dispenseBtn.addEventListener('click', async () => {
-          dispenseBtn.disabled = true;
-          try {
-            await updateOrderStatus(orderId, ORDER_STATUS.DISPENSED);
-            showToast('Dispensed successfully.');
-            closeModal('modal-order');
-            loadOrders(_currentFilter);
-          } catch (err) { showToast(err.message, 'error'); dispenseBtn.disabled = false; }
-        });
-        actionsEl.appendChild(dispenseBtn);
-      }
- 
-      openModal('modal-order');
-    }
- 
-    // Close buttons
     document.querySelectorAll('[data-close]').forEach(btn => {
       btn.addEventListener('click', () => closeModal(btn.dataset.close));
     });
  
-    // Auto-refresh every 60 seconds
-    setInterval(() => loadOrders(_currentFilter), 60_000);
+    await loadPayments();
   </script>
  
 </body>
