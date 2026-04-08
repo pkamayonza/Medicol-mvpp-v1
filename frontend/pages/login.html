@@ -188,9 +188,6 @@
       const email   = document.getElementById('signup-email').value.trim();
       const password = document.getElementById('signup-password').value;
 
-      localStorage.setItem('orgName', response.organization.name);
-      localStorage.setItem('orgType', response.organization.type);
-
       // Client-side validation
       if (!orgName) {
         signupErr.textContent   = 'Facility name is required.';
