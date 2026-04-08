@@ -1,3 +1,15 @@
+/**
+ * api.js — Minza Health API Service Layer
+ * =========================================
+ * ALL fetch() calls in the entire app go through this file.
+ * No other file touches fetch() directly except auth.js (session refresh).
+ *
+ * CRITICAL BEHAVIOUR:
+ *   - GET requests return [] (not throw) when offline → pages stay alive
+ *   - Mutations (POST/PATCH/DELETE) are queued to IndexedDB when offline
+ *   - Queue drains automatically on reconnect, FIFO, max 3 attempts each
+ */
+ 
 // CONFIG 
 const API_BASE  = 'https://qflqwmfdwalvmndaojzl.supabase.co/rest/v1';
 const AUTH_BASE = 'https://qflqwmfdwalvmndaojzl.supabase.co/auth/v1';
@@ -27,30 +39,47 @@ const OfflineQueue = (() => {
     });
   }
  
-  const tx = async (mode, fn) => {
+  async function push(entry) {
     const db = await open();
     return new Promise((resolve, reject) => {
-      const t = db.transaction(STORE, mode);
-      const r = fn(t.objectStore(STORE));
-      if (r) { r.onsuccess = e => resolve(e.target.result); r.onerror = e => reject(e.target.error); }
-      t.oncomplete = () => resolve();
-      t.onerror    = e => reject(e.target.error);
+      const tx = db.transaction(STORE, 'readwrite');
+      tx.objectStore(STORE).add(entry);
+      tx.oncomplete = resolve;
+      tx.onerror    = e => reject(e.target.error);
     });
-  };
+  }
  
-  return {
-    push:   e  => tx('readwrite', s => s.add(e)),
-    remove: id => tx('readwrite', s => s.delete(id)),
-    update: e  => tx('readwrite', s => s.put(e)),
-    all:    () => new Promise(async (resolve, reject) => {
-      const db = await open();
-      const t  = db.transaction(STORE, 'readonly');
-      const r  = t.objectStore(STORE).index('queuedAt').getAll();
-      r.onsuccess = e => resolve(e.target.result);
-      r.onerror   = e => reject(e.target.error);
-    }),
-    MAX_ATT,
-  };
+  async function all() {
+    const db = await open();
+    return new Promise((resolve, reject) => {
+      const tx  = db.transaction(STORE, 'readonly');
+      const req = tx.objectStore(STORE).index('queuedAt').getAll();
+      req.onsuccess = e => resolve(e.target.result);
+      req.onerror   = e => reject(e.target.error);
+    });
+  }
+ 
+  async function remove(id) {
+    const db = await open();
+    return new Promise((resolve, reject) => {
+      const tx = db.transaction(STORE, 'readwrite');
+      tx.objectStore(STORE).delete(id);
+      tx.oncomplete = resolve;
+      tx.onerror    = e => reject(e.target.error);
+    });
+  }
+ 
+  async function update(entry) {
+    const db = await open();
+    return new Promise((resolve, reject) => {
+      const tx = db.transaction(STORE, 'readwrite');
+      tx.objectStore(STORE).put(entry);
+      tx.oncomplete = resolve;
+      tx.onerror    = e => reject(e.target.error);
+    });
+  }
+ 
+  return { push, all, remove, update, MAX_ATT };
 })();
  
 // CONNECTIVITY 
@@ -60,7 +89,7 @@ const _connListeners = [];
  
 function getConnState() { return _isOnline; }
 function onConnChange(fn) { _connListeners.push(fn); }
-function _emit(state)   { _connListeners.forEach(fn => fn(state)); }
+function _emit(state)    { _connListeners.forEach(fn => fn(state)); }
  
 window.addEventListener('online',  () => { _isOnline = true;  _emit('online');  drainQueue(); });
 window.addEventListener('offline', () => { _isOnline = false; _emit('offline'); });
@@ -84,102 +113,81 @@ function clearSession() {
   localStorage.removeItem('minza_session');
 }
  
-// CORE REQUEST
-
+// CORE REQUEST 
+/**
+ * apiRequest — the single entry point for all data operations.
+ *
+ * @param {string}      endpoint  PostgREST path, e.g. '/patients?org_id=eq.xxx'
+ * @param {string}      method    GET | POST | PATCH | DELETE  (default: GET)
+ * @param {object|null} body      Mutation payload (ignored for GET)
+ * @param {object}      opts      { preferRepresentation: bool, count: bool, returnNull: bool }
+ * @returns {Promise<any>}
+ *   - GET success  → parsed JSON array or object
+ *   - GET offline  → []  (never throws — pages stay alive)
+ *   - Mutation success → parsed JSON or null (204)
+ *   - Mutation offline → null (queued to IndexedDB)
+ *   - Server error → throws with human-readable message
+ */
 async function apiRequest(endpoint, method = 'GET', body = null, opts = {}) {
   const token = getToken();
-
+ 
   const headers = {
     'Content-Type': 'application/json',
-    'apikey': ANON_KEY,
-    'Prefer': opts.preferRepresentation !== false ? 'return=representation' : 'return=minimal',
+    'apikey':       ANON_KEY,
+    'Prefer':       opts.preferRepresentation !== false
+                      ? 'return=representation'
+                      : 'return=minimal',
   };
-
-  if (token) headers['Authorization'] = `Bearer ${token}`;
-  if (opts.count) headers['Prefer'] += ',count=exact';
-
+  if (token)       headers['Authorization'] = `Bearer ${token}`;
+  if (opts.count)  headers['Prefer']       += ',count=exact';
+ 
   const config = { method, headers };
   if (body && method !== 'GET') config.body = JSON.stringify(body);
-
+ 
+  // ── GET: return [] when offline so pages render empty-state instead of crash
   if (method === 'GET') {
-    // Offline: return empty array/null instead of throwing — caller decides what to show
     if (!_isOnline) {
-      console.warn('[Minza] GET skipped — offline:', endpoint);
-      return opts.returnNullIfOffline ? null : [];
+      console.warn('[Minza] GET skipped (offline):', endpoint);
+      return opts.returnNull ? null : [];
     }
     try {
-      const res = await fetch(`${API_BASE}${endpoint}`, config);
+      const res  = await fetch(`${API_BASE}${endpoint}`, config);
       if (res.status === 204) return null;
       const data = await res.json();
       if (!res.ok) throw new Error(data.message || data.hint || data.error || `Request failed (${res.status})`);
       return data;
     } catch (err) {
-      // Network error on GET (e.g. request in flight when connection drops)
       if (err.name === 'TypeError') {
+        // Network dropped mid-flight
         _isOnline = false;
-        _emitConnChange('offline');
-        return opts.returnNullIfOffline ? null : [];
+        _emit('offline');
+        return opts.returnNull ? null : [];
       }
       throw err;
     }
   }
-
-  // Mutations: try live first, queue on failure
-  if (_isOnline) {
-    try {
-      const res = await fetch(`${API_BASE}${endpoint}`, config);
-      if (res.status === 204) return null;
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.message || data.hint || data.error || `Request failed (${res.status})`);
-      return data;
-    } catch (err) {
-      if (err.name === 'TypeError') {
-        // Network dropped mid-request — fall through to queue
-        _isOnline = false;
-        _emitConnChange('offline');
-      } else {
-        throw err; // Server rejected it (4xx/5xx) — surface to caller
-      }
-    }
-  }
-
-  // Offline — queue the mutation
-  const queued = {
-    id:       crypto.randomUUID(),
-    endpoint,
-    method,
-    body,
-    token,
-    queuedAt: Date.now(),
-    attempts: 0,
-  };
-  await OfflineQueue.push(queued);
-  console.log('[Minza] Queued offline mutation:', method, endpoint);
-  return null;
-}
  
-  // MUTATIONS: try live, queue on network failure
+  // MUTATIONS: try live first 
   if (_isOnline) {
     try {
-      const res = await fetch(`${API_BASE}${endpoint}`, config);
+      const res  = await fetch(`${API_BASE}${endpoint}`, config);
       if (res.status === 204) return null;
       const data = await res.json();
       if (!res.ok) throw new Error(data.message || data.hint || data.error || `Request failed (${res.status})`);
       return data;
     } catch (err) {
       if (err.name === 'TypeError') {
-        // Network dropped — fall through to queue
         _isOnline = false;
         _emit('offline');
+        // Fall through to queue
       } else {
-        // Server rejected (4xx/5xx) — surface to caller, do not queue
-        throw err;
+        throw err; // 4xx/5xx — surface to caller, do not queue
       }
     }
   }
  
-  // OFFLINE QUEUE
-  const entry = {
+  // QUEUE offline mutation 
+  await OfflineQueue.push({
     id:       crypto.randomUUID(),
     endpoint,
     method,
@@ -187,13 +195,12 @@ async function apiRequest(endpoint, method = 'GET', body = null, opts = {}) {
     token,
     queuedAt: Date.now(),
     attempts: 0,
-  };
-  await OfflineQueue.push(entry);
+  });
   console.log('[Minza] Queued offline:', method, endpoint);
-  return null; // caller must handle null gracefully
-
+  return null; // caller must handle null
+}
  
-// AUTH REQUESTS
+// AUTH REQUESTS (separate base URL, no token needed) 
 async function authRequest(path, body) {
   const res = await fetch(`${AUTH_BASE}/${path}`, {
     method:  'POST',
@@ -201,11 +208,11 @@ async function authRequest(path, body) {
     body:    JSON.stringify(body),
   });
   const data = await res.json();
-  if (!res.ok) throw new Error(data.error_description || data.msg || 'Auth failed');
+  if (!res.ok) throw new Error(data.error_description || data.msg || data.message || 'Auth failed');
   return data;
 }
  
-// DRAIN QUEUE
+// DRAIN QUEUE 
 async function drainQueue() {
   if (_syncInProgress || !_isOnline) return;
   const items = await OfflineQueue.all();
@@ -229,11 +236,9 @@ async function drainQueue() {
  
       if (res.ok || res.status === 204) {
         await OfflineQueue.remove(item.id);
-        console.log('[Minza] Drained:', item.endpoint);
       } else if (res.status >= 400 && res.status < 500) {
-        // Server permanently rejected — discard to avoid infinite loop
-        await OfflineQueue.remove(item.id);
-        console.warn('[Minza] Queue item rejected by server:', res.status, item.endpoint);
+        await OfflineQueue.remove(item.id); // server permanently rejected
+        console.warn('[Minza] Queue item rejected:', res.status, item.endpoint);
       } else {
         item.attempts = (item.attempts || 0) + 1;
         if (item.attempts >= OfflineQueue.MAX_ATT) {
@@ -244,7 +249,6 @@ async function drainQueue() {
         }
       }
     } catch (_) {
-      // Network dropped again during drain
       _isOnline = false;
       _syncInProgress = false;
       _emit('offline');
@@ -257,11 +261,10 @@ async function drainQueue() {
   _emit(remaining.length ? 'offline' : 'online');
 }
  
-// Drain on load if online; retry every 60 s
 if (_isOnline) drainQueue();
 setInterval(() => { if (_isOnline) drainQueue(); }, 60_000);
  
-// EXPORTS
+// EXPORTS 
 export {
   apiRequest,
   authRequest,
@@ -273,3 +276,4 @@ export {
   onConnChange,
   drainQueue,
 };
+ 
