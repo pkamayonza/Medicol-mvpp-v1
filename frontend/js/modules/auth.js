@@ -1,43 +1,24 @@
-/**
- * auth.js — Minza Health Auth Module
- *
- * Responsibility: Login, logout, session persistence, route protection.
- *
- * KEY RULE ON REDIRECTS:
- *   ALL window.location.href assignments use RELATIVE paths (no leading slash,
- *   no /pages/ prefix). This makes every redirect work regardless of how the
- *   dev server is configured or where the files are served from.
- */
- 
 import { authRequest, setSession, clearSession, getSession } from '../services/api.js';
- 
-// STATE
+
 let _currentUser    = null;
 let _currentSession = null;
- 
-// GETTERS 
+
 function getCurrentUser()    { return _currentUser; }
 function getCurrentSession() { return _currentSession; }
- 
-/** Returns the org UUID — used as the foreign key in every DB query */
+
+// ONLY ONE definition of each — reads from the live session object
 function getOrgId() {
-  return _currentUser?.user_metadata?.org_id
-      || _currentUser?.id
-      || null;
+  return _currentUser?.user_metadata?.org_id || _currentUser?.id || null;
 }
- 
-/** Returns 'clinic' or 'pharmacy' — lowercase, trimmed */
+
 function getOrgType() {
   return (_currentUser?.user_metadata?.org_type || 'clinic').toLowerCase().trim();
 }
- 
-/** Returns the human-readable org name for display in nav / headers */
+
 function getOrgName() {
-  return _currentUser?.user_metadata?.org_name
-      || _currentUser?.email
-      || '—';
+  return _currentUser?.user_metadata?.org_name || _currentUser?.email || '—';
 }
- 
+
 function getRole() {
   return _currentUser?.user_metadata?.role || 'admin';
 }
