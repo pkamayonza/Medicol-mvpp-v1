@@ -6,12 +6,13 @@ let _currentSession = null;
 function getCurrentUser()    { return _currentUser; }
 function getCurrentSession() { return _currentSession; }
 
-function getOrgId() {
-  return _currentUser?.user_metadata?.org_id || _currentUser?.id || null;
+export function getOrgName() {
+  // Retrieve from localStorage after login
+  return localStorage.getItem('orgName') || 'Your Clinic';
 }
 
-function getOrgType() {
-  return (_currentUser?.user_metadata?.org_type || 'clinic').toLowerCase().trim();
+export function getOrgType() {
+  return localStorage.getItem('orgType') || 'clinic';
 }
 
 function getOrgName() {

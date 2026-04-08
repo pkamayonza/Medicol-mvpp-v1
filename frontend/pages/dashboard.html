@@ -31,8 +31,8 @@
  
     <div class="page-header">
       <div>
-        <div class="page-title" id="facility-name">—</div>
-        <div class="page-subtitle" id="today-date">—</div>
+        <div class="page-title" id="facility-name"></div>
+        <div class="page-subtitle" id="today-date"></div>
       </div>
       <button class="btn btn--primary" id="new-patient-btn">+ New Patient</button>
     </div>
@@ -46,32 +46,32 @@
     <div class="stats-grid">
       <div class="stat-card">
         <div class="stat-card__label">Total Visits Today</div>
-        <div class="stat-card__num" data-stat="totalVisits">—</div>
+        <div class="stat-card__num" data-stat="totalVisits"></div>
         <div class="stat-card__sub">all statuses</div>
       </div>
       <div class="stat-card" id="stat-waiting">
         <div class="stat-card__label">Waiting</div>
-        <div class="stat-card__num" data-stat="waitingCount">—</div>
+        <div class="stat-card__num" data-stat="waitingCount"></div>
         <div class="stat-card__sub">in queue</div>
       </div>
       <div class="stat-card">
         <div class="stat-card__label">In Consult</div>
-        <div class="stat-card__num" data-stat="inConsultCount">—</div>
+        <div class="stat-card__num" data-stat="inConsultCount"></div>
         <div class="stat-card__sub">with doctor</div>
       </div>
       <div class="stat-card">
         <div class="stat-card__label">Completed</div>
-        <div class="stat-card__num" data-stat="completedCount">—</div>
+        <div class="stat-card__num" data-stat="completedCount"></div>
         <div class="stat-card__sub">today</div>
       </div>
       <div class="stat-card" id="stat-pending-rx">
         <div class="stat-card__label">Pending Rx</div>
-        <div class="stat-card__num" data-stat="pendingRxCount">—</div>
+        <div class="stat-card__num" data-stat="pendingRxCount"></div>
         <div class="stat-card__sub">prescriptions</div>
       </div>
       <div class="stat-card">
         <div class="stat-card__label">Revenue Today</div>
-        <div class="stat-card__num" data-stat="todayRevenue">—</div>
+        <div class="stat-card__num" data-stat="todayRevenue"></div>
         <div class="stat-card__sub">collected</div>
       </div>
     </div>
@@ -94,7 +94,7 @@
             </tr>
           </thead>
           <tbody id="queue-body">
-            <tr><td colspan="5" class="loading">Loading queue…</td></tr>
+            <tr><td colspan="5" class="loading">Loading </td></tr>
           </tbody>
         </table>
       </div>
@@ -188,8 +188,8 @@
     setInterval(loadDashboard, 60_000);
   </script>
 
-  <script src="./modules/app.js"></script>
-  <script src="./modules/dashboard.js"></script>
+  <script src="../js/modules/app.js"></script>
+  <script src="../js/modules/dashboard.js"></script>
  
 </body>
 </html>
