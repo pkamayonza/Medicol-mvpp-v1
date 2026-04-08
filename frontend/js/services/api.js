@@ -85,34 +85,27 @@ function clearSession() {
 }
  
 // CORE REQUEST
-/**
- * apiRequest — single entry point for all data operations.
- *
- * @param {string}      endpoint - PostgREST path e.g. '/patients?org_id=eq.xxx'
- * @param {string}      method   - GET | POST | PATCH | DELETE
- * @param {object|null} body     - mutation body
- * @param {object}      opts     - { count: bool, preferRepresentation: bool }
- */
+
 async function apiRequest(endpoint, method = 'GET', body = null, opts = {}) {
   const token = getToken();
- 
+
   const headers = {
     'Content-Type': 'application/json',
-    'apikey':        ANON_KEY,
-    'Prefer':        opts.preferRepresentation !== false ? 'return=representation' : 'return=minimal',
+    'apikey': ANON_KEY,
+    'Prefer': opts.preferRepresentation !== false ? 'return=representation' : 'return=minimal',
   };
+
   if (token) headers['Authorization'] = `Bearer ${token}`;
   if (opts.count) headers['Prefer'] += ',count=exact';
- 
+
   const config = { method, headers };
   if (body && method !== 'GET') config.body = JSON.stringify(body);
- 
-  // GET: return [] when offline instead of throwing 
-  // This keeps pages alive on flaky 3G — they show empty state rather than crash.
+
   if (method === 'GET') {
+    // Offline: return empty array/null instead of throwing — caller decides what to show
     if (!_isOnline) {
       console.warn('[Minza] GET skipped — offline:', endpoint);
-      return opts.returnNull ? null : [];
+      return opts.returnNullIfOffline ? null : [];
     }
     try {
       const res = await fetch(`${API_BASE}${endpoint}`, config);
@@ -121,15 +114,49 @@ async function apiRequest(endpoint, method = 'GET', body = null, opts = {}) {
       if (!res.ok) throw new Error(data.message || data.hint || data.error || `Request failed (${res.status})`);
       return data;
     } catch (err) {
+      // Network error on GET (e.g. request in flight when connection drops)
       if (err.name === 'TypeError') {
-        // Network dropped while request was in flight
         _isOnline = false;
-        _emit('offline');
-        return opts.returnNull ? null : [];
+        _emitConnChange('offline');
+        return opts.returnNullIfOffline ? null : [];
       }
       throw err;
     }
   }
+
+  // Mutations: try live first, queue on failure
+  if (_isOnline) {
+    try {
+      const res = await fetch(`${API_BASE}${endpoint}`, config);
+      if (res.status === 204) return null;
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message || data.hint || data.error || `Request failed (${res.status})`);
+      return data;
+    } catch (err) {
+      if (err.name === 'TypeError') {
+        // Network dropped mid-request — fall through to queue
+        _isOnline = false;
+        _emitConnChange('offline');
+      } else {
+        throw err; // Server rejected it (4xx/5xx) — surface to caller
+      }
+    }
+  }
+
+  // Offline — queue the mutation
+  const queued = {
+    id:       crypto.randomUUID(),
+    endpoint,
+    method,
+    body,
+    token,
+    queuedAt: Date.now(),
+    attempts: 0,
+  };
+  await OfflineQueue.push(queued);
+  console.log('[Minza] Queued offline mutation:', method, endpoint);
+  return null;
+}
  
   // MUTATIONS: try live, queue on network failure
   if (_isOnline) {

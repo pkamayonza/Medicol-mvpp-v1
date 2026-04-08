@@ -1,6 +1,7 @@
 import { apiRequest } from '../services/api.js';
 import { getOrgId }   from './auth.js';
 import { fmtUGX }     from '../utils/format.js';
+import { API_BASE_URL } from './config.js';
  
 // FETCH
 async function fetchDashboardData() {
