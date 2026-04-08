@@ -1,28 +1,47 @@
+/**
+ * auth.js — Minza Health Auth Module
+ *
+ * Responsibility: Login, logout, session persistence, route protection.
+ *
+ * KEY RULE ON REDIRECTS:
+ *   ALL window.location.href assignments use RELATIVE paths (no leading slash,
+ *   no /pages/ prefix). This makes every redirect work regardless of how the
+ *   dev server is configured or where the files are served from.
+ */
+ 
 import { authRequest, setSession, clearSession, getSession } from '../services/api.js';
-
+ 
+// STATE
 let _currentUser    = null;
 let _currentSession = null;
-
+ 
+// GETTERS 
 function getCurrentUser()    { return _currentUser; }
 function getCurrentSession() { return _currentSession; }
-
-export function getOrgName() {
-  // Retrieve from localStorage after login
-  return localStorage.getItem('orgName') || 'Your Clinic';
+ 
+/** Returns the org UUID — used as the foreign key in every DB query */
+function getOrgId() {
+  return _currentUser?.user_metadata?.org_id
+      || _currentUser?.id
+      || null;
 }
-
-export function getOrgType() {
-  return localStorage.getItem('orgType') || 'clinic';
+ 
+/** Returns 'clinic' or 'pharmacy' — lowercase, trimmed */
+function getOrgType() {
+  return (_currentUser?.user_metadata?.org_type || 'clinic').toLowerCase().trim();
 }
-
+ 
+/** Returns the human-readable org name for display in nav / headers */
 function getOrgName() {
-  return _currentUser?.user_metadata?.org_name || _currentUser?.email || '—';
+  return _currentUser?.user_metadata?.org_name
+      || _currentUser?.email
+      || '—';
 }
-
+ 
 function getRole() {
   return _currentUser?.user_metadata?.role || 'admin';
 }
-
+ 
 // LOGIN 
 async function login(email, password) {
   const data = await authRequest('token?grant_type=password', { email, password });
@@ -31,22 +50,26 @@ async function login(email, password) {
   setSession(data);
   return data;
 }
-
+ 
 // SIGNUP 
+/**
+ * signup — creates a new Supabase Auth user.
+ * org_name and org_type are stored in user_metadata and used throughout the app.
+ */
 async function signup(email, password, orgName, orgType) {
   const data = await authRequest('signup', {
     email,
     password,
     data: {
       org_name:    orgName,
-      org_type:    orgType,
+      org_type:    orgType || 'clinic',
       trial_start: new Date().toISOString(),
       trial_days:  14,
     },
   });
   return data;
 }
-
+ 
 // LOGOUT 
 async function logout() {
   const session = getSession();
@@ -59,19 +82,24 @@ async function logout() {
           'Authorization': `Bearer ${session.access_token}`,
         },
       });
-    } catch (_) { /* best-effort */ }
+    } catch (_) { /* best-effort — don't block the user */ }
   }
   _currentUser    = null;
   _currentSession = null;
   clearSession();
-  window.location.href = 'login.html'; // ← relative, not /pages/login.html
+  window.location.href = 'login.html'; // ← RELATIVE — no leading slash
 }
-
+ 
 // RESTORE SESSION 
+/**
+ * Attempts to restore a persisted session using the stored refresh_token.
+ * Returns the user object on success, null on any failure.
+ * Does NOT redirect — callers decide what to do with a null result.
+ */
 async function restoreSession() {
   const stored = getSession();
   if (!stored?.refresh_token) return null;
-
+ 
   try {
     const res = await fetch(
       'https://qflqwmfdwalvmndaojzl.supabase.co/auth/v1/token?grant_type=refresh_token',
@@ -84,41 +112,53 @@ async function restoreSession() {
         body: JSON.stringify({ refresh_token: stored.refresh_token }),
       }
     );
-
+ 
     if (!res.ok) { clearSession(); return null; }
-
+ 
     const data = await res.json();
     _currentSession = data;
     _currentUser    = data.user;
     setSession(data);
     return data.user;
   } catch (_) {
+    // Network down or Supabase unreachable — clear so we don't loop
     clearSession();
     return null;
   }
 }
-
+ 
 // ROUTE PROTECTION 
+/**
+ * protectRoute — await this at the top of every protected page.
+ * On success: returns the user object and execution continues normally.
+ * On failure: redirects to login.html and returns null.
+ *             The caller should check for null and stop execution.
+ */
 async function protectRoute() {
   const user = await restoreSession();
   if (!user) {
-    window.location.href = 'login.html'; // ← relative
+    window.location.href = 'login.html'; // ← RELATIVE
     return null;
   }
   return user;
 }
-
+ 
+/**
+ * redirectIfLoggedIn — call on login.html only.
+ * Silently skips the login screen if the session is still valid.
+ */
 async function redirectIfLoggedIn() {
   const stored = getSession();
   if (!stored?.refresh_token) return;
   const user = await restoreSession();
   if (user) {
     window.location.href = getOrgType() === 'pharmacy'
-      ? 'pharmacy.html'   // ← relative
-      : 'dashboard.html'; // ← relative
+      ? 'pharmacy.html'   // ← RELATIVE
+      : 'dashboard.html'; // ← RELATIVE
   }
 }
-
+ 
+// EXPORTS 
 export {
   login,
   signup,
@@ -133,3 +173,4 @@ export {
   getOrgName,
   getRole,
 };
+ 
