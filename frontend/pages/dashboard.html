@@ -9,7 +9,7 @@
   <link rel="stylesheet" href="../styles/main.css"/>
 </head>
 <body>
- 
+
   <nav class="nav">
     <div class="nav__left">
       <span class="nav__logo">Min<span>za</span></span>
@@ -26,57 +26,57 @@
       <button class="btn btn--ghost btn--sm" id="logout-btn">Sign Out</button>
     </div>
   </nav>
- 
+
   <main class="page">
- 
+
     <div class="page-header">
       <div>
-        <div class="page-title" id="facility-name"></div>
-        <div class="page-subtitle" id="today-date"></div>
+        <div class="page-title" id="facility-name">—</div>
+        <div class="page-subtitle" id="today-date">—</div>
       </div>
       <button class="btn btn--primary" id="new-patient-btn">+ New Patient</button>
     </div>
- 
-    <!-- Alert bar: waiting patients, low stock, etc. -->
+
+    <!-- Alert bar -->
     <div class="alert-bar alert-bar--warn" id="alert-bar" style="display:none;">
       <span id="alert-text"></span>
     </div>
- 
-    <!-- Stats -->
+
+    <!-- Stats grid -->
     <div class="stats-grid">
       <div class="stat-card">
         <div class="stat-card__label">Total Visits Today</div>
-        <div class="stat-card__num" data-stat="totalVisits"></div>
+        <div class="stat-card__num" data-stat="totalVisits">0</div>
         <div class="stat-card__sub">all statuses</div>
       </div>
       <div class="stat-card" id="stat-waiting">
         <div class="stat-card__label">Waiting</div>
-        <div class="stat-card__num" data-stat="waitingCount"></div>
+        <div class="stat-card__num" data-stat="waitingCount">0</div>
         <div class="stat-card__sub">in queue</div>
       </div>
       <div class="stat-card">
         <div class="stat-card__label">In Consult</div>
-        <div class="stat-card__num" data-stat="inConsultCount"></div>
+        <div class="stat-card__num" data-stat="inConsultCount">0</div>
         <div class="stat-card__sub">with doctor</div>
       </div>
       <div class="stat-card">
         <div class="stat-card__label">Completed</div>
-        <div class="stat-card__num" data-stat="completedCount"></div>
+        <div class="stat-card__num" data-stat="completedCount">0</div>
         <div class="stat-card__sub">today</div>
       </div>
       <div class="stat-card" id="stat-pending-rx">
         <div class="stat-card__label">Pending Rx</div>
-        <div class="stat-card__num" data-stat="pendingRxCount"></div>
+        <div class="stat-card__num" data-stat="pendingRxCount">0</div>
         <div class="stat-card__sub">prescriptions</div>
       </div>
       <div class="stat-card">
         <div class="stat-card__label">Revenue Today</div>
-        <div class="stat-card__num" data-stat="todayRevenue"></div>
+        <div class="stat-card__num" data-stat="todayRevenue">UGX 0</div>
         <div class="stat-card__sub">collected</div>
       </div>
     </div>
- 
-    <!-- Queue -->
+
+    <!-- Today's Queue -->
     <div class="card">
       <div class="card__header">
         <h2 class="card__title">Today's Queue</h2>
@@ -94,33 +94,44 @@
             </tr>
           </thead>
           <tbody id="queue-body">
-            <tr><td colspan="5" class="loading">Loading </td></tr>
+            <tr><td colspan="5" class="loading">...</td></tr>
           </tbody>
         </table>
       </div>
     </div>
- 
+
   </main>
- 
+
   <div id="toast" class="toast"></div>
- 
+
+  <!-- Global bootstrap FIRST — sets up connectivity pill fallback, active nav tab -->
+  <script src="../js/modules/app.js"></script>
+
+  <!-- ES Module block — all page logic here, nothing duplicated below -->
   <script type="module">
-    import { protectRoute, logout, getOrgType, getOrgName } from '../js/modules/auth.js';
+    import { protectRoute, logout, getOrgName, getOrgType } from '../js/modules/auth.js';
     import { fetchDashboardData, renderStats }              from '../js/modules/dashboard.js';
     import { fetchTodaysVisits, renderQueue }               from '../js/modules/visits.js';
     import { initConnPill, showToast }                      from '../js/utils/ui.js';
- 
+
     // Boot 
+    // protectRoute() restores the session. If it returns null the page has
+    // already been redirected to login.html — the throw stops further execution.
     const user = await protectRoute();
-    if (!user) throw new Error('No session'); // protectRoute already redirected
- 
-    // Redirect pharmacy accounts away from the clinic dashboard
+    if (!user) throw new Error('No session');
+
+    // Pharmacy users belong on their own page
     if (getOrgType() === 'pharmacy') {
       window.location.href = 'pharmacy.html';
     }
- 
+
+    // UI Bootstrap 
+    // Mark conn pill as module-wired so app.js doesn't double-wire it
+    const connPillEl = document.getElementById('conn-pill');
+    if (connPillEl) connPillEl.dataset.moduleWired = '1';
     initConnPill('conn-pill');
- 
+
+    // Populate org name in nav and page header
     const orgName = getOrgName();
     document.getElementById('nav-org').textContent       = orgName;
     document.getElementById('facility-name').textContent = orgName;
@@ -128,69 +139,78 @@
       new Date().toLocaleDateString('en-GB', {
         weekday: 'long', day: 'numeric', month: 'long', year: 'numeric'
       });
- 
+
     document.getElementById('logout-btn').addEventListener('click', logout);
+
+    // New Patient → patients.html with registration modal pre-opened
     document.getElementById('new-patient-btn').addEventListener('click', () => {
       window.location.href = 'patients.html?action=new';
     });
- 
+
     // Load 
     async function loadDashboard() {
-      // Skeleton loading state
-      document.querySelectorAll('.stat-card').forEach(c => c.classList.add('stat-card--loading'));
- 
+      // Show loading skeleton on stat cards
+      document.querySelectorAll('.stat-card__num').forEach(el => {
+        el.style.opacity = '0.4';
+      });
+
       try {
         const [stats, visits] = await Promise.all([
           fetchDashboardData(),
           fetchTodaysVisits(),
         ]);
- 
-        document.querySelectorAll('.stat-card').forEach(c => c.classList.remove('stat-card--loading'));
+
+        // Restore opacity
+        document.querySelectorAll('.stat-card__num').forEach(el => {
+          el.style.opacity = '1';
+        });
+
         renderStats(stats);
- 
-        // Highlight stat cards on alert conditions
+
+        // Alert highlights
         document.getElementById('stat-waiting')
           ?.classList.toggle('stat-card--warn', stats.waitingCount > 5);
         document.getElementById('stat-pending-rx')
           ?.classList.toggle('stat-card--warn', stats.pendingRxCount > 0);
- 
-        // Alert bar for patients waiting > 10 minutes
+
+        // Alert bar: patients waiting > 10 minutes
         const longWait = visits.filter(v => {
           if (v.status !== 'waiting') return false;
           return (Date.now() - new Date(v.created_at).getTime()) > 10 * 60 * 1000;
         });
-        const alertBar  = document.getElementById('alert-bar');
-        const alertText = document.getElementById('alert-text');
+        const alertBar = document.getElementById('alert-bar');
         if (longWait.length) {
-          alertText.textContent =
+          document.getElementById('alert-text').textContent =
             `${longWait.length} patient${longWait.length > 1 ? 's have' : ' has'} been waiting over 10 minutes.`;
           alertBar.style.display = 'flex';
         } else {
           alertBar.style.display = 'none';
         }
- 
+
+        // Render queue
         renderQueue(document.getElementById('queue-body'), visits, {
           onConsult: visitId => { window.location.href = `visit.html?id=${visitId}`; },
           onView:    visitId => { window.location.href = `visit.html?id=${visitId}`; },
         });
- 
+
       } catch (err) {
-        document.querySelectorAll('.stat-card').forEach(c => c.classList.remove('stat-card--loading'));
+        // Restore opacity even on error so UI isn't stuck faded
+        document.querySelectorAll('.stat-card__num').forEach(el => {
+          el.style.opacity = '1';
+        });
         showToast(err.message || 'Failed to load dashboard.', 'error');
         document.getElementById('queue-body').innerHTML =
-          `<tr><td colspan="5" class="empty-state">Could not load queue. Check your connection.</td></tr>`;
+          `<tr><td colspan="5" class="empty-state">
+            Could not load queue. Check your connection and refresh.
+          </td></tr>`;
       }
     }
- 
+
     await loadDashboard();
- 
+
     document.getElementById('refresh-queue').addEventListener('click', loadDashboard);
-    setInterval(loadDashboard, 60_000);
+    setInterval(loadDashboard, 60_000); // auto-refresh every minute
   </script>
 
-  <script src="../js/modules/app.js"></script>
-  <script src="../js/modules/dashboard.js"></script>
- 
 </body>
 </html>
- 
