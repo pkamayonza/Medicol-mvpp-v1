@@ -191,7 +191,7 @@ async function apiRequest(endpoint, method = 'GET', body = null, opts = {}) {
   await OfflineQueue.push(entry);
   console.log('[Minza] Queued offline:', method, endpoint);
   return null; // caller must handle null gracefully
-}
+
  
 // AUTH REQUESTS
 async function authRequest(path, body) {

@@ -23,21 +23,20 @@ export const PAYMENT_STATUS = {
 // FETCH 
 async function _recalculateBillStatus(billId) {
   if (!billId) return;
+  
   const billData = await apiRequest(`/bills?id=eq.${billId}&select=*,payments(*)`);
   if (!billData?.[0]) return;
 
-  const b           = billData[0];
-  const paidTotal   = (b.payments || [])
-    .filter(p => p.status === PAYMENT_STATUS.SUCCESS)
-    .reduce((s, p) => s + Number(p.amount), 0);
-  const total       = Number(b.total_amount);
-  const newStatus   = paidTotal >= total ? BILL_STATUS.PAID
-                    : paidTotal > 0      ? BILL_STATUS.PARTIAL
-                    :                      BILL_STATUS.UNPAID;
+  const b = billData[0];
+  const successfulPayments = (b.payments || []).filter(p => p.status === PAYMENT_STATUS.SUCCESS);
+  const totalPaid = successfulPayments.reduce((s, p) => s + Number(p.amount), 0);
+  const total     = Number(b.total_amount);
 
-  if (newStatus !== b.status) {
-    await apiRequest(`/bills?id=eq.${billId}`, 'PATCH', { status: newStatus });
-  }
+  let newStatus = BILL_STATUS.UNPAID;
+  if (totalPaid >= total) newStatus = BILL_STATUS.PAID;
+  else if (totalPaid > 0) newStatus = BILL_STATUS.PARTIAL;
+
+  await apiRequest(`/bills?id=eq.${billId}`, 'PATCH', { status: newStatus });
 }
 
 async function fetchPaymentsByBill(billId) {
