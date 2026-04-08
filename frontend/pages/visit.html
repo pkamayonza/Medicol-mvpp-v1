@@ -80,7 +80,6 @@
           <div id="rx-view" style="display:none;"></div>
  
           <div id="rx-builder" style="display:none;">
-            <!-- Drug entry -->
             <div class="drug-entry">
               <div class="form-row">
                 <div class="form-group form-group--grow">
@@ -116,7 +115,6 @@
               <strong id="rx-total">UGX 0</strong>
             </div>
  
-            <!-- Pharmacy selector -->
             <div class="card card--inset">
               <h3 class="section-label">Send to Pharmacy</h3>
               <div class="form-group">
@@ -182,7 +180,15 @@
   </main>
  
   <div id="toast" class="toast"></div>
+  <script src="../js/modules/app.js"></script>
  
+  <!--
+    IMPORTANT: This is the ONLY script block for visit.html.
+    The original file had duplicate tags at the bottom:
+      <script src="js/modules/app.js"></script>   ← REMOVED
+      <script src="js/modules/visit.js"></script>  ← REMOVED
+    Those conflicted with this module block and caused silent failures.
+  -->
   <script type="module">
     import { protectRoute, logout }                               from '../js/modules/auth.js';
     import { fetchVisitById, updateVisitStatus, VISIT_STATUS }    from '../js/modules/visits.js';
@@ -202,14 +208,20 @@
     const user = await protectRoute();
     if (!user) throw new Error('No session');
  
-    document.getElementById('logout-btn').addEventListener('click', logout);
+    const connPillEl = document.getElementById('conn-pill');
+    if (connPillEl) connPillEl.dataset.moduleWired = '1';
     initConnPill('conn-pill');
+    document.getElementById('logout-btn').addEventListener('click', logout);
  
+    // Visit ID from URL 
     const params  = new URLSearchParams(window.location.search);
     const visitId = params.get('id');
-    if (!visitId) { window.location.href = 'dashboard.html'; throw new Error(); }
+    if (!visitId) {
+      window.location.href = 'dashboard.html';
+      throw new Error('No visit ID');
+    }
  
-    // Item store (one per page load) 
+    // In-memory item store (one instance per page load) 
     const store = createItemsStore();
  
     // Load visit 
@@ -217,12 +229,12 @@
     if (!visit) {
       showToast('Visit not found.', 'error');
       window.location.href = 'dashboard.html';
-      throw new Error();
+      throw new Error('Visit not found');
     }
  
     const patient = visit.patients || {};
  
-    // Patient banner
+    // Patient banner initials
     const initials = (patient.full_name || '?').trim().split(/\s+/)
       .slice(0, 2).map(w => w[0].toUpperCase()).join('');
     document.getElementById('patient-avatar').textContent = initials;
@@ -243,7 +255,7 @@
     badge.className   = `badge ${cls}`;
  
     // Consultation 
-    let consultation = await fetchConsultationByVisit(visitId);
+    let consultation  = await fetchConsultationByVisit(visitId);
     const consultView = document.getElementById('consult-view');
     const consultForm = document.getElementById('consult-form');
  
@@ -264,14 +276,14 @@
     });
  
     // Prescription Builder 
-    // Guard: only initialise event listeners once even if called multiple times
+    // Guard flag: event listeners are wired exactly once
     let _rxBuilderInitialised = false;
  
     async function initRxBuilder() {
       const rxView    = document.getElementById('rx-view');
       const rxBuilder = document.getElementById('rx-builder');
  
-      // Check if prescription already exists
+      // If prescription already exists, show read-only card
       const existing = await fetchPrescriptionByVisit(visitId);
       if (existing) {
         renderPrescriptionCard(rxView, existing);
@@ -283,19 +295,18 @@
  
       rxBuilder.style.display = 'block';
  
-      // Only wire up event listeners once
       if (_rxBuilderInitialised) return;
       _rxBuilderInitialised = true;
  
-      // Load pharmacies
+      // Populate pharmacy dropdown
       const pharmacies = await fetchLinkedPharmacies();
       renderPharmacySelector(
         document.getElementById('pharmacy-select'),
         pharmacies,
-        user.id // user.id = clinic org identifier
+        user.id
       );
  
-      // Add drug helper — extracted so Enter key can reuse it
+      // Add drug — shared between button click and Enter key
       function addDrug() {
         const nameEl   = document.getElementById('drug-name');
         const dosageEl = document.getElementById('drug-dosage');
@@ -309,7 +320,7 @@
         }
  
         try {
-          const items  = store.add({
+          const items = store.add({
             drug_name: nameEl.value,
             dosage:    dosageEl.value,
             quantity:  qtyEl.value,
@@ -333,7 +344,7 @@
         if (e.key === 'Enter') { e.preventDefault(); addDrug(); }
       });
  
-      // Send prescription
+      // Send prescription to pharmacy
       document.getElementById('send-rx-btn').addEventListener('click', async () => {
         const errEl      = document.getElementById('rx-error');
         const sendBtn    = document.getElementById('send-rx-btn');
@@ -379,7 +390,7 @@
     }
  
     // Billing 
-    // Guard: only bind payment form listeners once
+    // Guard: payment form listeners wired exactly once
     let _billId           = null;
     let _paymentFormBound = false;
  
@@ -407,7 +418,7 @@
  
       paySection.style.display = 'block';
  
-      // Pre-fill outstanding amount
+      // Pre-fill outstanding balance
       const paid = (bill.payments || [])
         .filter(p => p.status === 'success')
         .reduce((s, p) => s + Number(p.amount), 0);
@@ -417,13 +428,11 @@
       if (!_paymentFormBound) {
         _paymentFormBound = true;
  
-        // MoMo reference field toggle
         document.getElementById('pay-method').addEventListener('change', e => {
           document.getElementById('momo-ref-group').style.display =
             e.target.value === 'momo' ? 'block' : 'none';
         });
  
-        // bindPaymentForm uses form._paymentBound guard internally — safe to call once
         bindPaymentForm(document.getElementById('payment-form'), _billId, async () => {
           const updated = await fetchBillByVisit(visitId);
           renderBillSummary(billSection, updated);
@@ -432,7 +441,7 @@
             paySection.style.display = 'none';
             showToast('Bill fully paid. ✓');
           } else {
-            // Update outstanding amount field after partial payment
+            // Recalculate and update outstanding field
             const newPaid = (updated?.payments || [])
               .filter(p => p.status === 'success')
               .reduce((s, p) => s + Number(p.amount), 0);
@@ -449,17 +458,16 @@
       if (existing) {
         const rxView = document.getElementById('rx-view');
         renderPrescriptionCard(rxView, existing);
-        rxView.style.display                           = 'block';
+        rxView.style.display = 'block';
         document.getElementById('rx-builder').style.display = 'none';
         await initBilling();
       } else {
         await initRxBuilder();
       }
     }
+ 
   </script>
 
-  <script src="js/modules/app.js"></script>
-  <script src="js/modules/visit.js"></script>
- 
 </body>
 </html>
+ 
