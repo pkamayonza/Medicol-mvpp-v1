@@ -182,13 +182,6 @@
   <div id="toast" class="toast"></div>
   <script src="../js/modules/app.js"></script>
  
-  <!--
-    IMPORTANT: This is the ONLY script block for visit.html.
-    The original file had duplicate tags at the bottom:
-      <script src="js/modules/app.js"></script>   ← REMOVED
-      <script src="js/modules/visit.js"></script>  ← REMOVED
-    Those conflicted with this module block and caused silent failures.
-  -->
   <script type="module">
     import { protectRoute, logout }                               from '../js/modules/auth.js';
     import { fetchVisitById, updateVisitStatus, VISIT_STATUS }    from '../js/modules/visits.js';

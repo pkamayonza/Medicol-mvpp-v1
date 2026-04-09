@@ -95,10 +95,15 @@ function renderPatientList(container, patients, onSelect) {
   container.querySelectorAll('.js-start-visit').forEach(btn => {
     btn.addEventListener('click', e => {
       e.stopPropagation();
-      const patient = _patients.find(p => p.id === btn.dataset.patientId);
-      if (patient && onSelect) onSelect(patient);
+      const patient = _patients.find(p => p.id == btn.dataset.patientId);
+      if (!patient) {
+        console.error('Patient not found for ID:', btn.dataset.patientId);
+      return;
+    }
+
+      if (onSelect) onSelect(patient);
     });
-  });
+    });
  
   // Row click → profile page
   container.querySelectorAll('.table-row--clickable').forEach(row => {

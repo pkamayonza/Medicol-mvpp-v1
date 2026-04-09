@@ -19,8 +19,9 @@ function getOrgName() {
   return _currentUser?.user_metadata?.org_name || _currentUser?.email || '—';
 }
 
-function getRole() {
-  return _currentUser?.user_metadata?.role || 'admin';
+export function getUserRole() {
+  const user = getCurrentUser(); // whatever you use
+  return user?.user_metadata?.role || 'receptionist';
 }
  
 // LOGIN 
@@ -133,9 +134,16 @@ async function redirectIfLoggedIn() {
   if (!stored?.refresh_token) return;
   const user = await restoreSession();
   if (user) {
-    window.location.href = getOrgType() === 'pharmacy'
-      ? 'pharmacy.html'   // ← RELATIVE
-      : 'dashboard.html'; // ← RELATIVE
+    const role = getUserRole();
+
+const routes = {
+  receptionist: 'dashboard.html',
+  doctor: 'doctor-queue.html',
+  pharmacy: 'pharmacy.html',
+  admin: 'admin.html'
+};
+
+window.location.href = routes[role] || 'dashboard.html';
   }
 }
  

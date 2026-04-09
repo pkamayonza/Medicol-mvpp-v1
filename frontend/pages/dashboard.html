@@ -103,11 +103,8 @@
   </main>
 
   <div id="toast" class="toast"></div>
-
-  <!-- Global bootstrap FIRST — sets up connectivity pill fallback, active nav tab -->
   <script src="../js/modules/app.js"></script>
-
-  <!-- ES Module block — all page logic here, nothing duplicated below -->
+  
   <script type="module">
     import { protectRoute, logout, getOrgName, getOrgType } from '../js/modules/auth.js';
     import { fetchDashboardData, renderStats }              from '../js/modules/dashboard.js';
