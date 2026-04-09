@@ -192,14 +192,21 @@
           });
         }
 
+        import { apiRequest } from '../js/services/api.js';
+
+        async function createVisit(patientId) {
+          return apiRequest('/visits', 'POST', {
+          patient_id: patientId,
+          status: 'waiting'
+          });
+        }
+
         bindCreateForm(form, async (patient) => {
           if (!patient) return;
 
-          const visit = await createVisit(patient.id);
-          loadQueue(); // refresh queue
+          await createVisit(patient.id);
+          loadQueue(); // refresh your table
         });
-
-        renderQueue(visits, 'queue-body', { createVisit });
 
       } catch (err) {
         // Restore opacity even on error so UI isn't stuck faded
