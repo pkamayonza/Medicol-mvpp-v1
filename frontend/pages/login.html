@@ -164,14 +164,24 @@
         );
         const orgType = data.user?.user_metadata?.org_type?.toLowerCase() || 'clinic';
         // Relative paths — work regardless of how the server is configured
-        window.location.href = orgType === 'pharmacy' ? 'pharmacy.html' : 'dashboard.html';
-      } catch (err) {
-        loginErr.textContent   = err.message;
-        loginErr.style.display = 'block';
-        loginBtn.disabled      = false;
-        loginBtn.textContent   = 'Sign In →';
-      }
-    });
+        import { getUserRole } from '../js/modules/auth.js';
+        const role = getUserRole();
+
+        const routes = {
+          receptionist: 'dashboard.html',
+          doctor: 'doctor-queue.html',
+          pharmacy: 'pharmacy.html',
+          admin: 'admin.html'
+      };
+
+        window.location.href = routes[role] || 'dashboard.html';
+          } catch (err) {
+            loginErr.textContent   = err.message;
+            loginErr.style.display = 'block';
+            loginBtn.disabled      = false;
+            loginBtn.textContent   = 'Sign In →';
+          }
+        });
 
     // ── Sign Up ───────────────────────────────────────────────────────────────
     const signupForm    = document.getElementById('signup-form');
