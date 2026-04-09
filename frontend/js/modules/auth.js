@@ -20,7 +20,7 @@ function getOrgName() {
 }
 
 export function getUserRole() {
-  const user = getCurrentUser(); // whatever you use
+  const user = JSON.parse(localStorage.getItem('user')); 
   return user?.user_metadata?.role || 'receptionist';
 }
  
