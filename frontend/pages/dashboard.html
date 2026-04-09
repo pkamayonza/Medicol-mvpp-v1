@@ -185,10 +185,21 @@
         }
 
         // Render queue
-        renderQueue(document.getElementById('queue-body'), visits, {
-          onConsult: visitId => { window.location.href = `visit.html?id=${visitId}`; },
-          onView:    visitId => { window.location.href = `visit.html?id=${visitId}`; },
+        async function createVisit(patientId) {
+          return apiRequest('/visits', 'POST', {
+          patient_id: patientId,
+          status: 'waiting'
+          });
+        }
+
+        bindCreateForm(form, async (patient) => {
+          if (!patient) return;
+
+          const visit = await createVisit(patient.id);
+          loadQueue(); // refresh queue
         });
+
+        renderQueue(visits, 'queue-body', { createVisit });
 
       } catch (err) {
         // Restore opacity even on error so UI isn't stuck faded
