@@ -163,6 +163,11 @@
           `<tr><td colspan="6" class="empty-state">${escapeHtml(err.message)}</td></tr>`;
       }
     }
+
+    async function updateOrder(id, status) {
+      await apiRequest(`/pharmacy_orders?id=eq.${id}`, 'PATCH', { status });
+      loadOrders();
+    }
  
     await loadOrders();
  
@@ -280,6 +285,9 @@
     });
  
     setInterval(() => loadOrders(_currentFilter), 60_000);
+
+    btnAccept.addEventListener('click', () => updateOrder(id, 'accepted'));
+    btnDispense.addEventListener('click', () => updateOrder(id, 'dispensed'));
   </script>
  
 </body>
