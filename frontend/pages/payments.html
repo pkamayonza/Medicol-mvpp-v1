@@ -282,9 +282,10 @@
       openModal('modal-bill');
 
       try {
-        const bills = await apiRequest(
-          `/bills?id=eq.${billId}&select=*,payments(*),visits(id,patients(full_name,phone))`
-        );
+        const params = new URLSearchParams(window.location.search);
+        const visitId = params.get('visit_id');
+
+        apiRequest(`/bills?visit_id=eq.${visitId}`);
         const bill = bills?.[0];
         if (!bill) {
           detailBody.innerHTML = `<div class="empty-state">Bill not found.</div>`;
