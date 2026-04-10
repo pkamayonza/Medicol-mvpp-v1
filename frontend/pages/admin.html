@@ -153,7 +153,7 @@
       } catch (_) {}
     }
  
-    // ── Render Users ──────────────────────────────────────────────────
+    // ── Render Users (extended with actions and revoked style) ───────
     function renderUsers() {
       const body = document.getElementById('users-body');
       const roleEmoji = { receptionist: 'R', doctor: 'D', pharmacist: 'P', admin: 'A' };
@@ -165,7 +165,7 @@
       }
  
       body.innerHTML = DB.users.map(u => `
-        <div class="queue-item" style="padding:0.875rem 0;border-bottom:1px solid var(--border);">
+        <div class="queue-item" style="padding:0.875rem 0;border-bottom:1px solid var(--border); opacity:${u.disabled ? 0.5 : 1};">
           <div class="queue-item__avatar" style="width:36px;height:36px;font-size:1rem;background:var(--surface-2);border-color:var(--border-2);">
             ${roleEmoji[u.role] || '👤'}
           </div>
@@ -174,9 +174,68 @@
             <div class="queue-item__meta">${escapeHtml(u.email)}</div>
           </div>
           <span class="badge ${roleColors[u.role] || 'badge--muted'}" style="text-transform:capitalize;">${u.role}</span>
+          ${u.disabled ? '<span class="badge badge--muted" style="margin-left:0.5rem;">Revoked</span>' : ''}
+          <div style="display:flex;gap:0.5rem;margin-left:auto;">
+            <button class="btn btn--ghost btn--sm revoke-btn" data-id="${u.id}">
+              Revoke
+            </button>
+            <button class="btn btn--ghost btn--sm delete-btn" data-id="${u.id}" style="color:red;">
+              Remove
+            </button>
+          </div>
         </div>`).join('');
     }
  
+    // ── Bind user action buttons (delete & revoke) ───────────────────
+    function bindUserActions() {
+      document.querySelectorAll('.delete-btn').forEach(btn => {
+        btn.addEventListener('click', async () => {
+          const id = btn.dataset.id;
+
+          // Prevent admin from deleting themselves
+          if (id == user.id) {
+            showToast("You cannot remove yourself", "error");
+            return;
+          }
+
+          if (!confirm('Are you sure you want to permanently remove this user?')) return;
+
+          try {
+            await apiRequest(`/users/${id}`, 'DELETE');
+
+            DB.users = DB.users.filter(u => u.id != id);
+
+            renderUsers();
+            bindUserActions();
+
+            showToast('User removed successfully', 'success');
+          } catch (err) {
+            showToast('Failed to remove user', 'error');
+          }
+        });
+      });
+
+      document.querySelectorAll('.revoke-btn').forEach(btn => {
+        btn.addEventListener('click', async () => {
+          const id = btn.dataset.id;
+
+          try {
+            await apiRequest(`/users/${id}/revoke`, 'PATCH');
+
+            const targetUser = DB.users.find(u => u.id == id);
+            if (targetUser) targetUser.disabled = true;
+
+            renderUsers();
+            bindUserActions();
+
+            showToast('Access revoked', 'success');
+          } catch (err) {
+            showToast('Failed to revoke access', 'error');
+          }
+        });
+      });
+    }
+    
     // ── Add User ──────────────────────────────────────────────────────
     document.getElementById('add-user-btn').addEventListener('click', () => openModal('modal-user'));
  
@@ -205,6 +264,7 @@
         document.getElementById('user-form').reset();
         showToast(`${name} added as ${role}.`, 'success');
         renderUsers();
+        bindUserActions();   // re‑attach listeners after render
       } catch (err) {
         errEl.textContent   = err.message;
         errEl.style.display = 'block';
@@ -214,8 +274,10 @@
       }
     });
  
+    // ── Initial load ──────────────────────────────────────────────────
     await loadStats();
     renderUsers();
+    bindUserActions();   // attach listeners after first render
   </script>
  
 </body>
