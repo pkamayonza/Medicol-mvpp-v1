@@ -65,6 +65,11 @@ export function roleHome(role) {
   };
   return map[role] || 'login.html';
 }
+
+export function getUserRole() {
+  const user = JSON.parse(localStorage.getItem("user"));
+  return user?.role || null;
+}
  
 // ── REDIRECT IF LOGGED IN ─────────────────────────────────────────
 export function redirectIfLoggedIn() {
