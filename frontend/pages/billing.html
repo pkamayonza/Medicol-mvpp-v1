@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Billing — Minza Health</title>
+  <link rel="stylesheet" href="../styles/main.css"/>
+</head>
+<body>
+ 
+  <nav class="nav">
+    <div class="nav__brand">
+      <span class="nav__logo">Min<span>za</span></span>
+      <span class="nav__role">Payments</span>
+    </div>
+    <div class="nav__links">
+      <a href="queue.html" class="nav__link nav__link--back">← Queue</a>
+    </div>
+    <div class="nav__right">
+      <span class="conn-pill" id="conn-pill"></span>
+      <span class="nav__user" id="nav-user">—</span>
+      <button class="btn btn--ghost btn--sm" id="logout-btn">Sign out</button>
+    </div>
+  </nav>
+ 
+  <!-- Workflow bar -->
+  <div style="background:var(--bg-2);border-bottom:1px solid var(--border);padding:0.6rem 1.5rem;">
+    <div class="workflow-bar" style="border:none;padding:0;margin:0;background:transparent;max-width:1080px;margin:0 auto;">
+      <div class="workflow-step workflow-step--done">
+        <div class="workflow-step__dot"></div>
+        <span class="workflow-step__label">Registration</span>
+      </div>
+      <div class="workflow-sep workflow-sep--done"></div>
+      <div class="workflow-step workflow-step--done">
+        <div class="workflow-step__dot"></div>
+        <span class="workflow-step__label">Consultation</span>
+      </div>
+      <div class="workflow-sep workflow-sep--done"></div>
+      <div class="workflow-step workflow-step--done">
+        <div class="workflow-step__dot"></div>
+        <span class="workflow-step__label">Pharmacy</span>
+      </div>
+      <div class="workflow-sep workflow-sep--done"></div>
+      <div class="workflow-step workflow-step--active">
+        <div class="workflow-step__dot"></div>
+        <span class="workflow-step__label">Payment</span>
+      </div>
+    </div>
+  </div>
+ 
+  <main class="page page--narrow">
+ 
+    <!-- Patient Banner -->
+    <div class="patient-banner" id="patient-banner" style="display:none;">
+      <div class="patient-banner__avatar" id="pt-avatar">?</div>
+      <div class="patient-banner__info">
+        <div class="patient-banner__name" id="pt-name">Loading…</div>
+        <div class="patient-banner__meta" id="pt-meta">—</div>
+      </div>
+    </div>
+ 
+    <!-- Paid state -->
+    <div id="paid-state" style="display:none;">
+      <div class="card" style="text-align:center;padding:2.5rem;">
+        <div style="font-size:3rem;margin-bottom:0.75rem;">✅</div>
+        <div style="font-size:1.1rem;font-weight:700;color:var(--success);margin-bottom:0.5rem;">Payment Complete</div>
+        <div style="font-size:0.875rem;color:var(--text-3);margin-bottom:1.5rem;">This bill has been fully settled.</div>
+        <a href="queue.html" class="btn btn--primary">Back to Queue →</a>
+      </div>
+    </div>
+ 
+    <!-- Active billing state -->
+    <div id="billing-state" style="display:none;">
+ 
+      <!-- Bill Summary -->
+      <div class="card">
+        <div class="card__header">
+          <h2 class="card__title">Bill Summary</h2>
+          <span class="badge" id="bill-status-badge">—</span>
+        </div>
+        <div id="bill-breakdown"></div>
+        <div id="bill-totals" style="margin-top:0.75rem;"></div>
+      </div>
+ 
+      <!-- Payment Form -->
+      <div class="card" id="payment-form-card">
+        <div class="card__header">
+          <h2 class="card__title">Record Payment</h2>
+        </div>
+ 
+        <div class="section-label">Payment Method</div>
+        <div class="method-cards">
+          <div class="method-card method-card--selected" data-method="cash" id="method-cash">
+            <div class="method-card__icon"></div>
+            <div class="method-card__label">Cash</div>
+            <div class="method-card__sub">Instant</div>
+          </div>
+          <div class="method-card" data-method="momo" id="method-momo">
+            <div class="method-card__icon"></div>
+            <div class="method-card__label">Mobile Money</div>
+            <div class="method-card__sub">MTN / Airtel</div>
+          </div>
+        </div>
+ 
+        <form id="payment-form" novalidate>
+          <div class="form-group">
+            <label class="form-label" for="pay-amount">Amount (UGX) *</label>
+            <input class="form-input" type="number" id="pay-amount" name="amount" min="1" placeholder="0"/>
+          </div>
+          <div class="form-group" id="momo-ref-group" style="display:none;">
+            <label class="form-label" for="pay-ref">Mobile Money Reference</label>
+            <input class="form-input" type="text" id="pay-ref" name="reference"
+                   placeholder="e.g. MP25012345678"/>
+          </div>
+          <div id="pay-error" class="form-error" style="display:none;"></div>
+          <div class="form-actions" style="margin-top:1rem;">
+            <button type="submit" class="btn btn--primary btn--full btn--lg" id="pay-btn">
+              Record Payment →
+            </button>
+          </div>
+        </form>
+      </div>
+ 
+      <!-- Payment history -->
+      <div class="card" id="payment-history-card" style="display:none;">
+        <div class="card__header">
+          <h2 class="card__title">Payment History</h2>
+        </div>
+        <div id="payment-history-body"></div>
+      </div>
+ 
+    </div>
+ 
+    <!-- Loading state -->
+    <div id="loading-state">
+      <div class="card">
+        <div class="state-loading">
+          <div class="state-loading__spinner"></div>
+          <span class="text-muted text-sm">Loading bill…</span>
+        </div>
+      </div>
+    </div>
+ 
+  </main>
+ 
+  <script type="module">
+    import { protectRoute, logout, getUserName } from '../js/modules/auth.js';
+    import { apiRequest } from '../js/services/api.js';
+    import { initConnPill, showToast, btnLoading } from '../js/utils/ui.js';
+    import { escapeHtml, initials, fmtDate, fmtTime, fmtAge, fmtUGX } from '../js/utils/format.js';
+ 
+    const user = protectRoute(); // any role can access billing
+    if (!user) throw new Error();
+ 
+    initConnPill('conn-pill');
+    document.getElementById('nav-user').textContent = getUserName();
+    document.getElementById('logout-btn').addEventListener('click', logout);
+ 
+    const params  = new URLSearchParams(window.location.search);
+    const visitId = params.get('visit_id');
+    if (!visitId) { window.location.href = 'queue.html'; throw new Error(); }
+ 
+    let _bill       = null;
+    let _visitData  = null;
+    let _payMethod  = 'cash';
+ 
+    // ── Load ─────────────────────────────────────────────────────────
+    async function load() {
+      try {
+        _visitData = await apiRequest(`/visits/${visitId}`);
+        if (!_visitData) { window.location.href = 'queue.html'; return; }
+ 
+        const patient = _visitData.patients || {};
+        document.getElementById('patient-banner').style.display = 'flex';
+        document.getElementById('pt-avatar').textContent = initials(patient.full_name || '?');
+        document.getElementById('pt-name').textContent   = patient.full_name || '—';
+        document.getElementById('pt-meta').innerHTML =
+          [patient.phone, patient.gender, patient.dob ? `${fmtAge(patient.dob)} old` : null]
+            .filter(Boolean).map(t => `<span>${escapeHtml(t)}</span>`).join('');
+ 
+        // Get or create bill
+        const bills = await apiRequest(`/bills?visit_id=${visitId}`);
+        _bill = bills?.[0];
+ 
+        if (!_bill) {
+          // Auto-create bill from prescription total
+          const rxItems = _visitData.prescriptions?.[0]?.prescription_items || [];
+          const total   = rxItems.reduce((s, i) => s + (i.price||0) * (i.quantity||1), 0);
+ 
+          if (total > 0) {
+            _bill = await apiRequest('/bills', 'POST', {
+              visit_id:     visitId,
+              total_amount: total,
+            });
+          } else {
+            // Allow manual amount entry — show form with zero total
+            _bill = { id: null, visit_id: visitId, total_amount: 0, status: 'unpaid', payments: [] };
+          }
+        }
+ 
+        renderBilling();
+      } catch (err) {
+        showToast(err.message, 'error');
+      }
+    }
+ 
+    function renderBilling() {
+      document.getElementById('loading-state').style.display = 'none';
+ 
+      if (_bill?.status === 'paid') {
+        document.getElementById('paid-state').style.display = 'block';
+        return;
+      }
+ 
+      document.getElementById('billing-state').style.display = 'block';
+ 
+      const payments  = _bill?.payments || [];
+      const totalPaid = payments
+        .filter(p => p.status === 'success')
+        .reduce((s, p) => s + Number(p.amount), 0);
+      const outstanding = Math.max(0, Number(_bill?.total_amount || 0) - totalPaid);
+ 
+      // Status badge
+      const statusCls = { unpaid: 'badge--danger', partial: 'badge--warn', paid: 'badge--success' };
+      const statusBadge = document.getElementById('bill-status-badge');
+      statusBadge.className   = `badge ${statusCls[_bill?.status] || 'badge--muted'}`;
+      statusBadge.textContent = _bill?.status || 'new';
+ 
+      // Breakdown from prescription items
+      const rxItems = _visitData?.prescriptions?.[0]?.prescription_items || [];
+      const breakdown = document.getElementById('bill-breakdown');
+      if (rxItems.length) {
+        breakdown.innerHTML = rxItems.map(i => `
+          <div class="bill-row">
+            <span class="bill-row__label">${escapeHtml(i.drug_name)} × ${i.quantity||1}</span>
+            <span class="bill-row__value">${fmtUGX((i.price||0) * (i.quantity||1))}</span>
+          </div>`).join('');
+      } else {
+        breakdown.innerHTML = `<div class="bill-row"><span class="bill-row__label">Consultation fee</span><span class="bill-row__value">${fmtUGX(_bill?.total_amount || 0)}</span></div>`;
+      }
+ 
+      // Totals
+      document.getElementById('bill-totals').innerHTML = `
+        ${totalPaid > 0 ? `
+          <div class="bill-row bill-row--paid">
+            <span class="bill-row__label">Amount paid</span>
+            <span class="bill-row__value">${fmtUGX(totalPaid)}</span>
+          </div>` : ''}
+        <div class="bill-row bill-row--total bill-row--owed">
+          <span class="bill-row__label">${totalPaid > 0 ? 'Outstanding' : 'Total'}</span>
+          <span class="bill-row__value">${fmtUGX(outstanding)}</span>
+        </div>`;
+ 
+      // Pre-fill amount
+      document.getElementById('pay-amount').value = outstanding > 0 ? outstanding : '';
+ 
+      // Payment history
+      if (payments.length) {
+        const histCard = document.getElementById('payment-history-card');
+        histCard.style.display = 'block';
+        document.getElementById('payment-history-body').innerHTML = payments.map(p => `
+          <div class="bill-row">
+            <span class="bill-row__label" style="text-transform:capitalize;">${p.method} ${p.reference ? '· ' + p.reference : ''}</span>
+            <span class="bill-row__value" style="color:var(--success);">${fmtUGX(p.amount)}</span>
+          </div>`).join('');
+      }
+ 
+      // Hide payment form if fully paid
+      if (_bill?.status === 'paid') {
+        document.getElementById('payment-form-card').style.display = 'none';
+      }
+    }
+ 
+    // ── Payment Method Selector ───────────────────────────────────────
+    document.querySelectorAll('.method-card').forEach(card => {
+      card.addEventListener('click', () => {
+        document.querySelectorAll('.method-card').forEach(c => c.classList.remove('method-card--selected'));
+        card.classList.add('method-card--selected');
+        _payMethod = card.dataset.method;
+        document.getElementById('momo-ref-group').style.display =
+          _payMethod === 'momo' ? 'block' : 'none';
+      });
+    });
+ 
+    // ── Payment Form ──────────────────────────────────────────────────
+    document.getElementById('payment-form').addEventListener('submit', async e => {
+      e.preventDefault();
+      const btn   = document.getElementById('pay-btn');
+      const errEl = document.getElementById('pay-error');
+      errEl.style.display = 'none';
+ 
+      const amount = parseFloat(document.getElementById('pay-amount').value);
+      const ref    = document.getElementById('pay-ref').value.trim() || null;
+ 
+      if (!amount || amount <= 0) {
+        errEl.textContent   = 'Enter a valid payment amount.';
+        errEl.style.display = 'block';
+        return;
+      }
+ 
+      btnLoading(btn, true, 'Processing…');
+ 
+      try {
+        // Create bill if it doesn't exist yet (manual amount case)
+        if (!_bill?.id) {
+          _bill = await apiRequest('/bills', 'POST', {
+            visit_id:     visitId,
+            total_amount: amount,
+          });
+        }
+ 
+        await apiRequest('/payments', 'POST', {
+          bill_id:   _bill.id,
+          amount,
+          method:    _payMethod,
+          status:    'success',
+          reference: ref,
+        });
+ 
+        showToast('Payment recorded successfully.', 'success');
+        await load();
+      } catch (err) {
+        errEl.textContent   = err.message;
+        errEl.style.display = 'block';
+        btnLoading(btn, false);
+      }
+    });
+ 
+    await load();
+  </script>
+ 
+</body>
+</html>
