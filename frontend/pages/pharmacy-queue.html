@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Pharmacy Queue — Minza Health</title>
+  <link rel="stylesheet" href="../styles/main.css"/>
+</head>
+<body>
+ 
+  <nav class="nav">
+    <div class="nav__brand">
+      <span class="nav__logo">Min<span>za</span></span>
+      <span class="nav__role">Pharmacy</span>
+    </div>
+    <div class="nav__right">
+      <span class="conn-pill" id="conn-pill"></span>
+      <span class="nav__user" id="nav-user">—</span>
+      <button class="btn btn--ghost btn--sm" id="logout-btn">Sign out</button>
+    </div>
+  </nav>
+ 
+  <!-- Workflow bar -->
+  <div style="background:var(--bg-2);border-bottom:1px solid var(--border);padding:0.6rem 1.5rem;">
+    <div class="workflow-bar" style="border:none;padding:0;margin:0;background:transparent;max-width:1080px;margin:0 auto;">
+      <div class="workflow-step workflow-step--done">
+        <div class="workflow-step__dot"></div>
+        <span class="workflow-step__label">Registration</span>
+      </div>
+      <div class="workflow-sep workflow-sep--done"></div>
+      <div class="workflow-step workflow-step--done">
+        <div class="workflow-step__dot"></div>
+        <span class="workflow-step__label">Consultation</span>
+      </div>
+      <div class="workflow-sep workflow-sep--done"></div>
+      <div class="workflow-step workflow-step--active">
+        <div class="workflow-step__dot"></div>
+        <span class="workflow-step__label">Pharmacy</span>
+      </div>
+      <div class="workflow-sep"></div>
+      <div class="workflow-step">
+        <div class="workflow-step__dot"></div>
+        <span class="workflow-step__label">Payment</span>
+      </div>
+    </div>
+  </div>
+ 
+  <main class="page">
+ 
+    <div class="page-header">
+      <div>
+        <h1 class="page-title">Pharmacy Queue</h1>
+        <p class="page-sub" id="today-date">—</p>
+      </div>
+      <button class="btn btn--ghost btn--sm" id="refresh-btn">↻ Refresh</button>
+    </div>
+ 
+    <!-- Stats strip -->
+    <div class="stats-grid" style="grid-template-columns:repeat(3,1fr);margin-bottom:1.5rem;">
+      <div class="stat-card stat-card--terra">
+        <div class="stat-label">Incoming</div>
+        <div class="stat-num" id="stat-incoming">—</div>
+        <div class="stat-sub">awaiting review</div>
+      </div>
+      <div class="stat-card stat-card--gold">
+        <div class="stat-label">Accepted</div>
+        <div class="stat-num" id="stat-accepted">—</div>
+        <div class="stat-sub">being dispensed</div>
+      </div>
+      <div class="stat-card stat-card--sage">
+        <div class="stat-label">Dispensed</div>
+        <div class="stat-num" id="stat-dispensed">—</div>
+        <div class="stat-sub">today</div>
+      </div>
+    </div>
+ 
+    <!-- Filter -->
+    <div class="filter-tabs" style="margin-bottom:1rem;" id="filter-tabs">
+      <button class="filter-tab filter-tab--active" data-filter="all">All</button>
+      <button class="filter-tab" data-filter="sent">Incoming</button>
+      <button class="filter-tab" data-filter="accepted">Accepted</button>
+      <button class="filter-tab" data-filter="dispensed">Dispensed</button>
+      <button class="filter-tab" data-filter="rejected">Rejected</button>
+    </div>
+ 
+    <!-- Orders table -->
+    <div class="card card--flush">
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Patient</th>
+              <th>Drugs</th>
+              <th>Total</th>
+              <th>Status</th>
+              <th>Received</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="order-body"></tbody>
+        </table>
+      </div>
+    </div>
+ 
+  </main>
+ 
+  <!-- Order Detail Modal -->
+  <div class="modal" id="modal-order">
+    <div class="modal__card modal__card--wide">
+      <div class="modal__header">
+        <span class="modal__title">Prescription Details</span>
+        <button class="modal__close" data-close="modal-order">✕</button>
+      </div>
+      <div id="order-detail"></div>
+      <div class="modal__footer" id="order-actions"></div>
+    </div>
+  </div>
+ 
+  <script type="module">
+    import { protectRoute, logout, getUserName } from '../js/modules/auth.js';
+    import { apiRequest } from '../js/services/api.js';
+    import { initConnPill, showToast, openModal, closeModal, bindCloseButtons, setLoading, setEmpty } from '../js/utils/ui.js';
+    import { fmtRelative, fmtDate, fmtUGX, escapeHtml, initials } from '../js/utils/format.js';
+ 
+    const user = protectRoute(['pharmacist', 'admin']);
+    if (!user) throw new Error();
+ 
+    initConnPill('conn-pill');
+    bindCloseButtons();
+    document.getElementById('nav-user').textContent = getUserName();
+    document.getElementById('logout-btn').addEventListener('click', logout);
+    document.getElementById('today-date').textContent =
+      new Date().toLocaleDateString('en-GB', { weekday:'long', day:'numeric', month:'long' });
+ 
+    let _orders = [];
+    let _filter = 'all';
+ 
+    const statusMap = {
+      sent:      { cls: 'badge--warn',    label: 'Incoming'  },
+      accepted:  { cls: 'badge--info',    label: 'Accepted'  },
+      dispensed: { cls: 'badge--success', label: 'Dispensed' },
+      rejected:  { cls: 'badge--danger',  label: 'Rejected'  },
+    };
+ 
+    async function load() {
+      const body = document.getElementById('order-body');
+      setLoading(body, true, 6);
+      try {
+        _orders = await apiRequest('/pharmacy_orders');
+        const today = new Date().toDateString();
+ 
+        document.getElementById('stat-incoming').textContent  = _orders.filter(o => o.status === 'sent').length;
+        document.getElementById('stat-accepted').textContent  = _orders.filter(o => o.status === 'accepted').length;
+        document.getElementById('stat-dispensed').textContent = _orders.filter(o => o.status === 'dispensed' && new Date(o.created_at).toDateString() === today).length;
+ 
+        render();
+      } catch (err) {
+        showToast(err.message, 'error');
+        setEmpty(body, { icon: '⚠️', title: 'Failed to load', sub: err.message }, 6);
+      }
+    }
+ 
+    function render() {
+      const body = document.getElementById('order-body');
+      const list = _filter === 'all' ? _orders : _orders.filter(o => o.status === _filter);
+ 
+      if (!list.length) {
+        setEmpty(body, {
+          icon: '💊',
+          title: _filter === 'all' ? 'No orders yet' : `No ${_filter} orders`,
+          sub: ''
+        }, 6);
+        return;
+      }
+ 
+      body.innerHTML = list.map(order => {
+        const presc   = order.prescriptions || {};
+        const items   = presc.prescription_items || [];
+        const patient = presc.visits?.patients || {};
+        const total   = items.reduce((s, i) => s + (i.price||0) * (i.quantity||1), 0);
+        const drugs   = items.map(i => escapeHtml(i.drug_name)).join(', ') || '—';
+        const { cls, label } = statusMap[order.status] || { cls: 'badge--muted', label: order.status };
+ 
+        return `<tr>
+          <td>
+            <div style="display:flex;align-items:center;gap:0.5rem;">
+              <div style="width:30px;height:30px;border-radius:50%;background:var(--terra-lt);display:flex;align-items:center;justify-content:center;font-size:0.68rem;font-weight:700;color:var(--terra);flex-shrink:0;">${initials(patient.full_name||'?')}</div>
+              <div>
+                <div style="font-weight:600;font-size:0.875rem;">${escapeHtml(patient.full_name||'—')}</div>
+                <div class="text-muted text-xs">${patient.phone||'—'}</div>
+              </div>
+            </div>
+          </td>
+          <td class="text-sm" style="max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${drugs}">${drugs}</td>
+          <td class="text-mono" style="font-size:0.875rem;font-weight:600;color:var(--terra);">${total > 0 ? fmtUGX(total) : '—'}</td>
+          <td><span class="badge ${cls}">${label}</span></td>
+          <td class="text-muted text-sm">${fmtRelative(order.created_at)}</td>
+          <td class="td-actions">
+            <button class="btn btn--sm btn--secondary js-view" data-id="${order.id}">View</button>
+            ${order.status === 'sent' ? `
+              <button class="btn btn--sm btn--success js-accept" data-id="${order.id}">Accept</button>
+              <button class="btn btn--sm btn--danger  js-reject" data-id="${order.id}">Reject</button>
+            ` : ''}
+            ${order.status === 'accepted' ? `
+              <button class="btn btn--sm btn--primary js-dispense" data-id="${order.id}">Dispense ✓</button>
+            ` : ''}
+          </td>
+        </tr>`;
+      }).join('');
+ 
+      // Bind action buttons
+      body.querySelectorAll('.js-view').forEach(btn => {
+        btn.addEventListener('click', e => { e.stopPropagation(); openDetail(btn.dataset.id); });
+      });
+      body.querySelectorAll('.js-accept').forEach(btn => {
+        btn.addEventListener('click', e => { e.stopPropagation(); updateOrder(btn.dataset.id, 'accepted', btn); });
+      });
+      body.querySelectorAll('.js-reject').forEach(btn => {
+        btn.addEventListener('click', e => { e.stopPropagation(); updateOrder(btn.dataset.id, 'rejected', btn); });
+      });
+      body.querySelectorAll('.js-dispense').forEach(btn => {
+        btn.addEventListener('click', e => { e.stopPropagation(); updateOrder(btn.dataset.id, 'dispensed', btn); });
+      });
+    }
+ 
+    async function updateOrder(id, status, btn) {
+      if (btn) { btn.disabled = true; }
+      try {
+        await apiRequest(`/pharmacy_orders/${id}`, 'PATCH', { status });
+        const messages = { accepted: 'Order accepted.', rejected: 'Order rejected.', dispensed: 'Dispensed successfully.' };
+        showToast(messages[status] || 'Updated.', status === 'rejected' ? 'warn' : 'success');
+        if (status === 'dispensed') {
+          // Find the visit for this order and link to billing
+          const order = _orders.find(o => o.id === id);
+          const visitId = order?.prescriptions?.visit_id;
+          if (visitId) {
+            setTimeout(() => {
+              if (confirm('Dispensed. Go to billing now?')) {
+                window.location.href = `billing.html?visit_id=${visitId}`;
+              }
+            }, 500);
+          }
+        }
+        await load();
+      } catch (err) {
+        showToast(err.message, 'error');
+        if (btn) btn.disabled = false;
+      }
+    }
+ 
+    function openDetail(orderId) {
+      const order = _orders.find(o => o.id === orderId);
+      if (!order) return;
+ 
+      const presc   = order.prescriptions || {};
+      const items   = presc.prescription_items || [];
+      const patient = presc.visits?.patients || {};
+      const total   = items.reduce((s, i) => s + (i.price||0) * (i.quantity||1), 0);
+      const { cls, label } = statusMap[order.status] || { cls: 'badge--muted', label: order.status };
+ 
+      document.getElementById('order-detail').innerHTML = `
+        <div class="patient-banner" style="margin-bottom:1.25rem;padding:1rem;">
+          <div class="patient-banner__avatar" style="width:40px;height:40px;font-size:0.875rem;">${initials(patient.full_name||'?')}</div>
+          <div class="patient-banner__info">
+            <div class="patient-banner__name">${escapeHtml(patient.full_name||'—')}</div>
+            <div class="patient-banner__meta"><span>${patient.phone||'—'}</span></div>
+          </div>
+          <span class="badge ${cls}">${label}</span>
+        </div>
+        <div class="section-label">Prescribed Drugs</div>
+        ${items.map(i => `
+          <div class="rx-item mb-1">
+            <div class="rx-item__info">
+              <div class="rx-item__name">${escapeHtml(i.drug_name)}</div>
+              <div class="rx-item__meta">${i.dosage ? escapeHtml(i.dosage) + ' · ' : ''}Qty: ${i.quantity||1}${i.price ? ' · ' + fmtUGX(i.price*(i.quantity||1)) : ''}</div>
+            </div>
+          </div>`).join('')}
+        ${total > 0 ? `
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:0.75rem 0;border-top:1px solid var(--border);margin-top:0.5rem;">
+            <span class="text-muted text-sm">Total</span>
+            <span style="font-family:var(--mono);font-weight:700;color:var(--terra);">${fmtUGX(total)}</span>
+          </div>` : ''}
+        <div style="margin-top:0.75rem;font-size:0.75rem;color:var(--text-3);">Received ${fmtDate(order.created_at)}</div>`;
+ 
+      const actionsEl = document.getElementById('order-actions');
+      actionsEl.innerHTML = '';
+ 
+      const closeBtn = document.createElement('button');
+      closeBtn.className   = 'btn btn--ghost';
+      closeBtn.textContent = 'Close';
+      closeBtn.addEventListener('click', () => closeModal('modal-order'));
+      actionsEl.appendChild(closeBtn);
+ 
+      if (order.status === 'sent') {
+        const acceptBtn = document.createElement('button');
+        acceptBtn.className   = 'btn btn--success';
+        acceptBtn.textContent = 'Accept Order';
+        acceptBtn.addEventListener('click', async () => {
+          acceptBtn.disabled = true;
+          await updateOrder(orderId, 'accepted', null);
+          closeModal('modal-order');
+        });
+        actionsEl.appendChild(acceptBtn);
+ 
+        const rejectBtn = document.createElement('button');
+        rejectBtn.className   = 'btn btn--danger';
+        rejectBtn.textContent = 'Reject';
+        rejectBtn.addEventListener('click', async () => {
+          rejectBtn.disabled = true;
+          await updateOrder(orderId, 'rejected', null);
+          closeModal('modal-order');
+        });
+        actionsEl.appendChild(rejectBtn);
+      }
+ 
+      if (order.status === 'accepted') {
+        const dispenseBtn = document.createElement('button');
+        dispenseBtn.className   = 'btn btn--primary';
+        dispenseBtn.textContent = 'Mark Dispensed ✓';
+        dispenseBtn.addEventListener('click', async () => {
+          dispenseBtn.disabled = true;
+          await updateOrder(orderId, 'dispensed', null);
+          closeModal('modal-order');
+        });
+        actionsEl.appendChild(dispenseBtn);
+      }
+ 
+      openModal('modal-order');
+    }
+ 
+    // Filter tabs
+    document.getElementById('filter-tabs').addEventListener('click', e => {
+      const tab = e.target.closest('.filter-tab');
+      if (!tab) return;
+      document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('filter-tab--active'));
+      tab.classList.add('filter-tab--active');
+      _filter = tab.dataset.filter;
+      render();
+    });
+ 
+    document.getElementById('refresh-btn').addEventListener('click', load);
+    setInterval(load, 30_000);
+ 
+    await load();
+  </script>
+ 
+</body>
+</html>
+ 
