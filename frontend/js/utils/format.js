@@ -1,61 +1,49 @@
-function fmtDate(isoString) {
-  if (!isoString) return '—';
-  return new Date(isoString).toLocaleDateString('en-GB', {
-    day:   '2-digit',
-    month: 'short',
-    year:  'numeric',
-  });
+/**
+ * format.js — Pure formatting utilities. Zero DOM dependency.
+ */
+ 
+export function fmtDate(iso) {
+  if (!iso) return '—';
+  return new Date(iso).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
 }
-
-function fmtDateTime(isoString) {
-  if (!isoString) return '—';
-  return new Date(isoString).toLocaleString('en-GB', {
-    day:    '2-digit',
-    month:  'short',
-    year:   'numeric',
-    hour:   '2-digit',
-    minute: '2-digit',
-  });
+ 
+export function fmtTime(iso) {
+  if (!iso) return '—';
+  return new Date(iso).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
 }
-
-function fmtTime(isoString) {
-  if (!isoString) return '—';
-  return new Date(isoString).toLocaleTimeString('en-GB', {
-    hour:   '2-digit',
-    minute: '2-digit',
-  });
+ 
+export function fmtDateTime(iso) {
+  if (!iso) return '—';
+  return new Date(iso).toLocaleString('en-GB', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' });
 }
-
-function fmtRelative(isoString) {
-  if (!isoString) return '—';
-  const diff = Date.now() - new Date(isoString).getTime();
+ 
+export function fmtRelative(iso) {
+  if (!iso) return '—';
+  const diff = Date.now() - new Date(iso).getTime();
   const mins = Math.floor(diff / 60000);
-  if (mins < 1)  return 'Just now';
+  if (mins < 1)  return 'just now';
   if (mins < 60) return `${mins}m ago`;
   const hrs = Math.floor(mins / 60);
   if (hrs < 24)  return `${hrs}h ago`;
-  return fmtDate(isoString);
+  return fmtDate(iso);
 }
-
-// CURRENCY
-function fmtUGX(amount) {
-  if (amount === null || amount === undefined) return '—';
-  return 'UGX ' + Number(amount).toLocaleString('en-UG');
+ 
+export function fmtUGX(amount) {
+  if (amount === null || amount === undefined || amount === '') return '—';
+  return 'UGX\u00A0' + Number(amount).toLocaleString('en-UG');
 }
-
-// AGE
-function fmtAge(dob) {
+ 
+export function fmtAge(dob) {
   if (!dob) return '—';
   const birth = new Date(dob);
   const now   = new Date();
   let age = now.getFullYear() - birth.getFullYear();
-  const m = now.getMonth() - birth.getMonth();
-  if (m < 0 || (m === 0 && now.getDate() < birth.getDate())) age--;
-  return `${age}y`;
+  if (now.getMonth() < birth.getMonth() ||
+     (now.getMonth() === birth.getMonth() && now.getDate() < birth.getDate())) age--;
+  return age + 'y';
 }
-
-// SECURITY
-function escapeHtml(str) {
+ 
+export function escapeHtml(str) {
   if (!str) return '';
   return String(str)
     .replace(/&/g, '&amp;')
@@ -64,6 +52,9 @@ function escapeHtml(str) {
     .replace(/"/g, '&quot;')
     .replace(/'/g, '&#39;');
 }
-
-// EXPORTS 
-export { fmtDate, fmtDateTime, fmtTime, fmtRelative, fmtUGX, fmtAge, escapeHtml };
+ 
+export function initials(name) {
+  if (!name) return '?';
+  return name.trim().split(/\s+/).slice(0, 2).map(w => w[0].toUpperCase()).join('');
+}
+ 
