@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Doctor Queue — Minza Health</title>
+  <link rel="stylesheet" href="../styles/main.css"/>
+</head>
+<body>
+ 
+  <nav class="nav">
+    <div class="nav__brand">
+      <span class="nav__logo">Min<span>za</span></span>
+      <span class="nav__role">Doctor</span>
+    </div>
+    <div class="nav__right">
+      <span class="conn-pill" id="conn-pill"></span>
+      <span class="nav__user" id="nav-user">—</span>
+      <button class="btn btn--ghost btn--sm" id="logout-btn">Sign out</button>
+    </div>
+  </nav>
+ 
+  <main class="page page--narrow">
+ 
+    <div class="page-header">
+      <div>
+        <h1 class="page-title">My Patients</h1>
+        <p class="page-sub" id="today-date">—</p>
+      </div>
+      <button class="btn btn--ghost btn--sm" id="refresh-btn">↻ Refresh</button>
+    </div>
+ 
+    <!-- Stats -->
+    <div class="stats-grid" style="grid-template-columns:repeat(3,1fr);margin-bottom:1.5rem;">
+      <div class="stat-card stat-card--terra">
+        <div class="stat-label">Waiting</div>
+        <div class="stat-num" id="stat-waiting">—</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">In Consult</div>
+        <div class="stat-num" id="stat-consult">—</div>
+      </div>
+      <div class="stat-card stat-card--sage">
+        <div class="stat-label">Done</div>
+        <div class="stat-num" id="stat-done">—</div>
+      </div>
+    </div>
+ 
+    <!-- Patient Queue -->
+    <div class="card card--flush" id="queue-card">
+      <div id="queue-container"></div>
+    </div>
+ 
+    <!-- Tip when empty -->
+    <p style="text-align:center;font-size:0.78rem;color:var(--text-3);margin-top:1rem;">
+      Reception assigns patients to you. Refresh to see new assignments.
+    </p>
+ 
+  </main>
+ 
+  <script type="module">
+    import { protectRoute, logout, getUserName, getCurrentUser } from '../js/modules/auth.js';
+    import { apiRequest } from '../js/services/api.js';
+    import { initConnPill, showToast, setLoading, setEmpty, btnLoading } from '../js/utils/ui.js';
+    import { fmtRelative, escapeHtml, initials, fmtAge } from '../js/utils/format.js';
+ 
+    const user = protectRoute(['doctor', 'admin']);
+    if (!user) throw new Error();
+ 
+    initConnPill('conn-pill');
+    document.getElementById('nav-user').textContent = getUserName();
+    document.getElementById('logout-btn').addEventListener('click', logout);
+    document.getElementById('today-date').textContent =
+      new Date().toLocaleDateString('en-GB', { weekday:'long', day:'numeric', month:'long' });
+ 
+    async function load() {
+      const container = document.getElementById('queue-container');
+      setLoading(container, true);
+      try {
+        // Show all today's visits (doctor sees patients assigned to them + any waiting)
+        const visits = await apiRequest(`/visits?doctor_id=${user.id}`);
+ 
+        // Filter: show waiting (to claim) and in_consult (assigned to this doctor)
+        const mine = visits.filter(v =>
+          v.status === 'waiting' ||
+          (v.doctor_id === user.id && (v.status === 'in_consult' || v.status === 'completed'))
+        );
+ 
+        document.getElementById('stat-waiting').textContent = mine.filter(v=>v.status==='waiting').length;
+        document.getElementById('stat-consult').textContent = mine.filter(v=>v.status==='in_consult').length;
+        document.getElementById('stat-done').textContent    = mine.filter(v=>v.status==='completed').length;
+ 
+        if (!mine.length) {
+          setEmpty(container, { title: 'No patients yet', sub: 'Waiting for reception to assign patients.' });
+          return;
+        }
+ 
+        const order = { waiting: 0, in_consult: 1, completed: 2 };
+        mine.sort((a, b) => order[a.status] - order[b.status]);
+ 
+        const statusMap = {
+          waiting:    { cls: 'badge--warn',    label: 'Waiting'    },
+          in_consult: { cls: 'badge--info',    label: 'In Consult' },
+          completed:  { cls: 'badge--success', label: 'Done'       },
+        };
+ 
+        container.innerHTML = mine.map(v => {
+          const p = v.patients || {};
+          const { cls, label } = statusMap[v.status] || { cls: 'badge--muted', label: v.status };
+          const ini = initials(p.full_name || '?');
+          const isActionable = v.status === 'waiting' || v.status === 'in_consult';
+ 
+          return `
+            <div class="queue-item">
+              <div class="queue-item__avatar">${ini}</div>
+              <div class="queue-item__info">
+                <div class="queue-item__name">${escapeHtml(p.full_name || '—')}</div>
+                <div class="queue-item__meta">
+                  ${p.gender ? p.gender + ' · ' : ''}${fmtAge(p.dob)} · ${fmtRelative(v.created_at)}
+                </div>
+              </div>
+              <span class="badge ${cls}">${label}</span>
+              <div class="queue-item__actions">
+                ${isActionable ? `
+                  <a href="consultation.html?visit_id=${v.id}" class="btn btn--primary btn--sm">
+                    ${v.status === 'waiting' ? 'Start Consult →' : 'Continue →'}
+                  </a>` : `
+                  <a href="consultation.html?visit_id=${v.id}" class="btn btn--ghost btn--sm">
+                    View
+                  </a>`}
+              </div>
+            </div>`;
+        }).join('');
+ 
+      } catch (err) {
+        showToast(err.message, 'error');
+        setEmpty(container, { title: 'Error loading queue', sub: err.message });
+      }
+    }
+ 
+    document.getElementById('refresh-btn').addEventListener('click', load);
+    setInterval(load, 30_000);
+ 
+    await load();
+  </script>
+ 
+</body>
+</html>
