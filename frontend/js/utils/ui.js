@@ -38,7 +38,10 @@ export function showToast(message, type = 'success', duration = 3500) {
 // ── MODAL ─────────────────────────────────────────────────────────
 export function openModal(id) {
   const el = document.getElementById(id);
-  if (el) { el.classList.add('modal--open'); el.style.display = 'flex'; }
+  if (!el) return;
+  if (el._roLocked) return; // blocked by readonly.js
+  el.classList.add('modal--open');
+  el.style.display = 'flex';
 }
  
 export function closeModal(id) {
@@ -151,3 +154,4 @@ export function markActiveNav() {
     if (href && href === current) a.classList.add('nav__link--active');
   });
 }
+ 

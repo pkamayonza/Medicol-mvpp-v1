@@ -176,7 +176,7 @@
         renderQueue();
       } catch (err) {
         showToast(err.message, 'error');
-        setEmpty(container, { icon: '⚠️', title: 'Failed to load', sub: err.message });
+        setEmpty(container, { title: 'Failed to load', sub: err.message });
       }
     }
  
@@ -184,7 +184,6 @@
     function renderQueue() {
       const container = document.getElementById('queue-container');
       let list = _filter === 'all' ? _visits : _visits.filter(v => v.status === _filter);
- 
       if (!list.length) {
         setEmpty(container, {
           icon: '🪑',
