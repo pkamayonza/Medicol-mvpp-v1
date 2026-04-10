@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Consultation — Minza Health</title>
+  <link rel="stylesheet" href="../styles/main.css"/>
+</head>
+<body>
+ 
+  <nav class="nav">
+    <div class="nav__brand">
+      <span class="nav__logo">Min<span>za</span></span>
+      <span class="nav__role">Doctor</span>
+    </div>
+    <div class="nav__links">
+      <a href="doctor-queue.html" class="nav__link nav__link--back">← My Queue</a>
+    </div>
+    <div class="nav__right">
+      <span class="conn-pill" id="conn-pill"></span>
+      <span class="nav__user" id="nav-user">—</span>
+      <button class="btn btn--ghost btn--sm" id="logout-btn">Sign out</button>
+    </div>
+  </nav>
+ 
+  <!-- Workflow progress bar -->
+  <div style="background:var(--bg-2);border-bottom:1px solid var(--border);padding:0.6rem 1.5rem;">
+    <div class="workflow-bar" style="border:none;padding:0;margin:0;background:transparent;max-width:1080px;margin:0 auto;">
+      <div class="workflow-step workflow-step--done">
+        <div class="workflow-step__dot"></div>
+        <span class="workflow-step__label">Registration</span>
+      </div>
+      <div class="workflow-sep workflow-sep--done"></div>
+      <div class="workflow-step workflow-step--active">
+        <div class="workflow-step__dot"></div>
+        <span class="workflow-step__label">Consultation</span>
+      </div>
+      <div class="workflow-sep"></div>
+      <div class="workflow-step">
+        <div class="workflow-step__dot"></div>
+        <span class="workflow-step__label">Pharmacy</span>
+      </div>
+      <div class="workflow-sep"></div>
+      <div class="workflow-step">
+        <div class="workflow-step__dot"></div>
+        <span class="workflow-step__label">Payment</span>
+      </div>
+    </div>
+  </div>
+ 
+  <main class="page page--wide">
+ 
+    <!-- Patient Banner -->
+    <div class="patient-banner" id="patient-banner" style="display:none;">
+      <div class="patient-banner__avatar" id="pt-avatar">?</div>
+      <div class="patient-banner__info">
+        <div class="patient-banner__name" id="pt-name">Loading…</div>
+        <div class="patient-banner__meta" id="pt-meta">—</div>
+      </div>
+      <div>
+        <span class="badge" id="pt-status-badge">—</span>
+      </div>
+    </div>
+ 
+    <!-- Two-column layout -->
+    <div class="consult-grid">
+ 
+      <!-- LEFT: Consultation + Prescription -->
+      <div>
+ 
+        <!-- Step 1: Consultation -->
+        <div class="card">
+          <div class="card__header">
+            <div class="step-badge">1</div>
+            <h2 class="card__title">Consultation</h2>
+            <span class="badge badge--muted" id="consult-status-badge" style="display:none;"></span>
+          </div>
+ 
+          <!-- Read-only view (if already saved) -->
+          <div id="consult-view" style="display:none;"></div>
+ 
+          <!-- Form -->
+          <form id="consult-form" style="display:none;" novalidate>
+            <div class="form-group">
+              <label class="form-label" for="symptoms">Presenting Complaint / Symptoms</label>
+              <textarea class="form-textarea" id="symptoms" name="symptoms" rows="2"
+                        placeholder="e.g. Fever for 3 days, headache, joint pain…"></textarea>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="diagnosis">Diagnosis *</label>
+              <input class="form-input" type="text" id="diagnosis" name="diagnosis"
+                     placeholder="e.g. Malaria — confirmed by RDT" required/>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="notes">Clinical Notes</label>
+              <textarea class="form-textarea" id="notes" name="notes" rows="3"
+                        placeholder="History, examination findings, management plan…"></textarea>
+            </div>
+            <div id="consult-error" class="form-error" style="display:none;"></div>
+            <div class="form-actions">
+              <button type="submit" class="btn btn--primary" id="save-consult-btn">Save Consultation</button>
+            </div>
+          </form>
+        </div>
+ 
+        <!-- Step 2: Prescription -->
+        <div class="card" id="rx-card">
+          <div class="card__header">
+            <div class="step-badge">2</div>
+            <h2 class="card__title">Prescription</h2>
+            <span class="badge badge--terra text-mono" id="rx-total-badge" style="display:none;"></span>
+          </div>
+ 
+          <!-- Locked until consultation saved -->
+          <div id="rx-locked" class="state-empty" style="padding:1.5rem 0;">
+            <div class="state-empty__icon">🔒</div>
+            <div class="state-empty__title">Save consultation first</div>
+          </div>
+ 
+          <!-- Read-only Rx (if already sent) -->
+          <div id="rx-view" style="display:none;"></div>
+ 
+          <!-- Builder -->
+          <div id="rx-builder" style="display:none;">
+            <!-- Drug entry row -->
+            <div style="background:var(--bg-2);border:1px solid var(--border);border-radius:var(--radius);padding:1rem;margin-bottom:1rem;">
+              <div class="form-row">
+                <div class="form-group form-group--grow">
+                  <label class="form-label">Drug Name *</label>
+                  <input class="form-input" type="text" id="drug-name" placeholder="e.g. Coartem 20/120mg"/>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Dosage</label>
+                  <input class="form-input" type="text" id="drug-dosage" placeholder="e.g. 4 tabs BD x 3d"/>
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label class="form-label">Qty</label>
+                  <input class="form-input" type="number" id="drug-qty" min="1" value="1" style="width:90px;"/>
+                </div>
+                <div class="form-group form-group--grow">
+                  <label class="form-label">Unit Price (UGX)</label>
+                  <input class="form-input" type="number" id="drug-price" min="0" placeholder="0"/>
+                </div>
+                <div class="form-group" style="align-self:flex-end;">
+                  <button type="button" class="btn btn--secondary btn--full" id="add-drug-btn">+ Add Drug</button>
+                </div>
+              </div>
+            </div>
+ 
+            <div id="rx-items"></div>
+ 
+            <div style="display:flex;justify-content:space-between;align-items:center;padding:0.75rem 0;border-top:1px solid var(--border);margin-bottom:1rem;">
+              <span style="font-size:0.82rem;font-weight:600;color:var(--text-3);">Prescription Total</span>
+              <span style="font-size:1.1rem;font-weight:700;font-family:var(--mono);color:var(--terra);" id="rx-total">UGX 0</span>
+            </div>
+ 
+            <div id="rx-error" class="form-error" style="display:none;"></div>
+            <div class="form-actions">
+              <button type="button" class="btn btn--ghost" id="skip-rx-btn">Skip Prescription</button>
+              <button type="button" class="btn btn--primary" id="send-rx-btn">Save &amp; Send to Pharmacy →</button>
+            </div>
+          </div>
+        </div>
+ 
+      </div><!-- /left -->
+ 
+      <!-- RIGHT: Visit actions + Previous History -->
+      <div>
+ 
+        <!-- Complete Visit -->
+        <div class="card">
+          <div class="card__header">
+            <div class="step-badge">3</div>
+            <h2 class="card__title">Visit Actions</h2>
+          </div>
+          <div id="actions-locked" class="state-empty" style="padding:1.25rem 0;">
+            <div class="state-empty__icon">⏳</div>
+            <div class="state-empty__title">Save consultation to proceed</div>
+          </div>
+          <div id="actions-ready" style="display:none;">
+            <a href="#" class="btn btn--success btn--full mb-1" id="go-to-billing-btn">
+              Go to Billing →
+            </a>
+            <button type="button" class="btn btn--primary btn--full" id="complete-visit-btn">
+              Complete Visit ✓
+            </button>
+            <p style="font-size:0.72rem;color:var(--text-3);text-align:center;margin-top:0.75rem;">
+              Completing the visit closes the consultation and notifies reception.
+            </p>
+          </div>
+        </div>
+ 
+        <!-- Previous visit history -->
+        <div class="card">
+          <div class="card__header">
+            <h2 class="card__title">Patient History</h2>
+            <span class="card__badge" id="history-count">—</span>
+          </div>
+          <div id="history-body">
+            <div class="state-loading"><div class="state-loading__spinner"></div></div>
+          </div>
+        </div>
+ 
+      </div><!-- /right -->
+ 
+    </div>
+ 
+  </main>
+ 
+  <script type="module">
+    import { protectRoute, logout, getUserName, getCurrentUser } from '../js/modules/auth.js';
+    import { apiRequest, DB } from '../js/services/api.js';
+    import { initConnPill, showToast, btnLoading } from '../js/utils/ui.js';
+    import { escapeHtml, initials, fmtDate, fmtTime, fmtAge, fmtUGX } from '../js/utils/format.js';
+ 
+    const user = protectRoute(['doctor', 'admin']);
+    if (!user) throw new Error();
+ 
+    initConnPill('conn-pill');
+    document.getElementById('nav-user').textContent = getUserName();
+    document.getElementById('logout-btn').addEventListener('click', logout);
+ 
+    const params  = new URLSearchParams(window.location.search);
+    const visitId = params.get('visit_id');
+    if (!visitId) { window.location.href = 'doctor-queue.html'; throw new Error(); }
+ 
+    // ── In-memory prescription items ──────────────────────────────────
+    let _items = [];
+    let _consultId   = null;
+    let _visit       = null;
+    let _rxBuiltOnce = false;
+ 
+    function itemTotal() {
+      return _items.reduce((s, i) => s + i.price * i.quantity, 0);
+    }
+ 
+    // ── Load visit ────────────────────────────────────────────────────
+    const visit = await apiRequest(`/visits/${visitId}`);
+    if (!visit) { window.location.href = 'doctor-queue.html'; throw new Error(); }
+    _visit = visit;
+ 
+    const patient = visit.patients || {};
+ 
+    // Patient banner
+    document.getElementById('patient-banner').style.display = 'flex';
+    document.getElementById('pt-avatar').textContent = initials(patient.full_name || '?');
+    document.getElementById('pt-name').textContent   = patient.full_name || '—';
+    document.getElementById('pt-meta').innerHTML =
+      [patient.phone, patient.gender, patient.dob ? `${fmtAge(patient.dob)} old` : null]
+        .filter(Boolean).map(t => `<span>${escapeHtml(t)}</span>`).join('');
+ 
+    const statusMap = {
+      waiting:    { cls: 'badge--warn',    label: 'Waiting'    },
+      in_consult: { cls: 'badge--info',    label: 'In Consult' },
+      completed:  { cls: 'badge--success', label: 'Completed'  },
+    };
+    const { cls, label } = statusMap[visit.status] || { cls: 'badge--muted', label: visit.status };
+    const badge = document.getElementById('pt-status-badge');
+    badge.className   = `badge ${cls}`;
+    badge.textContent = label;
+ 
+    // ── Load history ──────────────────────────────────────────────────
+    async function loadHistory() {
+      const body = document.getElementById('history-body');
+      try {
+        const allVisits = await apiRequest('/visits');
+        const history = allVisits
+          .filter(v => v.patient_id === patient.id && v.id !== visitId && v.status === 'completed')
+          .sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+ 
+        document.getElementById('history-count').textContent = history.length + ' past visits';
+ 
+        if (!history.length) {
+          body.innerHTML = `<div class="state-empty" style="padding:1.25rem 0;"><div class="state-empty__title">First visit</div><div class="state-empty__sub">No previous visits recorded.</div></div>`;
+          return;
+        }
+ 
+        body.innerHTML = history.slice(0, 5).map(v => {
+          const consult = DB.consultations.find(c => c.visit_id === v.id);
+          return `
+            <div class="visit-row">
+              <span class="visit-row__date">${fmtDate(v.created_at)}</span>
+              <div class="visit-row__info">
+                <div class="visit-row__diag">${escapeHtml(consult?.diagnosis || 'No diagnosis')}</div>
+                ${consult?.symptoms ? `<div class="visit-row__sub">${escapeHtml(consult.symptoms)}</div>` : ''}
+              </div>
+            </div>`;
+        }).join('');
+      } catch (err) {
+        body.innerHTML = `<div class="form-error">${err.message}</div>`;
+      }
+    }
+ 
+    loadHistory();
+ 
+    // ── Consultation ──────────────────────────────────────────────────
+    const existingConsult = visit.consultations?.[0] || null;
+ 
+    function showConsultView(c) {
+      document.getElementById('consult-view').style.display = 'block';
+      document.getElementById('consult-form').style.display = 'none';
+      const badge = document.getElementById('consult-status-badge');
+      badge.textContent = 'Saved';
+      badge.style.display = 'inline-flex';
+      document.getElementById('consult-view').innerHTML = `
+        <div class="detail-grid">
+          <div class="detail-item detail-item--full">
+            <span class="detail-key">Symptoms</span>
+            <span class="detail-val">${escapeHtml(c.symptoms || '—')}</span>
+          </div>
+          <div class="detail-item detail-item--full">
+            <span class="detail-key">Diagnosis</span>
+            <span class="detail-val detail-val--hl">${escapeHtml(c.diagnosis || '—')}</span>
+          </div>
+          ${c.notes ? `<div class="detail-item detail-item--full">
+            <span class="detail-key">Notes</span>
+            <span class="detail-val">${escapeHtml(c.notes)}</span>
+          </div>` : ''}
+        </div>`;
+      _consultId = c.id;
+      unlockRx();
+      unlockActions();
+    }
+ 
+    if (existingConsult) {
+      showConsultView(existingConsult);
+    } else {
+      document.getElementById('consult-form').style.display = 'block';
+    }
+ 
+    document.getElementById('consult-form').addEventListener('submit', async e => {
+      e.preventDefault();
+      const btn   = document.getElementById('save-consult-btn');
+      const errEl = document.getElementById('consult-error');
+      errEl.style.display = 'none';
+ 
+      const diagnosis = document.getElementById('diagnosis').value.trim();
+      if (!diagnosis) {
+        errEl.textContent   = 'Diagnosis is required.';
+        errEl.style.display = 'block';
+        return;
+      }
+ 
+      btnLoading(btn, true, 'Saving…');
+      try {
+        const c = await apiRequest('/consultations', 'POST', {
+          visit_id:  visitId,
+          symptoms:  document.getElementById('symptoms').value.trim() || null,
+          diagnosis,
+          notes:     document.getElementById('notes').value.trim() || null,
+        });
+        showConsultView(c);
+        showToast('Consultation saved.', 'success');
+      } catch (err) {
+        errEl.textContent   = err.message;
+        errEl.style.display = 'block';
+      } finally {
+        btnLoading(btn, false);
+      }
+    });
+ 
+    // ── Prescription Builder ──────────────────────────────────────────
+    function unlockRx() {
+      document.getElementById('rx-locked').style.display  = 'none';
+      document.getElementById('rx-builder').style.display = 'block';
+ 
+      // Check if prescription already exists
+      const existingRx = visit.prescriptions?.[0];
+      if (existingRx && existingRx.status !== 'pending') {
+        showRxReadOnly(existingRx);
+        return;
+      }
+      if (existingRx) {
+        // Load items
+        _items = (existingRx.prescription_items || []).map(i => ({ ...i, _key: i.id }));
+        renderItems();
+      }
+ 
+      if (_rxBuiltOnce) return;
+      _rxBuiltOnce = true;
+ 
+      document.getElementById('add-drug-btn').addEventListener('click', addDrug);
+      document.getElementById('drug-name').addEventListener('keydown', e => {
+        if (e.key === 'Enter') { e.preventDefault(); addDrug(); }
+      });
+ 
+      document.getElementById('send-rx-btn').addEventListener('click', sendRx);
+      document.getElementById('skip-rx-btn').addEventListener('click', () => {
+        document.getElementById('rx-builder').style.display = 'none';
+        const v = document.getElementById('rx-view');
+        v.style.display = 'block';
+        v.innerHTML = `<div class="state-empty" style="padding:1rem 0;"><div class="state-empty__title">No prescription for this visit.</div></div>`;
+        unlockActions();
+      });
+    }
+ 
+    function showRxReadOnly(rx) {
+      document.getElementById('rx-builder').style.display = 'none';
+      const view = document.getElementById('rx-view');
+      view.style.display = 'block';
+      const items = rx.prescription_items || [];
+      const total = items.reduce((s, i) => s + (i.price||0) * (i.quantity||1), 0);
+      view.innerHTML = `
+        <div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.75rem;">
+          <span class="badge badge--${rx.status==='dispensed'?'success':'terra'}">${rx.status}</span>
+          <span class="text-muted text-sm">Rx #${rx.id.slice(-6).toUpperCase()}</span>
+        </div>
+        ${items.map(i => `
+          <div class="rx-item">
+            <div class="rx-item__info">
+              <div class="rx-item__name">${escapeHtml(i.drug_name)}</div>
+              <div class="rx-item__meta">${i.dosage||''} · Qty ${i.quantity||1} · ${fmtUGX(i.price||0)}</div>
+            </div>
+          </div>`).join('')}
+        ${total > 0 ? `<div style="text-align:right;font-weight:700;font-family:var(--mono);color:var(--terra);margin-top:0.75rem;">${fmtUGX(total)}</div>` : ''}`;
+    }
+ 
+    function addDrug() {
+      const nameEl   = document.getElementById('drug-name');
+      const dosageEl = document.getElementById('drug-dosage');
+      const qtyEl    = document.getElementById('drug-qty');
+      const priceEl  = document.getElementById('drug-price');
+      if (!nameEl.value.trim()) { nameEl.focus(); showToast('Enter a drug name.', 'warn'); return; }
+      _items.push({
+        _key:      crypto.randomUUID(),
+        drug_name: nameEl.value.trim(),
+        dosage:    dosageEl.value.trim() || null,
+        quantity:  parseInt(qtyEl.value) || 1,
+        price:     parseFloat(priceEl.value) || 0,
+      });
+      nameEl.value = dosageEl.value = priceEl.value = '';
+      qtyEl.value  = '1';
+      nameEl.focus();
+      renderItems();
+    }
+ 
+    function renderItems() {
+      const container = document.getElementById('rx-items');
+      const totalEl   = document.getElementById('rx-total');
+      const badgeEl   = document.getElementById('rx-total-badge');
+ 
+      if (!_items.length) {
+        container.innerHTML = `<div class="state-empty" style="padding:1rem 0;"><div class="state-empty__title">No drugs added yet</div></div>`;
+        totalEl.textContent  = fmtUGX(0);
+        badgeEl.style.display = 'none';
+        return;
+      }
+ 
+      const total = itemTotal();
+      totalEl.textContent   = fmtUGX(total);
+      badgeEl.textContent   = fmtUGX(total);
+      badgeEl.style.display = 'inline-flex';
+ 
+      container.innerHTML = _items.map(item => `
+        <div class="rx-item" data-key="${item._key}">
+          <div class="rx-item__info">
+            <div class="rx-item__name">${escapeHtml(item.drug_name)}</div>
+            <div class="rx-item__meta">${item.dosage ? escapeHtml(item.dosage) + ' · ' : ''}Qty ${item.quantity} · ${fmtUGX(item.price * item.quantity)}</div>
+          </div>
+          <button class="btn btn--icon btn--danger js-remove" data-key="${item._key}" title="Remove">✕</button>
+        </div>`).join('');
+ 
+      container.querySelectorAll('.js-remove').forEach(btn => {
+        btn.addEventListener('click', () => {
+          _items = _items.filter(i => i._key !== btn.dataset.key);
+          renderItems();
+        });
+      });
+    }
+ 
+    async function sendRx() {
+      const errEl  = document.getElementById('rx-error');
+      const sendBtn = document.getElementById('send-rx-btn');
+      errEl.style.display = 'none';
+ 
+      if (!_items.length) {
+        errEl.textContent   = 'Add at least one drug before sending.';
+        errEl.style.display = 'block';
+        return;
+      }
+ 
+      btnLoading(sendBtn, true, 'Sending…');
+      try {
+        const rx = await apiRequest('/prescriptions', 'POST', { visit_id: visitId });
+        if (!rx?.id) throw new Error('Failed to create prescription.');
+ 
+        await apiRequest('/prescription_items', 'POST',
+          _items.map(i => ({
+            prescription_id: rx.id,
+            drug_name: i.drug_name,
+            dosage:    i.dosage,
+            quantity:  i.quantity,
+            price:     i.price,
+          }))
+        );
+ 
+        await apiRequest('/pharmacy_orders', 'POST', {
+          prescription_id: rx.id,
+          clinic_id:       'org1',
+          pharmacy_id:     'org1',
+          order_type:      'internal',
+        });
+ 
+        showRxReadOnly({ ...rx, prescription_items: _items });
+        showToast('Prescription sent to pharmacy.', 'success');
+        unlockActions();
+      } catch (err) {
+        errEl.textContent   = err.message;
+        errEl.style.display = 'block';
+      } finally {
+        btnLoading(sendBtn, false);
+      }
+    }
+ 
+    // ── Actions ───────────────────────────────────────────────────────
+    function unlockActions() {
+      document.getElementById('actions-locked').style.display = 'none';
+      document.getElementById('actions-ready').style.display  = 'block';
+ 
+      const billingBtn = document.getElementById('go-to-billing-btn');
+      billingBtn.href  = `billing.html?visit_id=${visitId}`;
+    }
+ 
+    document.getElementById('complete-visit-btn').addEventListener('click', async () => {
+      const btn = document.getElementById('complete-visit-btn');
+      btnLoading(btn, true, 'Completing…');
+      try {
+        await apiRequest(`/visits/${visitId}`, 'PATCH', { status: 'completed' });
+        showToast('Visit completed.', 'success');
+        setTimeout(() => { window.location.href = 'doctor-queue.html'; }, 1200);
+      } catch (err) {
+        showToast(err.message, 'error');
+        btnLoading(btn, false);
+      }
+    });
+ 
+    // Unlock actions if consultation was already saved
+    if (existingConsult) unlockActions();
+  </script>
+ 
+</body>
+</html>
+ 
