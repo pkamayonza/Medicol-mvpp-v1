@@ -156,8 +156,8 @@
     // ── Render Users ──────────────────────────────────────────────────
     function renderUsers() {
       const body = document.getElementById('users-body');
-      const roleEmoji = { receptionist: '👩', doctor: '🩺', pharmacist: '💊', admin: '⚙️' };
-      const roleColors = { receptionist: 'badge--muted', doctor: 'badge--info', pharmacist: 'badge--terra', admin: 'badge--violet' };
+      const roleEmoji = { receptionist: 'R', doctor: 'D', pharmacist: 'P', admin: 'A' };
+      const roleColors = { receptionist: 'badge--terra', doctor: 'badge--terra', pharmacist: 'badge--terra', admin: 'badge--terra' };
  
       if (!DB.users.length) {
         body.innerHTML = `<div class="state-empty" style="padding:1.5rem 0;"><div class="state-empty__title">No users yet</div></div>`;
