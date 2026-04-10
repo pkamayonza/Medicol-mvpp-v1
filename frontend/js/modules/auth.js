@@ -1,165 +1,74 @@
-import { authRequest, setSession, clearSession, getSession } from '../services/api.js';
-
-let _currentUser    = null;
-let _currentSession = null;
-
-function getCurrentUser()    { return _currentUser; }
-function getCurrentSession() { return _currentSession; }
-
-// ONLY ONE definition of each — reads from the live session object
-function getOrgId() {
-  return _currentUser?.user_metadata?.org_id || _currentUser?.id || null;
-}
-
-function getOrgType() {
-  return (_currentUser?.user_metadata?.org_type || 'clinic').toLowerCase().trim();
-}
-
-function getOrgName() {
-  return _currentUser?.user_metadata?.org_name || _currentUser?.email || '—';
-}
-
-export function getUserRole() {
-  const user = JSON.parse(localStorage.getItem('user')); 
-  return user?.user_metadata?.role || 'receptionist';
-}
+/**
+ * auth.js — Session management, role protection, redirects
+ */
  
-// LOGIN 
-async function login(email, password) {
-  const data = await authRequest('token?grant_type=password', { email, password });
-  _currentSession = data;
-  _currentUser    = data.user;
+import { authLogin, getSession, setSession, clearSession } from '../services/api.js';
+ 
+let _user = null;
+ 
+export function getCurrentUser() { return _user; }
+export function getRole()        { return _user?.user_metadata?.role || null; }
+export function getOrgId()       { return _user?.user_metadata?.org_id || _user?.id || null; }
+export function getOrgName()     { return _user?.user_metadata?.org_name || _user?.email || '—'; }
+export function getUserName()    { return _user?.user_metadata?.name || _user?.email || '—'; }
+ 
+// ── LOGIN ──────────────────────────────────────────────────────────
+export async function login(email, password) {
+  const data = await authLogin(email, password);
+  _user = data.user;
   setSession(data);
   return data;
 }
  
-// SIGNUP 
-/**
- * signup — creates a new Supabase Auth user.
- * org_name and org_type are stored in user_metadata and used throughout the app.
- */
-async function signup(email, password, orgName, orgType) {
-  const data = await authRequest('signup', {
-    email,
-    password,
-    data: {
-      org_name:    orgName,
-      org_type:    orgType || 'clinic',
-      trial_start: new Date().toISOString(),
-      trial_days:  14,
-    },
-  });
-  return data;
-}
- 
-// LOGOUT 
-async function logout() {
-  const session = getSession();
-  if (session?.access_token) {
-    try {
-      await fetch('https://qflqwmfdwalvmndaojzl.supabase.co/auth/v1/logout', {
-        method:  'POST',
-        headers: {
-          'apikey':        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFmbHF3bWZkd2Fsdm1uZGFvanpsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE2MjcxMTcsImV4cCI6MjA4NzIwMzExN30.Ewpo8PoGq6PGcHnN85aYCUdPtSv7RXoGh9qthBJHezA',
-          'Authorization': `Bearer ${session.access_token}`,
-        },
-      });
-    } catch (_) { /* best-effort — don't block the user */ }
-  }
-  _currentUser    = null;
-  _currentSession = null;
+// ── LOGOUT ─────────────────────────────────────────────────────────
+export function logout() {
+  _user = null;
   clearSession();
-  window.location.href = 'login.html'; // ← RELATIVE — no leading slash
+  window.location.href = 'login.html';
 }
  
-// RESTORE SESSION 
+// ── RESTORE SESSION ────────────────────────────────────────────────
+export function restoreSession() {
+  const sess = getSession();
+  if (!sess?.user) return null;
+  _user = sess.user;
+  return _user;
+}
+ 
+// ── ROUTE PROTECTION ───────────────────────────────────────────────
 /**
- * Attempts to restore a persisted session using the stored refresh_token.
- * Returns the user object on success, null on any failure.
- * Does NOT redirect — callers decide what to do with a null result.
+ * Call at top of every protected page.
+ * allowedRoles: null = any authenticated user, or array of roles e.g. ['doctor','admin']
+ * Returns user or redirects to login.
  */
-async function restoreSession() {
-  const stored = getSession();
-  if (!stored?.refresh_token) return null;
- 
-  try {
-    const res = await fetch(
-      'https://qflqwmfdwalvmndaojzl.supabase.co/auth/v1/token?grant_type=refresh_token',
-      {
-        method:  'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFmbHF3bWZkd2Fsdm1uZGFvanpsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE2MjcxMTcsImV4cCI6MjA4NzIwMzExN30.Ewpo8PoGq6PGcHnN85aYCUdPtSv7RXoGh9qthBJHezA',
-        },
-        body: JSON.stringify({ refresh_token: stored.refresh_token }),
-      }
-    );
- 
-    if (!res.ok) { clearSession(); return null; }
- 
-    const data = await res.json();
-    _currentSession = data;
-    _currentUser    = data.user;
-    setSession(data);
-    return data.user;
-  } catch (_) {
-    // Network down or Supabase unreachable — clear so we don't loop
-    clearSession();
+export function protectRoute(allowedRoles = null) {
+  const user = restoreSession();
+  if (!user) {
+    window.location.href = 'login.html';
     return null;
   }
-}
- 
-// ROUTE PROTECTION 
-/**
- * protectRoute — await this at the top of every protected page.
- * On success: returns the user object and execution continues normally.
- * On failure: redirects to login.html and returns null.
- *             The caller should check for null and stop execution.
- */
-async function protectRoute() {
-  const user = await restoreSession();
-  if (!user) {
-    window.location.href = 'login.html'; // ← RELATIVE
+  if (allowedRoles && !allowedRoles.includes(getRole())) {
+    // Redirect to role-appropriate home
+    window.location.href = roleHome(getRole());
     return null;
   }
   return user;
 }
  
-/**
- * redirectIfLoggedIn — call on login.html only.
- * Silently skips the login screen if the session is still valid.
- */
-async function redirectIfLoggedIn() {
-  const stored = getSession();
-  if (!stored?.refresh_token) return;
-  const user = await restoreSession();
-  if (user) {
-    const role = getUserRole();
-
-const routes = {
-  receptionist: 'dashboard.html',
-  doctor: 'doctor-queue.html',
-  pharmacy: 'pharmacy.html',
-  admin: 'admin.html'
-};
-
-window.location.href = routes[role] || 'dashboard.html';
-  }
+// ── ROLE → HOME PAGE ───────────────────────────────────────────────
+export function roleHome(role) {
+  const map = {
+    receptionist: 'queue.html',
+    doctor:       'doctor-queue.html',
+    pharmacist:   'pharmacy-queue.html',
+    admin:        'admin.html',
+  };
+  return map[role] || 'login.html';
 }
  
-// EXPORTS 
-export {
-  login,
-  signup,
-  logout,
-  restoreSession,
-  protectRoute,
-  redirectIfLoggedIn,
-  getCurrentUser,
-  getCurrentSession,
-  getOrgId,
-  getOrgType,
-  getOrgName,
-  getRole,
-};
+// ── REDIRECT IF LOGGED IN ─────────────────────────────────────────
+export function redirectIfLoggedIn() {
+  const user = restoreSession();
+  if (user) window.location.href = roleHome(getRole());
+}
  
