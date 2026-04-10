@@ -1,140 +1,153 @@
+/**
+ * ui.js — UI utilities: toast, modal, connectivity pill, states
+ */
+ 
 import { onConnChange, getConnState } from '../services/api.js';
-
-// TOAST 
-let _toastTimer = null;
-
-function showToast(message, type = 'success') {
-  let toast = document.getElementById('toast');
-  if (!toast) {
-    toast = document.createElement('div');
-    toast.id = 'toast';
-    document.body.appendChild(toast);
-  }
-
-  toast.textContent = message;
-  toast.className   = `toast toast--${type} toast--visible`;
-
-  if (_toastTimer) clearTimeout(_toastTimer);
-  _toastTimer = setTimeout(() => {
-    toast.classList.remove('toast--visible');
-  }, 3500);
+ 
+// ── TOAST ─────────────────────────────────────────────────────────
+let _toastContainer = null;
+ 
+function _getContainer() {
+  if (_toastContainer) return _toastContainer;
+  _toastContainer = document.createElement('div');
+  _toastContainer.className = 'toast-container';
+  document.body.appendChild(_toastContainer);
+  return _toastContainer;
 }
-
-// MODAL 
-function openModal(id) {
+ 
+export function showToast(message, type = 'success', duration = 3500) {
+  const container = _getContainer();
+  const el = document.createElement('div');
+  el.className = `toast toast--${type}`;
+ 
+  const icons = { success: '✓', error: '✕', warn: '⚠' };
+  el.innerHTML = `<span>${icons[type] || '·'}</span><span>${message}</span>`;
+ 
+  container.appendChild(el);
+  const timer = setTimeout(() => {
+    el.style.animation = 'none';
+    el.style.opacity   = '0';
+    el.style.transform = 'translateX(20px)';
+    el.style.transition = 'opacity 0.25s, transform 0.25s';
+    setTimeout(() => el.remove(), 280);
+  }, duration);
+ 
+  el.addEventListener('click', () => { clearTimeout(timer); el.remove(); });
+}
+ 
+// ── MODAL ─────────────────────────────────────────────────────────
+export function openModal(id) {
   const el = document.getElementById(id);
-  if (el) el.classList.add('modal--open');
+  if (el) { el.classList.add('modal--open'); el.style.display = 'flex'; }
 }
-
-function closeModal(id) {
+ 
+export function closeModal(id) {
   const el = document.getElementById(id);
-  if (el) el.classList.remove('modal--open');
+  if (el) { el.classList.remove('modal--open'); el.style.display = ''; }
 }
-
-// Close on backdrop click
+ 
+// Backdrop click closes modal
 document.addEventListener('click', e => {
-  if (e.target.classList.contains('modal')) {
-    e.target.classList.remove('modal--open');
-  }
+  if (e.target.classList.contains('modal')) closeModal(e.target.id);
 });
-
-// Close on Escape
+ 
+// Escape closes all modals
 document.addEventListener('keydown', e => {
   if (e.key === 'Escape') {
-    document.querySelectorAll('.modal--open').forEach(m => m.classList.remove('modal--open'));
+    document.querySelectorAll('.modal--open').forEach(m => {
+      m.classList.remove('modal--open');
+      m.style.display = '';
+    });
   }
 });
-
-// CONNECTIVITY PILL 
-function initConnPill(pillId = 'conn-pill') {
-  const pill = document.getElementById(pillId);
-  if (!pill) return;
-
+ 
+// ── CONNECTIVITY PILL ─────────────────────────────────────────────
+export function initConnPill(id = 'conn-pill') {
+  const el = document.getElementById(id);
+  if (!el) return;
+ 
   function update(state) {
     const map = {
-      online:  { cls: 'conn-pill--online',  label: 'Online' },
-      offline: { cls: 'conn-pill--offline', label: 'Offline' },
-      syncing: { cls: 'conn-pill--syncing', label: 'Syncing…' },
+      online:  { cls: 'conn-pill--online',  label: 'Online'    },
+      offline: { cls: 'conn-pill--offline', label: 'Offline'   },
+      syncing: { cls: 'conn-pill--syncing', label: 'Syncing\u2026' },
     };
     const { cls, label } = map[state] || map.online;
-    pill.className = `conn-pill ${cls}`;
-
-    const dot = '<span class="conn-dot"></span>';
-    pill.innerHTML = dot + label;
+    el.className   = `conn-pill ${cls}`;
+    el.innerHTML   = `<span class="conn-dot"></span>${label}`;
   }
-
-  // Set initial state
+ 
   update(getConnState() ? 'online' : 'offline');
-
-  // Subscribe to changes from the API service
   onConnChange(update);
 }
-
-// LOADING 
-function setLoading(container, isLoading, message = 'Loading…') {
+ 
+// ── LOADING STATES ────────────────────────────────────────────────
+export function setLoading(container, show, colspan = 6) {
+  if (!container || !show) return;
+  const isTable = container.tagName === 'TBODY';
+  if (isTable) {
+    container.innerHTML = `<tr><td colspan="${colspan}">
+      <div class="state-loading">
+        <div class="state-loading__spinner"></div>
+        <span class="text-muted text-sm">Loading\u2026</span>
+      </div>
+    </td></tr>`;
+  } else {
+    container.innerHTML = `<div class="state-loading">
+      <div class="state-loading__spinner"></div>
+      <span class="text-muted text-sm">Loading\u2026</span>
+    </div>`;
+  }
+}
+ 
+export function setEmpty(container, { icon = '📋', title = 'Nothing here', sub = '' } = {}, colspan = 6) {
   if (!container) return;
-  if (isLoading) {
-    container.innerHTML = `<tr><td colspan="99" class="loading">${message}</td></tr>`;
-  }
+  const isTable = container.tagName === 'TBODY';
+  const inner = `<div class="state-empty">
+    <div class="state-empty__icon">${icon}</div>
+    <div class="state-empty__title">${title}</div>
+    ${sub ? `<div class="state-empty__sub">${sub}</div>` : ''}
+  </div>`;
+  if (isTable) container.innerHTML = `<tr><td colspan="${colspan}">${inner}</td></tr>`;
+  else container.innerHTML = inner;
 }
-
-function setButtonLoading(btn, isLoading, loadingText = 'Loading…', defaultText = null) {
+ 
+export function setError(container, message, colspan = 6) {
+  if (!container) return;
+  const isTable = container.tagName === 'TBODY';
+  const inner = `<div class="state-error">
+    <div class="state-error__icon">⚠️</div>
+    <div class="state-empty__title">Something went wrong</div>
+    <div class="state-empty__sub text-danger">${message}</div>
+  </div>`;
+  if (isTable) container.innerHTML = `<tr><td colspan="${colspan}">${inner}</td></tr>`;
+  else container.innerHTML = inner;
+}
+ 
+// ── BUTTON LOADING ────────────────────────────────────────────────
+export function btnLoading(btn, loading, loadingText = 'Loading\u2026') {
   if (!btn) return;
-  btn.disabled = isLoading;
-  if (isLoading) {
-    btn.dataset.originalText = btn.textContent;
-    btn.textContent = loadingText;
+  btn.disabled = loading;
+  if (loading) {
+    btn._originalText = btn.textContent;
+    btn.textContent   = loadingText;
   } else {
-    btn.textContent = defaultText || btn.dataset.originalText || 'Submit';
+    btn.textContent   = btn._originalText || 'Submit';
   }
 }
-
-// FORM HELPERS 
-function clearFormErrors(form) {
-  if (!form) return;
-  form.querySelectorAll('.form-error').forEach(el => {
-    el.textContent = '';
-    el.style.display = 'none';
+ 
+// ── BIND CLOSE BUTTONS ────────────────────────────────────────────
+export function bindCloseButtons() {
+  document.querySelectorAll('[data-close]').forEach(btn => {
+    btn.addEventListener('click', () => closeModal(btn.dataset.close));
   });
 }
-
-function showFormError(form, message) {
-  if (!form) return;
-  const errEl = form.querySelector('.form-error');
-  if (errEl) {
-    errEl.textContent = message;
-    errEl.style.display = 'block';
-  } else {
-    showToast(message, 'error');
-  }
-}
-
-function getFormData(form) {
-  if (!form) return {};
-  const data = {};
-  new FormData(form).forEach((value, key) => {
-    data[key] = value;
+ 
+// ── ACTIVE NAV LINK ───────────────────────────────────────────────
+export function markActiveNav() {
+  const current = window.location.pathname.split('/').pop();
+  document.querySelectorAll('.nav__link').forEach(a => {
+    const href = a.getAttribute('href')?.split('/').pop();
+    if (href && href === current) a.classList.add('nav__link--active');
   });
-  return data;
 }
-
-// PAGE TITLE 
-function setPageTitle(title) {
-  document.title = `${title} — Minza Health`;
-  const h1 = document.querySelector('.page-title');
-  if (h1) h1.textContent = title;
-}
-
-// EXPORTS 
-export {
-  showToast,
-  openModal,
-  closeModal,
-  initConnPill,
-  setLoading,
-  setButtonLoading,
-  clearFormErrors,
-  showFormError,
-  getFormData,
-  setPageTitle,
-};
