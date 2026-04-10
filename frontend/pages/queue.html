@@ -141,6 +141,7 @@
     import { apiRequest, DB } from '../js/services/api.js';
     import { initConnPill, showToast, openModal, closeModal, bindCloseButtons, setLoading, setEmpty } from '../js/utils/ui.js';
     import { fmtTime, fmtDate, fmtRelative, escapeHtml, initials } from '../js/utils/format.js';
+    import { applyReadOnlyMode } from '../js/utils/readonly.js';
  
     // ── Boot ────────────────────────────────────────────────────────
     const user = protectRoute(['receptionist', 'admin']);
@@ -332,6 +333,7 @@
     setInterval(load, 60_000);
  
     await load();
+    applyReadOnlyMode();
   </script>
  
 </body>

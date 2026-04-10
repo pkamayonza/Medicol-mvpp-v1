@@ -78,6 +78,7 @@
     import { apiRequest } from '../js/services/api.js';
     import { initConnPill, showToast, openModal, closeModal, bindCloseButtons, setLoading, setEmpty } from '../js/utils/ui.js';
     import { fmtDate, fmtAge, escapeHtml, initials, fmtTime } from '../js/utils/format.js';
+    import { applyReadOnlyMode } from '../js/utils/readonly.js';
  
     const user = protectRoute(['receptionist', 'admin', 'doctor']);
     if (!user) throw new Error();
@@ -214,6 +215,7 @@
     });
  
     await loadPatients();
+    applyReadOnlyMode();
   </script>
  
 </body>

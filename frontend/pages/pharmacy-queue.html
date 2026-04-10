@@ -121,6 +121,7 @@
     import { apiRequest } from '../js/services/api.js';
     import { initConnPill, showToast, openModal, closeModal, bindCloseButtons, setLoading, setEmpty } from '../js/utils/ui.js';
     import { fmtRelative, fmtDate, fmtUGX, escapeHtml, initials } from '../js/utils/format.js';
+    import { applyReadOnlyMode } from '../js/utils/readonly.js';
  
     const user = protectRoute(['pharmacist', 'admin']);
     if (!user) throw new Error();
@@ -342,6 +343,7 @@
     setInterval(load, 30_000);
  
     await load();
+    applyReadOnlyMode();
   </script>
  
 </body>
