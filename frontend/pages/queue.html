@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Queue — Minza Health</title>
+  <link rel="stylesheet" href="../styles/main.css"/>
+</head>
+<body>
+ 
+  <nav class="nav">
+    <div class="nav__brand">
+      <span class="nav__logo">Min<span>za</span></span>
+      <span class="nav__role">Reception</span>
+    </div>
+    <div class="nav__links">
+      <a href="queue.html"    class="nav__link nav__link--active">Queue</a>
+      <a href="patients.html" class="nav__link">Patients</a>
+    </div>
+    <div class="nav__right">
+      <span class="conn-pill" id="conn-pill"></span>
+      <span class="nav__user" id="nav-user">—</span>
+      <button class="btn btn--ghost btn--sm" id="logout-btn">Sign out</button>
+    </div>
+  </nav>
+ 
+  <main class="page">
+ 
+    <div class="page-header">
+      <div>
+        <h1 class="page-title" id="clinic-name">Today's Queue</h1>
+        <p class="page-sub" id="today-date">—</p>
+      </div>
+      <button class="btn btn--primary" id="new-patient-btn">+ New Patient</button>
+    </div>
+ 
+    <!-- Stats -->
+    <div class="stats-grid" id="stats-grid">
+      <div class="stat-card">
+        <div class="stat-label">Total Today</div>
+        <div class="stat-num" id="stat-total">—</div>
+        <div class="stat-sub">all statuses</div>
+      </div>
+      <div class="stat-card stat-card--terra">
+        <div class="stat-label">Waiting</div>
+        <div class="stat-num" id="stat-waiting">—</div>
+        <div class="stat-sub">in queue</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">In Consult</div>
+        <div class="stat-num" id="stat-consult">—</div>
+        <div class="stat-sub">with doctor</div>
+      </div>
+      <div class="stat-card stat-card--sage">
+        <div class="stat-label">Completed</div>
+        <div class="stat-num" id="stat-done">—</div>
+        <div class="stat-sub">today</div>
+      </div>
+    </div>
+ 
+    <!-- Filter -->
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;flex-wrap:wrap;gap:0.75rem;">
+      <div class="filter-tabs" id="filter-tabs">
+        <button class="filter-tab filter-tab--active" data-filter="all">All</button>
+        <button class="filter-tab" data-filter="waiting">Waiting</button>
+        <button class="filter-tab" data-filter="in_consult">In Consult</button>
+        <button class="filter-tab" data-filter="completed">Completed</button>
+      </div>
+      <button class="btn btn--ghost btn--sm" id="refresh-btn">↻ Refresh</button>
+    </div>
+ 
+    <!-- Queue table -->
+    <div class="card card--flush">
+      <div id="queue-container"></div>
+    </div>
+ 
+  </main>
+ 
+  <!-- New Patient Modal -->
+  <div class="modal" id="modal-new-patient">
+    <div class="modal__card">
+      <div class="modal__header">
+        <span class="modal__title">Register New Patient</span>
+        <button class="modal__close" data-close="modal-new-patient">✕</button>
+      </div>
+      <form id="new-patient-form" novalidate>
+        <div class="form-group">
+          <label class="form-label" for="np-name">Full Name *</label>
+          <input class="form-input" type="text" id="np-name" placeholder="e.g. Grace Nakato" required/>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label" for="np-phone">Phone</label>
+            <input class="form-input" type="tel" id="np-phone" placeholder="0701234567"/>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="np-gender">Gender</label>
+            <select class="form-select" id="np-gender">
+              <option value="">Select</option>
+              <option value="female">Female</option>
+              <option value="male">Male</option>
+              <option value="other">Other</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="np-dob">Date of Birth</label>
+          <input class="form-input" type="date" id="np-dob"/>
+        </div>
+        <div id="np-error" class="form-error" style="display:none;"></div>
+        <div class="modal__footer">
+          <button type="button" class="btn btn--ghost" data-close="modal-new-patient">Cancel</button>
+          <button type="submit" class="btn btn--primary" id="np-submit">Register &amp; Add to Queue →</button>
+        </div>
+      </form>
+    </div>
+  </div>
+ 
+  <!-- Assign Doctor Modal -->
+  <div class="modal" id="modal-assign">
+    <div class="modal__card">
+      <div class="modal__header">
+        <span class="modal__title">Assign to Doctor</span>
+        <button class="modal__close" data-close="modal-assign">✕</button>
+      </div>
+      <p id="assign-patient-name" style="font-size:0.95rem;font-weight:600;color:var(--text);margin-bottom:1rem;"></p>
+      <div class="form-group">
+        <label class="form-label" for="assign-doctor">Select Doctor</label>
+        <select class="form-select" id="assign-doctor"></select>
+      </div>
+      <div id="assign-error" class="form-error" style="display:none;"></div>
+      <div class="modal__footer">
+        <button class="btn btn--ghost" data-close="modal-assign">Cancel</button>
+        <button class="btn btn--primary" id="assign-confirm">Assign →</button>
+      </div>
+    </div>
+  </div>
+ 
+  <script type="module">
+    import { protectRoute, logout, getOrgName, getUserName } from '../js/modules/auth.js';
+    import { apiRequest, DB } from '../js/services/api.js';
+    import { initConnPill, showToast, openModal, closeModal, bindCloseButtons, setLoading, setEmpty } from '../js/utils/ui.js';
+    import { fmtTime, fmtDate, fmtRelative, escapeHtml, initials } from '../js/utils/format.js';
+ 
+    // ── Boot ────────────────────────────────────────────────────────
+    const user = protectRoute(['receptionist', 'admin']);
+    if (!user) throw new Error();
+ 
+    initConnPill('conn-pill');
+    bindCloseButtons();
+    document.getElementById('nav-user').textContent = getUserName();
+    document.getElementById('logout-btn').addEventListener('click', logout);
+    document.getElementById('clinic-name').textContent = getOrgName() + ' — Queue';
+    document.getElementById('today-date').textContent =
+      new Date().toLocaleDateString('en-GB', { weekday:'long', day:'numeric', month:'long', year:'numeric' });
+ 
+    // ── State ────────────────────────────────────────────────────────
+    let _visits      = [];
+    let _filter      = 'all';
+    let _pendingVisitId = null;
+ 
+    // ── Load ─────────────────────────────────────────────────────────
+    async function load() {
+      const container = document.getElementById('queue-container');
+      setLoading(container, true);
+      try {
+        _visits = await apiRequest('/visits');
+        const stats = await apiRequest('/stats');
+ 
+        document.getElementById('stat-total').textContent   = stats.total_visits ?? _visits.length;
+        document.getElementById('stat-waiting').textContent = stats.waiting       ?? _visits.filter(v=>v.status==='waiting').length;
+        document.getElementById('stat-consult').textContent = stats.in_consult    ?? _visits.filter(v=>v.status==='in_consult').length;
+        document.getElementById('stat-done').textContent    = stats.completed     ?? _visits.filter(v=>v.status==='completed').length;
+ 
+        renderQueue();
+      } catch (err) {
+        showToast(err.message, 'error');
+        setEmpty(container, { icon: '⚠️', title: 'Failed to load', sub: err.message });
+      }
+    }
+ 
+    // ── Render ────────────────────────────────────────────────────────
+    function renderQueue() {
+      const container = document.getElementById('queue-container');
+      let list = _filter === 'all' ? _visits : _visits.filter(v => v.status === _filter);
+ 
+      if (!list.length) {
+        setEmpty(container, {
+          icon: '🪑',
+          title: _filter === 'all' ? 'No patients today' : `No ${_filter.replace('_',' ')} patients`,
+          sub: _filter === 'all' ? 'Register a new patient to get started.' : ''
+        });
+        return;
+      }
+ 
+      const statusMap = {
+        waiting:    { cls: 'badge--warn',    label: 'Waiting'    },
+        in_consult: { cls: 'badge--info',    label: 'In Consult' },
+        completed:  { cls: 'badge--success', label: 'Completed'  },
+      };
+ 
+      container.innerHTML = list.map((v, i) => {
+        const p = v.patients || {};
+        const { cls, label } = statusMap[v.status] || { cls: 'badge--muted', label: v.status };
+        const ini = initials(p.full_name || '?');
+        return `
+          <div class="queue-item">
+            <span class="queue-item__num">${i + 1}</span>
+            <div class="queue-item__avatar">${ini}</div>
+            <div class="queue-item__info">
+              <div class="queue-item__name">${escapeHtml(p.full_name || '—')}</div>
+              <div class="queue-item__meta">${p.phone || '—'} · ${fmtRelative(v.created_at)}</div>
+            </div>
+            <span class="badge ${cls}">${label}</span>
+            <div class="queue-item__actions">
+              ${v.status === 'waiting' ? `
+                <button class="btn btn--sm btn--primary js-assign" data-visit-id="${v.id}" data-patient-name="${escapeHtml(p.full_name||'')}">
+                  Assign Doctor
+                </button>` : ''}
+              ${v.status === 'completed' ? `
+                <a href="billing.html?visit_id=${v.id}" class="btn btn--sm btn--secondary">
+                  Bill
+                </a>` : ''}
+            </div>
+          </div>`;
+      }).join('');
+ 
+      // Bind assign buttons
+      container.querySelectorAll('.js-assign').forEach(btn => {
+        btn.addEventListener('click', () => {
+          _pendingVisitId = btn.dataset.visitId;
+          document.getElementById('assign-patient-name').textContent = btn.dataset.patientName;
+          openModal('modal-assign');
+        });
+      });
+    }
+ 
+    // ── Filter tabs ───────────────────────────────────────────────────
+    document.getElementById('filter-tabs').addEventListener('click', e => {
+      const tab = e.target.closest('.filter-tab');
+      if (!tab) return;
+      document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('filter-tab--active'));
+      tab.classList.add('filter-tab--active');
+      _filter = tab.dataset.filter;
+      renderQueue();
+    });
+ 
+    // ── New Patient Form ──────────────────────────────────────────────
+    document.getElementById('new-patient-btn').addEventListener('click', () => openModal('modal-new-patient'));
+ 
+    document.getElementById('new-patient-form').addEventListener('submit', async e => {
+      e.preventDefault();
+      const btn   = document.getElementById('np-submit');
+      const errEl = document.getElementById('np-error');
+      errEl.style.display = 'none';
+ 
+      const name = document.getElementById('np-name').value.trim();
+      if (!name) {
+        errEl.textContent   = 'Full name is required.';
+        errEl.style.display = 'block';
+        return;
+      }
+ 
+      btn.disabled    = true;
+      btn.textContent = 'Saving…';
+ 
+      try {
+        const patient = await apiRequest('/patients', 'POST', {
+          full_name: name,
+          phone:     document.getElementById('np-phone').value.trim() || null,
+          gender:    document.getElementById('np-gender').value       || null,
+          dob:       document.getElementById('np-dob').value          || null,
+        });
+ 
+        // Auto-create a visit
+        await apiRequest('/visits', 'POST', {
+          patient_id: patient.id,
+          status:     'waiting',
+        });
+ 
+        closeModal('modal-new-patient');
+        document.getElementById('new-patient-form').reset();
+        showToast(`${name} added to queue.`, 'success');
+        await load();
+      } catch (err) {
+        errEl.textContent   = err.message;
+        errEl.style.display = 'block';
+      } finally {
+        btn.disabled    = false;
+        btn.textContent = 'Register & Add to Queue →';
+      }
+    });
+ 
+    // ── Assign Doctor ─────────────────────────────────────────────────
+    // Populate doctor list from DB
+    const doctorSel = document.getElementById('assign-doctor');
+    const doctors = DB.users.filter(u => u.role === 'doctor');
+    doctorSel.innerHTML = '<option value="">— Select —</option>' +
+      doctors.map(d => `<option value="${d.id}">${escapeHtml(d.name)}</option>`).join('');
+ 
+    document.getElementById('assign-confirm').addEventListener('click', async () => {
+      const doctorId = doctorSel.value;
+      const errEl    = document.getElementById('assign-error');
+      errEl.style.display = 'none';
+ 
+      if (!doctorId) {
+        errEl.textContent   = 'Select a doctor.';
+        errEl.style.display = 'block';
+        return;
+      }
+ 
+      const btn = document.getElementById('assign-confirm');
+      btn.disabled    = true;
+      btn.textContent = 'Assigning…';
+ 
+      try {
+        await apiRequest(`/visits/${_pendingVisitId}`, 'PATCH', { doctor_id: doctorId });
+        closeModal('modal-assign');
+        showToast('Patient assigned to doctor.', 'success');
+        await load();
+      } catch (err) {
+        errEl.textContent   = err.message;
+        errEl.style.display = 'block';
+      } finally {
+        btn.disabled    = false;
+        btn.textContent = 'Assign →';
+      }
+    });
+ 
+    // ── Refresh ───────────────────────────────────────────────────────
+    document.getElementById('refresh-btn').addEventListener('click', load);
+    setInterval(load, 60_000);
+ 
+    await load();
+  </script>
+ 
+</body>
+</html>
+ 
