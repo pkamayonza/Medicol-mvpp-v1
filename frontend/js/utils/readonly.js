@@ -108,7 +108,7 @@ function _insertBanner(page) {
   banner.className = 'ro-banner';
   banner.innerHTML = `
     <span class="ro-banner__icon">👁</span>
-    <span class="ro-banner__text">You are viewing this page as admin. Actions are disabled.</span>
+    <span class="ro-banner__text">You are viewing this page as admin. All actions are disabled.</span>
     <span class="ro-banner__role">${labels[page] || 'Staff View'}</span>
   `;
  
