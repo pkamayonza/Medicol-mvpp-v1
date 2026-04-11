@@ -224,7 +224,7 @@
 
             const targetUser = DB.users.find(u => u.id == id);
             if (targetUser) targetUser.disabled = true;
-
+                
             renderUsers();
             bindUserActions();
 
