@@ -5,6 +5,25 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Admin — Minza Health</title>
   <link rel="stylesheet" href="../styles/main.css"/>
+  <!-- Simple style for filter buttons -->
+  <style>
+    .rev-filter {
+      padding: 0.25rem 0.75rem;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: transparent;
+      color: var(--text-2);
+      font-size: 0.75rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.1s ease;
+    }
+    .rev-filter.active {
+      background: var(--gold);
+      border-color: var(--gold);
+      color: white;
+    }
+  </style>
 </head>
 <body>
  
@@ -40,7 +59,14 @@
         <div class="stat-num" id="stat-patients">—</div>
       </div>
       <div class="stat-card stat-card--gold">
-        <div class="stat-label">Revenue Today</div>
+        <div class="stat-label">Revenue</div>
+        <!-- Filter buttons added directly above revenue number -->
+        <div style="display:flex;gap:8px;margin-bottom:10px;">
+          <button class="rev-filter active" data-range="today">Today</button>
+          <button class="rev-filter" data-range="week">This Week</button>
+          <button class="rev-filter" data-range="month">This Month</button>
+          <button class="rev-filter" data-range="all">All Time</button>
+        </div>
         <div class="stat-num" id="stat-revenue" style="font-size:1.25rem;">—</div>
       </div>
       <div class="stat-card">
@@ -55,7 +81,7 @@
       <div>
         <div class="card">
           <div class="card__header">
-            <h2 class="card__title">Team Members</h2>
+            <h2 class="card__title">Staff</h2>
             <button class="btn btn--sm btn--primary" id="add-user-btn">+ Add User</button>
           </div>
           <div id="users-body"></div>
@@ -94,7 +120,7 @@
   <div class="modal" id="modal-user">
     <div class="modal__card">
       <div class="modal__header">
-        <span class="modal__title">Add Team Member</span>
+        <span class="modal__title">Add Staff Member</span>
         <button class="modal__close" data-close="modal-user">✕</button>
       </div>
       <form id="user-form" novalidate>
@@ -142,7 +168,7 @@
     document.getElementById('today-date').textContent =
       new Date().toLocaleDateString('en-GB', { weekday:'long', day:'numeric', month:'long', year:'numeric' });
  
-    // ── Load stats ────────────────────────────────────────────────────
+    // ── Load stats (existing) ─────────────────────────────────────────
     async function loadStats() {
       try {
         const stats = await apiRequest('/stats');
@@ -153,7 +179,7 @@
       } catch (_) {}
     }
  
-    // ── Render Users (extended with actions and revoked style) ───────
+    // ── Render Users (unchanged) ──────────────────────────────────────
     function renderUsers() {
       const body = document.getElementById('users-body');
       const roleEmoji = { receptionist: 'R', doctor: 'D', pharmacist: 'P', admin: 'A' };
@@ -186,28 +212,21 @@
         </div>`).join('');
     }
  
-    // ── Bind user action buttons (delete & revoke) ───────────────────
+    // ── Bind user actions (unchanged) ─────────────────────────────────
     function bindUserActions() {
       document.querySelectorAll('.delete-btn').forEach(btn => {
         btn.addEventListener('click', async () => {
           const id = btn.dataset.id;
-
-          // Prevent admin from deleting themselves
           if (id == user.id) {
             showToast("You cannot remove yourself", "error");
             return;
           }
-
           if (!confirm('Are you sure you want to permanently remove this user?')) return;
-
           try {
             await apiRequest(`/users/${id}`, 'DELETE');
-
             DB.users = DB.users.filter(u => u.id != id);
-
             renderUsers();
             bindUserActions();
-
             showToast('User removed successfully', 'success');
           } catch (err) {
             showToast('Failed to remove user', 'error');
@@ -218,16 +237,12 @@
       document.querySelectorAll('.revoke-btn').forEach(btn => {
         btn.addEventListener('click', async () => {
           const id = btn.dataset.id;
-
           try {
             await apiRequest(`/users/${id}/revoke`, 'PATCH');
-
             const targetUser = DB.users.find(u => u.id == id);
             if (targetUser) targetUser.disabled = true;
-                
             renderUsers();
             bindUserActions();
-
             showToast('Access revoked', 'success');
           } catch (err) {
             showToast('Failed to revoke access', 'error');
@@ -236,7 +251,7 @@
       });
     }
  
-    // ── Add User ──────────────────────────────────────────────────────
+    // ── Add User (unchanged) ──────────────────────────────────────────
     document.getElementById('add-user-btn').addEventListener('click', () => openModal('modal-user'));
  
     document.getElementById('user-form').addEventListener('submit', async e => {
@@ -264,7 +279,7 @@
         document.getElementById('user-form').reset();
         showToast(`${name} added as ${role}.`, 'success');
         renderUsers();
-        bindUserActions();   // re‑attach listeners after render
+        bindUserActions();
       } catch (err) {
         errEl.textContent   = err.message;
         errEl.style.display = 'block';
@@ -274,12 +289,50 @@
       }
     });
  
+    // ═══════════════════════════════════════════════════════════════════
+    // REVENUE FILTERING (ADDED FEATURE)
+    // ═══════════════════════════════════════════════════════════════════
+    let currentRevenueRange = "today";
+ 
+    // Filter button click handler
+    document.querySelectorAll(".rev-filter").forEach(btn => {
+      btn.addEventListener("click", () => {
+        document.querySelectorAll(".rev-filter").forEach(b => b.classList.remove("active"));
+        btn.classList.add("active");
+        currentRevenueRange = btn.dataset.range;
+        updateRevenueByRange(currentRevenueRange);
+      });
+    });
+ 
+    // Fetch filtered revenue and update display
+    async function updateRevenueByRange(range) {
+      try {
+        const data = await apiRequest(`/analytics/revenue?range=${range}`);
+        if (!data) return;
+        updateRevenueDisplay(data.total);
+      } catch (err) {
+        console.error("Failed to load revenue:", err);
+        showToast("Could not load revenue data", "error");
+      }
+    }
+ 
+    // Update the revenue element (preserves existing format)
+    function updateRevenueDisplay(total) {
+      const el = document.getElementById("stat-revenue");
+      if (el) {
+        el.textContent = fmtUGX(total);
+      }
+    }
+ 
     // ── Initial load ──────────────────────────────────────────────────
-    await loadStats();
+    await loadStats();               // loads today's revenue from /stats
     renderUsers();
-    bindUserActions();   // attach listeners after first render
+    bindUserActions();
+ 
+    // Immediately sync revenue with the active filter (default "today")
+    // This ensures consistency and sets up the filter behaviour.
+    await updateRevenueByRange("today");
   </script>
  
 </body>
 </html>
- 
