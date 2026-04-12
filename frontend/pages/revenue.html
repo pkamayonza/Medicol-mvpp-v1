@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Revenue — Minza Health</title>
+  <link rel="stylesheet" href="../styles/main.css"/>
+</head>
+<body>
+ 
+  <nav class="nav">
+    <div class="nav__brand">
+      <span class="nav__logo">Min<span>za</span></span>
+      <span class="nav__role">Admin</span>
+    </div>
+    <div class="nav__links" style="display:flex;gap:1.5rem;margin-left:2rem;">
+      <a href="admin.html" class="nav__link">Dashboard</a>
+      <a href="prescriptions.html" class="nav__link">Prescriptions</a>
+      <a href="revenue.html" class="nav__link nav__link--active">Revenue</a>
+      <a href="staff.html" class="nav__link">Staff</a>
+      <a href="settings.html" class="nav__link">Settings</a>
+    </div>
+    <div class="nav__right">
+      <span class="conn-pill" id="conn-pill"></span>
+      <span class="nav__user" id="nav-user">—</span>
+      <button class="btn btn--ghost btn--sm" id="logout-btn">Sign out</button>
+    </div>
+  </nav>
+ 
+  <main class="page">
+ 
+    <div class="page-header">
+      <h1 class="page-title">Revenue Analytics</h1>
+    </div>
+ 
+    <!-- Filters -->
+    <div style="display:flex;gap:0.75rem;margin-bottom:1.5rem;">
+      <button class="filter-btn active" data-range="today">Today</button>
+      <button class="filter-btn" data-range="week">This Week</button>
+      <button class="filter-btn" data-range="month">This Month</button>
+      <button class="filter-btn" data-range="all">All Time</button>
+    </div>
+ 
+    <!-- Total Display -->
+    <div class="card card--inset" style="text-align:center;padding:2rem;">
+      <div style="font-size:0.9rem;text-transform:uppercase;letter-spacing:1px;color:var(--text-3);">Total Revenue</div>
+      <div style="font-size:3rem;font-weight:700;color:var(--gold);" id="revenue-total">—</div>
+    </div>
+ 
+  </main>
+ 
+  <style>
+    .filter-btn {
+      padding: 0.5rem 1.25rem;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: transparent;
+      color: var(--text-2);
+      font-weight: 500;
+      cursor: pointer;
+    }
+    .filter-btn.active {
+      background: var(--gold);
+      border-color: var(--gold);
+      color: white;
+    }
+  </style>
+ 
+  <script type="module">
+    import { protectRoute, logout, getUserName } from '../js/modules/auth.js';
+    import { apiRequest } from '../js/services/api.js';
+    import { initConnPill, showToast } from '../js/utils/ui.js';
+    import { fmtUGX } from '../js/utils/format.js';
+ 
+    protectRoute(['admin']);
+ 
+    initConnPill('conn-pill');
+    document.getElementById('nav-user').textContent = getUserName();
+    document.getElementById('logout-btn').addEventListener('click', logout);
+ 
+    let currentRange = 'today';
+    const totalEl = document.getElementById('revenue-total');
+ 
+    async function loadRevenue(range) {
+      try {
+        const data = await apiRequest(`/analytics/revenue?range=${range}`);
+        totalEl.textContent = fmtUGX(data.total);
+      } catch (err) {
+        showToast('Failed to load revenue', 'error');
+      }
+    }
+ 
+    // Filter button listeners
+    document.querySelectorAll('.filter-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        currentRange = btn.dataset.range;
+        loadRevenue(currentRange);
+      });
+    });
+ 
+    // Initial load
+    await loadRevenue('today');
+  </script>
+ 
+</body>
+</html>
