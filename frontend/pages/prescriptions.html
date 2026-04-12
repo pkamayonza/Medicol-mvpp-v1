@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Prescriptions — Minza Health</title>
+  <link rel="stylesheet" href="../styles/main.css"/>
+</head>
+<body>
+ 
+  <nav class="nav">
+    <div class="nav__brand">
+      <span class="nav__logo">Min<span>za</span></span>
+      <span class="nav__role">Admin</span>
+    </div>
+    <div class="nav__links" style="display:flex;gap:1.5rem;margin-left:2rem;">
+      <a href="admin.html" class="nav__link">Dashboard</a>
+      <a href="prescriptions.html" class="nav__link nav__link--active">Prescriptions</a>
+      <a href="revenue.html" class="nav__link">Revenue</a>
+      <a href="staff.html" class="nav__link">Staff</a>
+      <a href="settings.html" class="nav__link">Settings</a>
+    </div>
+    <div class="nav__right">
+      <span class="conn-pill" id="conn-pill"></span>
+      <span class="nav__user" id="nav-user">—</span>
+      <button class="btn btn--ghost btn--sm" id="logout-btn">Sign out</button>
+    </div>
+  </nav>
+ 
+  <main class="page">
+ 
+    <div class="page-header">
+      <h1 class="page-title">Prescriptions</h1>
+    </div>
+ 
+    <!-- Metrics -->
+    <div class="stats-grid" style="margin-bottom:1.5rem;">
+      <div class="stat-card">
+        <div class="stat-label">Total</div>
+        <div class="stat-num" id="total-rx">—</div>
+      </div>
+      <div class="stat-card stat-card--success">
+        <div class="stat-label">Fulfilled</div>
+        <div class="stat-num" id="fulfilled-rx">—</div>
+      </div>
+      <div class="stat-card stat-card--warn">
+        <div class="stat-label">Pending</div>
+        <div class="stat-num" id="pending-rx">—</div>
+      </div>
+      <div class="stat-card stat-card--muted">
+        <div class="stat-label">Lost</div>
+        <div class="stat-num" id="lost-rx">—</div>
+      </div>
+    </div>
+ 
+    <!-- Table -->
+    <div class="card card--flush">
+      <table class="table" style="width:100%;">
+        <thead>
+          <tr>
+            <th>Patient</th>
+            <th>Drug</th>
+            <th>Status</th>
+            <th>Pharmacy</th>
+            <th>Date</th>
+          </tr>
+        </thead>
+        <tbody id="rx-table-body">
+          <tr><td colspan="5" style="text-align:center;padding:2rem;">Loading…</td></tr>
+        </tbody>
+      </table>
+    </div>
+ 
+  </main>
+ 
+  <script type="module">
+    import { protectRoute, logout, getUserName } from '../js/modules/auth.js';
+    import { apiRequest } from '../js/services/api.js';
+    import { initConnPill, showToast } from '../js/utils/ui.js';
+    import { escapeHtml, fmtDate } from '../js/utils/format.js';
+ 
+    protectRoute(['admin']);
+ 
+    initConnPill('conn-pill');
+    document.getElementById('nav-user').textContent = getUserName();
+    document.getElementById('logout-btn').addEventListener('click', logout);
+ 
+    async function loadPrescriptions() {
+      try {
+        const data = await apiRequest('/prescriptions');
+        
+        // Update metrics
+        const total = data.length;
+        const fulfilled = data.filter(p => p.status === 'fulfilled').length;
+        const pending = data.filter(p => p.status === 'pending').length;
+        const lost = data.filter(p => p.status === 'lost').length;
+ 
+        document.getElementById('total-rx').textContent = total;
+        document.getElementById('fulfilled-rx').textContent = fulfilled;
+        document.getElementById('pending-rx').textContent = pending;
+        document.getElementById('lost-rx').textContent = lost;
+ 
+        // Render table
+        const tbody = document.getElementById('rx-table-body');
+        if (!total) {
+          tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;padding:2rem;">No prescriptions found</td></tr>`;
+          return;
+        }
+ 
+        const statusBadge = {
+          fulfilled: 'badge--success',
+          pending: 'badge--warn',
+          lost: 'badge--muted'
+        };
+ 
+        tbody.innerHTML = data.map(p => `
+          <tr>
+            <td>${escapeHtml(p.patient_name)}</td>
+            <td>${escapeHtml(p.drug)}</td>
+            <td><span class="badge ${statusBadge[p.status] || 'badge--muted'}">${p.status}</span></td>
+            <td>${escapeHtml(p.pharmacy || '—')}</td>
+            <td>${fmtDate(p.created_at)}</td>
+          </tr>
+        `).join('');
+ 
+      } catch (err) {
+        showToast('Failed to load prescriptions', 'error');
+      }
+    }
+ 
+    await loadPrescriptions();
+  </script>
+ 
+</body>
+</html>
