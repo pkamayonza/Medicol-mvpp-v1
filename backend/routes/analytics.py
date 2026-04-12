@@ -1,23 +1,19 @@
 from fastapi import APIRouter, Query
-from db import database
-from models import StatsResponse, PrescriptionMetrics, RevenueResponse
 from datetime import datetime, timedelta
+from db import database
+from models import StatsResponse, RevenueResponse, PrescriptionMetrics
 
 router = APIRouter(prefix="/analytics", tags=["analytics"])
 
 @router.get("/stats", response_model=StatsResponse)
 async def get_stats():
-    # Total visits today
     visits_today = await database.fetch_val(
         "SELECT COUNT(*) FROM prescriptions WHERE DATE(created_at) = CURRENT_DATE"
     )
-    # Total patients
     total_patients = await database.fetch_val("SELECT COUNT(*) FROM patients")
-    # Revenue today
     revenue_today = await database.fetch_val(
         "SELECT COALESCE(SUM(amount),0) FROM payments WHERE DATE(created_at) = CURRENT_DATE"
     )
-    # Pending prescriptions
     pending_rx = await database.fetch_val(
         "SELECT COUNT(*) FROM prescriptions WHERE status = 'pending'"
     )
@@ -28,13 +24,6 @@ async def get_stats():
         "pending_rx": pending_rx
     }
 
-@router.get("/prescriptions", response_model=PrescriptionMetrics)
-async def prescription_metrics():
-    total = await database.fetch_val("SELECT COUNT(*) FROM prescriptions")
-    fulfilled = await database.fetch_val("SELECT COUNT(*) FROM prescriptions WHERE status = 'fulfilled'")
-    pending = await database.fetch_val("SELECT COUNT(*) FROM prescriptions WHERE status = 'pending'")
-    lost = await database.fetch_val("SELECT COUNT(*) FROM prescriptions WHERE status = 'lost'")
-    return {"total": total, "fulfilled": fulfilled, "pending": pending, "lost": lost}
 
 @router.get("/revenue", response_model=RevenueResponse)
 async def revenue_by_range(range: str = Query("today", enum=["today","week","month","all"])):
@@ -54,3 +43,17 @@ async def revenue_by_range(range: str = Query("today", enum=["today","week","mon
         {"start": start}
     )
     return {"total": float(total)}
+
+
+@router.get("/prescriptions", response_model=PrescriptionMetrics)
+async def prescription_metrics():
+    total = await database.fetch_val("SELECT COUNT(*) FROM prescriptions")
+    fulfilled = await database.fetch_val("SELECT COUNT(*) FROM prescriptions WHERE status = 'fulfilled'")
+    pending = await database.fetch_val("SELECT COUNT(*) FROM prescriptions WHERE status = 'pending'")
+    lost = await database.fetch_val("SELECT COUNT(*) FROM prescriptions WHERE status = 'lost'")
+    return {
+        "total": total,
+        "fulfilled": fulfilled,
+        "pending": pending,
+        "lost": lost
+    }

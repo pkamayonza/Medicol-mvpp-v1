@@ -894,3 +894,10 @@ async def generic_exception_handler(request: Request, exc: Exception):
         content={"error": "Internal server error"},
     )
  
+from fastapi_utils.tasks import repeat_every
+from routes.prescriptions import mark_lost_prescriptions
+
+@app.on_event("startup")
+@repeat_every(seconds=3600)  # run every hour
+async def scheduled_lost_check():
+    await mark_lost_prescriptions()

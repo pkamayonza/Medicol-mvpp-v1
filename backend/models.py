@@ -72,3 +72,13 @@ class PrescriptionMetrics(BaseModel):
 
 class RevenueResponse(BaseModel):
     total: float
+
+class DispenseRequest(BaseModel):
+    pharmacist_id: UUID
+    pharmacy_id: Optional[UUID] = None
+
+class PrescriptionMetrics(BaseModel):
+    total: int
+    fulfilled: int
+    pending: int
+    lost: int
