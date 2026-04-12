@@ -5,25 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Admin — Minza Health</title>
   <link rel="stylesheet" href="../styles/main.css"/>
-  <!-- Simple style for filter buttons -->
-  <style>
-    .rev-filter {
-      padding: 0.25rem 0.75rem;
-      border-radius: 999px;
-      border: 1px solid var(--border);
-      background: transparent;
-      color: var(--text-2);
-      font-size: 0.75rem;
-      font-weight: 500;
-      cursor: pointer;
-      transition: all 0.1s ease;
-    }
-    .rev-filter.active {
-      background: var(--gold);
-      border-color: var(--gold);
-      color: white;
-    }
-  </style>
+  <!-- No additional styles needed – we reuse .form-select -->
 </head>
 <body>
  
@@ -60,12 +42,14 @@
       </div>
       <div class="stat-card stat-card--gold">
         <div class="stat-label">Revenue</div>
-        <!-- Filter buttons added directly above revenue number -->
-        <div style="display:flex;gap:8px;margin-bottom:10px;">
-          <button class="rev-filter active" data-range="today">Today</button>
-          <button class="rev-filter" data-range="week">This Week</button>
-          <button class="rev-filter" data-range="month">This Month</button>
-          <button class="rev-filter" data-range="all">All Time</button>
+        <!-- Dropdown filter placed above revenue number -->
+        <div style="margin-bottom:10px;">
+          <select id="revenue-range-select" class="form-select" style="font-size:0.8rem; padding:0.3rem 0.5rem;">
+            <option value="today" selected>Today</option>
+            <option value="week">This Week</option>
+            <option value="month">This Month</option>
+            <option value="all">All Time</option>
+          </select>
         </div>
         <div class="stat-num" id="stat-revenue" style="font-size:1.25rem;">—</div>
       </div>
@@ -174,7 +158,7 @@
         const stats = await apiRequest('/stats');
         document.getElementById('stat-visits').textContent   = stats.total_visits   ?? 0;
         document.getElementById('stat-patients').textContent = stats.total_patients ?? 0;
-        document.getElementById('stat-revenue').textContent  = fmtUGX(stats.revenue_today ?? 0);
+        // Revenue will be set by the filter handler; we skip it here to avoid conflict
         document.getElementById('stat-rx').textContent       = stats.pending_rx ?? 0;
       } catch (_) {}
     }
@@ -290,19 +274,9 @@
     });
  
     // ═══════════════════════════════════════════════════════════════════
-    // REVENUE FILTERING (ADDED FEATURE)
+    // REVENUE FILTERING WITH DROPDOWN
     // ═══════════════════════════════════════════════════════════════════
-    let currentRevenueRange = "today";
- 
-    // Filter button click handler
-    document.querySelectorAll(".rev-filter").forEach(btn => {
-      btn.addEventListener("click", () => {
-        document.querySelectorAll(".rev-filter").forEach(b => b.classList.remove("active"));
-        btn.classList.add("active");
-        currentRevenueRange = btn.dataset.range;
-        updateRevenueByRange(currentRevenueRange);
-      });
-    });
+    const revenueSelect = document.getElementById('revenue-range-select');
  
     // Fetch filtered revenue and update display
     async function updateRevenueByRange(range) {
@@ -316,7 +290,7 @@
       }
     }
  
-    // Update the revenue element (preserves existing format)
+    // Update the revenue element using the existing formatter
     function updateRevenueDisplay(total) {
       const el = document.getElementById("stat-revenue");
       if (el) {
@@ -324,14 +298,18 @@
       }
     }
  
+    // Listen for dropdown changes
+    revenueSelect.addEventListener('change', (e) => {
+      updateRevenueByRange(e.target.value);
+    });
+ 
     // ── Initial load ──────────────────────────────────────────────────
-    await loadStats();               // loads today's revenue from /stats
+    await loadStats();                 // loads visits, patients, rx (revenue skipped)
     renderUsers();
     bindUserActions();
  
-    // Immediately sync revenue with the active filter (default "today")
-    // This ensures consistency and sets up the filter behaviour.
-    await updateRevenueByRange("today");
+    // Load revenue for default selection (Today)
+    await updateRevenueByRange('today');
   </script>
  
 </body>
