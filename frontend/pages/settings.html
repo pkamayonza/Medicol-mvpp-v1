@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Settings — Minza Health</title>
+  <link rel="stylesheet" href="../styles/main.css"/>
+</head>
+<body>
+ 
+  <nav class="nav">
+    <div class="nav__brand">
+      <span class="nav__logo">Min<span>za</span></span>
+      <span class="nav__role">Admin</span>
+    </div>
+    <div class="nav__links" style="display:flex;gap:1.5rem;margin-left:2rem;">
+      <a href="admin.html" class="nav__link">Dashboard</a>
+      <a href="prescriptions.html" class="nav__link">Prescriptions</a>
+      <a href="revenue.html" class="nav__link">Revenue</a>
+      <a href="staff.html" class="nav__link">Staff</a>
+      <a href="settings.html" class="nav__link nav__link--active">Settings</a>
+    </div>
+    <div class="nav__right">
+      <span class="conn-pill" id="conn-pill"></span>
+      <span class="nav__user" id="nav-user">—</span>
+      <button class="btn btn--ghost btn--sm" id="logout-btn">Sign out</button>
+    </div>
+  </nav>
+ 
+  <main class="page">
+ 
+    <div class="page-header">
+      <h1 class="page-title">System Settings</h1>
+    </div>
+ 
+    <div class="card card--inset" style="border-left:3px solid var(--terra);">
+      <div style="font-size:0.72rem;font-weight:700;text-transform:uppercase;letter-spacing:0.9px;color:var(--terra);margin-bottom:1rem;">System Info</div>
+      <div style="font-size:0.9rem;color:var(--text-2);line-height:2;">
+        <div><strong>Mode:</strong> <span style="color:var(--text);font-family:var(--mono);">STUB (demo data)</span></div>
+        <div><strong>Version:</strong> <span style="color:var(--text);font-family:var(--mono);">1.0.0</span></div>
+        <div><strong>Stack:</strong> <span style="color:var(--text);font-family:var(--mono);">Vanilla JS + FastAPI</span></div>
+        <div><strong>Environment:</strong> <span style="color:var(--text);font-family:var(--mono);">Development</span></div>
+      </div>
+    </div>
+ 
+    <div class="card" style="margin-top:1.5rem;">
+      <h3 style="margin-bottom:1rem;">Account</h3>
+      <button class="btn btn--ghost" id="logout-btn-settings">Sign out</button>
+    </div>
+ 
+  </main>
+ 
+  <script type="module">
+    import { protectRoute, logout, getUserName } from '../js/modules/auth.js';
+    import { initConnPill } from '../js/utils/ui.js';
+ 
+    protectRoute(['admin']);
+ 
+    initConnPill('conn-pill');
+    document.getElementById('nav-user').textContent = getUserName();
+    document.getElementById('logout-btn').addEventListener('click', logout);
+    document.getElementById('logout-btn-settings').addEventListener('click', logout);
+  </script>
+ 
+</body>
+</html>
