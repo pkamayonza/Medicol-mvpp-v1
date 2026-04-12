@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Staff — Minza Health</title>
+  <link rel="stylesheet" href="../styles/main.css"/>
+</head>
+<body>
+ 
+  <nav class="nav">
+    <div class="nav__brand">
+      <span class="nav__logo">Min<span>za</span></span>
+      <span class="nav__role">Admin</span>
+    </div>
+    <div class="nav__links" style="display:flex;gap:1.5rem;margin-left:2rem;">
+      <a href="admin.html" class="nav__link">Dashboard</a>
+      <a href="prescriptions.html" class="nav__link">Prescriptions</a>
+      <a href="revenue.html" class="nav__link">Revenue</a>
+      <a href="staff.html" class="nav__link nav__link--active">Staff</a>
+      <a href="settings.html" class="nav__link">Settings</a>
+    </div>
+    <div class="nav__right">
+      <span class="conn-pill" id="conn-pill"></span>
+      <span class="nav__user" id="nav-user">—</span>
+      <button class="btn btn--ghost btn--sm" id="logout-btn">Sign out</button>
+    </div>
+  </nav>
+ 
+  <main class="page">
+ 
+    <div class="page-header">
+      <h1 class="page-title">Staff Management</h1>
+    </div>
+ 
+    <div class="card">
+      <div class="card__header">
+        <h2 class="card__title">Team Members</h2>
+        <button class="btn btn--sm btn--primary" id="add-user-btn">+ Add User</button>
+      </div>
+      <div id="users-body"></div>
+    </div>
+ 
+  </main>
+ 
+  <!-- Add User Modal (same as original) -->
+  <div class="modal" id="modal-user">
+    <div class="modal__card">
+      <div class="modal__header">
+        <span class="modal__title">Add Staff Member</span>
+        <button class="modal__close" data-close="modal-user">✕</button>
+      </div>
+      <form id="user-form" novalidate>
+        <div class="form-group">
+          <label class="form-label" for="u-name">Full Name *</label>
+          <input class="form-input" type="text" id="u-name" placeholder="e.g. Dr. Sarah Kato" required/>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="u-email">Email *</label>
+          <input class="form-input" type="email" id="u-email" placeholder="sarah@clinic.com" required/>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="u-role">Role *</label>
+          <select class="form-select" id="u-role" required>
+            <option value="">Select role</option>
+            <option value="receptionist">Receptionist</option>
+            <option value="doctor">Doctor</option>
+            <option value="pharmacist">Pharmacist</option>
+            <option value="admin">Admin</option>
+          </select>
+        </div>
+        <div id="user-error" class="form-error" style="display:none;"></div>
+        <div class="modal__footer">
+          <button type="button" class="btn btn--ghost" data-close="modal-user">Cancel</button>
+          <button type="submit" class="btn btn--primary" id="user-submit">Create User →</button>
+        </div>
+      </form>
+    </div>
+  </div>
+ 
+  <script type="module">
+    import { protectRoute, logout, getUserName } from '../js/modules/auth.js';
+    import { apiRequest, DB } from '../js/services/api.js';
+    import { initConnPill, showToast, openModal, closeModal, bindCloseButtons } from '../js/utils/ui.js';
+    import { escapeHtml } from '../js/utils/format.js';
+ 
+    const user = protectRoute(['admin']);
+    if (!user) throw new Error();
+ 
+    initConnPill('conn-pill');
+    bindCloseButtons();
+    document.getElementById('nav-user').textContent = getUserName();
+    document.getElementById('logout-btn').addEventListener('click', logout);
+ 
+    // ── Render Users ──────────────────────────────────────────────────
+    function renderUsers() {
+      const body = document.getElementById('users-body');
+      const roleEmoji = { receptionist: 'R', doctor: 'D', pharmacist: 'P', admin: 'A' };
+      const roleColors = { receptionist: 'badge--terra', doctor: 'badge--terra', pharmacist: 'badge--terra', admin: 'badge--terra' };
+ 
+      if (!DB.users.length) {
+        body.innerHTML = `<div class="state-empty" style="padding:1.5rem 0;"><div class="state-empty__title">No users yet</div></div>`;
+        return;
+      }
+ 
+      body.innerHTML = DB.users.map(u => `
+        <div class="queue-item" style="padding:0.875rem 0;border-bottom:1px solid var(--border); opacity:${u.disabled ? 0.5 : 1};">
+          <div class="queue-item__avatar" style="width:36px;height:36px;font-size:1rem;background:var(--surface-2);border-color:var(--border-2);">
+            ${roleEmoji[u.role] || '👤'}
+          </div>
+          <div class="queue-item__info">
+            <div class="queue-item__name">${escapeHtml(u.name)}</div>
+            <div class="queue-item__meta">${escapeHtml(u.email)}</div>
+          </div>
+          <span class="badge ${roleColors[u.role] || 'badge--muted'}" style="text-transform:capitalize;">${u.role}</span>
+          ${u.disabled ? '<span class="badge badge--muted" style="margin-left:0.5rem;">Revoked</span>' : ''}
+          <div style="display:flex;gap:0.5rem;margin-left:auto;">
+            <button class="btn btn--ghost btn--sm revoke-btn" data-id="${u.id}">Revoke</button>
+            <button class="btn btn--ghost btn--sm delete-btn" data-id="${u.id}" style="color:red;">Remove</button>
+          </div>
+        </div>`).join('');
+    }
+ 
+    // ── Bind Actions ──────────────────────────────────────────────────
+    function bindUserActions() {
+      document.querySelectorAll('.delete-btn').forEach(btn => {
+        btn.addEventListener('click', async () => {
+          const id = btn.dataset.id;
+          if (id == user.id) {
+            showToast("You cannot remove yourself", "error");
+            return;
+          }
+          if (!confirm('Are you sure you want to permanently remove this user?')) return;
+          try {
+            await apiRequest(`/users/${id}`, 'DELETE');
+            DB.users = DB.users.filter(u => u.id != id);
+            renderUsers();
+            bindUserActions();
+            showToast('User removed successfully', 'success');
+          } catch (err) {
+            showToast('Failed to remove user', 'error');
+          }
+        });
+      });
+ 
+      document.querySelectorAll('.revoke-btn').forEach(btn => {
+        btn.addEventListener('click', async () => {
+          const id = btn.dataset.id;
+          try {
+            await apiRequest(`/users/${id}/revoke`, 'PATCH');
+            const targetUser = DB.users.find(u => u.id == id);
+            if (targetUser) targetUser.disabled = true;
+            renderUsers();
+            bindUserActions();
+            showToast('Access revoked', 'success');
+          } catch (err) {
+            showToast('Failed to revoke access', 'error');
+          }
+        });
+      });
+    }
+ 
+    // ── Add User ──────────────────────────────────────────────────────
+    document.getElementById('add-user-btn').addEventListener('click', () => openModal('modal-user'));
+ 
+    document.getElementById('user-form').addEventListener('submit', async e => {
+      e.preventDefault();
+      const btn   = document.getElementById('user-submit');
+      const errEl = document.getElementById('user-error');
+      errEl.style.display = 'none';
+ 
+      const name  = document.getElementById('u-name').value.trim();
+      const email = document.getElementById('u-email').value.trim();
+      const role  = document.getElementById('u-role').value;
+ 
+      if (!name || !email || !role) {
+        errEl.textContent = 'All fields are required.';
+        errEl.style.display = 'block';
+        return;
+      }
+ 
+      btn.disabled = true;
+      btn.textContent = 'Creating…';
+ 
+      try {
+        await apiRequest('/users', 'POST', { name, email, role });
+        closeModal('modal-user');
+        document.getElementById('user-form').reset();
+        showToast(`${name} added as ${role}.`, 'success');
+        renderUsers();
+        bindUserActions();
+      } catch (err) {
+        errEl.textContent = err.message;
+        errEl.style.display = 'block';
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Create User →';
+      }
+    });
+ 
+    // Initial load
+    renderUsers();
+    bindUserActions();
+  </script>
+ 
+</body>
+</html>
