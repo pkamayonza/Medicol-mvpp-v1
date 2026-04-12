@@ -1,6 +1,7 @@
 from __future__ import annotations
  
 import os
+from db import database
 import uuid
 from datetime import date, datetime
 from enum import Enum
@@ -461,6 +462,13 @@ async def update_visit_status(
         raise HTTPException(404, "Visit not found")
     return record_to_dict(row)
  
+ @app.on_event("startup")
+async def startup():
+    await database.connect()
+
+@app.on_event("shutdown")
+async def shutdown():
+    await database.disconnect()
  
 # CONSULTATIONS
 @app.get("/api/visits/{visit_id}/consultation", response_model=Optional[ConsultationOut], tags=["Consultations"])
