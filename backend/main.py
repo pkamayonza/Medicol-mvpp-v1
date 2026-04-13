@@ -16,7 +16,7 @@ from pydantic import BaseModel, Field
  
 # CONFIG 
 DATABASE_URL        = os.getenv("DATABASE_URL", "postgresql://postgres:postgres@localhost:5432/minza")
-SUPABASE_JWT_SECRET = os.getenv("SUPABASE_JWT_SECRET", "your-jwt-secret-here")
+SUPABASE_JWT_SECRET = os.getenv("SUPABASE_JWT_SECRET", "127cf92f-065a-4601-8278-77d175893f70")
 ALLOWED_ORIGINS     = os.getenv("ALLOWED_ORIGINS", "http://localhost:5500,http://127.0.0.1:5500").split(",")
  
 # APP
