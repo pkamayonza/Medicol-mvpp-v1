@@ -37,6 +37,8 @@ class PrescriptionItem(PrescriptionItemCreate):
 class PrescriptionCreate(BaseModel):
     patient_id: UUID
     doctor_id: UUID
+    clinic_id: UUID
+    pharmacy_id: UUID
     items: List[PrescriptionItemCreate]
 
 class PrescriptionResponse(BaseModel):
