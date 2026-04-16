@@ -7,8 +7,7 @@ from enum import Enum
 from typing import List, Optional
 
 import asyncpg
-from fastapi import Query
-from fastapi import Depends, FastAPI, HTTPException, Request, status
+from fastapi import FastAPI, Depends, HTTPException, Request, status, Query
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from fastapi_utils.tasks import repeat_every
