@@ -77,7 +77,6 @@ class RevenueResponse(BaseModel):
 
 class DispenseRequest(BaseModel):
     pharmacist_id: UUID
-    pharmacy_id: Optional[UUID] = None
 
 class PrescriptionMetrics(BaseModel):
     total: int
