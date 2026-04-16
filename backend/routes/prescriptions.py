@@ -23,7 +23,7 @@ async def create_prescription(data: PrescriptionCreate):
             "doctor_id": data.doctor_id,
             "clinic_id": data.clinic_id,
             "pharmacy_id": data.pharmacy_id
-}
+        }
         presc_id = await database.fetch_val(query, values)
 
         # Insert items
@@ -41,10 +41,10 @@ async def create_prescription(data: PrescriptionCreate):
                 }
             )
     return {
-    "id": str(presc_id),
-    "status": "sent",
-    "items": [item.dict() for item in data.items]
-}
+        "id": str(presc_id),
+        "status": "sent",
+        "items": [item.dict() for item in data.items]
+    }
 
 
 @router.get("/", response_model=List[PrescriptionResponse])
@@ -86,35 +86,25 @@ async def dispense_prescription(prescription_id: UUID, data: DispenseRequest):
                 detail=f"Cannot dispense prescription with status '{current_status}'"
             )
 
-        # Update status to fulfilled
+        # Update status
         await database.execute(
             "UPDATE prescriptions SET status = 'dispensed' WHERE id = :id",
             {"id": prescription_id}
         )
 
-        # Insert dispensation record
-        await database.execute (
-            """
-            await database.execute(
+        # Insert dispensation record (FIXED)
+        await database.execute(
             """
             INSERT INTO dispensations (prescription_id, pharmacist_id)
             VALUES (:prescription_id, :pharmacist_id)
             """,
-        {
-            "prescription_id": prescription_id,
-            "pharmacist_id": data.pharmacist_id
-        }
-    )
-            VALUES (:prescription_id, :pharmacist_id, :pharmacy_id)
-            """,
             {
                 "prescription_id": prescription_id,
-                "pharmacist_id": data.pharmacist_id,
-                "pharmacy_id": data.pharmacy_id
+                "pharmacist_id": data.pharmacist_id
             }
         )
-    return {"status": "dispensed", "prescription_id": str(prescription_id)}
 
+    return {"status": "dispensed", "prescription_id": str(prescription_id)}
 
 
 # Optional: mark lost function (to be called by background task)
@@ -131,7 +121,8 @@ async def mark_lost_prescriptions():
     """
     await database.execute(query)
 
-    @router.get("/pharmacy/{pharmacy_id}", response_model=List[PrescriptionResponse])
+
+@router.get("/pharmacy/{pharmacy_id}", response_model=List[PrescriptionResponse])
 async def get_pharmacy_prescriptions(pharmacy_id: UUID):
     query = """
     SELECT
