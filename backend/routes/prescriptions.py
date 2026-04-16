@@ -88,7 +88,7 @@ async def dispense_prescription(prescription_id: UUID, data: DispenseRequest):
 
         # Update status to fulfilled
         await database.execute(
-            "UPDATE prescriptions SET status = 'fulfilled' WHERE id = :id",
+            "UPDATE prescriptions SET status = 'dispensed' WHERE id = :id",
             {"id": prescription_id}
         )
 
