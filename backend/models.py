@@ -68,9 +68,9 @@ class StatsResponse(BaseModel):
 
 class PrescriptionMetrics(BaseModel):
     total: int
-    fulfilled: int
+    dispensed: int
     pending: int
-    lost: int
+    unavailable: int
 
 class RevenueResponse(BaseModel):
     total: float
@@ -81,6 +81,6 @@ class DispenseRequest(BaseModel):
 
 class PrescriptionMetrics(BaseModel):
     total: int
-    fulfilled: int
+    dispensed: int
     pending: int
-    lost: int
+    unavailable: int
