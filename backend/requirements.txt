@@ -3,3 +3,4 @@ uvicorn
 asyncpg
 databases[postgresql]
 python-dotenv
+pydantic
