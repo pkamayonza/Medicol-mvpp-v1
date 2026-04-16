@@ -95,7 +95,16 @@ async def dispense_prescription(prescription_id: UUID, data: DispenseRequest):
         # Insert dispensation record
         await database.execute(
             """
-            INSERT INTO dispensations (prescription_id, pharmacist_id, pharmacy_id)
+            await database.execute(
+            """
+            INSERT INTO dispensations (prescription_id, pharmacist_id)
+            VALUES (:prescription_id, :pharmacist_id)
+            """,
+        {
+            "prescription_id": prescription_id,
+            "pharmacist_id": data.pharmacist_id
+        }
+    )
             VALUES (:prescription_id, :pharmacist_id, :pharmacy_id)
             """,
             {
