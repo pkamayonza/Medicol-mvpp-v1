@@ -7,6 +7,7 @@ from enum import Enum
 from typing import List, Optional
 
 import asyncpg
+from fastapi import Query
 from fastapi import Depends, FastAPI, HTTPException, Request, status
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
@@ -811,8 +812,8 @@ async def create_prescription(
 @app.patch("/prescriptions/{prescription_id}/dispense", tags=["Prescriptions"])
 async def dispense_prescription(
     prescription_id: uuid.UUID,
-    pharmacist_id: uuid.UUID = Field(..., description="Pharmacist user ID"),
-    pharmacy_id: Optional[uuid.UUID] = None,
+    pharmacist_id: uuid.UUID = Query(..., description="Pharmacist user ID"),
+    pharmacy_id: Optional[uuid.UUID] = Query(None),
     conn: asyncpg.Connection = Depends(db),
     user: TokenPayload = Depends(current_user),
 ):
