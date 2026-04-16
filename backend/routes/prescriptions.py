@@ -104,7 +104,7 @@ async def dispense_prescription(prescription_id: UUID, data: DispenseRequest):
                 "pharmacy_id": data.pharmacy_id
             }
         )
-    return {"status": "fulfilled", "prescription_id": str(prescription_id)}
+    return {"status": "dispensed", "prescription_id": str(prescription_id)}
 
 
 # Optional: mark lost function (to be called by background task)
