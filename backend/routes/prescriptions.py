@@ -93,7 +93,7 @@ async def dispense_prescription(prescription_id: UUID, data: DispenseRequest):
         )
 
         # Insert dispensation record
-        await database.execute(
+        await database.execute (
             """
             await database.execute(
             """
@@ -116,6 +116,7 @@ async def dispense_prescription(prescription_id: UUID, data: DispenseRequest):
     return {"status": "dispensed", "prescription_id": str(prescription_id)}
 
 
+
 # Optional: mark lost function (to be called by background task)
 async def mark_lost_prescriptions():
     """
@@ -129,3 +130,23 @@ async def mark_lost_prescriptions():
       AND created_at < NOW() - INTERVAL '48 hours'
     """
     await database.execute(query)
+
+    @router.get("/pharmacy/{pharmacy_id}", response_model=List[PrescriptionResponse])
+async def get_pharmacy_prescriptions(pharmacy_id: UUID):
+    query = """
+    SELECT
+      p.id,
+      pt.name AS patient_name,
+      COALESCE(string_agg(pi.drug_name, ', ' ORDER BY pi.drug_name), '') AS drug,
+      p.status,
+      p.pharmacy_id::text AS pharmacy,
+      p.created_at
+    FROM prescriptions p
+    JOIN patients pt ON p.patient_id = pt.id
+    LEFT JOIN prescription_items pi ON pi.prescription_id = p.id
+    WHERE p.pharmacy_id = :pharmacy_id
+    GROUP BY p.id, pt.name, p.pharmacy_id
+    ORDER BY p.created_at DESC
+    """
+    rows = await database.fetch_all(query, {"pharmacy_id": pharmacy_id})
+    return [dict(row) for row in rows]
