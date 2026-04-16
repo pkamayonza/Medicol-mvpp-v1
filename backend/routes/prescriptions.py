@@ -14,9 +14,9 @@ async def create_prescription(data: PrescriptionCreate):
     async with database.transaction():
         # Create prescription with default 'pending' status
         query = """
-        INSERT INTO prescriptions (patient_id, doctor_id, status)
-        VALUES (:patient_id, :doctor_id, 'pending')
-        RETURNING id
+            INSERT INTO prescriptions (patient_id, doctor_id, clinic_id, pharmacy_id, status)
+            VALUES (:patient_id, :doctor_id, :clinic_id, :pharmacy_id, 'sent')
+            RETURNING *;
         """
         values = {"patient_id": data.patient_id, "doctor_id": data.doctor_id}
         presc_id = await database.fetch_val(query, values)
