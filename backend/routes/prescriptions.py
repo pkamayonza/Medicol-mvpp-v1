@@ -18,7 +18,12 @@ async def create_prescription(data: PrescriptionCreate):
             VALUES (:patient_id, :doctor_id, :clinic_id, :pharmacy_id, 'sent')
             RETURNING *;
         """
-        values = {"patient_id": data.patient_id, "doctor_id": data.doctor_id}
+        values = {
+            "patient_id": data.patient_id,
+            "doctor_id": data.doctor_id,
+            "clinic_id": data.clinic_id,
+            "pharmacy_id": data.pharmacy_id
+}
         presc_id = await database.fetch_val(query, values)
 
         # Insert items
@@ -35,7 +40,11 @@ async def create_prescription(data: PrescriptionCreate):
                     "unit_price": item.unit_price
                 }
             )
-    return {"id": str(presc_id), "status": "pending", "items": [item.dict() for item in data.items]}
+    return {
+    "id": str(presc_id),
+    "status": "sent",
+    "items": [item.dict() for item in data.items]
+}
 
 
 @router.get("/", response_model=List[PrescriptionResponse])
