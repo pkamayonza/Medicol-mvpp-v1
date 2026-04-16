@@ -80,7 +80,7 @@ async def dispense_prescription(prescription_id: UUID, data: DispenseRequest):
         )
         if not current_status:
             raise HTTPException(status_code=404, detail="Prescription not found")
-        if current_status != "pending":
+        if current_status not in ("pending", "sent"):
             raise HTTPException(
                 status_code=400,
                 detail=f"Cannot dispense prescription with status '{current_status}'"
