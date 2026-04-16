@@ -10,7 +10,7 @@ import asyncpg
 from fastapi import FastAPI, Depends, HTTPException, Request, status, Query
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
-from fastapi_utils.tasks import repeat_every
+import asyncio
 from jose import JWTError, jwt
 from pydantic import BaseModel, Field
 
@@ -64,7 +64,12 @@ async def shutdown():
         await _pool.close()
 
 
-async def db() -> asyncpg.Connection: # type: ignore
+from typing import AsyncGenerator
+
+async def db() -> AsyncGenerator[asyncpg.Connection, None]:
+    pool = await get_pool()
+    async with pool.acquire() as conn:
+        yield conn
     pool = await get_pool()
     async with pool.acquire() as conn:
         yield conn
@@ -385,9 +390,14 @@ async def mark_lost_prescriptions():
 
 
 @app.on_event("startup")
-@repeat_every(seconds=3600)  # every hour
-async def scheduled_lost_check():
-    await mark_lost_prescriptions()
+async def start_background_tasks():
+    asyncio.create_task(lost_prescription_worker())
+
+
+async def lost_prescription_worker():
+    while True:
+        await mark_lost_prescriptions()
+        await asyncio.sleep(3600)  # run every hour
 
 
 # ---------- HEALTH ----------
@@ -759,8 +769,11 @@ async def list_prescriptions(
     ORDER BY pr.created_at DESC
     """
     if limit:
-        query += f" LIMIT {limit}"
-    rows = await conn.fetch(query, org_id)
+        query += " LIMIT $2"
+        rows = await conn.fetch(query, org_id, limit)
+    else:
+        rows = await conn.fetch(query, org_id)
+        rows = await conn.fetch(query, org_id)
     return [dict(row) for row in rows]
 
 
