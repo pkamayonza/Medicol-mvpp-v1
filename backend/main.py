@@ -70,9 +70,6 @@ async def db() -> AsyncGenerator[asyncpg.Connection, None]:
     pool = await get_pool()
     async with pool.acquire() as conn:
         yield conn
-    pool = await get_pool()
-    async with pool.acquire() as conn:
-        yield conn
 
 
 # ---------- AUTH ----------
