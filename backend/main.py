@@ -191,6 +191,44 @@ async def follow_up_prescription(
         "whatsapp_link": whatsapp_link,
     }
 
+    class FollowUpUpdate(BaseModel):
+    outcome: str  # "dispensed" or "not_fulfilled"
+
+
+@app.patch("/prescriptions/{prescription_id}/follow-up", tags=["Prescriptions"])
+async def update_follow_up(
+    prescription_id: uuid.UUID,
+    body: FollowUpUpdate,
+    conn: asyncpg.Connection = Depends(db),
+    user: TokenPayload = Depends(current_user),
+):
+    org_id = _org_id_from_token(user)
+
+    valid = ["dispensed", "not_fulfilled"]
+
+    if body.outcome not in valid:
+        raise HTTPException(400, "Invalid outcome")
+
+    row = await conn.fetchrow(
+        """
+        UPDATE prescriptions pr
+        SET status = $1
+        FROM visits v
+        WHERE pr.id = $2
+          AND pr.visit_id = v.id
+          AND v.org_id = $3
+        RETURNING pr.*
+        """,
+        body.outcome,
+        prescription_id,
+        org_id,
+    )
+
+    if not row:
+        raise HTTPException(404, "Prescription not found")
+
+    return {"status": body.outcome}
+
 
 # ---------- MODELS ----------
 # Patients
