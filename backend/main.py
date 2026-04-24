@@ -144,9 +144,11 @@ class OrderType(str, Enum):
 
 
 class PrescriptionStatus(str, Enum):
-    pending = "pending"
-    dispensed = "dispensed"
-    lost = "lost"  # added for lost prescriptions
+    pending = "pending"              # not contacted yet
+    contacted = "contacted"          # follow-up sent
+    dispensed = "dispensed"          # patient confirmed bought
+    not_fulfilled = "not_fulfilled"  # patient did NOT buy
+    lost = "lost"                    # auto after 48h
 
 
 # ---------- MODELS ----------
