@@ -579,6 +579,13 @@ async def prescription_metrics(
     """,
     org_id,
 )
+    
+    return {
+    "total": row["total"] or 0,
+    "fulfilled": row["fulfilled"] or 0,
+    "pending": row["pending"] or 0,
+    "lost": row["lost"] or 0,
+}
 
 # ---------- PATIENTS ----------
 @app.get("/patients", response_model=List[PatientOut], tags=["Patients"])
