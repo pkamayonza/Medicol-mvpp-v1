@@ -150,6 +150,47 @@ class PrescriptionStatus(str, Enum):
     not_fulfilled = "not_fulfilled"  # patient did NOT buy
     lost = "lost"                    # auto after 48h
 
+@app.post("/prescriptions/{prescription_id}/follow-up", tags=["Prescriptions"])
+async def follow_up_prescription(
+    prescription_id: uuid.UUID,
+    conn: asyncpg.Connection = Depends(db),
+    user: TokenPayload = Depends(current_user),
+):
+    org_id = _org_id_from_token(user)
+
+    row = await conn.fetchrow(
+        """
+        SELECT pr.id, pt.phone, pt.full_name
+        FROM prescriptions pr
+        JOIN visits v ON v.id = pr.visit_id
+        JOIN patients pt ON pt.id = v.patient_id
+        WHERE pr.id = $1 AND v.org_id = $2
+        """,
+        prescription_id,
+        org_id,
+    )
+
+    if not row:
+        raise HTTPException(404, "Prescription not found")
+
+    if not row["phone"]:
+        raise HTTPException(400, "Patient has no phone number")
+
+    message = f"Hi {row['full_name']}, this is your clinic following up. Were you able to get your prescribed medication?"
+
+    whatsapp_link = f"https://wa.me/{row['phone']}?text={message.replace(' ', '%20')}"
+
+    # Update status → contacted
+    await conn.execute(
+        "UPDATE prescriptions SET status = 'contacted' WHERE id = $1",
+        prescription_id,
+    )
+
+    return {
+        "message": "Follow-up ready",
+        "whatsapp_link": whatsapp_link,
+    }
+
 
 # ---------- MODELS ----------
 # Patients
