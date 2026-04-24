@@ -38,7 +38,7 @@ export function onConnChange(fn) {
   _listeners.push(fn);
 }
 
-// ── SESSION ─────────────────────────────────────────────────────
+// SESSION 
 export function getSession() {
   try { return JSON.parse(localStorage.getItem('minza_sess')); }
   catch { return null; }
@@ -56,7 +56,7 @@ export function getToken() {
   return getSession()?.access_token || null;
 }
 
-// ── CORE REQUEST ────────────────────────────────────────────────
+// CORE REQUEST 
 export async function apiRequest(endpoint, method = 'GET', payload = null) {
 
   const token = getToken();
@@ -92,12 +92,12 @@ export async function apiRequest(endpoint, method = 'GET', payload = null) {
     return data;
 
   } catch (err) {
-    console.error("FETCH FAILED:", err);
-    return null;
+  console.error("FETCH FAILED:", err);
+  throw err;
   }
 }
 
-// ── AUTH ────────────────────────────────────────────────────────
+// AUTH 
 export async function authLogin(email, password) {
   return apiRequest('/auth/login', 'POST', { email, password });
 }
