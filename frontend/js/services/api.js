@@ -84,3 +84,14 @@ export async function apiRequest(endpoint, method = 'GET', payload = null) {
 export async function authLogin(email, password) {
   return apiRequest('/auth/login', 'POST', { email, password });
 }
+
+export function getConnState() {
+  return _isOnline;
+}
+
+export function onConnChange(fn) {
+  // optional: keep it simple for now
+}
+
+
+
