@@ -853,7 +853,6 @@ async def list_prescriptions(
         rows = await conn.fetch(query, org_id, limit)
     else:
         rows = await conn.fetch(query, org_id)
-        rows = await conn.fetch(query, org_id)
     return [dict(row) for row in rows]
 
 
