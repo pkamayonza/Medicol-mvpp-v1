@@ -565,25 +565,20 @@ async def prescription_metrics(
 ):
     org_id = _org_id_from_token(user)
     row = await conn.fetchrow(
-        """
-        SELECT
-          COUNT(*) AS total,
-          COUNT(*) FILTER (WHERE pr.status = 'dispensed') AS fulfilled,
-          COUNT(*) FILTER (WHERE pr.status = 'pending') AS pending,
-          COUNT(*) FILTER (WHERE pr.status = 'lost') AS lost
-        FROM prescriptions pr
-        JOIN visits v ON v.id = pr.visit_id
-        WHERE v.org_id = $1
-        """,
-        org_id,
-    )
-    return {
-        "total": row["total"] or 0,
-        "fulfilled": row["fulfilled"] or 0,
-        "pending": row["pending"] or 0,
-        "lost": row["lost"] or 0,
-    }
-
+    """
+    SELECT
+      COUNT(*) AS total,
+      COUNT(*) FILTER (WHERE pr.status = 'dispensed') AS fulfilled,
+      COUNT(*) FILTER (WHERE pr.status = 'pending') AS pending,
+      COUNT(*) FILTER (WHERE pr.status = 'contacted') AS contacted,
+      COUNT(*) FILTER (WHERE pr.status = 'not_fulfilled') AS not_fulfilled,
+      COUNT(*) FILTER (WHERE pr.status = 'lost') AS lost
+    FROM prescriptions pr
+    JOIN visits v ON v.id = pr.visit_id
+    WHERE v.org_id = $1
+    """,
+    org_id,
+)
 
 # ---------- PATIENTS ----------
 @app.get("/patients", response_model=List[PatientOut], tags=["Patients"])
