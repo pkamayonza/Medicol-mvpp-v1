@@ -15,11 +15,28 @@ export const API_BASE = 'http://127.0.0.1:8000';
 // ❌ REMOVE SUPABASE KEY (not needed anymore)
 export const ANON_KEY = null;
 
-// ── CONNECTION STATE ─────────────────────────────────────────────
-let _isOnline = true;
+// CONNECTION STATE 
+let _isOnline = navigator.onLine;
 
-window.addEventListener('online',  () => { _isOnline = true; });
-window.addEventListener('offline', () => { _isOnline = false; });
+const _listeners = [];
+
+window.addEventListener('online', () => {
+  _isOnline = true;
+  _listeners.forEach(fn => fn('online'));
+});
+
+window.addEventListener('offline', () => {
+  _isOnline = false;
+  _listeners.forEach(fn => fn('offline'));
+});
+
+export function getConnState() {
+  return _isOnline;
+}
+
+export function onConnChange(fn) {
+  _listeners.push(fn);
+}
 
 // ── SESSION ─────────────────────────────────────────────────────
 export function getSession() {
