@@ -18,7 +18,7 @@ from pydantic import BaseModel, Field
 
 # CONFIG
 DATABASE_URL = os.getenv(
-    "DATABASE_URL", "postgresql://postgres:GQagEWW75$nwXxU@localhost:5432/MinzaHealthV1"
+    "DATABASE_URL", "postgresql://postgres:GQagEWW75$nwXxU@localhost:5432/minza"
 )
 SUPABASE_JWT_SECRET = os.getenv(
     "SUPABASE_JWT_SECRET", "127cf92f-065a-4601-8278-77d175893f70"
