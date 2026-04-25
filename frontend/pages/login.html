@@ -33,21 +33,6 @@
       </button>
     </form>
  
-    <div class="auth-divider">demo credentials</div>
- 
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.5rem;">
-      <button class="btn btn--ghost btn--sm" onclick="fillCreds('reception@clinic.com')">Reception</button>
-      <button class="btn btn--ghost btn--sm" onclick="fillCreds('doctor@clinic.com')">Doctor</button>
-      <button class="btn btn--ghost btn--sm" onclick="fillCreds('pharmacy@clinic.com')">Pharmacy</button>
-      <button class="btn btn--ghost btn--sm" onclick="fillCreds('admin@clinic.com')">Admin</button>
-    </div>
- 
-    <p style="text-align:center;font-size:0.72rem;color:var(--text-3);margin-top:1rem;">
-      Password for all demo accounts: <code style="color:var(--terra);font-family:var(--mono);">minza123</code>
-    </p>
- 
-  </div>
- 
   <div class="toast-container" id="toast-container"></div>
  
   <script type="module">
@@ -84,6 +69,7 @@
       }
     });
   </script>
+  <script type="module" src="../js/modules/auth.js"></script>
  
 </body>
 </html>
