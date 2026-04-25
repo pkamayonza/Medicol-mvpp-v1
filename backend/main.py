@@ -186,13 +186,13 @@ async def follow_up_prescription(
         prescription_id,
     )
 
-    return {
-        "message": "Follow-up ready",
-        "whatsapp_link": whatsapp_link,
-    }
+ return {
+    "message": "Follow-up ready",
+    "whatsapp_link": whatsapp_link,
+}
 
     class FollowUpUpdate(BaseModel):
-    outcome: str  # "dispensed" or "not_fulfilled"
+    outcome: str # "dispensed" or "not_fulfilled"
 
 
 @app.patch("/prescriptions/{prescription_id}/follow-up", tags=["Prescriptions"])
