@@ -186,12 +186,12 @@ async def follow_up_prescription(
         prescription_id,
     )
 
- return {
+    return {
     "message": "Follow-up ready",
     "whatsapp_link": whatsapp_link,
-}
+    }
 
-    class FollowUpUpdate(BaseModel):
+class FollowUpUpdate(BaseModel):
     outcome: str # "dispensed" or "not_fulfilled"
 
 
